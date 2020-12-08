@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project
+        xmlns="http://maven.apache.org/POM/4.0.0"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.alipay.oceanbase</groupId>
+    <artifactId>mock-parent</artifactId>
+    <packaging>pom</packaging>
+    <name>ob-mock-data</name>
+    <url>http://maven.apache.org</url>
+    <version>0.1.0-SNAPSHOT</version>
+
+    <modules>
+        <module>app/ob-mocker</module>
+    </modules>
+
+    <properties>
+        <maven.compiler.source>1.8</maven.compiler.source>
+	    <maven.compiler.target>1.8</maven.compiler.target>
+        <java.version>1.8</java.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <rpm.install.path>/opt/odc</rpm.install.path>
+        <rpm.prefix>/opt/odc</rpm.prefix>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+        </dependencies>
+    </dependencyManagement>
+
+    <dependencies>
+
+    </dependencies>
+
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                    <encoding>UTF-8</encoding>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <argLine>-Dspring.profiles.active=${spring.profiles.active}</argLine>
+                    <includes>
+                        <include>**/*Tests.java</include>
+                        <include>**/*Test.java</include>
+                    </includes>
+                    <excludes>
+                        <exclude>**/Abstract*.java</exclude>
+                        <exclude>**/DockerRestfulTest.java</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+        </plugins>
+
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <includes>
+                    <include>**/*.*</include>
+                </includes>
+                <filtering>false</filtering>
+            </resource>
+        </resources>
+    </build>
+
+    <profiles>
+        <profile>
+            <id>build-rpm</id>
+            <properties>
+                <jar.location>target/boot/odc-web-starter-${project.version}-executable.jar</jar.location>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>rpm-maven-plugin</artifactId>
+                        <version>2.1.5</version>
+                        <extensions>true</extensions>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>rpm</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <prefix>${rpm.prefix}</prefix>
+                            <distribution>${project.artifactId}</distribution>
+                            <group>Applications/Databases</group>
+                            <packager>shanlu</packager>
+                            <version>${project.version}</version>
+                            <autoRequires>true</autoRequires>
+                            <release>3</release>
+                            <mappings>
+                                <mapping>
+                                    <directory>${rpm.install.path}/${project.artifactId}</directory>
+                                    <filemode>755</filemode>
+                                    <username>root</username>
+                                    <groupname>root</groupname>
+                                    <sources>
+                                        <source>
+                                            <location>${jar.location}</location>
+                                        </source>
+                                    </sources>
+                                </mapping>
+                            </mappings>
+                            <preinstallScriptlet>
+                                <script>echo "installing ${project.name} now"</script>
+                            </preinstallScriptlet>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>dev</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <repositories>
+                <repository>
+                    <id>central_prod</id>
+                    <url>http://mvn.test.alipay.net/artifactory/content/groups/public/</url>
+                    <snapshots>
+                        <enabled>true</enabled>
+                    </snapshots>
+                </repository>
+                <repository>
+                    <id>test</id>
+                    <url>http://mvn.test.alipay.net/artifactory/content/groups/public/</url>
+                    <snapshots>
+                        <enabled>true</enabled>
+                    </snapshots>
+                </repository>
+            </repositories>
+            <pluginRepositories>
+                <pluginRepository>
+                    <id>central</id>
+                    <url>http://mvn.test.alipay.net/artifactory/content/groups/public/</url>
+                    <snapshots>
+                        <enabled>true</enabled>
+                    </snapshots>
+                </pluginRepository>
+            </pluginRepositories>
+            <properties>
+                <spring.profiles.active>clientMode</spring.profiles.active>
+            </properties>
+        </profile>
+    </profiles>
+</project>
