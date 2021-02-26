@@ -121,16 +121,6 @@ under the License.
           <password>repopwd</password>
         </server>
         -->
-        <server>
-            <id>dev</id>
-            <username>zhihua.lzh</username>
-            <password>123</password>
-        </server>
-        <server>
-            <id>snapshots</id>
-            <username>zhihua.lzh</username>
-            <password>123</password>
-        </server>
         <!--
         <server>
              <id>snapshots</id>

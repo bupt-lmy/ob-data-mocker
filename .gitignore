@@ -15,6 +15,3 @@ app.jar
 *.tar.gz
 _build
 logs
-distribution/docker/resources/*.rpm
-regression/report/*
-app/odc-web-starter/oss_temp_dir/

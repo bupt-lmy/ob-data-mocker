@@ -4,7 +4,7 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>com.alipay.oceanbase</groupId>
+    <groupId>com.oceanbase</groupId>
     <artifactId>mock-parent</artifactId>
     <packaging>pom</packaging>
     <name>ob-mock-data</name>
@@ -12,28 +12,66 @@
     <version>0.1.0-SNAPSHOT</version>
 
     <modules>
-        <module>app/ob-mocker</module>
+        <module>ob-mocker</module>
     </modules>
 
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>
-	    <maven.compiler.target>1.8</maven.compiler.target>
+        <maven.compiler.target>1.8</maven.compiler.target>
         <java.version>1.8</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <rpm.install.path>/opt/odc</rpm.install.path>
-        <rpm.prefix>/opt/odc</rpm.prefix>
     </properties>
 
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>4.12</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.alipay.oceanbase</groupId>
+                <artifactId>oceanbase-client</artifactId>
+                <version>1.1.7</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-databind</artifactId>
+                <version>2.9.6</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-lang</groupId>
+                <artifactId>commons-lang</artifactId>
+                <version>2.6</version>
+            </dependency>
+            <dependency>
+                <groupId>dk.brics.automaton</groupId>
+                <artifactId>automaton</artifactId>
+                <version>1.11-8</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
     <dependencies>
-
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-slf4j-impl</artifactId>
+            <version>2.6.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+            <version>2.6.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.4</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
-
 
     <build>
         <plugins>
@@ -51,79 +89,19 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
-                    <argLine>-Dspring.profiles.active=${spring.profiles.active}</argLine>
                     <includes>
                         <include>**/*Tests.java</include>
                         <include>**/*Test.java</include>
                     </includes>
                     <excludes>
                         <exclude>**/Abstract*.java</exclude>
-                        <exclude>**/DockerRestfulTest.java</exclude>
                     </excludes>
                 </configuration>
             </plugin>
         </plugins>
-
-        <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-                <includes>
-                    <include>**/*.*</include>
-                </includes>
-                <filtering>false</filtering>
-            </resource>
-        </resources>
     </build>
 
     <profiles>
-        <profile>
-            <id>build-rpm</id>
-            <properties>
-                <jar.location>target/boot/odc-web-starter-${project.version}-executable.jar</jar.location>
-            </properties>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>rpm-maven-plugin</artifactId>
-                        <version>2.1.5</version>
-                        <extensions>true</extensions>
-                        <executions>
-                            <execution>
-                                <goals>
-                                    <goal>rpm</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                        <configuration>
-                            <prefix>${rpm.prefix}</prefix>
-                            <distribution>${project.artifactId}</distribution>
-                            <group>Applications/Databases</group>
-                            <packager>shanlu</packager>
-                            <version>${project.version}</version>
-                            <autoRequires>true</autoRequires>
-                            <release>3</release>
-                            <mappings>
-                                <mapping>
-                                    <directory>${rpm.install.path}/${project.artifactId}</directory>
-                                    <filemode>755</filemode>
-                                    <username>root</username>
-                                    <groupname>root</groupname>
-                                    <sources>
-                                        <source>
-                                            <location>${jar.location}</location>
-                                        </source>
-                                    </sources>
-                                </mapping>
-                            </mappings>
-                            <preinstallScriptlet>
-                                <script>echo "installing ${project.name} now"</script>
-                            </preinstallScriptlet>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
         <profile>
             <id>dev</id>
             <activation>
@@ -154,9 +132,6 @@
                     </snapshots>
                 </pluginRepository>
             </pluginRepositories>
-            <properties>
-                <spring.profiles.active>clientMode</spring.profiles.active>
-            </properties>
         </profile>
     </profiles>
 </project>

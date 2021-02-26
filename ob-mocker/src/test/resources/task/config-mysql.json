@@ -1,0 +1,482 @@
+{
+  "tables": [
+    {
+      "columns": [
+        {
+          "columnName": "col",
+          "typeConfig": {
+            "name": "DIGIT",
+            "lowValue": 0,
+            "highValue": 67,
+            "columnType": "OB_MYSQL_TINYINT",
+            "generator": "UNIFORM_GENERATOR"
+          },
+          "allowNull": false,
+          "defaultValue": null,
+          "dataType": null
+        },
+        {
+          "columnName": "col2",
+          "typeConfig": {
+            "name": "DIGIT",
+            "lowValue": 0,
+            "highValue": 230,
+            "columnType": "OB_MYSQL_TINYINT_UNSIGNED",
+            "generator": "FIX_GENERATOR",
+            "genParams": {
+              "fixNum": 123
+            }
+          },
+          "allowNull": false,
+          "defaultValue": null,
+          "dataType": null
+        },
+        {
+          "columnName": "col3",
+          "typeConfig": {
+            "name": "DIGIT",
+            "columnType": "OB_MYSQL_SMALLINT",
+            "generator": "UNIFORM_GENERATOR"
+          },
+          "allowNull": false,
+          "defaultValue": null,
+          "dataType": null
+        },
+        {
+          "columnName": "col4",
+          "typeConfig": {
+            "name": "DIGIT",
+            "lowValue": 0,
+            "highValue": 62234,
+            "columnType": "OB_MYSQL_SMALLINT_UNSIGNED",
+            "generator": "STEP_GENERATOR",
+            "genParams": {
+              "step": 120
+            }
+          },
+          "allowNull": false,
+          "defaultValue": null,
+          "dataType": null
+        },
+        {
+          "columnName": "col5",
+          "typeConfig": {
+            "name": "DIGIT",
+            "columnType": "OB_MYSQL_MEDIUMINT",
+            "generator": "UNIFORM_GENERATOR"
+          },
+          "allowNull": false,
+          "defaultValue": null,
+          "dataType": null
+        },
+        {
+          "columnName": "col6",
+          "typeConfig": {
+            "name": "DIGIT",
+            "lowValue": 0,
+            "highValue": 62234,
+            "columnType": "OB_MYSQL_MEDIUMINT_UNSIGNED",
+            "generator": "STEP_GENERATOR",
+            "genParams": {
+              "step": 120
+            }
+          },
+          "allowNull": false,
+          "defaultValue": null,
+          "dataType": null
+        },
+        {
+          "columnName": "col7",
+          "typeConfig": {
+            "name": "DIGIT",
+            "columnType": "OB_MYSQL_INT",
+            "generator": "UNIFORM_GENERATOR"
+          },
+          "allowNull": false,
+          "defaultValue": null,
+          "dataType": null
+        },
+        {
+          "columnName": "col8",
+          "typeConfig": {
+            "name": "DIGIT",
+            "lowValue": 0,
+            "highValue": 123123124,
+            "columnType": "OB_MYSQL_INT_UNSIGNED",
+            "generator": "STEP_GENERATOR",
+            "genParams": {
+              "step": 120
+            }
+          },
+          "allowNull": false,
+          "defaultValue": null,
+          "dataType": null
+        },
+        {
+          "columnName": "col9",
+          "typeConfig": {
+            "name": "DIGIT",
+            "columnType": "OB_MYSQL_BIGINT",
+            "generator": "UNIFORM_GENERATOR"
+          },
+          "allowNull": false,
+          "defaultValue": null,
+          "dataType": null
+        },
+        {
+          "columnName": "col10",
+          "typeConfig": {
+            "name": "DIGIT",
+            "lowValue": 0,
+            "highValue": 123123124,
+            "columnType": "OB_MYSQL_BIGINT_UNSIGNED",
+            "generator": "STEP_GENERATOR",
+            "genParams": {
+              "step": 120
+            }
+          },
+          "allowNull": false,
+          "defaultValue": null,
+          "dataType": null
+        },
+        {
+          "columnName": "col11",
+          "typeConfig": {
+            "name": "DIGIT",
+            "columnType": "OB_MYSQL_DECIMAL",
+            "generator": "UNIFORM_GENERATOR"
+          },
+          "allowNull": false,
+          "defaultValue": null,
+          "dataType": null
+        },
+        {
+          "columnName": "col12",
+          "typeConfig": {
+            "name": "DIGIT",
+            "columnType": "OB_MYSQL_DECIMAL_UNSIGNED",
+            "generator": "UNIFORM_GENERATOR",
+            "precision": 12,
+            "scale": 5
+          },
+          "allowNull": false,
+          "defaultValue": null,
+          "dataType": null
+        },
+        {
+          "columnName": "col13",
+          "typeConfig": {
+            "name": "DIGIT",
+            "lowValue": 2.234,
+            "highValue": 12312.7867,
+            "columnType": "OB_MYSQL_FLOAT_UNSIGNED",
+            "generator": "UNIFORM_GENERATOR"
+          },
+          "allowNull": false,
+          "defaultValue": null,
+          "dataType": null
+        },
+        {
+          "columnName": "col14",
+          "typeConfig": {
+            "name": "DIGIT",
+            "columnType": "OB_MYSQL_FLOAT",
+            "generator": "UNIFORM_GENERATOR"
+          },
+          "allowNull": false,
+          "defaultValue": null,
+          "dataType": null
+        },
+        {
+          "columnName": "col15",
+          "typeConfig": {
+            "name": "DIGIT",
+            "columnType": "OB_MYSQL_FLOAT",
+            "generator": "UNIFORM_GENERATOR",
+            "precision": 5,
+            "scale": 3
+          },
+          "allowNull": false,
+          "defaultValue": null,
+          "dataType": null
+        },
+        {
+          "columnName": "col16",
+          "typeConfig": {
+            "name": "CHAR",
+            "columnType": "OB_MYSQL_CHAR",
+            "generator": "RANDOM_DATE_CHAR_GENERATOR",
+            "genParams": {
+              "startTime": 0,
+              "endTime": 31536000000
+            },
+            "width": 256,
+            "charset": "UTF_8"
+          },
+          "allowNull": false,
+          "defaultValue": null,
+          "dataType": null
+        },
+        {
+          "columnName": "col17",
+          "typeConfig": {
+            "name": "CHAR",
+            "lowValue": 32,
+            "highValue": 64,
+            "columnType": "OB_MYSQL_VARCHAR",
+            "generator": "RANDOM_GENERATOR",
+            "width": 512,
+            "charset": "UTF_8"
+          },
+          "allowNull": false,
+          "defaultValue": null,
+          "dataType": null
+        },
+        {
+          "columnName": "col18",
+          "typeConfig": {
+            "name": "CHAR",
+            "columnType": "OB_MYSQL_TINYTEXT",
+            "highValue": 64,
+            "generator": "RANDOM_DATE_CHAR_GENERATOR",
+            "genParams": {
+              "startTime": 0,
+              "endTime": 31536000000
+            },
+            "charset": "UTF_8"
+          },
+          "allowNull": false,
+          "defaultValue": null,
+          "dataType": null
+        },
+        {
+          "columnName": "col19",
+          "typeConfig": {
+            "name": "CHAR",
+            "lowValue": 32,
+            "highValue": 64,
+            "columnType": "OB_MYSQL_TEXT",
+            "generator": "RANDOM_GENERATOR",
+            "charset": "UTF_8"
+          },
+          "allowNull": false,
+          "defaultValue": null,
+          "dataType": null
+        },
+        {
+          "columnName": "col20",
+          "typeConfig": {
+            "name": "CHAR",
+            "lowValue": 32,
+            "highValue": 64,
+            "columnType": "OB_MYSQL_MEDIUMTEXT",
+            "generator": "RANDOM_GENERATOR",
+            "charset": "UTF_8"
+          },
+          "allowNull": false,
+          "defaultValue": null,
+          "dataType": null
+        },
+        {
+          "columnName": "col21",
+          "typeConfig": {
+            "name": "CHAR",
+            "lowValue": 32,
+            "highValue": 64,
+            "columnType": "OB_MYSQL_LONGTEXT",
+            "generator": "RANDOM_GENERATOR",
+            "charset": "UTF_8"
+          },
+          "allowNull": false,
+          "defaultValue": null,
+          "dataType": null
+        },
+        {
+          "columnName": "col22",
+          "typeConfig": {
+            "name": "CHAR",
+            "lowValue": 32,
+            "highValue": 64,
+            "columnType": "OB_MYSQL_TINYBLOB",
+            "generator": "RANDOM_BYTE_GENERATOR",
+            "charset": "UTF_8"
+          },
+          "allowNull": false,
+          "defaultValue": null,
+          "dataType": null
+        },
+        {
+          "columnName": "col23",
+          "typeConfig": {
+            "name": "CHAR",
+            "lowValue": 32,
+            "highValue": 64,
+            "columnType": "OB_MYSQL_BLOB",
+            "generator": "RANDOM_BYTE_GENERATOR",
+            "charset": "UTF_8"
+          },
+          "allowNull": false,
+          "defaultValue": null,
+          "dataType": null
+        },
+        {
+          "columnName": "col24",
+          "typeConfig": {
+            "name": "CHAR",
+            "lowValue": 32,
+            "highValue": 64,
+            "columnType": "OB_MYSQL_MEDIUMBLOB",
+            "generator": "RANDOM_BYTE_GENERATOR",
+            "charset": "UTF_8"
+          },
+          "allowNull": false,
+          "defaultValue": null,
+          "dataType": null
+        },
+        {
+          "columnName": "col25",
+          "typeConfig": {
+            "name": "CHAR",
+            "lowValue": 32,
+            "highValue": 64,
+            "columnType": "OB_MYSQL_LONGBLOB",
+            "generator": "RANDOM_BYTE_GENERATOR",
+            "charset": "UTF_8"
+          },
+          "allowNull": false,
+          "defaultValue": null,
+          "dataType": null
+        },
+        {
+          "columnName": "col26",
+          "typeConfig": {
+            "name": "CHAR",
+            "lowValue": 32,
+            "highValue": 64,
+            "columnType": "OB_MYSQL_BINARY",
+            "generator": "RANDOM_BYTE_GENERATOR",
+            "charset": "UTF_8",
+            "width": 128
+          },
+          "allowNull": false,
+          "defaultValue": null,
+          "dataType": null
+        },
+        {
+          "columnName": "col27",
+          "typeConfig": {
+            "name": "CHAR",
+            "lowValue": 32,
+            "highValue": 64,
+            "columnType": "OB_MYSQL_VARBINARY",
+            "generator": "RANDOM_BYTE_GENERATOR",
+            "charset": "UTF_8",
+            "width": 256
+          },
+          "allowNull": false,
+          "defaultValue": null,
+          "dataType": null
+        },
+        {
+          "columnName": "col28",
+          "typeConfig": {
+            "name": "DATE",
+            "lowValue": 0,
+            "highValue": 14351139750000,
+            "columnType": "OB_MYSQL_DATE",
+            "generator": "RANDOM_DATE_GENERATOR"
+          },
+          "allowNull": false,
+          "defaultValue": null,
+          "dataType": null
+        },
+        {
+          "columnName": "col29",
+          "typeConfig": {
+            "name": "DATE",
+            "lowValue": 0,
+            "highValue": 14351139750000,
+            "columnType": "OB_MYSQL_TIMESTAMP",
+            "generator": "RANDOM_TIMESTAMP_GENERATOR",
+            "scale": 5
+          },
+          "allowNull": false,
+          "defaultValue": null,
+          "dataType": null
+        },
+        {
+          "columnName": "col30",
+          "typeConfig": {
+            "name": "DATE",
+            "lowValue": 0,
+            "highValue": 14351139750000,
+            "columnType": "OB_MYSQL_TIME",
+            "generator": "RANDOM_TIMESTAMP_GENERATOR",
+            "scale": 2
+          },
+          "allowNull": false,
+          "defaultValue": null,
+          "dataType": null
+        },
+        {
+          "columnName": "col31",
+          "typeConfig": {
+            "name": "DATE",
+            "lowValue": 0,
+            "highValue": 14351139750000,
+            "columnType": "OB_MYSQL_DATETIME",
+            "generator": "RANDOM_TIMESTAMP_GENERATOR"
+          },
+          "allowNull": false,
+          "defaultValue": null,
+          "dataType": null
+        },
+        {
+          "columnName": "col32",
+          "typeConfig": {
+            "name": "DATE",
+            "columnType": "OB_MYSQL_YEAR",
+            "generator": "RANDOM_DATE_GENERATOR"
+          },
+          "allowNull": false,
+          "defaultValue": null,
+          "dataType": null
+        },
+        {
+          "columnName": "col33",
+          "typeConfig": {
+            "name": "CHAR",
+            "columnType": "OB_MYSQL_BIT",
+            "generator": "RANDOM_BYTE_GENERATOR",
+            "width": 16
+          },
+          "allowNull": false,
+          "defaultValue": null,
+          "dataType": null
+        }
+      ],
+      "totalCount": 100,
+      "strategy": "IGNORE",
+      "batchSize": 240,
+      "whetherTruncate": false,
+      "tableName": "emp",
+      "schemaName": "test",
+      "timeout": 180000,
+      "location": "test/mock/emp.sql"
+    }
+  ],
+  "dialectType": "OB_MYSQL",
+  "dbConfig": {
+    "host": "100.81.152.93",
+    "port": 2881,
+    "user": "root",
+    "tenant": "mysql",
+    "cluster": null,
+    "password": "Mac8.6Mac8.6",
+    "defaultSchame": "test"
+  },
+  "taskName": null,
+  "minConnectionSize": 8,
+  "maxConnectionSize": 10,
+  "connectionIncreasementStep": 2
+}

@@ -7,11 +7,9 @@ only:
     - push
     - tagPush
 
-# 共定义了4个stages
 stages:
   - preProcess
 
-# PMD扫描方面，为了顺利通过PMD测试，目前设置的卡点比较宽松
 PMD扫描:
   stage: preProcess # 将PMD扫描这个job绑定到相应的stage上
   plugin: PMD # 定义插件名称
@@ -25,13 +23,13 @@ PMD扫描:
       - "conf/**"
       - "**/target/**"
   checkRule: # 卡点规则，blocker和critical对应pmd1和pmd2
-    - blocker <= 24 && critical < 18
+    - blocker = 0 && critical = 0
 
 STC扫描:
   stage: preProcess
   plugin: STC
   checkRule:
-    - stc <= 10
+    - stc = 0
 
 单元测试: #该job定义项目的单元测试
   stage: preProcess
@@ -42,7 +40,6 @@ STC扫描:
   parameters:
     encoding: UTF-8
   checkRule:
-    - passRate >= 80
-    - failCount < 30
-    - lineCoverage >= 13
+    - failCount = 0
+    - lineCoverage >= 0
     - changLineCoverage >= 0
