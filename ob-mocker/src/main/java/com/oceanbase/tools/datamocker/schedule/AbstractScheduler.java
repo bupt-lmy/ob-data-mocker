@@ -1,0 +1,285 @@
+package com.oceanbase.tools.datamocker.schedule;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+
+import com.oceanbase.tools.datamocker.core.Dispatcher;
+import com.oceanbase.tools.datamocker.core.task.TableTask;
+import com.oceanbase.tools.datamocker.core.task.TableTaskContext;
+import com.oceanbase.tools.datamocker.core.task.TableTaskInfo;
+import com.oceanbase.tools.datamocker.core.write.output.MockerDataSource;
+import com.oceanbase.tools.datamocker.core.write.output.MockerFile;
+import com.oceanbase.tools.datamocker.model.enums.MockTaskStatus;
+import com.oceanbase.tools.datamocker.model.exception.MockerError;
+import com.oceanbase.tools.datamocker.model.exception.MockerException;
+import lombok.extern.slf4j.Slf4j;
+
+/**
+ * 抽象调度器，通过实现该调度器实现任务的线程调度
+ *
+ * @author yh263208
+ * @date 2021-01-18 00:37
+ * @since OBMOCKER_snapshot_0.1.0
+ */
+@Slf4j
+public abstract class AbstractScheduler {
+    /**
+     * 线程池的初始大小
+     */
+    private static final int CORE_POOL_SIZE = 3;
+    /**
+     * 线程池的最大大小
+     */
+    private static final int MAX_POOL_SIZE = 5;
+    /**
+     * 线程池的对象封装
+     */
+    private MockExecutorService service;
+    private final MockContext context;
+
+    public AbstractScheduler() {
+        ThreadPoolExecutor executor = pool();
+        if (executor == null) {
+            executor = new ThreadPoolExecutor(CORE_POOL_SIZE, MAX_POOL_SIZE, 0, TimeUnit.MILLISECONDS,
+                    new LinkedBlockingQueue<>(), new ThreadPoolExecutor.CallerRunsPolicy());
+        }
+        service = new MockExecutorService(executor);
+        context = new MockContext(this.service);
+    }
+
+    /**
+     * 获取调度器的执行上下文
+     */
+    public MockContext getContext() {
+        return this.context;
+    }
+
+    /**
+     * 任务执行方法，抽象调度器使用该方法进行任务的实际执行
+     *
+     * @param dispatcher 分发器对象
+     * @return 一共执行的任务数量
+     */
+    public MockContext execute(Dispatcher<TableTaskInfo> dispatcher) {
+        this.context.setTaskName(dispatcher.name());
+        int concurrentCount = dispatcher.count();
+        //标识数组，数组长度和tasks的任务队列数量相同，每一位分别用于标示对应任务队列中是否还有任务等待执行
+        boolean[] flags = new boolean[concurrentCount];
+        for (int i = 0; i < concurrentCount; i++) {
+            flags[i] = true;
+        }
+        Callable<Integer> scheduleTask = () -> {
+            int totalCount = 0;
+            int total = 0;
+            Long maxTimeout = 0L;
+            for (int i = 0; i < dispatcher.count(); i++) {
+                for (int j = 0; j < dispatcher.getTaskSize(i); j++) {
+                    TableTaskInfo tableTask = dispatcher.getObj(i, j);
+                    Long timeout = tableTask.getMetaData().getTimeout();
+                    if (maxTimeout < timeout) {
+                        maxTimeout = timeout;
+                    }
+                }
+            }
+            long failCount = 0;
+            long maxFailCount = maxTimeout / 5000L + 36;
+            while (true) {
+                for (int i = 0; i < concurrentCount; i++) {
+                    if (flags[i]) {
+                        TableTaskInfo task = dispatcher.getObj(i, 0);
+                        if (task != null) {
+                            Map<Set<String>, Integer> dataGroups = scheduleDataTask(task.dataWriteGroups(), service.getActiveCount(),
+                                    service.getCorePoolSize(), service.getMaximumPoolSize());
+                            if (dataGroups == null) {
+                                Thread.sleep(5000);
+                                log.warn("no enough thread resource available for table task bean at \"{}\".\"{}\" table, will retry",
+                                        task.getMetaData().getTableSchema(), task.getMetaData().getTableName());
+                                if ((failCount++) > maxFailCount) {
+                                    log.warn("no task is successfully scheduled for more than {} minutes, the schedule thread exits",
+                                            maxTimeout / 60000 + 3);
+                                    clearResource(dispatcher);
+                                    return totalCount;
+                                }
+                                continue;
+                            }
+                            int currentActive = 0;
+                            for (Map.Entry<Set<String>, Integer> entry : dataGroups.entrySet()) {
+                                currentActive += entry.getValue();
+                            }
+                            Set<Set<String>> columnGroups = scheduleColumnTask(task.columnGroups(),
+                                    service.getActiveCount() + currentActive, service.getCorePoolSize(), service.getMaximumPoolSize());
+                            if (columnGroups == null) {
+                                Thread.sleep(5000);
+                                log.warn("no enough thread resource available for table task bean at \"{}\".\"{}\" table, will retry",
+                                        task.getMetaData().getTableSchema(), task.getMetaData().getTableName());
+                                if ((failCount++) > maxFailCount) {
+                                    log.warn("no task is successfully scheduled for more than {} minutes, the schedule thread exits",
+                                            maxTimeout / 60000 + 3);
+                                    clearResource(dispatcher);
+                                    return totalCount;
+                                }
+                                continue;
+                            }
+                            validateSet(columnGroups);
+                            failCount = 0;
+                            if (!validateThreadResource(columnGroups, dataGroups, service.getActiveCount(), service.getMaximumPoolSize())) {
+                                int required = columnGroups.size();
+                                Set<Map.Entry<Set<String>, Integer>> entrySet = dataGroups.entrySet();
+                                for (Map.Entry<Set<String>, Integer> entry : entrySet) {
+                                    required += entry.getValue();
+                                }
+                                log.warn("the thread resource requirement {} which schedule algorithm give is illegal for current "
+                                         + "available thread resource {}, the schedule thread exits", required,
+                                        this.service.getMaximumPoolSize() - service.getActiveCount());
+                                clearResource(dispatcher);
+                                return totalCount;
+                            }
+                            dispatcher.pop(i);
+                            flags[i] = false;
+                            //初始化TaskBean，主要是定义TaskBean的回调函数
+                            TableTask mockTaskBean = new TableTask(task, columnGroups, dataGroups, dispatcher.name(),
+                                    task.getMetaData().getTaskId(), i);
+                            mockTaskBean.setStatus(MockTaskStatus.PENDING);
+                            mockTaskBean.init(service, result -> {
+                                ((MockerDataSource) result.getDataSource()).clear();
+                                for (MockerFile fileManager : result.getFileManagers()) {
+                                    fileManager.close();
+                                }
+                                flags[result.getTopIndex()] = true;
+                                callBack(result);
+                            });
+                            if (service.isShutdown()) {
+                                ((MockerDataSource) task.getDataSource()).clear();
+                                for (MockerFile manager : task.getFileManagers()) {
+                                    manager.close();
+                                }
+                                clearResource(dispatcher);
+                                log.warn("task has been shut down, total task executed is {}", totalCount);
+                                return totalCount;
+                            }
+                            totalCount++;
+                            TableTaskContext mockContext = service.submit(mockTaskBean);
+                            context.appendContext(mockContext);
+                        } else {
+                            total++;
+                            flags[i] = false;
+                        }
+                    }
+                }
+                if (total >= concurrentCount) {
+                    break;
+                }
+            }
+            clearResource(dispatcher);
+            log.info("schedule task has been executed successfully, total task executed is {}", totalCount);
+            return totalCount;
+        };
+        this.service.submitCallable(scheduleTask);
+        return this.context;
+    }
+
+    /**
+     * 调度器线程退出前需要清理分发器对象内部没有执行完的任务的资源
+     *
+     * @param dispatcher 分发器对象
+     * @throws Exception 释放资源可能发生异常
+     */
+    private void clearResource(Dispatcher<TableTaskInfo> dispatcher) throws Exception {
+        for (int i = 0; i < dispatcher.count(); i++) {
+            for (int j = 0; j < dispatcher.getTaskSize(i); j++) {
+                TableTaskInfo bean = dispatcher.getObj(i, j);
+                ((MockerDataSource) bean.getDataSource()).clear();
+                for (MockerFile manager : bean.getFileManagers()) {
+                    manager.close();
+                }
+            }
+        }
+    }
+
+    /**
+     * 验证线程资源是否足够，该方法不抛出异常，如果验证不通过则直接抛出异常
+     *
+     * @param columnGroups 列原语分组ID集合
+     * @param dataGroups   数据生成原语分组ID集合
+     * @param active       目前线程池中活跃的任务
+     * @param max          线程池的最大线程数
+     * @return 返回验证结果
+     */
+    private boolean validateThreadResource(Set<Set<String>> columnGroups, Map<Set<String>, Integer> dataGroups, int active, int max) {
+        int freeResource = max - active;
+        if (freeResource < 0) {
+            throw new MockerException(MockerError.UNKNOWN_ERROR, "free resource thread pool size is smaller than zero");
+        }
+        int required = columnGroups.size();
+        Set<Map.Entry<Set<String>, Integer>> entrySet = dataGroups.entrySet();
+        for (Map.Entry<Set<String>, Integer> entry : entrySet) {
+            if (entry.getValue() <= 0) {
+                throw new MockerException(MockerError.PARAMETER_ERROR, "thread count can not be smaller than zero");
+            }
+            required += entry.getValue();
+        }
+        return required < freeResource;
+    }
+
+    /**
+     * 验证用户实现接口返回列原语分组集合是否合法，验证标准是各个分组ID集合之间不能有交集
+     *
+     * @param input 输入分组集合
+     * @throws MockerException 若验证失败则抛出异常
+     */
+    private void validateSet(Set<Set<String>> input) {
+        List<Set<String>> middle = new ArrayList<>(input);
+        for (int i = 0; i < middle.size(); i++) {
+            Set<String> copyObj = new HashSet<>(middle.get(i));
+            for (int j = i + 1; j < middle.size(); j++) {
+                copyObj.retainAll(middle.get(j));
+                if (copyObj.size() != 0) {
+                    throw new MockerException(MockerError.PARAMETER_ERROR, "column group set is illegal");
+                }
+            }
+        }
+    }
+
+    /**
+     * 列生成原语的线程调度抽象方法，通过该方法实现列原语的调度
+     *
+     * @param groups 列原语的分组ID集合
+     * @param active 当前线程池的活跃任务数量
+     * @param core   当前线程池的core size
+     * @param max    当前线程池的最大大小
+     * @return 返回group分组，每个分组分配一个线程资源
+     */
+    abstract protected Set<Set<String>> scheduleColumnTask(Set<String> groups, int active, int core, int max);
+
+    /**
+     * 数据写入原语的抽象调度方法，通过该方法调度数据原语
+     *
+     * @param groups 数据原语的分组ID
+     * @param active 线程池的活跃任务数量
+     * @param core   线程池的core size
+     * @param max    线程池的最大容量
+     * @return 返回每个分组集合所分配的线程数量
+     */
+    abstract protected Map<Set<String>, Integer> scheduleDataTask(Set<String> groups, int active, int core, int max);
+
+    /**
+     * 任务执行完成后调用的回调方法
+     *
+     * @param context mock任务的执行上下文
+     */
+    protected abstract void callBack(TableTaskContext context);
+
+    /**
+     * 获取线程池对象，如果想使用默认的就可以直接返回null
+     *
+     * @return 返回线程池对象
+     */
+    public abstract ThreadPoolExecutor pool();
+}

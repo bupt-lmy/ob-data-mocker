@@ -1,0 +1,43 @@
+package com.oceanbase.tools.datamocker.generator.digit;
+
+import java.math.BigDecimal;
+
+import com.oceanbase.tools.datamocker.generator.DigitalGeneratorBase;
+import com.oceanbase.tools.datamocker.model.exception.MockerError;
+import com.oceanbase.tools.datamocker.model.exception.MockerException;
+
+/**
+ * 固定数字的数据生成器
+ *
+ * @author yh263208
+ * @date 2020-12-16 13:31
+ * @since OBMOCKER_snapshot_0.1.0
+ */
+public class FixNumGenerator extends DigitalGeneratorBase<BigDecimal> {
+    /**
+     * 固定的数字
+     */
+    private final BigDecimal fixNum;
+
+    public FixNumGenerator(BigDecimal fixNum) {
+        if (fixNum == null) {
+            throw new MockerException(MockerError.PARAMETER_ERROR, "fix number for fix num generator can not be null");
+        }
+        this.fixNum = fixNum;
+    }
+
+    @Override
+    public Boolean preCheck(BigDecimal minValue, BigDecimal maxValue) {
+        return this.fixNum.compareTo(minValue) >= 0 && this.fixNum.compareTo(maxValue) <= 0;
+    }
+
+    @Override
+    public BigDecimal generate(BigDecimal minValue, BigDecimal maxValue) {
+        return this.fixNum;
+    }
+
+    @Override
+    public Long count(BigDecimal minValue, BigDecimal maxValue) {
+        return 1L;
+    }
+}

@@ -1,0 +1,57 @@
+package com.oceanbase.tools.datamocker.generator.chartype;
+
+import com.oceanbase.tools.datamocker.generator.CharGeneratorBase;
+import com.oceanbase.tools.datamocker.model.enums.CharCaseOption;
+
+/**
+ * 布尔类型数据生成器
+ *
+ * @author yh263208
+ * @date 2020-12-16 23:38
+ * @since OBMOCKER_snapshot_0.1.0
+ */
+public class BoolCharGenerator extends CharGeneratorBase {
+    /**
+     * 定值布尔类型，若不传则为null，代表随机布尔类型
+     */
+    private Boolean fixBool;
+
+    public BoolCharGenerator(CharCaseOption caseType, String fixBool) {
+        super(caseType);
+        if (fixBool == null || fixBool.length() == 0) {
+            this.fixBool = null;
+        } else {
+            this.fixBool = Boolean.valueOf(fixBool);
+        }
+    }
+
+    @Override
+    public Boolean preCheck(Integer minLength, Integer maxLength) {
+        int realLength = "FALSE".length();
+        if (realLength >= minLength) {
+            if (realLength <= maxLength) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public String generate(Integer minLength, Integer maxLength) {
+        if (this.fixBool != null) {
+            return caseOption().convert(this.fixBool.toString());
+        }
+        if (Math.random() > 0.5) {
+            return "TRUE";
+        }
+        return "FALSE";
+    }
+
+    @Override
+    public Long count(Integer minLength, Integer maxLength) {
+        if (this.fixBool == null) {
+            return 2L;
+        }
+        return 1L;
+    }
+}

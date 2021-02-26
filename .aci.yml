@@ -1,0 +1,45 @@
+# AntCode Pipeline, Details:https://yuque.antfin-inc.com/linke/help/pipeline
+#
+# 流水线作业的触发选项
+only:
+  triggerType:
+    - pullRequest
+    - push
+    - tagPush
+
+stages:
+  - preProcess
+
+PMD扫描:
+  stage: preProcess # 将PMD扫描这个job绑定到相应的stage上
+  plugin: PMD # 定义插件名称
+  pluginConfig:
+    encoding: UTF-8
+    excludes: # PMD扫描排除部分
+      - "**/resources/**"
+      - "**/test/**"
+      - "distribution/**"
+      - "builds/**"
+      - "conf/**"
+      - "**/target/**"
+  checkRule: # 卡点规则，blocker和critical对应pmd1和pmd2
+    - blocker = 0 && critical = 0
+
+STC扫描:
+  stage: preProcess
+  plugin: STC
+  checkRule:
+    - stc = 0
+
+单元测试: #该job定义项目的单元测试
+  stage: preProcess
+  plugin: LINKQ-UT
+  tools:
+    jdk: '1.8'
+    mvn: 3.5.4
+  parameters:
+    encoding: UTF-8
+  checkRule:
+    - failCount = 0
+    - lineCoverage >= 0
+    - changLineCoverage >= 0

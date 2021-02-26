@@ -1,0 +1,140 @@
+{
+  "tables": [
+    {
+      "columns": [
+        {
+          "columnName": "COL",
+          "typeConfig": {
+            "name": "DIGIT",
+            "columnType": "OB_ORACLE_NUMBER",
+            "generator": "STEP_GENERATOR",
+            "genParams": {
+              "step": -1
+            },
+            "precision": 5,
+            "scale": 2
+          },
+          "allowNull": false,
+          "defaultValue": null,
+          "dataType": null
+        },
+        {
+          "columnName": "COL2",
+          "typeConfig": {
+            "name": "CHAR",
+            "columnType": "OB_ORACLE_VARCHAR",
+            "generator": "REGEXP_GENERATOR",
+            "genParams": {
+              "regText": "[a-z0-9A-Z]+\\@[a-z0-9A-Z]+\\.com"
+            },
+            "width": 64,
+            "charset": "UTF_8"
+          },
+          "allowNull": false,
+          "defaultValue": null,
+          "dataType": null
+        },
+        {
+          "columnName": "COL3",
+          "typeConfig": {
+            "name": "CHAR",
+            "columnType": "OB_ORACLE_VARCHAR2",
+            "genParams": {
+              "start": "-100",
+              "end": "100"
+            },
+            "generator": "RANDOM_NUMBER_GENERATOR",
+            "width": 128,
+            "charset": "UTF_8"
+          },
+          "allowNull": false,
+          "defaultValue": null,
+          "dataType": null
+        },
+        {
+          "columnName": "COL4",
+          "typeConfig": {
+            "name": "CHAR",
+            "lowValue": 64,
+            "highValue": 128,
+            "columnType": "OB_ORACLE_CHAR",
+            "generator": "RANDOM_GENERATOR",
+            "width": 128,
+            "charset": "UTF_8"
+          },
+          "allowNull": false,
+          "defaultValue": null,
+          "dataType": null
+        },
+        {
+          "columnName": "COL5",
+          "typeConfig": {
+            "name": "CHAR",
+            "columnType": "OB_ORACLE_NVARCHAR",
+            "generator": "RANDOM_GENERATOR",
+            "width": 128,
+            "charset": "UTF_8"
+          },
+          "allowNull": false,
+          "defaultValue": null,
+          "dataType": null
+        },
+        {
+          "columnName": "COL6",
+          "typeConfig": {
+            "name": "DATE",
+            "columnType": "OB_ORACLE_TIMESTAMP",
+            "generator": "NULL_TIMESTAMP_GENERATOR"
+          },
+          "allowNull": true,
+          "defaultValue": null,
+          "dataType": null
+        },
+        {
+          "columnName": "COL7",
+          "typeConfig": {
+            "name": "DATE",
+            "columnType": "OB_ORACLE_INTERVAL_YEAR_TO_MONTH",
+            "generator": "NULL_INTERVALYM_GENERATOR"
+          },
+          "allowNull": true,
+          "defaultValue": null,
+          "dataType": null
+        },
+        {
+          "columnName": "COL8",
+          "typeConfig": {
+            "name": "DATE",
+            "columnType": "OB_ORACLE_INTERVAL_DAY_TO_SECOND",
+            "generator": "NULL_INTERVALYM_GENERATOR"
+          },
+          "allowNull": true,
+          "defaultValue": null,
+          "dataType": null
+        }
+      ],
+      "totalCount": 4500,
+      "strategy": "IGNORE",
+      "batchSize": 240,
+      "whetherTruncate": false,
+      "tableName": "EMP",
+      "schemaName": "SYS",
+      "timeout": 180000,
+      "location": "test/mock/emp.sql"
+    }
+  ],
+  "dialectType": "OB_ORACLE",
+  "dbConfig": {
+    "host": "100.81.152.93",
+    "port": 2881,
+    "user": "SYS",
+    "tenant": "oracle",
+    "cluster": null,
+    "password": "Mac8.6Mac8.6",
+    "defaultSchame": "SYS"
+  },
+  "taskName": null,
+  "minConnectionSize": 4,
+  "maxConnectionSize": 6,
+  "connectionIncreasementStep": 2
+}
