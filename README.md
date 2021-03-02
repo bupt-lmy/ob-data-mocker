@@ -11,9 +11,7 @@ Mock数据即模拟数据工具用于批量产生测试数据，该工具研发�
 
 ## Overview
 
-模拟数据工具分两种工作模式，分别为Oracle模式和Mysql模式，对应于OB的Oracle租户和Mysql租户。模拟数据工具针对每一种租户模式都进行了深度兼容，针对不同的数据类型给出了丰富的数据生成范式，允许用户根据自身的需要在工具能力范围内生成有语义的数据。目前版本的模拟数据工具兼容的Oracle数据类型包括：`NUMBER,CHAR,VARCHAR,VARCHAR2,NVARCHAR,DATE,TIMESTAMP,TIMESTAMP WITH TIME ZONE,TIMESTAMP WITH LOCAL TIME ZONE,INTERVAL YEAR TO MONTH,INTERVAL DAY TO SECOND,BLOB,CLOB,RAW`。
-
-Mysql模式下兼容的数据类型包括:`int,number,tinyint,smallint,mediumint,bigint,decimal,float,double,varchar,char,tinytext,mediumtext,text,longtext,tinyblob,blob,mediumblob,longblob,bit,binary,varbinary,timestamp,date,time,datetime,year`。
+模拟数据工具分两种工作模式，分别为Oracle模式和Mysql模式，对应于OB的Oracle租户和Mysql租户。模拟数据工具针对每一种租户模式都进行了深度兼容，针对不同的数据类型给出了丰富的数据生成范式，允许用户根据自身的需要在工具能力范围内生成有语义的数据。目前版本的模拟数据工具兼容的Oracle数据类型包括：`NUMBER`,`CHAR`,`VARCHAR`,`VARCHAR2`,`NVARCHAR`,`DATE`,`TIMESTAMP`,`TIMESTAMP WITH TIME ZONE`,`TIMESTAMP WITH LOCAL TIME ZONE`,`INTERVAL YEAR TO MONTH`,`INTERVAL DAY TO SECOND`,`BLOB`,`CLOB`,`RAW`。Mysql模式下兼容的数据类型包括:`int`,`number`,`tinyint`,`smallint`,`mediumint`,`bigint`,`decimal`,`float`,`double`,`varchar`,`char`,`tinytext`,`mediumtext`,`text`,`longtext`,`tinyblob`,`blob`,`mediumblob`,`longblob`,`bit`,`binary`,`varbinary`,`timestamp`,`date`,`time`,`datetime`,`year`。
 
 在生成数据的语义上，模拟数据工具允许用户配置多种类型的数据生成器，每种数据生成器均可根据配置生成带有语义的数据，典型的例如随机日期数据生成器，顺序日期数据生成器等等。
 
