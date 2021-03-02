@@ -97,7 +97,7 @@ public class DefaultTableConfig extends AbstractTableConfig {
     }
 
     @Override
-    public Long timeoutSeconds() {
+    public Long timeoutMilliseconds() {
         return timeout;
     }
 

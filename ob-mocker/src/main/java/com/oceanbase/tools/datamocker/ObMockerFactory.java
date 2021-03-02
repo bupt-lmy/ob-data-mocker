@@ -49,7 +49,7 @@ public class ObMockerFactory extends AbstractMockerFactory {
             MockerBuffer buffer = new MockerBuffer(tableSchema, tableConfig.maxBatchSize());
             List<AbstractMockWriter> dataWriter = this.getDataWriter(tableConfig, buffer);
             TableTaskMetaData metaData = new TableTaskMetaData(tableSchema, tableConfig.tableName(),
-                    tableConfig.schemaName(), tableConfig.truncated(), tableConfig.timeoutSeconds(), tableConfig.maxBatchSize(),
+                    tableConfig.schemaName(), tableConfig.truncated(), tableConfig.timeoutMilliseconds(), tableConfig.maxBatchSize(),
                     tableConfig.duplicateStrategy(), taskConfig.obDialectType(), tableConfig.maxCount(), tableConfig.tableTaskId());
             TableTaskInfo bean = new TableTaskInfo(columnReaders, dataWriter, constraints, buffer,
                     getDataSource(tableConfig.tableTaskId()), getFileManager(tableConfig.tableTaskId()), metaData);

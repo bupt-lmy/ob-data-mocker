@@ -104,7 +104,7 @@ public abstract class AbstractTableConfig {
      *
      * @return 返回超时时间
      */
-    abstract public Long timeoutSeconds();
+    abstract public Long timeoutMilliseconds();
 
     /**
      * 脚本类型枚举，mock数据可以定义写出脚本类型，可以输出多个脚本
