@@ -3,7 +3,7 @@ package com.oceanbase.tools.datamocker.datatype;
 import java.security.NoSuchAlgorithmException;
 
 import com.oceanbase.tools.datamocker.generator.ByteGeneratorBase;
-import com.oceanbase.tools.datamocker.model.enums.DialectType;
+import com.oceanbase.tools.datamocker.model.enums.ObModeType;
 import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
 import com.oceanbase.tools.datamocker.util.DigestUtil;
@@ -24,7 +24,7 @@ public abstract class AbstractByteDataType extends AbstractDataType<byte[], Inte
      * @param dialectType OB模式
      * @param allowNull   是否允许空值
      */
-    public AbstractByteDataType(ByteGeneratorBase generator, DialectType dialectType, byte[] defaultValue, Boolean allowNull) {
+    public AbstractByteDataType(ByteGeneratorBase generator, ObModeType dialectType, byte[] defaultValue, Boolean allowNull) {
         super(generator, dialectType, defaultValue, allowNull);
     }
 
@@ -34,7 +34,7 @@ public abstract class AbstractByteDataType extends AbstractDataType<byte[], Inte
      * @param dialectType OB模式
      * @param allowNull   是否允许空值
      */
-    protected AbstractByteDataType(DialectType dialectType, byte[] defaultValue, Boolean allowNull) {
+    protected AbstractByteDataType(ObModeType dialectType, byte[] defaultValue, Boolean allowNull) {
         super(dialectType, defaultValue, allowNull);
     }
 

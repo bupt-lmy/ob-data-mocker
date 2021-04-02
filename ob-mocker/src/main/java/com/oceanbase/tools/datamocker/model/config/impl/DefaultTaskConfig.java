@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.oceanbase.tools.datamocker.model.config.AbstractTaskConfig;
 import com.oceanbase.tools.datamocker.model.config.model.DataBaseConfig;
-import com.oceanbase.tools.datamocker.model.enums.DialectType;
+import com.oceanbase.tools.datamocker.model.enums.ObModeType;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -25,7 +25,7 @@ public class DefaultTaskConfig extends AbstractTaskConfig {
     /**
      * 生成任务的方言类型
      */
-    private DialectType dialectType;
+    private ObModeType dialectType;
     /**
      * 数据库配置对象
      */
@@ -48,7 +48,7 @@ public class DefaultTaskConfig extends AbstractTaskConfig {
     private int connectionIncreasementStep;
 
     @Override
-    public DialectType obDialectType() {
+    public ObModeType obDialectType() {
         return dialectType;
     }
 

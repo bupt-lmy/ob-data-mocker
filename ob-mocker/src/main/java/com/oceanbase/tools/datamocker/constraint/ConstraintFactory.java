@@ -21,7 +21,7 @@ import com.oceanbase.tools.datamocker.constraint.impl.UniqueConstraint;
 import com.oceanbase.tools.datamocker.datatype.AbstractDataType;
 import com.oceanbase.tools.datamocker.model.dbobject.ConstraintColumn;
 import com.oceanbase.tools.datamocker.model.dbobject.TableColumn;
-import com.oceanbase.tools.datamocker.model.enums.DialectType;
+import com.oceanbase.tools.datamocker.model.enums.ObModeType;
 import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
 import com.oceanbase.tools.datamocker.util.Pair;
@@ -102,13 +102,13 @@ public abstract class ConstraintFactory {
      */
     private static final ConstraintFactory UNIQUE_CONSTRAINT = new ConstraintFactory() {
         @Override
-        public List<AbstractConstraint> make(DataSource dataSource, DialectType dialectType, String database, String tableName,
+        public List<AbstractConstraint> make(DataSource dataSource, ObModeType dialectType, String database, String tableName,
                 Map<String, AbstractDataType> columnName2DataType, int totalCount) {
             List<AbstractConstraint> constraints;
-            if (DialectType.OB_ORACLE.equals(dialectType)) {
+            if (ObModeType.OB_ORACLE.equals(dialectType)) {
                 constraints = getConstraints(dataSource, ORACLE_UNIQUE_CONSTRAINT_SQL, database, tableName, columnName2DataType, totalCount,
                         new OracleValidation());
-            } else if (DialectType.OB_MYSQL.equals(dialectType)) {
+            } else if (ObModeType.OB_MYSQL.equals(dialectType)) {
                 constraints = getConstraints(dataSource, MYSQL_UNIQUE_CONSTRAINT_SQL, database, tableName, columnName2DataType, totalCount,
                         new MysqlValidation());
             } else {
@@ -124,13 +124,13 @@ public abstract class ConstraintFactory {
      */
     private static final ConstraintFactory PRIMARY_CONSTRAINT = new ConstraintFactory() {
         @Override
-        public List<AbstractConstraint> make(DataSource dataSource, DialectType dialectType, String database, String tableName,
+        public List<AbstractConstraint> make(DataSource dataSource, ObModeType dialectType, String database, String tableName,
                 Map<String, AbstractDataType> columnName2DataType, int totalCount) {
             List<AbstractConstraint> constraints;
-            if (DialectType.OB_ORACLE.equals(dialectType)) {
+            if (ObModeType.OB_ORACLE.equals(dialectType)) {
                 constraints = getConstraints(dataSource, ORACLE_PRIMARY_CONSTRAINT_SQL, database, tableName, columnName2DataType,
                         totalCount, null);
-            } else if (DialectType.OB_MYSQL.equals(dialectType)) {
+            } else if (ObModeType.OB_MYSQL.equals(dialectType)) {
                 constraints = getConstraints(dataSource, MYSQL_PRIMARY_CONSTRAINT_SQL, database, tableName, columnName2DataType,
                         totalCount, null);
             } else {
@@ -146,10 +146,10 @@ public abstract class ConstraintFactory {
      */
     private static final ConstraintFactory CHECK_CONSTRAINT = new ConstraintFactory() {
         @Override
-        public List<AbstractConstraint> make(DataSource dataSource, DialectType dialectType, String database, String tableName,
+        public List<AbstractConstraint> make(DataSource dataSource, ObModeType dialectType, String database, String tableName,
                 Map<String, AbstractDataType> columnName2DataType, int totalCount) {
             String[] params = new String[] {database, tableName};
-            if (DialectType.OB_ORACLE.equals(dialectType)) {
+            if (ObModeType.OB_ORACLE.equals(dialectType)) {
                 SqlUtil.executeQuery(dataSource, ORACLE_CHECK_CONSTRAINT_SQL, params, new CallBack<ResultSet>() {
                     @Override
                     public void onComplete(ResultSet result) throws Exception {
@@ -167,7 +167,7 @@ public abstract class ConstraintFactory {
                         throw new MockerException(e);
                     }
                 });
-            } else if (DialectType.OB_MYSQL.equals(dialectType)) {
+            } else if (ObModeType.OB_MYSQL.equals(dialectType)) {
                 // mysql模式目前不支持检查约束，在这里直接返回null
                 return null;
             } else {
@@ -182,9 +182,9 @@ public abstract class ConstraintFactory {
      */
     private static final ConstraintFactory FOREIGN_CONSTRAINT = new ConstraintFactory() {
         @Override
-        public List<AbstractConstraint> make(DataSource dataSource, DialectType dialectType, String database, String tableName,
+        public List<AbstractConstraint> make(DataSource dataSource, ObModeType dialectType, String database, String tableName,
                 Map<String, AbstractDataType> columnName2DataType, int totalCount) {
-            if (DialectType.OB_ORACLE.equals(dialectType)) {
+            if (ObModeType.OB_ORACLE.equals(dialectType)) {
                 String[] params = new String[] {database, tableName};
                 SqlUtil.executeQuery(dataSource, ORACLE_FOREIGN_CONSTRAINT_SQL, params, new CallBack<ResultSet>() {
                     @Override
@@ -201,7 +201,7 @@ public abstract class ConstraintFactory {
                         throw new MockerException(e);
                     }
                 });
-            } else if (DialectType.OB_MYSQL.equals(dialectType)) {
+            } else if (ObModeType.OB_MYSQL.equals(dialectType)) {
                 // mysql模式目前无法从内部表中查询出检查约束，在这里直接返回null
                 return null;
             } else {
@@ -236,7 +236,7 @@ public abstract class ConstraintFactory {
      * @param columnName2DataType 表结构
      * @param totalCount          一共要产生的数据量
      */
-    abstract public List<AbstractConstraint> make(DataSource dataSource, DialectType dialectType, String database, String tableName,
+    abstract public List<AbstractConstraint> make(DataSource dataSource, ObModeType dialectType, String database, String tableName,
             Map<String, AbstractDataType> columnName2DataType, int totalCount);
 
     /**

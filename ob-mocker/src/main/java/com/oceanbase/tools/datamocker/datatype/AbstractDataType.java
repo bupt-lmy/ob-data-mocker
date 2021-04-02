@@ -1,7 +1,7 @@
 package com.oceanbase.tools.datamocker.datatype;
 
 import com.oceanbase.tools.datamocker.generator.BaseGenerator;
-import com.oceanbase.tools.datamocker.model.enums.DialectType;
+import com.oceanbase.tools.datamocker.model.enums.ObModeType;
 import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
 
@@ -40,14 +40,14 @@ public abstract class AbstractDataType<T, V extends Comparable> {
     /**
      * 该数据类型对应的OB模式
      */
-    private final DialectType dialectType;
+    private final ObModeType dialectType;
 
     /**
      * 抽象基类的构造函数，在这里需要传入这个数据类型绑定的随机数据生成器，并且指明该数据类型对应的OB模式以及该模式下的数据库类型
      *
      * @param dialectType OB模式
      */
-    protected AbstractDataType(DialectType dialectType, T defaultValue, Boolean allowNull) {
+    protected AbstractDataType(ObModeType dialectType, T defaultValue, Boolean allowNull) {
         this.dialectType = dialectType;
         this.allowNull = allowNull;
         this.defaultValue = defaultValue;
@@ -58,7 +58,7 @@ public abstract class AbstractDataType<T, V extends Comparable> {
      *
      * @param dialectType OB模式
      */
-    protected AbstractDataType(BaseGenerator<V, T> generator, DialectType dialectType, T defaultValue, Boolean allowNull) {
+    protected AbstractDataType(BaseGenerator<V, T> generator, ObModeType dialectType, T defaultValue, Boolean allowNull) {
         this.dialectType = dialectType;
         this.allowNull = allowNull;
         this.defaultValue = defaultValue;
@@ -163,7 +163,7 @@ public abstract class AbstractDataType<T, V extends Comparable> {
      *
      * @return 返回方言模式
      */
-    public DialectType getDialectType() {
+    public ObModeType getDialectType() {
         return dialectType;
     }
 

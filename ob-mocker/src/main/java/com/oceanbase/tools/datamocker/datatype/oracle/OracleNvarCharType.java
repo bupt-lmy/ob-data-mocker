@@ -4,7 +4,7 @@ import com.oceanbase.tools.datamocker.datatype.AbstractCharDataType;
 import com.oceanbase.tools.datamocker.datatype.DataTypeFactory;
 import com.oceanbase.tools.datamocker.generator.CharGeneratorBase;
 import com.oceanbase.tools.datamocker.model.enums.CharsetType;
-import com.oceanbase.tools.datamocker.model.enums.DialectType;
+import com.oceanbase.tools.datamocker.model.enums.ObModeType;
 
 /**
  * oracle模式下的nvarchar2类型
@@ -24,7 +24,7 @@ public class OracleNvarCharType extends AbstractCharDataType {
      */
     public OracleNvarCharType(CharGeneratorBase generator, Integer length, String defaultValue, Boolean allowNull,
             CharsetType charsetType) {
-        super(generator, DialectType.OB_ORACLE, charsetType, length, defaultValue, allowNull, Boolean.TRUE);
+        super(generator, ObModeType.OB_ORACLE, charsetType, length, defaultValue, allowNull, Boolean.TRUE);
     }
 
     /**
@@ -35,7 +35,7 @@ public class OracleNvarCharType extends AbstractCharDataType {
      * @param allowNull   是否允许空值
      */
     public OracleNvarCharType(Integer length, String defaultvalue, Boolean allowNull, CharsetType charsetType) {
-        super(DialectType.OB_ORACLE, charsetType, length, defaultvalue, allowNull, Boolean.TRUE);
+        super(ObModeType.OB_ORACLE, charsetType, length, defaultvalue, allowNull, Boolean.TRUE);
     }
 
     @Override

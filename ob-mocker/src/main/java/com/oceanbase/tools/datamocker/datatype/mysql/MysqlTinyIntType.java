@@ -5,7 +5,7 @@ import java.math.BigDecimal;
 import com.oceanbase.tools.datamocker.datatype.AbstractDigitDataType;
 import com.oceanbase.tools.datamocker.datatype.DataTypeFactory;
 import com.oceanbase.tools.datamocker.generator.DigitalGeneratorBase;
-import com.oceanbase.tools.datamocker.model.enums.DialectType;
+import com.oceanbase.tools.datamocker.model.enums.ObModeType;
 
 /**
  * mysql中的tinyint类型
@@ -24,7 +24,7 @@ public class MysqlTinyIntType extends AbstractDigitDataType<BigDecimal> {
      * @param signed       是否为有符号数
      */
     public MysqlTinyIntType(DigitalGeneratorBase<BigDecimal> generator, BigDecimal defaultValue, Boolean allowNull, Boolean signed) {
-        super(generator, DialectType.OB_MYSQL, defaultValue, allowNull, signed);
+        super(generator, ObModeType.OB_MYSQL, defaultValue, allowNull, signed);
     }
 
     @Override

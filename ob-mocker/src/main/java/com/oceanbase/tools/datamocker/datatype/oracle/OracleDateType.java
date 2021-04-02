@@ -9,7 +9,7 @@ import com.oceanbase.tools.datamocker.datatype.AbstractDateDataType;
 import com.oceanbase.tools.datamocker.datatype.DataTypeFactory;
 import com.oceanbase.tools.datamocker.generator.BaseGenerator;
 import com.oceanbase.tools.datamocker.generator.DateGeneratorBase;
-import com.oceanbase.tools.datamocker.model.enums.DialectType;
+import com.oceanbase.tools.datamocker.model.enums.ObModeType;
 import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
 
@@ -35,16 +35,16 @@ public class OracleDateType extends AbstractDateDataType<Date> {
     private final SimpleDateFormat dateFormat = new SimpleDateFormat(JAVA_DATE_FORMAT);
 
     public OracleDateType(DateGeneratorBase<Date> generator, Date defaultValue, Boolean allowNull) {
-        super(generator, DialectType.OB_ORACLE, defaultValue, allowNull);
+        super(generator, ObModeType.OB_ORACLE, defaultValue, allowNull);
         generator.setTimeUnit(TimeUnit.SECONDS);
     }
 
     public OracleDateType(TimeZone timeZone, Date defaultValue, Boolean allowNull) {
-        super(DialectType.OB_ORACLE, timeZone, defaultValue, allowNull);
+        super(ObModeType.OB_ORACLE, timeZone, defaultValue, allowNull);
     }
 
     public OracleDateType(Date defaultValue, Boolean allowNull) {
-        super(DialectType.OB_ORACLE, defaultValue, allowNull);
+        super(ObModeType.OB_ORACLE, defaultValue, allowNull);
     }
 
     /**

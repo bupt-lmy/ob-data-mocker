@@ -3,8 +3,8 @@ package com.oceanbase.tools.datamocker.core.task;
 import java.util.Map;
 
 import com.oceanbase.tools.datamocker.datatype.AbstractDataType;
-import com.oceanbase.tools.datamocker.model.enums.DialectType;
 import com.oceanbase.tools.datamocker.model.enums.DuplicateStrategy;
+import com.oceanbase.tools.datamocker.model.enums.ObModeType;
 import lombok.Getter;
 
 /**
@@ -27,7 +27,7 @@ public class TableTaskMetaData {
     /**
      * 方言类型
      */
-    private final DialectType dialectType;
+    private final ObModeType dialectType;
     /**
      * 表结构定义，用于描述表的结构，包括各字段名和类型的映射关系
      *
@@ -61,7 +61,7 @@ public class TableTaskMetaData {
     private final DuplicateStrategy strategy;
 
     public TableTaskMetaData(Map<String, AbstractDataType> tableSchema, String tableName, String schema, Boolean truncate, Long timeout,
-            Long batchSize, DuplicateStrategy strategy, DialectType dialectType, Long totalCount, String taskId) {
+            Long batchSize, DuplicateStrategy strategy, ObModeType dialectType, Long totalCount, String taskId) {
         this.tableSchema = tableSchema;
         this.tableName = tableName;
         this.schema = schema;

@@ -3,7 +3,7 @@ package com.oceanbase.tools.datamocker.datatype.mysql;
 import com.oceanbase.tools.datamocker.datatype.AbstractByteDataType;
 import com.oceanbase.tools.datamocker.datatype.DataTypeFactory;
 import com.oceanbase.tools.datamocker.generator.ByteGeneratorBase;
-import com.oceanbase.tools.datamocker.model.enums.DialectType;
+import com.oceanbase.tools.datamocker.model.enums.ObModeType;
 
 /**
  * mysql模式下的blob类型
@@ -26,7 +26,7 @@ public class MysqlBlobType extends AbstractByteDataType {
      * @param allowNull 是否允许空值
      */
     public MysqlBlobType(Integer length, byte[] defaultValue, Boolean allowNull, ByteGeneratorBase generator) {
-        super(generator, DialectType.OB_MYSQL, defaultValue, allowNull);
+        super(generator, ObModeType.OB_MYSQL, defaultValue, allowNull);
         this.length = length;
     }
 
@@ -38,7 +38,7 @@ public class MysqlBlobType extends AbstractByteDataType {
      * @param defaultValue 默认值
      */
     public MysqlBlobType(Integer length, byte[] defaultValue, Boolean allowNull) {
-        super(DialectType.OB_MYSQL, defaultValue, allowNull);
+        super(ObModeType.OB_MYSQL, defaultValue, allowNull);
         this.length = length;
     }
 

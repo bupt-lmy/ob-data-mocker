@@ -8,7 +8,7 @@ import com.oceanbase.tools.datamocker.datatype.AbstractDateDataType;
 import com.oceanbase.tools.datamocker.datatype.DataTypeFactory;
 import com.oceanbase.tools.datamocker.generator.BaseGenerator;
 import com.oceanbase.tools.datamocker.generator.DateGeneratorBase;
-import com.oceanbase.tools.datamocker.model.enums.DialectType;
+import com.oceanbase.tools.datamocker.model.enums.ObModeType;
 
 /**
  * mysql模式下的year类型
@@ -32,7 +32,7 @@ public class MysqlYearType extends AbstractDateDataType {
     private final SimpleDateFormat dateFormat = new SimpleDateFormat(JAVA_DATE_FORMAT);
 
     public MysqlYearType(DateGeneratorBase generator, int scale, Date defaultValue, Boolean allowNull) {
-        super(generator, DialectType.OB_MYSQL, defaultValue, allowNull);
+        super(generator, ObModeType.OB_MYSQL, defaultValue, allowNull);
         generator.setScale(scale);
         generator.setTimeUnit(TimeUnit.DAYS);
         this.scale = scale;

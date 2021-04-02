@@ -26,7 +26,7 @@ import com.oceanbase.tools.datamocker.core.write.output.MockerDataSource;
 import com.oceanbase.tools.datamocker.datatype.AbstractDataType;
 import com.oceanbase.tools.datamocker.datatype.oracle.OracleNumberType;
 import com.oceanbase.tools.datamocker.model.config.model.DataBaseConfig;
-import com.oceanbase.tools.datamocker.model.enums.DialectType;
+import com.oceanbase.tools.datamocker.model.enums.ObModeType;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
 import com.oceanbase.tools.datamocker.util.MockDataPipe;
 import com.oceanbase.tools.datamocker.util.Pair;
@@ -71,13 +71,13 @@ public class DataBasePrimitiveTest extends MockerTestBase {
      * @param dialectType 方言类型
      * @throws IOException 文件读取操作可能会抛出异常
      */
-    private static DataBaseConfig getDBConfig(DialectType dialectType) throws IOException {
+    private static DataBaseConfig getDBConfig(ObModeType dialectType) throws IOException {
         DataBaseConfig config = new DataBaseConfig();
         Properties properties = new Properties();
         URL url = null;
-        if (DialectType.OB_MYSQL.equals(dialectType)) {
+        if (ObModeType.OB_MYSQL.equals(dialectType)) {
             url = DataBasePrimitiveTest.class.getClassLoader().getResource(mysqlEnv);
-        } else if (DialectType.OB_ORACLE.equals(dialectType)) {
+        } else if (ObModeType.OB_ORACLE.equals(dialectType)) {
             url = DataBasePrimitiveTest.class.getClassLoader().getResource(oracleEnv);
         } else {
             return null;
@@ -164,9 +164,9 @@ public class DataBasePrimitiveTest extends MockerTestBase {
 
     @BeforeClass
     public static void initEnv() throws IOException, SQLException {
-        DataBaseConfig mysqlConfig = getDBConfig(DialectType.OB_MYSQL);
+        DataBaseConfig mysqlConfig = getDBConfig(ObModeType.OB_MYSQL);
         mysqlDataSource = new MockerDataSource(mysqlConfig, 3, 5, 2, null);
-        DataBaseConfig oracleConfig = getDBConfig(DialectType.OB_ORACLE);
+        DataBaseConfig oracleConfig = getDBConfig(ObModeType.OB_ORACLE);
         oracleDataSource = new MockerDataSource(oracleConfig, 3, 5, 2, null);
         initEnv(oracleDataSource.getConnection());
         initEnv(mysqlDataSource.getConnection());
@@ -183,14 +183,14 @@ public class DataBasePrimitiveTest extends MockerTestBase {
     public void testPrimitiveWithoutDatabase() {
         expect.expectMessage("database can not be null");
         expect.expect(MockerException.class);
-        AbstractMockWriter primitive = new DataBaseWriter(oracleDataSource, DialectType.OB_ORACLE, null, null);
+        AbstractMockWriter primitive = new DataBaseWriter(oracleDataSource, ObModeType.OB_ORACLE, null, null);
     }
 
     @Test
     public void testPrimitiveWithouttable() throws IOException {
         expect.expectMessage("table name can not be null");
         expect.expect(MockerException.class);
-        DialectType dialectType = DialectType.OB_ORACLE;
+        ObModeType dialectType = ObModeType.OB_ORACLE;
         DataBaseConfig config = getDBConfig(dialectType);
         AbstractMockWriter primitive = new DataBaseWriter(oracleDataSource, dialectType, config.getDefaultSchame(), null);
     }
@@ -198,7 +198,7 @@ public class DataBasePrimitiveTest extends MockerTestBase {
     @Test
     public void testInsertDataForMysql() throws Exception {
         List<Map<String, Pair<AbstractDataType, Object>>> rows = getRows(24);
-        DialectType dialectType = DialectType.OB_MYSQL;
+        ObModeType dialectType = ObModeType.OB_MYSQL;
         DataBaseConfig config = getDBConfig(dialectType);
         DataBaseWriter primitive = new DataBaseWriter(mysqlDataSource, dialectType, config.getDefaultSchame(), tableName);
         AbstractDataPipe pipe = new MockDataPipe();
@@ -211,7 +211,7 @@ public class DataBasePrimitiveTest extends MockerTestBase {
     @Test
     public void testInsertDataForOracle() throws Exception {
         List<Map<String, Pair<AbstractDataType, Object>>> rows = getRows(24);
-        DialectType dialectType = DialectType.OB_ORACLE;
+        ObModeType dialectType = ObModeType.OB_ORACLE;
         DataBaseConfig config = getDBConfig(dialectType);
         DataBaseWriter primitive = new DataBaseWriter(oracleDataSource, dialectType, config.getDefaultSchame(), tableName);
         AbstractDataPipe pipe = new MockDataPipe();

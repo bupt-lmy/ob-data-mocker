@@ -4,7 +4,7 @@ import com.oceanbase.tools.datamocker.datatype.AbstractCharDataType;
 import com.oceanbase.tools.datamocker.datatype.DataTypeFactory;
 import com.oceanbase.tools.datamocker.generator.CharGeneratorBase;
 import com.oceanbase.tools.datamocker.model.enums.CharsetType;
-import com.oceanbase.tools.datamocker.model.enums.DialectType;
+import com.oceanbase.tools.datamocker.model.enums.ObModeType;
 
 /**
  * oracle中的varchar类型
@@ -24,7 +24,7 @@ public class OracleVarCharType extends AbstractCharDataType {
      */
     public OracleVarCharType(CharGeneratorBase generator, Integer length, String defaultValue, Boolean allowNull, CharsetType charsetType,
             Boolean isUnicode) {
-        super(generator, DialectType.OB_ORACLE, charsetType, length, defaultValue, allowNull, isUnicode);
+        super(generator, ObModeType.OB_ORACLE, charsetType, length, defaultValue, allowNull, isUnicode);
     }
 
     /**
@@ -35,7 +35,7 @@ public class OracleVarCharType extends AbstractCharDataType {
      * @param allowNull   是否允许空值
      */
     public OracleVarCharType(Integer length, String defaultValue, Boolean allowNull, CharsetType charsetType, Boolean isUnicode) {
-        super(DialectType.OB_ORACLE, charsetType, length, defaultValue, allowNull, isUnicode);
+        super(ObModeType.OB_ORACLE, charsetType, length, defaultValue, allowNull, isUnicode);
     }
 
     @Override

@@ -3,7 +3,7 @@ package com.oceanbase.tools.datamocker.datatype.mysql;
 import com.oceanbase.tools.datamocker.datatype.AbstractByteDataType;
 import com.oceanbase.tools.datamocker.datatype.DataTypeFactory;
 import com.oceanbase.tools.datamocker.generator.ByteGeneratorBase;
-import com.oceanbase.tools.datamocker.model.enums.DialectType;
+import com.oceanbase.tools.datamocker.model.enums.ObModeType;
 
 /**
  * mysql模式下的binary类型，包括binary和varbinary
@@ -26,7 +26,7 @@ public class MysqlBinaryType extends AbstractByteDataType {
      * @param allowNull 是否允许空值
      */
     public MysqlBinaryType(byte[] defaultValue, Boolean allowNull, Integer width, ByteGeneratorBase generator) {
-        super(generator, DialectType.OB_MYSQL, defaultValue, allowNull);
+        super(generator, ObModeType.OB_MYSQL, defaultValue, allowNull);
         this.width = width;
     }
 
@@ -37,7 +37,7 @@ public class MysqlBinaryType extends AbstractByteDataType {
      * @param width     宽度
      */
     public MysqlBinaryType(byte[] defaultValue, Boolean allowNull, Integer width) {
-        super(DialectType.OB_MYSQL, defaultValue, allowNull);
+        super(ObModeType.OB_MYSQL, defaultValue, allowNull);
         this.width = width;
     }
 

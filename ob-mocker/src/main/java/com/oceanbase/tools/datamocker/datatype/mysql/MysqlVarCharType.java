@@ -4,7 +4,7 @@ import com.oceanbase.tools.datamocker.datatype.AbstractCharDataType;
 import com.oceanbase.tools.datamocker.datatype.DataTypeFactory;
 import com.oceanbase.tools.datamocker.generator.CharGeneratorBase;
 import com.oceanbase.tools.datamocker.model.enums.CharsetType;
-import com.oceanbase.tools.datamocker.model.enums.DialectType;
+import com.oceanbase.tools.datamocker.model.enums.ObModeType;
 import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
 
@@ -26,7 +26,7 @@ public class MysqlVarCharType extends AbstractCharDataType {
      */
     public MysqlVarCharType(Integer length, String defaultValue, Boolean allowNull, CharsetType charsetType, CharGeneratorBase generator,
             Boolean isUnicode) {
-        super(generator, DialectType.OB_MYSQL, charsetType, length, defaultValue, allowNull, isUnicode);
+        super(generator, ObModeType.OB_MYSQL, charsetType, length, defaultValue, allowNull, isUnicode);
         if (length > 65535 || length <= 0) {
             throw new MockerException(MockerError.PARAMETER_ERROR,
                     "length for char type of mysql can not be larger than 65535 or smaller than 0");
@@ -41,7 +41,7 @@ public class MysqlVarCharType extends AbstractCharDataType {
      * @param allowNull   是否允许空值
      */
     public MysqlVarCharType(Integer length, String defaultValue, Boolean allowNull, CharsetType charsetType, Boolean isUnicode) {
-        super(DialectType.OB_MYSQL, charsetType, length, defaultValue, allowNull, isUnicode);
+        super(ObModeType.OB_MYSQL, charsetType, length, defaultValue, allowNull, isUnicode);
         if (length > 65535 || length <= 0) {
             throw new MockerException(MockerError.PARAMETER_ERROR,
                     "length for char type of mysql can not be larger than 65535 or smaller than 0");

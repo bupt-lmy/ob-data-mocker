@@ -8,7 +8,7 @@ import javax.sql.DataSource;
 import com.oceanbase.tools.datamocker.constraint.AbstractConstraint;
 import com.oceanbase.tools.datamocker.constraint.ConstraintFactory;
 import com.oceanbase.tools.datamocker.core.task.TableTaskMetaData;
-import com.oceanbase.tools.datamocker.model.enums.DialectType;
+import com.oceanbase.tools.datamocker.model.enums.ObModeType;
 import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
 import com.oceanbase.tools.datamocker.schedule.AbstractMockTask;
@@ -55,9 +55,9 @@ public class MockDataBeforeTask extends AbstractMockTask<List<AbstractConstraint
         //如果设置了清空表则需要重新加载约束
         if (Boolean.TRUE.equals(metaData.getShouldTruncate())) {
             String sql;
-            if (DialectType.OB_MYSQL.equals(metaData.getDialectType())) {
+            if (ObModeType.OB_MYSQL.equals(metaData.getDialectType())) {
                 sql = String.format("delete from `%s`.`%s` where 1=1; ", metaData.getSchema(), metaData.getTableName());
-            } else if (DialectType.OB_ORACLE.equals(metaData.getDialectType())) {
+            } else if (ObModeType.OB_ORACLE.equals(metaData.getDialectType())) {
                 sql = String.format("delete from %s.\"%s\" where 1=1; ", metaData.getSchema(), metaData.getTableName());
             } else {
                 result = false;

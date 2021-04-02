@@ -1,7 +1,7 @@
 package com.oceanbase.tools.datamocker.datatype;
 
 import com.oceanbase.tools.datamocker.generator.DigitalGeneratorBase;
-import com.oceanbase.tools.datamocker.model.enums.DialectType;
+import com.oceanbase.tools.datamocker.model.enums.ObModeType;
 
 /**
  * 数字类型的抽象基类
@@ -22,7 +22,7 @@ public abstract class AbstractDigitDataType<T extends Comparable> extends Abstra
      * @param generator   随机数据生成器
      * @param dialectType OB模式
      */
-    public AbstractDigitDataType(DigitalGeneratorBase<T> generator, DialectType dialectType, T defaultValue, Boolean allowNull) {
+    public AbstractDigitDataType(DigitalGeneratorBase<T> generator, ObModeType dialectType, T defaultValue, Boolean allowNull) {
         super(generator, dialectType, defaultValue, allowNull);
     }
 
@@ -32,7 +32,7 @@ public abstract class AbstractDigitDataType<T extends Comparable> extends Abstra
      * @param generator   随机数据生成器
      * @param dialectType OB模式
      */
-    public AbstractDigitDataType(DigitalGeneratorBase<T> generator, DialectType dialectType, T defaultValue, Boolean allowNull,
+    public AbstractDigitDataType(DigitalGeneratorBase<T> generator, ObModeType dialectType, T defaultValue, Boolean allowNull,
             Boolean isSigned) {
         super(generator, dialectType, defaultValue, allowNull);
         this.isSigned = isSigned;
@@ -43,7 +43,7 @@ public abstract class AbstractDigitDataType<T extends Comparable> extends Abstra
      *
      * @param dialectType OB模式
      */
-    protected AbstractDigitDataType(DialectType dialectType, T defaultValue, Boolean allowNull) {
+    protected AbstractDigitDataType(ObModeType dialectType, T defaultValue, Boolean allowNull) {
         super(dialectType, defaultValue, allowNull);
     }
 

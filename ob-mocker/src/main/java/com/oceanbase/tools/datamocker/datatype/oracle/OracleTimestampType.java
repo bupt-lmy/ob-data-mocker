@@ -8,7 +8,7 @@ import com.oceanbase.tools.datamocker.datatype.AbstractDateDataType;
 import com.oceanbase.tools.datamocker.datatype.DataTypeFactory;
 import com.oceanbase.tools.datamocker.generator.BaseGenerator;
 import com.oceanbase.tools.datamocker.generator.DateGeneratorBase;
-import com.oceanbase.tools.datamocker.model.enums.DialectType;
+import com.oceanbase.tools.datamocker.model.enums.ObModeType;
 import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
 
@@ -38,7 +38,7 @@ public class OracleTimestampType extends AbstractDateDataType<Timestamp> {
     private final int scale;
 
     public OracleTimestampType(DateGeneratorBase<Timestamp> generator, int scale, Timestamp defaultValue, Boolean allowNull) {
-        super(generator, DialectType.OB_ORACLE, defaultValue, allowNull);
+        super(generator, ObModeType.OB_ORACLE, defaultValue, allowNull);
         if (scale < 0 || scale > 9) {
             throw new MockerException(MockerError.PARAMETER_ERROR, "scale for timestamp can not smaller than zero or bigger than nine");
         }
@@ -57,7 +57,7 @@ public class OracleTimestampType extends AbstractDateDataType<Timestamp> {
     }
 
     public OracleTimestampType(DateGeneratorBase<Timestamp> generator, Timestamp defaultValue, Boolean allowNull) {
-        super(generator, DialectType.OB_ORACLE, defaultValue, allowNull);
+        super(generator, ObModeType.OB_ORACLE, defaultValue, allowNull);
         this.scale = 3;
         generator.setScale(this.scale);
         if (scale > 3) {

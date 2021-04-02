@@ -3,7 +3,7 @@ package com.oceanbase.tools.datamocker.datatype.oracle;
 import com.oceanbase.tools.datamocker.datatype.AbstractByteDataType;
 import com.oceanbase.tools.datamocker.datatype.DataTypeFactory;
 import com.oceanbase.tools.datamocker.generator.ByteGeneratorBase;
-import com.oceanbase.tools.datamocker.model.enums.DialectType;
+import com.oceanbase.tools.datamocker.model.enums.ObModeType;
 
 /**
  * oracle模式下的raw类型
@@ -23,7 +23,7 @@ public class OracleRawType extends AbstractByteDataType {
      * @param allowNull 是否允许空值
      */
     public OracleRawType(byte[] defaultValue, Boolean allowNull, Integer width, ByteGeneratorBase generator) {
-        super(generator, DialectType.OB_ORACLE, defaultValue, allowNull);
+        super(generator, ObModeType.OB_ORACLE, defaultValue, allowNull);
         this.width = width;
     }
 
@@ -34,7 +34,7 @@ public class OracleRawType extends AbstractByteDataType {
      * @param width     宽度
      */
     public OracleRawType(byte[] defaultValue, Boolean allowNull, Integer width) {
-        super(DialectType.OB_ORACLE, defaultValue, allowNull);
+        super(ObModeType.OB_ORACLE, defaultValue, allowNull);
         this.width = width;
     }
 

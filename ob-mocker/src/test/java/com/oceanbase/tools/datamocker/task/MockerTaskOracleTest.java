@@ -30,8 +30,8 @@ import com.oceanbase.tools.datamocker.model.config.AbstractTableConfig;
 import com.oceanbase.tools.datamocker.model.config.AbstractTaskConfig;
 import com.oceanbase.tools.datamocker.model.config.impl.DefaultTaskConfig;
 import com.oceanbase.tools.datamocker.model.config.model.DataBaseConfig;
-import com.oceanbase.tools.datamocker.model.enums.DialectType;
 import com.oceanbase.tools.datamocker.model.enums.MockTaskStatus;
+import com.oceanbase.tools.datamocker.model.enums.ObModeType;
 import com.oceanbase.tools.datamocker.model.enums.ScriptType;
 import com.oceanbase.tools.datamocker.schedule.MockContext;
 import org.junit.After;
@@ -84,13 +84,13 @@ public class MockerTaskOracleTest extends MockerTestBase {
      * @param dialectType 方言类型
      * @throws IOException 文件读取操作可能会抛出异常
      */
-    private DataBaseConfig getDBConfig(DialectType dialectType) throws IOException {
+    private DataBaseConfig getDBConfig(ObModeType dialectType) throws IOException {
         DataBaseConfig config = new DataBaseConfig();
         Properties properties = new Properties();
         URL url = null;
-        if (DialectType.OB_MYSQL.equals(dialectType)) {
+        if (ObModeType.OB_MYSQL.equals(dialectType)) {
             url = this.getClass().getClassLoader().getResource(mysqlEnv);
-        } else if (DialectType.OB_ORACLE.equals(dialectType)) {
+        } else if (ObModeType.OB_ORACLE.equals(dialectType)) {
             url = this.getClass().getClassLoader().getResource(oracleEnv);
         } else {
             return null;
@@ -131,7 +131,7 @@ public class MockerTaskOracleTest extends MockerTestBase {
     @Before
     public void initEnv() throws IOException, SQLException {
         if (oracleDatasource == null) {
-            DataBaseConfig config = getDBConfig(DialectType.OB_ORACLE);
+            DataBaseConfig config = getDBConfig(ObModeType.OB_ORACLE);
             oracleDatasource = new MockerDataSource(config, 3, 5, 2, null);
         }
         try (Connection connection = oracleDatasource.getConnection()) {

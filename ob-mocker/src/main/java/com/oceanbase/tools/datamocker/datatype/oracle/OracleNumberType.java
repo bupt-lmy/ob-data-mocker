@@ -5,7 +5,7 @@ import java.math.BigDecimal;
 import com.oceanbase.tools.datamocker.datatype.AbstractDigitDataType;
 import com.oceanbase.tools.datamocker.datatype.DataTypeFactory;
 import com.oceanbase.tools.datamocker.generator.DigitalGeneratorBase;
-import com.oceanbase.tools.datamocker.model.enums.DialectType;
+import com.oceanbase.tools.datamocker.model.enums.ObModeType;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
 
 /**
@@ -27,19 +27,19 @@ public class OracleNumberType extends AbstractDigitDataType<BigDecimal> {
 
     public OracleNumberType(int precision, int scale, DigitalGeneratorBase<BigDecimal> generator, BigDecimal defaultValue,
             Boolean allowNull) {
-        super(generator, DialectType.OB_ORACLE, defaultValue, allowNull);
+        super(generator, ObModeType.OB_ORACLE, defaultValue, allowNull);
         this.precision = precision;
         this.scale = scale;
     }
 
     public OracleNumberType(int precision, DigitalGeneratorBase<BigDecimal> generator, BigDecimal defaultValue, Boolean allowNull) {
-        super(generator, DialectType.OB_ORACLE, defaultValue, allowNull);
+        super(generator, ObModeType.OB_ORACLE, defaultValue, allowNull);
         this.precision = precision;
         this.scale = 0;
     }
 
     public OracleNumberType(int precision, int scale, BigDecimal defaultValue, Boolean allowNull) {
-        super(DialectType.OB_ORACLE, defaultValue, allowNull);
+        super(ObModeType.OB_ORACLE, defaultValue, allowNull);
         this.precision = precision;
         this.scale = scale;
     }

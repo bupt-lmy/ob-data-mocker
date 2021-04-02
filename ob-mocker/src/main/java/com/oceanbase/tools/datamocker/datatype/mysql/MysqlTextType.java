@@ -4,7 +4,7 @@ import com.oceanbase.tools.datamocker.datatype.AbstractCharDataType;
 import com.oceanbase.tools.datamocker.datatype.DataTypeFactory;
 import com.oceanbase.tools.datamocker.generator.CharGeneratorBase;
 import com.oceanbase.tools.datamocker.model.enums.CharsetType;
-import com.oceanbase.tools.datamocker.model.enums.DialectType;
+import com.oceanbase.tools.datamocker.model.enums.ObModeType;
 
 /**
  * mysq模式下的text类型
@@ -23,7 +23,7 @@ public class MysqlTextType extends AbstractCharDataType {
      */
     public MysqlTextType(Integer length, String defaultValue, Boolean allowNull, CharsetType charsetType, CharGeneratorBase generator,
             Boolean isUnicode) {
-        super(generator, DialectType.OB_MYSQL, charsetType, length, defaultValue, allowNull, isUnicode);
+        super(generator, ObModeType.OB_MYSQL, charsetType, length, defaultValue, allowNull, isUnicode);
     }
 
     /**
@@ -33,7 +33,7 @@ public class MysqlTextType extends AbstractCharDataType {
      * @param allowNull   是否允许空值
      */
     public MysqlTextType(Integer length, String defaultValue, Boolean allowNull, CharsetType charsetType, Boolean isUnicode) {
-        super(DialectType.OB_MYSQL, charsetType, length, defaultValue, allowNull, isUnicode);
+        super(ObModeType.OB_MYSQL, charsetType, length, defaultValue, allowNull, isUnicode);
     }
 
     @Override

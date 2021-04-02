@@ -8,7 +8,7 @@ import com.oceanbase.tools.datamocker.datatype.AbstractDateDataType;
 import com.oceanbase.tools.datamocker.datatype.DataTypeFactory;
 import com.oceanbase.tools.datamocker.generator.BaseGenerator;
 import com.oceanbase.tools.datamocker.generator.DateGeneratorBase;
-import com.oceanbase.tools.datamocker.model.enums.DialectType;
+import com.oceanbase.tools.datamocker.model.enums.ObModeType;
 import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
 
@@ -35,7 +35,7 @@ public class MysqlDateTimeType extends AbstractDateDataType<Timestamp> {
     private final int scale;
 
     public MysqlDateTimeType(DateGeneratorBase<Timestamp> generator, int scale, Timestamp defaultValue, Boolean allowNull) {
-        super(generator, DialectType.OB_MYSQL, defaultValue, allowNull);
+        super(generator, ObModeType.OB_MYSQL, defaultValue, allowNull);
         if (scale < 0 || scale > 6) {
             throw new MockerException(MockerError.PARAMETER_ERROR, "scale for datetime can not smaller than zero or bigger than six");
         }
@@ -49,7 +49,7 @@ public class MysqlDateTimeType extends AbstractDateDataType<Timestamp> {
     }
 
     public MysqlDateTimeType(DateGeneratorBase<Timestamp> generator, Timestamp defaultValue, Boolean allowNull) {
-        super(generator, DialectType.OB_MYSQL, defaultValue, allowNull);
+        super(generator, ObModeType.OB_MYSQL, defaultValue, allowNull);
         this.scale = 3;
         generator.setScale(this.scale);
         if (scale > 3) {

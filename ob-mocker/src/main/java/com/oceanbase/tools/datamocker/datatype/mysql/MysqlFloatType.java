@@ -5,7 +5,7 @@ import java.math.BigDecimal;
 import com.oceanbase.tools.datamocker.datatype.AbstractDigitDataType;
 import com.oceanbase.tools.datamocker.datatype.DataTypeFactory;
 import com.oceanbase.tools.datamocker.generator.DigitalGeneratorBase;
-import com.oceanbase.tools.datamocker.model.enums.DialectType;
+import com.oceanbase.tools.datamocker.model.enums.ObModeType;
 import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
 
@@ -28,14 +28,14 @@ public class MysqlFloatType extends AbstractDigitDataType<BigDecimal> {
 
     public MysqlFloatType(int precision, int scale, DigitalGeneratorBase<BigDecimal> generator, BigDecimal defaultValue, Boolean allowNull,
             Boolean signed) {
-        super(generator, DialectType.OB_MYSQL, defaultValue, allowNull, signed);
+        super(generator, ObModeType.OB_MYSQL, defaultValue, allowNull, signed);
         validate(precision, scale);
         this.precision = precision;
         this.scale = scale;
     }
 
     public MysqlFloatType(DigitalGeneratorBase<BigDecimal> generator, BigDecimal defaultValue, Boolean allowNull, Boolean signed) {
-        super(generator, DialectType.OB_MYSQL, defaultValue, allowNull, signed);
+        super(generator, ObModeType.OB_MYSQL, defaultValue, allowNull, signed);
         this.precision = -1;
         this.scale = -1;
     }

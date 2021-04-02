@@ -3,7 +3,7 @@ package com.oceanbase.tools.datamocker.model.config;
 import java.util.List;
 
 import com.oceanbase.tools.datamocker.model.config.model.DataBaseConfig;
-import com.oceanbase.tools.datamocker.model.enums.DialectType;
+import com.oceanbase.tools.datamocker.model.enums.ObModeType;
 import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
 
@@ -20,7 +20,7 @@ public abstract class AbstractTaskConfig {
      *
      * @return 返回OB模式
      */
-    abstract public DialectType obDialectType();
+    abstract public ObModeType obDialectType();
 
     /**
      * 获取数据库配置对象

@@ -15,7 +15,7 @@ import com.oceanbase.tools.datamocker.core.write.SqlScriptWriter;
 import com.oceanbase.tools.datamocker.core.write.output.MockerFile;
 import com.oceanbase.tools.datamocker.datatype.AbstractDataType;
 import com.oceanbase.tools.datamocker.datatype.oracle.OracleNumberType;
-import com.oceanbase.tools.datamocker.model.enums.DialectType;
+import com.oceanbase.tools.datamocker.model.enums.ObModeType;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
 import com.oceanbase.tools.datamocker.util.MockDataPipe;
 import com.oceanbase.tools.datamocker.util.Pair;
@@ -71,7 +71,7 @@ public class SqlScriptPrimitiveTest extends MockerTestBase {
     @Test
     public void testSqlPrimitive() throws Exception {
         List<Map<String, Pair<AbstractDataType, Object>>> list = getRows(48);
-        SqlScriptWriter primitive = new SqlScriptWriter(manager, DialectType.OB_ORACLE, "test", "emp");
+        SqlScriptWriter primitive = new SqlScriptWriter(manager, ObModeType.OB_ORACLE, "test", "emp");
         AbstractDataPipe pipe = new MockDataPipe();
         primitive.register(pipe);
         pipe.write(list);
@@ -89,14 +89,14 @@ public class SqlScriptPrimitiveTest extends MockerTestBase {
     public void testPrimitiveWithoutDatabase() {
         expect.expectMessage("database can not be null");
         expect.expect(MockerException.class);
-        SqlScriptWriter primitive = new SqlScriptWriter(manager, DialectType.OB_ORACLE, null, null);
+        SqlScriptWriter primitive = new SqlScriptWriter(manager, ObModeType.OB_ORACLE, null, null);
     }
 
     @Test
     public void testPrimitiveWithouttable() throws IOException {
         expect.expectMessage("table name can not be null");
         expect.expect(MockerException.class);
-        DialectType dialectType = DialectType.OB_ORACLE;
+        ObModeType dialectType = ObModeType.OB_ORACLE;
         SqlScriptWriter primitive = new SqlScriptWriter(manager, dialectType, "test", null);
     }
 

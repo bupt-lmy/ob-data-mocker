@@ -3,7 +3,7 @@ package com.oceanbase.tools.datamocker.datatype;
 import java.util.TimeZone;
 
 import com.oceanbase.tools.datamocker.generator.DateGeneratorBase;
-import com.oceanbase.tools.datamocker.model.enums.DialectType;
+import com.oceanbase.tools.datamocker.model.enums.ObModeType;
 import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
 
@@ -26,7 +26,7 @@ public abstract class AbstractDateDataType<T extends Comparable> extends Abstrac
      * @param generator   随机数据生成器
      * @param dialectType OB模式
      */
-    public AbstractDateDataType(DateGeneratorBase<T> generator, DialectType dialectType, T defaultValue, Boolean allowNull) {
+    public AbstractDateDataType(DateGeneratorBase<T> generator, ObModeType dialectType, T defaultValue, Boolean allowNull) {
         super(generator, dialectType, defaultValue, allowNull);
     }
 
@@ -35,7 +35,7 @@ public abstract class AbstractDateDataType<T extends Comparable> extends Abstrac
      *
      * @param dialectType OB模式
      */
-    protected AbstractDateDataType(DialectType dialectType, T defaultValue, Boolean allowNull) {
+    protected AbstractDateDataType(ObModeType dialectType, T defaultValue, Boolean allowNull) {
         super(dialectType, defaultValue, allowNull);
     }
 
@@ -45,7 +45,7 @@ public abstract class AbstractDateDataType<T extends Comparable> extends Abstrac
      * @param dialectType OB模式
      * @param timeZone    时区
      */
-    protected AbstractDateDataType(DialectType dialectType, TimeZone timeZone, T defaultValue, Boolean allowNull) {
+    protected AbstractDateDataType(ObModeType dialectType, TimeZone timeZone, T defaultValue, Boolean allowNull) {
         super(dialectType, defaultValue, allowNull);
         this.timeZone = timeZone;
     }

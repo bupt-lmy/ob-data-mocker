@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 
 import com.oceanbase.tools.datamocker.core.write.output.MockerFile;
 import com.oceanbase.tools.datamocker.datatype.AbstractDataType;
-import com.oceanbase.tools.datamocker.model.enums.DialectType;
+import com.oceanbase.tools.datamocker.model.enums.ObModeType;
 import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
 import com.oceanbase.tools.datamocker.util.DigestUtil;
@@ -37,7 +37,7 @@ public class SqlScriptWriter extends AbstractMockWriter {
     /**
      * OB的方言模式，默认为oracle模式
      */
-    private DialectType dialectType = DialectType.OB_ORACLE;
+    private ObModeType dialectType = ObModeType.OB_ORACLE;
     /**
      * 文件管理器
      */
@@ -55,7 +55,7 @@ public class SqlScriptWriter extends AbstractMockWriter {
      * @param database    数据库名
      * @param tableName   表名
      */
-    public SqlScriptWriter(MockerFile manager, DialectType dialectType, String database,
+    public SqlScriptWriter(MockerFile manager, ObModeType dialectType, String database,
             String tableName) {
         validateParam(manager, dialectType, database, tableName);
         this.database = database;
@@ -77,7 +77,7 @@ public class SqlScriptWriter extends AbstractMockWriter {
      * @param tableName   表名
      * @param groupId     分组ID
      */
-    public SqlScriptWriter(MockerFile manager, DialectType dialectType, String database,
+    public SqlScriptWriter(MockerFile manager, ObModeType dialectType, String database,
             String tableName, String groupId) {
         validateParam(manager, dialectType, database, tableName);
         this.database = database;
@@ -98,7 +98,7 @@ public class SqlScriptWriter extends AbstractMockWriter {
      * @param tableName   表名
      * @throws MockerException 验证失败抛出异常
      */
-    private void validateParam(MockerFile manager, DialectType dialectType, String database,
+    private void validateParam(MockerFile manager, ObModeType dialectType, String database,
             String tableName) {
         if (manager == null) {
             MockerException e = new MockerException(MockerError.PARAMETER_ERROR, "file manager can not be null");
@@ -116,7 +116,7 @@ public class SqlScriptWriter extends AbstractMockWriter {
             throw e;
         }
         if (dialectType != null) {
-            if (!DialectType.OB_ORACLE.equals(dialectType) && !DialectType.OB_MYSQL.equals(dialectType)) {
+            if (!ObModeType.OB_ORACLE.equals(dialectType) && !ObModeType.OB_MYSQL.equals(dialectType)) {
                 throw new MockerException(MockerError.INVALID_OB_MODE);
             }
             this.dialectType = dialectType;
@@ -129,24 +129,24 @@ public class SqlScriptWriter extends AbstractMockWriter {
         Set<String> columnSet = firstRow.keySet();
         List<String> columnList = new ArrayList<>(columnSet);
         StringBuffer sqlBuffer = null;
-        if (DialectType.OB_ORACLE.equals(this.dialectType)) {
+        if (ObModeType.OB_ORACLE.equals(this.dialectType)) {
             sqlBuffer = new StringBuffer(String.format("insert into %s.\"%s\"(", database, tableName));
-        } else if (DialectType.OB_MYSQL.equals(this.dialectType)) {
+        } else if (ObModeType.OB_MYSQL.equals(this.dialectType)) {
             sqlBuffer = new StringBuffer(String.format("insert into `%s`.`%s`(", database, tableName));
         }
         int columnLength = columnList.size();
         for (int i = 0; i < columnLength; i++) {
             String columnName = columnList.get(i);
             if (i == columnLength - 1) {
-                if (DialectType.OB_ORACLE.equals(this.dialectType)) {
+                if (ObModeType.OB_ORACLE.equals(this.dialectType)) {
                     sqlBuffer.append(String.format("\"%s\") values (", columnName));
-                } else if (DialectType.OB_MYSQL.equals(this.dialectType)) {
+                } else if (ObModeType.OB_MYSQL.equals(this.dialectType)) {
                     sqlBuffer.append(String.format("`%s`) values (", columnName));
                 }
             } else {
-                if (DialectType.OB_ORACLE.equals(this.dialectType)) {
+                if (ObModeType.OB_ORACLE.equals(this.dialectType)) {
                     sqlBuffer.append(String.format("\"%s\", ", columnName));
-                } else if (DialectType.OB_MYSQL.equals(this.dialectType)) {
+                } else if (ObModeType.OB_MYSQL.equals(this.dialectType)) {
                     sqlBuffer.append(String.format("`%s`, ", columnName));
                 }
             }

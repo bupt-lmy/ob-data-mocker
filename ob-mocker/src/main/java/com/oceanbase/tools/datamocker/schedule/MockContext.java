@@ -80,7 +80,7 @@ public class MockContext {
      * get task progreee
      *
      * @return progress
-     * */
+     */
     public double getProgress() {
         return progress;
     }

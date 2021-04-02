@@ -9,7 +9,7 @@ import com.oceanbase.tools.datamocker.datatype.AbstractDateDataType;
 import com.oceanbase.tools.datamocker.datatype.DataTypeFactory;
 import com.oceanbase.tools.datamocker.generator.BaseGenerator;
 import com.oceanbase.tools.datamocker.generator.DateGeneratorBase;
-import com.oceanbase.tools.datamocker.model.enums.DialectType;
+import com.oceanbase.tools.datamocker.model.enums.ObModeType;
 import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
 
@@ -31,16 +31,16 @@ public class MysqlDateType extends AbstractDateDataType<Date> {
     private final SimpleDateFormat dateFormat = new SimpleDateFormat(JAVA_DATE_FORMAT);
 
     public MysqlDateType(DateGeneratorBase<Date> generator, Date defaultValue, Boolean allowNull) {
-        super(generator, DialectType.OB_MYSQL, defaultValue, allowNull);
+        super(generator, ObModeType.OB_MYSQL, defaultValue, allowNull);
         generator.setTimeUnit(TimeUnit.DAYS);
     }
 
     public MysqlDateType(TimeZone timeZone, Date defaultValue, Boolean allowNull) {
-        super(DialectType.OB_MYSQL, timeZone, defaultValue, allowNull);
+        super(ObModeType.OB_MYSQL, timeZone, defaultValue, allowNull);
     }
 
     public MysqlDateType(Date defaultValue, Boolean allowNull) {
-        super(DialectType.OB_MYSQL, defaultValue, allowNull);
+        super(ObModeType.OB_MYSQL, defaultValue, allowNull);
     }
 
     /**

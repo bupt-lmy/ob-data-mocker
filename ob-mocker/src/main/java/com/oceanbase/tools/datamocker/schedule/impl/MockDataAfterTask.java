@@ -8,7 +8,7 @@ import java.util.List;
 import javax.sql.DataSource;
 
 import com.oceanbase.tools.datamocker.core.task.TableTaskMetaData;
-import com.oceanbase.tools.datamocker.model.enums.DialectType;
+import com.oceanbase.tools.datamocker.model.enums.ObModeType;
 import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
 import com.oceanbase.tools.datamocker.schedule.AbstractMockTask;
@@ -53,9 +53,9 @@ public class MockDataAfterTask extends AbstractMockTask<Long> {
     public Long execute(TableTaskMetaData metaData) {
         log.info("begin execute mock after task");
         String sql;
-        if (DialectType.OB_ORACLE.equals(metaData.getDialectType())) {
+        if (ObModeType.OB_ORACLE.equals(metaData.getDialectType())) {
             sql = String.format("select count(*) from %s.\"%s\"; ", metaData.getSchema(), metaData.getTableName());
-        } else if (DialectType.OB_MYSQL.equals(metaData.getDialectType())) {
+        } else if (ObModeType.OB_MYSQL.equals(metaData.getDialectType())) {
             sql = String.format("select count(*) from `%s`.`%s`; ", metaData.getSchema(), metaData.getTableName());
         } else {
             MockerException e = new MockerException(MockerError.INVALID_OB_MODE);

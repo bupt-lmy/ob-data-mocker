@@ -10,9 +10,9 @@ import javax.sql.DataSource;
 
 import com.oceanbase.tools.datamocker.core.write.output.MockerFile;
 import com.oceanbase.tools.datamocker.datatype.AbstractDataType;
-import com.oceanbase.tools.datamocker.model.enums.DialectType;
 import com.oceanbase.tools.datamocker.model.enums.DuplicateStrategy;
 import com.oceanbase.tools.datamocker.model.enums.MockTaskStatus;
+import com.oceanbase.tools.datamocker.model.enums.ObModeType;
 import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
 import com.oceanbase.tools.datamocker.util.Pair;
@@ -57,7 +57,7 @@ public class TableTaskContext {
      * 方言类型
      */
     @Getter
-    private final DialectType dialectType;
+    private final ObModeType dialectType;
     /**
      * 表结构定义，用于描述表的结构，包括各字段名和类型的映射关系
      */
@@ -126,7 +126,7 @@ public class TableTaskContext {
     @Getter
     private final int topIndex;
 
-    public TableTaskContext(String taskId, String taskName, Long batchSize, Long totalNum, DialectType dialectType,
+    public TableTaskContext(String taskId, String taskName, Long batchSize, Long totalNum, ObModeType dialectType,
             Map<String, AbstractDataType> tableSchema, String tableName, String schema, Boolean truncate, Long timeout,
             DuplicateStrategy strategy, DataSource dataSource, List<MockerFile> fileManagers, int index) {
         this.taskId = taskId;

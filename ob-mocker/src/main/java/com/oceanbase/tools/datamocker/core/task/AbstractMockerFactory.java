@@ -34,7 +34,7 @@ import com.oceanbase.tools.datamocker.model.config.AbstractColumnConfig;
 import com.oceanbase.tools.datamocker.model.config.AbstractTableConfig;
 import com.oceanbase.tools.datamocker.model.config.AbstractTaskConfig;
 import com.oceanbase.tools.datamocker.model.config.model.DataBaseConfig;
-import com.oceanbase.tools.datamocker.model.enums.DialectType;
+import com.oceanbase.tools.datamocker.model.enums.ObModeType;
 import com.oceanbase.tools.datamocker.model.enums.ScriptType;
 import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
@@ -149,9 +149,9 @@ public abstract class AbstractMockerFactory {
             return;
         }
         String sql;
-        if (DialectType.OB_ORACLE.equals(this.taskConfig.obDialectType())) {
+        if (ObModeType.OB_ORACLE.equals(this.taskConfig.obDialectType())) {
             sql = String.format("select count(*) from %s.\"%s\"", schema, table);
-        } else if (DialectType.OB_MYSQL.equals(this.taskConfig.obDialectType())) {
+        } else if (ObModeType.OB_MYSQL.equals(this.taskConfig.obDialectType())) {
             sql = String.format("select count(*) from `%s`.`%s`", schema, table);
         } else {
             throw new MockerException(MockerError.INVALID_OB_MODE);
@@ -190,7 +190,7 @@ public abstract class AbstractMockerFactory {
      * @param tableConfig 表定义
      * @return 返回约束集合
      */
-    protected List<AbstractConstraint> getConstraints(AbstractTableConfig tableConfig, DialectType dialectType) {
+    protected List<AbstractConstraint> getConstraints(AbstractTableConfig tableConfig, ObModeType dialectType) {
         if (tableConfig.constraints() != null) {
             return tableConfig.constraints();
         } else if (this.innerDatasource == null) {

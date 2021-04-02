@@ -3,7 +3,7 @@ package com.oceanbase.tools.datamocker.datatype.oracle;
 import com.oceanbase.tools.datamocker.datatype.AbstractByteDataType;
 import com.oceanbase.tools.datamocker.datatype.DataTypeFactory;
 import com.oceanbase.tools.datamocker.generator.ByteGeneratorBase;
-import com.oceanbase.tools.datamocker.model.enums.DialectType;
+import com.oceanbase.tools.datamocker.model.enums.ObModeType;
 
 /**
  * oracle模式中的blob类型
@@ -20,7 +20,7 @@ public class OracleBlobType extends AbstractByteDataType {
      * @param allowNull 是否允许空值
      */
     public OracleBlobType(byte[] defaultValue, Boolean allowNull, ByteGeneratorBase generator) {
-        super(generator, DialectType.OB_ORACLE, defaultValue, allowNull);
+        super(generator, ObModeType.OB_ORACLE, defaultValue, allowNull);
     }
 
     /**
@@ -29,7 +29,7 @@ public class OracleBlobType extends AbstractByteDataType {
      * @param allowNull 是否允许空值
      */
     public OracleBlobType(byte[] defaultValue, Boolean allowNull) {
-        super(DialectType.OB_ORACLE, defaultValue, allowNull);
+        super(ObModeType.OB_ORACLE, defaultValue, allowNull);
     }
 
     @Override

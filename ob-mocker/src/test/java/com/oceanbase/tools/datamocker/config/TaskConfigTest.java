@@ -13,8 +13,8 @@ import com.oceanbase.tools.datamocker.model.config.impl.DefaultTaskConfig;
 import com.oceanbase.tools.datamocker.model.config.model.DataBaseConfig;
 import com.oceanbase.tools.datamocker.model.config.model.DataTypeConfig;
 import com.oceanbase.tools.datamocker.model.config.model.DigitDataTypeConfig;
-import com.oceanbase.tools.datamocker.model.enums.DialectType;
 import com.oceanbase.tools.datamocker.model.enums.DuplicateStrategy;
+import com.oceanbase.tools.datamocker.model.enums.ObModeType;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -138,13 +138,13 @@ public class TaskConfigTest extends MockerTestBase {
         taskConfig = new DefaultTaskConfig();
         taskConfig.setTables(initTableConfig(configListSize));
         taskConfig.setDbConfig(dbConfig);
-        taskConfig.setDialectType(DialectType.OB_ORACLE);
+        taskConfig.setDialectType(ObModeType.OB_ORACLE);
     }
 
     @Test
     public void testTaskConfig() {
         Assert.assertEquals(dbConfig, taskConfig.dbConfig());
-        Assert.assertEquals(DialectType.OB_ORACLE, taskConfig.obDialectType());
+        Assert.assertEquals(ObModeType.OB_ORACLE, taskConfig.obDialectType());
         Assert.assertNotNull(taskConfig.tasks());
         Assert.assertEquals(configListSize, taskConfig.tasks().size());
         Assert.assertNull(taskConfig.taskName());

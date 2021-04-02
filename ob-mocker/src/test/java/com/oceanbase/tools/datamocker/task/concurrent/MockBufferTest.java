@@ -28,7 +28,7 @@ import com.oceanbase.tools.datamocker.datatype.AbstractDataType;
 import com.oceanbase.tools.datamocker.datatype.oracle.OracleNumberType;
 import com.oceanbase.tools.datamocker.generator.digit.NormalGenerator;
 import com.oceanbase.tools.datamocker.model.config.model.DataBaseConfig;
-import com.oceanbase.tools.datamocker.model.enums.DialectType;
+import com.oceanbase.tools.datamocker.model.enums.ObModeType;
 import com.oceanbase.tools.datamocker.task.primitive.DataBasePrimitiveTest;
 import com.oceanbase.tools.datamocker.util.MockDataPipe;
 import com.oceanbase.tools.datamocker.util.MockerBuffer;
@@ -75,13 +75,13 @@ public class MockBufferTest extends MockerTestBase {
      * @param dialectType 方言类型
      * @throws IOException 文件读取操作可能会抛出异常
      */
-    private DataBaseConfig getDBConfig(DialectType dialectType) throws IOException {
+    private DataBaseConfig getDBConfig(ObModeType dialectType) throws IOException {
         DataBaseConfig config = new DataBaseConfig();
         Properties properties = new Properties();
         URL url = null;
-        if (DialectType.OB_MYSQL.equals(dialectType)) {
+        if (ObModeType.OB_MYSQL.equals(dialectType)) {
             url = DataBasePrimitiveTest.class.getClassLoader().getResource(mysqlEnv);
-        } else if (DialectType.OB_ORACLE.equals(dialectType)) {
+        } else if (ObModeType.OB_ORACLE.equals(dialectType)) {
             url = DataBasePrimitiveTest.class.getClassLoader().getResource(oracleEnv);
         } else {
             return null;
@@ -112,7 +112,7 @@ public class MockBufferTest extends MockerTestBase {
 
     @Before
     public void initFileManager() throws IOException, SQLException {
-        DataBaseConfig oracleConfig = getDBConfig(DialectType.OB_ORACLE);
+        DataBaseConfig oracleConfig = getDBConfig(ObModeType.OB_ORACLE);
         dataSource = new MockerDataSource(oracleConfig, 15, 25, 2, null);
         initEnv(dataSource);
         manager = new MockerFile("test/mock/mock.sql");
@@ -214,7 +214,7 @@ public class MockBufferTest extends MockerTestBase {
     public void testDataBasePrimitive() throws IOException, InterruptedException {
         AbstractDataPipe dataPipe = new MockDataPipe();
         startDataGenerateTask(dataPipe, 256, 600);
-        DialectType dialectType = DialectType.OB_ORACLE;
+        ObModeType dialectType = ObModeType.OB_ORACLE;
         DataBaseConfig config = getDBConfig(dialectType);
         DataBaseWriter primitive = new DataBaseWriter(dataSource, dialectType, config.getDefaultSchame(), "EMP");
         primitive.register(dataPipe);
@@ -243,7 +243,7 @@ public class MockBufferTest extends MockerTestBase {
     public void testScriptPrimitive() throws InterruptedException {
         AbstractDataPipe dataPipe = new MockDataPipe();
         startDataGenerateTask(dataPipe, 256, 123);
-        SqlScriptWriter primitive = new SqlScriptWriter(manager, DialectType.OB_ORACLE, "test", "emp");
+        SqlScriptWriter primitive = new SqlScriptWriter(manager, ObModeType.OB_ORACLE, "test", "emp");
         primitive.register(dataPipe);
         List<Thread> list = new LinkedList<>();
         for (int i = 0; i < 10; i++) {

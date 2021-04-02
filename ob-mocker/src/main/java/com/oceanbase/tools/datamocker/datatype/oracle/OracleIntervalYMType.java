@@ -5,7 +5,7 @@ import com.alipay.oceanbase.jdbc.extend.datatype.INTERVALYM;
 import com.oceanbase.tools.datamocker.datatype.AbstractDataType;
 import com.oceanbase.tools.datamocker.datatype.DataTypeFactory;
 import com.oceanbase.tools.datamocker.generator.BaseGenerator;
-import com.oceanbase.tools.datamocker.model.enums.DialectType;
+import com.oceanbase.tools.datamocker.model.enums.ObModeType;
 import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
 
@@ -33,7 +33,7 @@ public class OracleIntervalYMType extends AbstractDataType<INTERVALYM, Integer> 
      */
     public OracleIntervalYMType(BaseGenerator<Integer, INTERVALYM> generator, Integer scale, INTERVALYM defaultValue,
             Boolean allowNull) {
-        super(generator, DialectType.OB_ORACLE, defaultValue, allowNull);
+        super(generator, ObModeType.OB_ORACLE, defaultValue, allowNull);
         if (scale == null) {
             this.scale = 2;
         } else {

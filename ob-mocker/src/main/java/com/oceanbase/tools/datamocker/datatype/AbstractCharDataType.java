@@ -5,7 +5,7 @@ import java.io.UnsupportedEncodingException;
 import com.oceanbase.tools.datamocker.generator.BaseGenerator;
 import com.oceanbase.tools.datamocker.generator.CharGeneratorBase;
 import com.oceanbase.tools.datamocker.model.enums.CharsetType;
-import com.oceanbase.tools.datamocker.model.enums.DialectType;
+import com.oceanbase.tools.datamocker.model.enums.ObModeType;
 import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
 
@@ -39,7 +39,7 @@ public abstract class AbstractCharDataType extends AbstractDataType<String, Inte
      * @param length      类型长度
      * @param allowNull   是否允许空值
      */
-    public AbstractCharDataType(CharGeneratorBase generator, DialectType dialectType, CharsetType charsetType, Integer length,
+    public AbstractCharDataType(CharGeneratorBase generator, ObModeType dialectType, CharsetType charsetType, Integer length,
             String defaultValue, Boolean allowNull, Boolean isUnicode) {
         super(generator, dialectType, defaultValue, allowNull);
         validateParam(charsetType, length);
@@ -58,7 +58,7 @@ public abstract class AbstractCharDataType extends AbstractDataType<String, Inte
      * @param length      类型长度
      * @param allowNull   是否允许空值
      */
-    protected AbstractCharDataType(DialectType dialectType, CharsetType charsetType, Integer length, String defaultValue, Boolean allowNull,
+    protected AbstractCharDataType(ObModeType dialectType, CharsetType charsetType, Integer length, String defaultValue, Boolean allowNull,
             Boolean isUnicode) {
         super(dialectType, defaultValue, allowNull);
         validateParam(charsetType, length);
