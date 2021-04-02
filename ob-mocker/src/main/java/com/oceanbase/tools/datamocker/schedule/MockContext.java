@@ -14,6 +14,7 @@ public class MockContext {
     @Getter
     private List<TableTaskContext> tables;
     private final MockExecutorService service;
+    private double progress;
 
     public MockContext(MockExecutorService service) {
         tables = new LinkedList<>();
@@ -73,5 +74,14 @@ public class MockContext {
             returnVal &= context.shutdown();
         }
         return returnVal;
+    }
+
+    /**
+     * get task progreee
+     *
+     * @return progress
+     * */
+    public double getProgress() {
+        return progress;
     }
 }
