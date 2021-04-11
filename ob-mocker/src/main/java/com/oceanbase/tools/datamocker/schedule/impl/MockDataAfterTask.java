@@ -7,6 +7,7 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
+import com.oceanbase.tools.datamocker.core.task.TableTaskContext;
 import com.oceanbase.tools.datamocker.core.task.TableTaskMetaData;
 import com.oceanbase.tools.datamocker.model.enums.ObModeType;
 import com.oceanbase.tools.datamocker.model.exception.MockerError;
@@ -34,8 +35,8 @@ public class MockDataAfterTask extends AbstractMockTask<Long> {
      */
     private final DataSource dataSource;
 
-    public MockDataAfterTask(TableTaskMetaData metaData, DataSource dataSource) {
-        super(metaData);
+    public MockDataAfterTask(TableTaskMetaData metaData, TableTaskContext context, DataSource dataSource) {
+        super(metaData, context);
         if (dataSource == null) {
             MockerException e = new MockerException(MockerError.PARAMETER_ERROR, "data source can not be null");
             log.error("fail to init mock data after task, datasource can not be null", e);
@@ -50,7 +51,7 @@ public class MockDataAfterTask extends AbstractMockTask<Long> {
     }
 
     @Override
-    public Long execute(TableTaskMetaData metaData) {
+    public Long execute(TableTaskMetaData metaData, TableTaskContext context) {
         log.info("begin execute mock after task");
         String sql;
         if (ObModeType.OB_ORACLE.equals(metaData.getDialectType())) {

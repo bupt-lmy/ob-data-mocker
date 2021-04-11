@@ -8,6 +8,7 @@ import java.util.Set;
 
 import com.oceanbase.tools.datamocker.constraint.AbstractConstraint;
 import com.oceanbase.tools.datamocker.core.read.ColumnReader;
+import com.oceanbase.tools.datamocker.core.task.TableTaskContext;
 import com.oceanbase.tools.datamocker.core.task.TableTaskMetaData;
 import com.oceanbase.tools.datamocker.datatype.AbstractDataType;
 import com.oceanbase.tools.datamocker.model.exception.MockerError;
@@ -43,9 +44,9 @@ public class MockDataGenTask extends AbstractMockTask<Long> {
      */
     private List<AbstractConstraint> constraints;
 
-    public MockDataGenTask(TableTaskMetaData metaData, MockerBuffer buffer, List<ColumnReader> readers,
+    public MockDataGenTask(TableTaskMetaData metaData, TableTaskContext context, MockerBuffer buffer, List<ColumnReader> readers,
             List<AbstractConstraint> constraints) {
-        super(metaData);
+        super(metaData, context);
         validateParam(buffer, readers, constraints);
         this.buffer = buffer;
         this.readers = readers;
@@ -93,7 +94,7 @@ public class MockDataGenTask extends AbstractMockTask<Long> {
     }
 
     @Override
-    public Long execute(TableTaskMetaData metaData) {
+    public Long execute(TableTaskMetaData metaData, TableTaskContext context) {
         Long counter = 0L;
         boolean exception = false;
         // 循环空转计数器，通常空转超过totalCount还未写入任意一条数据则认为写入异常

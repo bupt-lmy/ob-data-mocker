@@ -1,7 +1,6 @@
 package com.oceanbase.tools.datamocker.model.config.impl;
 
 import java.util.List;
-import java.util.UUID;
 
 import com.oceanbase.tools.datamocker.constraint.AbstractConstraint;
 import com.oceanbase.tools.datamocker.model.config.AbstractTableConfig;
@@ -20,10 +19,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class DefaultTableConfig extends AbstractTableConfig {
-    /**
-     * 表任务ID
-     */
-    private final String tableTaskId = UUID.randomUUID().toString();
     /**
      * 列配置集合
      */
@@ -117,10 +112,5 @@ public class DefaultTableConfig extends AbstractTableConfig {
     @Override
     public List<AbstractConstraint> constraints() {
         return null;
-    }
-
-    @Override
-    public String tableTaskId() {
-        return this.tableTaskId;
     }
 }

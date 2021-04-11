@@ -46,6 +46,7 @@ import com.oceanbase.tools.datamocker.util.SqlUtil;
 import com.oceanbase.tools.datamocker.util.SqlUtil.CallBack;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.Validate;
 
 /**
  * 抽象数据模拟器，用于new一个数据模拟器出来
@@ -124,7 +125,8 @@ public abstract class AbstractMockerFactory {
         for (AbstractTableConfig tableConfig : this.taskConfig.tasks()) {
             validateTableFromDB(tableConfig.schemaName(), tableConfig.tableName());
         }
-        Dispatcher<TableTaskInfo> dispatcher = generate(this.taskConfig);
+        String taskId = UUID.randomUUID().toString().toUpperCase();
+        Dispatcher<TableTaskInfo> dispatcher = generate(this.taskConfig, taskId);
         this.innerDatasource.clear();
         return new ObDataMocker(dispatcher, scheduler);
     }
@@ -132,10 +134,11 @@ public abstract class AbstractMockerFactory {
     /**
      * 实现者自己定义分发器对象的逻辑
      *
-     * @param task 任务配置读喜庆封装体
+     * @param task   任务配置读喜庆封装体
+     * @param taskId 任务Id
      * @return 返回分发器对象
      */
-    abstract protected Dispatcher<TableTaskInfo> generate(AbstractTaskConfig task) throws Exception;
+    abstract protected Dispatcher<TableTaskInfo> generate(AbstractTaskConfig task, String taskId) throws Exception;
 
     /**
      * 验证表的存在性
@@ -248,8 +251,20 @@ public abstract class AbstractMockerFactory {
      *
      * @return 返回数据源
      */
-    protected synchronized List<MockerFile> getFileManager(String tableTaskId) {
-        return this.taskId2MockerFiles.get(tableTaskId);
+    protected synchronized List<MockerFile> getFileManager(String tableTaskId, AbstractTableConfig tableConfig) throws IOException {
+        Validate.notEmpty(tableTaskId, "table task id can not be null");
+        Validate.notNull(tableConfig, "table config can not be null");
+        List<MockerFile> returnVal = taskId2MockerFiles.get(tableTaskId);
+        if (returnVal == null) {
+            returnVal = new LinkedList<>();
+            taskId2MockerFiles.put(tableTaskId, returnVal);
+            for (ScriptType scriptType : tableConfig.scriptType()) {
+                String location = tableConfig.dataWriteLocation(scriptType);
+                MockerFile fileManager = new MockerFile(location, scriptType, true);
+                returnVal.add(fileManager);
+            }
+        }
+        return returnVal;
     }
 
     /**
@@ -258,20 +273,15 @@ public abstract class AbstractMockerFactory {
      * @param tableConfig 表生成任务封装体
      * @return 返回原语集合
      */
-    protected List<AbstractMockWriter> getDataWriter(AbstractTableConfig tableConfig, MockerBuffer buffer)
-            throws IOException, SQLException {
+    protected List<AbstractMockWriter> getDataWriter(AbstractTableConfig tableConfig, MockerBuffer buffer, List<MockerFile> managers,
+            DataSource ds) {
+        Validate.notNull(managers, "mocker file manager list can not be null");
         List<AbstractMockWriter> dataWriters = new ArrayList<>();
-        for (ScriptType scriptType : tableConfig.scriptType()) {
-            String location = tableConfig.dataWriteLocation(scriptType);
-            MockerFile fileManager = new MockerFile(location, true);
-            List<MockerFile> managers = this.taskId2MockerFiles.getOrDefault(tableConfig.tableTaskId(), new LinkedList<>());
-            managers.add(fileManager);
-            this.taskId2MockerFiles.put(tableConfig.tableTaskId(), managers);
-            SqlScriptWriter writer = new SqlScriptWriter(fileManager, this.taskConfig.obDialectType(), tableConfig.schemaName(),
+        for (MockerFile manager : managers) {
+            SqlScriptWriter writer = new SqlScriptWriter(manager, this.taskConfig.obDialectType(), tableConfig.schemaName(),
                     tableConfig.tableName());
             dataWriters.add(writer);
         }
-        DataSource ds = getDataSource(tableConfig.tableTaskId());
         if (ds == null) {
             return dataWriters;
         }

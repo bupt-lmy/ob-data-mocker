@@ -4,6 +4,7 @@ import java.util.UUID;
 import java.util.concurrent.Callable;
 
 import com.oceanbase.tools.datamocker.core.task.CallBackMethod;
+import com.oceanbase.tools.datamocker.core.task.TableTaskContext;
 import com.oceanbase.tools.datamocker.core.task.TableTaskMetaData;
 import com.oceanbase.tools.datamocker.util.Pair;
 import lombok.extern.slf4j.Slf4j;
@@ -33,10 +34,15 @@ public abstract class AbstractMockTask<T> implements Callable<T> {
      * 表生成任务配置对象
      */
     private final TableTaskMetaData metaData;
+    /**
+     * 表生成任务上下文
+     */
+    private final TableTaskContext context;
 
-    public AbstractMockTask(TableTaskMetaData metaData) {
+    public AbstractMockTask(TableTaskMetaData metaData, TableTaskContext context) {
         this.metaData = metaData;
         this.startTimeStamp = System.currentTimeMillis();
+        this.context = context;
     }
 
     /**
@@ -53,12 +59,12 @@ public abstract class AbstractMockTask<T> implements Callable<T> {
      * @return 返回任务执行所要返回的结果
      * @throws Exception 主要为了兼容Call方法抛出的异常
      */
-    public abstract T execute(TableTaskMetaData metaData);
+    public abstract T execute(TableTaskMetaData metaData, TableTaskContext context);
 
     @Override
     public T call() {
         try {
-            T result = execute(this.metaData);
+            T result = execute(this.metaData, context);
             if (this.callBack != null) {
                 this.callBack.execute(new Pair<>(isTaskSuccess(), result));
             }

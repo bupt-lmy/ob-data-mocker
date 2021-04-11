@@ -29,6 +29,7 @@ import com.oceanbase.tools.datamocker.datatype.oracle.OracleNumberType;
 import com.oceanbase.tools.datamocker.generator.digit.NormalGenerator;
 import com.oceanbase.tools.datamocker.model.config.model.DataBaseConfig;
 import com.oceanbase.tools.datamocker.model.enums.ObModeType;
+import com.oceanbase.tools.datamocker.model.enums.ScriptType;
 import com.oceanbase.tools.datamocker.task.primitive.DataBasePrimitiveTest;
 import com.oceanbase.tools.datamocker.util.MockDataPipe;
 import com.oceanbase.tools.datamocker.util.MockerBuffer;
@@ -115,7 +116,7 @@ public class MockBufferTest extends MockerTestBase {
         DataBaseConfig oracleConfig = getDBConfig(ObModeType.OB_ORACLE);
         dataSource = new MockerDataSource(oracleConfig, 15, 25, 2, null);
         initEnv(dataSource);
-        manager = new MockerFile("test/mock/mock.sql");
+        manager = new MockerFile("test/mock/mock.sql", ScriptType.SQL);
     }
 
     /**

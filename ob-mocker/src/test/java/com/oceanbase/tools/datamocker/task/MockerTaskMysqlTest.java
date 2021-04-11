@@ -182,8 +182,8 @@ public class MockerTaskMysqlTest extends MockerTestBase {
                 for (TableTaskContext item : contexts) {
                     String interval = (System.currentTimeMillis() - start) / 1000 + "s";
                     System.out.println(
-                            String.format("[\"%s\" - \"%s\"] : %s - %s", item.getTaskName(), item.getTaskId(), item.getStatus(),
-                                    interval));
+                            String.format("[\"%s\" - \"%s\"] : %s - %s - %f", item.getTaskName(), item.getTaskId(), item.getStatus(),
+                                    interval, context.getProgress()));
                     if (MockTaskStatus.CANCELED.equals(item.getStatus()) || MockTaskStatus.FAILED.equals(item.getStatus())) {
                         return false;
                     }

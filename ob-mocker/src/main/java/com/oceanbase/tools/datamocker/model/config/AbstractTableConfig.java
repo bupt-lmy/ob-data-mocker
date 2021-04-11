@@ -127,11 +127,4 @@ public abstract class AbstractTableConfig {
      * @return 返回表约束集合
      */
     abstract public List<AbstractConstraint> constraints();
-
-    /**
-     * 获取表任务ID
-     *
-     * @return 返回表任务ID
-     */
-    abstract public String tableTaskId();
 }

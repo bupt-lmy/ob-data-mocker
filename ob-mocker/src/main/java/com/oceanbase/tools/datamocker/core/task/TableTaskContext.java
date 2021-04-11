@@ -1,6 +1,8 @@
 package com.oceanbase.tools.datamocker.core.task;
 
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -10,7 +12,6 @@ import javax.sql.DataSource;
 
 import com.oceanbase.tools.datamocker.core.write.output.MockerFile;
 import com.oceanbase.tools.datamocker.datatype.AbstractDataType;
-import com.oceanbase.tools.datamocker.model.enums.DuplicateStrategy;
 import com.oceanbase.tools.datamocker.model.enums.MockTaskStatus;
 import com.oceanbase.tools.datamocker.model.enums.ObModeType;
 import com.oceanbase.tools.datamocker.model.exception.MockerError;
@@ -54,11 +55,6 @@ public class TableTaskContext {
     @Getter
     private final Long totalCount;
     /**
-     * 方言类型
-     */
-    @Getter
-    private final ObModeType dialectType;
-    /**
      * 表结构定义，用于描述表的结构，包括各字段名和类型的映射关系
      */
     @Getter
@@ -83,11 +79,6 @@ public class TableTaskContext {
      */
     @Getter
     private final Long timeoutSeconds;
-    /**
-     * 数据冲突时的策略
-     */
-    @Getter
-    private final DuplicateStrategy strategy;
     /**
      * 句柄集合，用于控制线程任务
      */
@@ -121,30 +112,33 @@ public class TableTaskContext {
     @Getter
     private final List<MockerFile> fileManagers;
     /**
+     * 方言类型
+     */
+    @Getter
+    private final ObModeType dialectType;
+    /**
      * 顶部指针索引
      */
     @Getter
     private final int topIndex;
 
-    public TableTaskContext(String taskId, String taskName, Long batchSize, Long totalNum, ObModeType dialectType,
-            Map<String, AbstractDataType> tableSchema, String tableName, String schema, Boolean truncate, Long timeout,
-            DuplicateStrategy strategy, DataSource dataSource, List<MockerFile> fileManagers, int index) {
-        this.taskId = taskId;
+    public TableTaskContext(TableTaskInfo taskInfo, String taskName, int index) {
+        TableTaskMetaData metaData = taskInfo.getMetaData();
+        this.taskId = metaData.getTableTaskId();
         this.taskName = taskName;
-        this.batchSize = batchSize;
-        this.totalCount = totalNum;
-        this.dialectType = dialectType;
-        this.tableSchema = tableSchema;
-        this.tableName = tableName;
-        this.schema = schema;
-        this.truncate = truncate;
-        this.timeoutSeconds = timeout;
-        this.strategy = strategy;
+        this.batchSize = metaData.getBatchSize();
+        this.totalCount = metaData.getTotalCount();
+        this.tableSchema = metaData.getTableSchema();
+        this.tableName = metaData.getTableName();
+        this.schema = metaData.getSchema();
+        this.truncate = metaData.getShouldTruncate();
+        this.timeoutSeconds = metaData.getTimeout();
         this.status = MockTaskStatus.CREATED;
         this.handlers = new LinkedList<>();
         this.writerName2writeCount = new HashMap<>();
-        this.dataSource = dataSource;
-        this.fileManagers = fileManagers;
+        this.dataSource = taskInfo.getDataSource();
+        this.fileManagers = taskInfo.getFileManagers();
+        this.dialectType = metaData.getDialectType();
         this.topIndex = index;
     }
 
@@ -208,5 +202,24 @@ public class TableTaskContext {
                 throw new MockerException(MockerError.OPERATION_FAILURE, "all column readers have to generate same number of data");
             }
         }
+    }
+
+    /**
+     * get table task progress
+     *
+     * @return progress of task
+     */
+    public double getProgress() {
+        if (totalCount != 0 && writerName2writeCount.size() != 0) {
+            Collection<Long> values = writerName2writeCount.values();
+            Iterator<Long> iter = values.iterator();
+            double totalProgress = 0.0;
+            while (iter.hasNext()) {
+                Long value = iter.next();
+                totalProgress += value.doubleValue() / totalCount;
+            }
+            return totalProgress / writerName2writeCount.size();
+        }
+        return 0.0;
     }
 }

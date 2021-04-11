@@ -1,5 +1,6 @@
 package com.oceanbase.tools.datamocker.schedule;
 
+import java.math.BigDecimal;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -9,23 +10,24 @@ import com.oceanbase.tools.datamocker.model.exception.MockerException;
 import lombok.Getter;
 
 public class MockContext {
+    private final Integer totalTableTaskCount;
     @Getter
-    private String taskName;
+    private final String taskName;
+    @Getter
+    private final String taskId;
     @Getter
     private List<TableTaskContext> tables;
     private final MockExecutorService service;
-    private double progress;
 
-    public MockContext(MockExecutorService service) {
+    public MockContext(MockExecutorService service, String taskId, String taskName, Integer totalTableTaskCount) {
+        this.taskId = taskId;
+        this.taskName = taskName;
+        this.totalTableTaskCount = totalTableTaskCount;
         tables = new LinkedList<>();
         if (service == null) {
             throw new MockerException(MockerError.PARAMETER_ERROR, "thread pool for schedule context can not be null");
         }
         this.service = service;
-    }
-
-    protected void setTaskName(String taskName) {
-        this.taskName = taskName;
     }
 
     /**
@@ -77,11 +79,19 @@ public class MockContext {
     }
 
     /**
-     * get task progreee
+     * get task progress(%)
      *
      * @return progress
      */
     public double getProgress() {
-        return progress;
+        if (this.tables != null && this.tables.size() != 0) {
+            double returnVal = 0.0;
+            for (TableTaskContext context : this.tables) {
+                returnVal += context.getProgress();
+            }
+            BigDecimal decaimal = new BigDecimal((returnVal * 100.0) / totalTableTaskCount);
+            return decaimal.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+        }
+        return 0.0;
     }
 }

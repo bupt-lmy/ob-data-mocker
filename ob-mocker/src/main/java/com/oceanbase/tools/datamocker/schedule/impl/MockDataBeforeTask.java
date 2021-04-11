@@ -7,6 +7,7 @@ import javax.sql.DataSource;
 
 import com.oceanbase.tools.datamocker.constraint.AbstractConstraint;
 import com.oceanbase.tools.datamocker.constraint.ConstraintFactory;
+import com.oceanbase.tools.datamocker.core.task.TableTaskContext;
 import com.oceanbase.tools.datamocker.core.task.TableTaskMetaData;
 import com.oceanbase.tools.datamocker.model.enums.ObModeType;
 import com.oceanbase.tools.datamocker.model.exception.MockerError;
@@ -34,8 +35,8 @@ public class MockDataBeforeTask extends AbstractMockTask<List<AbstractConstraint
      */
     private final DataSource dataSource;
 
-    public MockDataBeforeTask(TableTaskMetaData metaData, DataSource dataSource) {
-        super(metaData);
+    public MockDataBeforeTask(TableTaskMetaData metaData, TableTaskContext context, DataSource dataSource) {
+        super(metaData, context);
         if (dataSource == null) {
             MockerException e = new MockerException(MockerError.PARAMETER_ERROR, "data source can not be null");
             log.error("fail to init mock data before task, data source can not be null", e);
@@ -50,7 +51,7 @@ public class MockDataBeforeTask extends AbstractMockTask<List<AbstractConstraint
     }
 
     @Override
-    public List<AbstractConstraint> execute(TableTaskMetaData metaData) {
+    public List<AbstractConstraint> execute(TableTaskMetaData metaData, TableTaskContext context) {
         log.info("begin execute mock before task");
         //如果设置了清空表则需要重新加载约束
         if (Boolean.TRUE.equals(metaData.getShouldTruncate())) {

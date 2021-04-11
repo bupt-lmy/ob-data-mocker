@@ -5,11 +5,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.oceanbase.tools.datamocker.core.task.TableTaskContext;
 import com.oceanbase.tools.datamocker.core.task.TableTaskMetaData;
 import com.oceanbase.tools.datamocker.core.write.AbstractMockWriter;
 import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
 import com.oceanbase.tools.datamocker.schedule.AbstractMockTask;
+import com.oceanbase.tools.datamocker.util.Pair;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -34,8 +36,8 @@ public class MockDataOutputTask extends AbstractMockTask<Map<String, Long>> {
      */
     private Boolean isSuccess = Boolean.FALSE;
 
-    public MockDataOutputTask(TableTaskMetaData metaData, List<AbstractMockWriter> writers) {
-        super(metaData);
+    public MockDataOutputTask(TableTaskMetaData metaData, TableTaskContext context, List<AbstractMockWriter> writers) {
+        super(metaData, context);
         if (writers == null || writers.size() == 0) {
             MockerException e = new MockerException(MockerError.PARAMETER_ERROR, "data writer can not be null or empty");
             log.error("some errors occured when init mock data output task", e);
@@ -54,7 +56,7 @@ public class MockDataOutputTask extends AbstractMockTask<Map<String, Long>> {
     }
 
     @Override
-    public Map<String, Long> execute(TableTaskMetaData metaData) {
+    public Map<String, Long> execute(TableTaskMetaData metaData, TableTaskContext context) {
         int length = this.writerSymbols.size();
         Map<String, Long> returnVal = new HashMap<>();
         for (AbstractMockWriter writer : this.writers) {
@@ -72,6 +74,7 @@ public class MockDataOutputTask extends AbstractMockTask<Map<String, Long>> {
                             this.writerSymbols.set(i, Boolean.FALSE);
                         } else {
                             Long value = returnVal.get(writer.groupId());
+                            context.appendWriteInfo(new Pair<>(writer.groupId(), writeCounter));
                             returnVal.put(writer.groupId(), value + writeCounter);
                         }
                     }

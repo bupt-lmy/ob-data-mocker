@@ -49,7 +49,7 @@ public class TableTask {
      * 唯一的任务Id
      */
     @Getter
-    private final String taskId;
+    private final String tableTaskId;
     @Getter
     private final TableTaskContext context;
     /**
@@ -67,7 +67,7 @@ public class TableTask {
      */
     @Deprecated
     public TableTask(MockDataBeforeTask beforeTask, MockDataAfterTask afterTask, List<AbstractMockTask> businessTasks,
-            TableTaskContext context, String taskId) {
+            TableTaskContext context, String tableTaskId) {
         if (beforeTask == null || afterTask == null || businessTasks == null) {
             throw new RuntimeException("mock before task, after task or business tasks can not be null");
         }
@@ -75,7 +75,7 @@ public class TableTask {
         this.afterTask = afterTask;
         this.businessTasks = businessTasks;
         this.context = context;
-        this.taskId = taskId;
+        this.tableTaskId = tableTaskId;
     }
 
     /**
@@ -87,11 +87,9 @@ public class TableTask {
      * @param index        用于表明该TaskBean数据哪一个任务队列，任务队列在Dispatcher中的队列索引
      */
     public TableTask(TableTaskInfo taskBean, Set<Set<String>> columnGroups, Map<Set<String>, Integer> dataGroups, String taskName,
-            String taskId, int index) {
-        if (taskId == null) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "task id can not be null");
-        }
-        this.taskId = taskId;
+            int index) {
+        this.tableTaskId = taskBean.getMetaData().getTableTaskId();
+        this.context = new TableTaskContext(taskBean, taskName, index);
         this.businessTasks = new ArrayList<>();
         for (Set<String> groupSet : columnGroups) {
             List<ColumnReader> tmpList = new LinkedList<>();
@@ -102,7 +100,8 @@ public class TableTask {
                     }
                 }
             }
-            MockDataGenTask genTask = new MockDataGenTask(taskBean.getMetaData(), taskBean.getBuffer(), tmpList, taskBean.getConstraints());
+            MockDataGenTask genTask = new MockDataGenTask(taskBean.getMetaData(), this.context, taskBean.getBuffer(), tmpList,
+                    taskBean.getConstraints());
             businessTasks.add(genTask);
         }
         taskBean.getBuffer().setConcurrent(businessTasks.size());
@@ -121,18 +120,13 @@ public class TableTask {
                 throw new MockerException(MockerError.PARAMETER_ERROR, "task size can not be equal to or smaller than zero");
             }
             for (int i = 0; i < entry.getValue(); i++) {
-                MockDataOutputTask outputTask = new MockDataOutputTask(taskBean.getMetaData(), writers);
+                MockDataOutputTask outputTask = new MockDataOutputTask(taskBean.getMetaData(), this.context, writers);
                 businessTasks.add(outputTask);
             }
         }
-        this.beforeTask = new MockDataBeforeTask(taskBean.getMetaData(), taskBean.getDataSource());
-        this.afterTask = new MockDataAfterTask(taskBean.getMetaData(), taskBean.getDataSource());
-        TableTaskMetaData metaData = taskBean.getMetaData();
-        this.context = new TableTaskContext(this.taskId, taskName, metaData.getBatchSize(), metaData.getTotalCount(),
-                metaData.getDialectType(),
-                metaData.getTableSchema(), metaData.getTableName(), metaData.getSchema(), metaData.getShouldTruncate(),
-                metaData.getTimeout(),
-                metaData.getStrategy(), taskBean.getDataSource(), taskBean.getFileManagers(), index);
+        this.beforeTask = new MockDataBeforeTask(taskBean.getMetaData(), this.context, taskBean.getDataSource());
+        this.afterTask = new MockDataAfterTask(taskBean.getMetaData(), this.context, taskBean.getDataSource());
+
     }
 
     /**
@@ -192,7 +186,6 @@ public class TableTask {
                     Map<String, Long> resultValue = result.getValue();
                     StringBuilder builder = new StringBuilder();
                     for (Map.Entry<String, Long> item : resultValue.entrySet()) {
-                        this.context.appendWriteInfo(new Pair<>(item.getKey(), item.getValue()));
                         builder.append("{\"" + item.getKey() + "\" : " + item.getValue() + "} ");
                     }
                     if (result.getKey()) {
@@ -264,11 +257,11 @@ public class TableTask {
             return false;
         }
         TableTask that = (TableTask) o;
-        return this.taskId.equals(that.taskId);
+        return this.tableTaskId.equals(that.tableTaskId);
     }
 
     @Override
     public int hashCode() {
-        return this.taskId.hashCode();
+        return this.tableTaskId.hashCode();
     }
 }

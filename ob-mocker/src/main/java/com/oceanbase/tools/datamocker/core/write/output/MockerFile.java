@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+import com.oceanbase.tools.datamocker.model.enums.ScriptType;
 import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
 import lombok.extern.slf4j.Slf4j;
@@ -25,8 +26,12 @@ public class MockerFile {
      * 文件输出流
      */
     private FileOutputStream output;
+    /**
+     * 脚本类型
+     */
+    private ScriptType scriptType;
 
-    public MockerFile(String fileName) throws IOException {
+    public MockerFile(String fileName, ScriptType scriptType) throws IOException {
         file = new File(fileName);
         if (file.exists()) {
             if (!file.delete()) {
@@ -35,9 +40,10 @@ public class MockerFile {
         }
         create(file);
         output = new FileOutputStream(file);
+        this.scriptType = scriptType;
     }
 
-    public MockerFile(String fileName, Boolean truncate) throws IOException {
+    public MockerFile(String fileName, ScriptType scriptType, Boolean truncate) throws IOException {
         file = new File(fileName);
         if (file.exists()) {
             if (truncate) {
@@ -50,6 +56,7 @@ public class MockerFile {
             create(file);
         }
         output = new FileOutputStream(file, true);
+        this.scriptType = scriptType;
     }
 
     /**
@@ -119,5 +126,9 @@ public class MockerFile {
             return file.delete();
         }
         return true;
+    }
+
+    public ScriptType getScriptType() {
+        return this.scriptType;
     }
 }

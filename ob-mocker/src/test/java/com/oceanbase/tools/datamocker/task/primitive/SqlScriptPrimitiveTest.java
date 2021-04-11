@@ -16,6 +16,7 @@ import com.oceanbase.tools.datamocker.core.write.output.MockerFile;
 import com.oceanbase.tools.datamocker.datatype.AbstractDataType;
 import com.oceanbase.tools.datamocker.datatype.oracle.OracleNumberType;
 import com.oceanbase.tools.datamocker.model.enums.ObModeType;
+import com.oceanbase.tools.datamocker.model.enums.ScriptType;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
 import com.oceanbase.tools.datamocker.util.MockDataPipe;
 import com.oceanbase.tools.datamocker.util.Pair;
@@ -46,7 +47,7 @@ public class SqlScriptPrimitiveTest extends MockerTestBase {
 
     @Before
     public void initFileManager() throws IOException {
-        manager = new MockerFile("test/mock/mock.sql");
+        manager = new MockerFile("test/mock/mock.sql", ScriptType.SQL);
     }
 
     /**

@@ -42,7 +42,6 @@ public abstract class AbstractScheduler {
      * 线程池的对象封装
      */
     private MockExecutorService service;
-    private final MockContext context;
 
     public AbstractScheduler() {
         ThreadPoolExecutor executor = pool();
@@ -51,14 +50,6 @@ public abstract class AbstractScheduler {
                     new LinkedBlockingQueue<>(), new ThreadPoolExecutor.CallerRunsPolicy());
         }
         service = new MockExecutorService(executor);
-        context = new MockContext(this.service);
-    }
-
-    /**
-     * 获取调度器的执行上下文
-     */
-    public MockContext getContext() {
-        return this.context;
     }
 
     /**
@@ -68,7 +59,7 @@ public abstract class AbstractScheduler {
      * @return 一共执行的任务数量
      */
     public MockContext execute(Dispatcher<TableTaskInfo> dispatcher) {
-        this.context.setTaskName(dispatcher.name());
+        MockContext context = new MockContext(this.service, dispatcher.taskId(), dispatcher.name(), dispatcher.totalCount());
         int concurrentCount = dispatcher.count();
         //标识数组，数组长度和tasks的任务队列数量相同，每一位分别用于标示对应任务队列中是否还有任务等待执行
         boolean[] flags = new boolean[concurrentCount];
@@ -144,8 +135,7 @@ public abstract class AbstractScheduler {
                             dispatcher.pop(i);
                             flags[i] = false;
                             //初始化TaskBean，主要是定义TaskBean的回调函数
-                            TableTask mockTaskBean = new TableTask(task, columnGroups, dataGroups, dispatcher.name(),
-                                    task.getMetaData().getTaskId(), i);
+                            TableTask mockTaskBean = new TableTask(task, columnGroups, dataGroups, dispatcher.name(), i);
                             mockTaskBean.setStatus(MockTaskStatus.PENDING);
                             mockTaskBean.init(service, result -> {
                                 ((MockerDataSource) result.getDataSource()).clear();
@@ -182,7 +172,7 @@ public abstract class AbstractScheduler {
             return totalCount;
         };
         this.service.submitCallable(scheduleTask);
-        return this.context;
+        return context;
     }
 
     /**

@@ -2,6 +2,8 @@ package com.oceanbase.tools.datamocker.core;
 
 import java.util.concurrent.locks.ReentrantLock;
 
+import org.apache.commons.lang.Validate;
+
 /**
  * 这个对象用来封装待执行的任务，使用该对象可以描述任务之间的串行或并行关系。该数据封装对象本质上是多个栈（但是和普通栈不同的是
  * 该数据对象在"入栈"的时候是在末尾追加而不是在栈顶进行操作），栈顶指针使用一个数组来维护。一个栈中的任务都是需要串行执行的。
@@ -12,9 +14,13 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class Dispatcher<T> {
     /**
+     * 任务Id
+     */
+    private final String taskId;
+    /**
      * 名称，可以代指分发器的名称也可以代指整个任务的名称
      */
-    private String name;
+    private final String name;
     /**
      * 锁对象，该数据封装对象使用数组来维护多个栈的栈顶指针，由于数组不能动态地改变大小，因此每当程序要对栈顶指针
      * 数组进行维护时就获取该锁，防止多个线程并发地修改栈顶指针数组造成竞争条件
@@ -33,16 +39,20 @@ public class Dispatcher<T> {
      * 默认构造函数，此时初始化栈顶指针数组的长度为0。不推荐使用该构造函数，最好在构造之初就设定栈顶指针数组的大小，因为调整该指针数组大小
      * 是一个耗资源的行为
      */
-    public Dispatcher(String name) {
+    public Dispatcher(String name, String taskId) {
+        Validate.notEmpty(taskId, "task id can not be null");
         this.name = name;
+        this.taskId = taskId;
         this.concurrent = 0;
     }
 
     /**
      * 构造函数，该构造函数传入栈顶指针数组的默认大小，程序根据传入的大小初始化栈顶指针数组
      */
-    public Dispatcher(int concurrent, String name) {
+    public Dispatcher(int concurrent, String name, String taskId) {
+        Validate.notEmpty(taskId, "task id can not be null");
         this.name = name;
+        this.taskId = taskId;
         this.concurrent = concurrent;
         queuePointers = new TopNode[concurrent];
         for (int i = 0; i < concurrent; i++) {
@@ -58,6 +68,13 @@ public class Dispatcher<T> {
     }
 
     /**
+     * 返回任务id
+     */
+    public String taskId() {
+        return this.taskId;
+    }
+
+    /**
      * 获取topNodes数组的长度
      *
      * @return 返回长度
@@ -67,14 +84,28 @@ public class Dispatcher<T> {
     }
 
     /**
+     * 返回分发器内全部对象的数量
+     *
+     * @return 返回具体的数量
+     */
+    public int totalCount() {
+        int queueSize = count();
+        int returnVal = 0;
+        for (int i = 0; i < queueSize; i++) {
+            returnVal += getTaskSize(i);
+        }
+        return returnVal;
+    }
+
+    /**
      * 获取某个具体的任务队列的长度
      *
      * @param index 目标任务队列的索引
      * @return 返回目标任务队列的长度
      */
-    public int getTaskSize(int index) throws Exception {
+    public int getTaskSize(int index) {
         if (index >= this.concurrent || index < 0) {
-            throw new Exception(String.format("index %d out of bound [0,%d)", index, this.concurrent));
+            throw new IllegalArgumentException(String.format("index %d out of bound [0,%d)", index, this.concurrent));
         }
         TopNode topNode = this.queuePointers[index];
         return topNode.length;
