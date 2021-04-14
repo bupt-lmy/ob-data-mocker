@@ -26,15 +26,11 @@ import lombok.extern.slf4j.Slf4j;
  * @since OBMOCKER_snapshot_0.1.0
  */
 @Slf4j
-public class MockDataGenTask extends AbstractMockTask<Long> {
+public class MockDataGenTask extends AbstractMockTask {
     /**
      * 缓冲区，用于存放列生成任务产生的数据
      */
     private final MockerBuffer buffer;
-    /**
-     * 任务是否成功状态标志
-     */
-    private Boolean result = false;
     /**
      * 列生成原语集合
      */
@@ -89,19 +85,14 @@ public class MockDataGenTask extends AbstractMockTask<Long> {
     }
 
     @Override
-    protected boolean isTaskSuccess() {
-        return this.result;
-    }
-
-    @Override
-    public Long execute(TableTaskMetaData metaData, TableTaskContext context) {
-        Long counter = 0L;
-        boolean exception = false;
+    public Void execute(TableTaskMetaData metaData, TableTaskContext context) throws Exception {
+        long counter = 0;
         // 循环空转计数器，通常空转超过totalCount还未写入任意一条数据则认为写入异常
-        Long emptyLoopCount = 0L;
+        long emptyLoopCount = 0;
+        Exception exception = null;
         try {
             while ((counter++) < metaData.getTotalCount() && !Thread.currentThread().isInterrupted()
-                   && this.interval() <= metaData.getTimeout()) {
+                   && this.interval() <= metaData.getTimeoutMilliseconds()) {
                 Map<String, Pair<AbstractDataType, Object>> columnNameToData = new HashMap<>(this.readers.size());
                 for (ColumnReader item : readers) {
                     Pair<String, Pair<AbstractDataType, Object>> pair = item.read();
@@ -132,36 +123,28 @@ public class MockDataGenTask extends AbstractMockTask<Long> {
             }
             counter--;
         } catch (Exception e) {
-            if (e instanceof InterruptedException) {
-                if (!Thread.currentThread().isInterrupted()) {
-                    Thread.currentThread().interrupt();
-                }
-            }
-            exception = true;
+            exception = e;
             log.error("some errors occured when mocking data", e);
+        } finally {
+            buffer.close();
+        }
+        if (exception != null) {
+            throw exception;
         }
         if (Thread.currentThread().isInterrupted()) {
-            log.warn("data mock business thread has been interrupted, {} data have been generated, run {}ms", counter,
-                    System.currentTimeMillis() - this.startTime());
+            log.warn("data mock business thread has been interrupted, {} data have been generated, run {}ms", counter, interval());
+            throw new InterruptedException("data mock business has been interrupted by user");
         }
-        if (this.interval() >= metaData.getTimeout()) {
+        if (this.interval() >= metaData.getTimeoutMilliseconds()) {
             log.warn("data mock business thread has been terminated cause timeout, {} data have been generated, run {}ms", counter,
-                    System.currentTimeMillis() - this.startTime());
+                    interval());
         }
         if (counter >= metaData.getTotalCount()) {
             log.info("data mock business thread has been executed successfully, {} data have been generated, run {}ms", counter,
-                    System.currentTimeMillis() - this.startTime());
-            if (!exception) {
-                this.result = true;
-            }
+                    interval());
         }
-        try {
-            buffer.close();
-        } catch (Exception e) {
-            log.error("fail to close mock buffer", e);
-            this.result = false;
-        }
-        return counter;
+        context.appendDataGenInfo(counter);
+        return null;
     }
 
     /**

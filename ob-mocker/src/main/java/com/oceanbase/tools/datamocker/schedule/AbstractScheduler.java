@@ -11,6 +11,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import com.oceanbase.tools.datamocker.core.Dispatcher;
+import com.oceanbase.tools.datamocker.core.task.AbstractCallBack;
 import com.oceanbase.tools.datamocker.core.task.TableTask;
 import com.oceanbase.tools.datamocker.core.task.TableTaskContext;
 import com.oceanbase.tools.datamocker.core.task.TableTaskInfo;
@@ -73,7 +74,7 @@ public abstract class AbstractScheduler {
             for (int i = 0; i < dispatcher.count(); i++) {
                 for (int j = 0; j < dispatcher.getTaskSize(i); j++) {
                     TableTaskInfo tableTask = dispatcher.getObj(i, j);
-                    Long timeout = tableTask.getMetaData().getTimeout();
+                    Long timeout = tableTask.getMetaData().getTimeoutMilliseconds();
                     if (maxTimeout < timeout) {
                         maxTimeout = timeout;
                     }
@@ -81,7 +82,7 @@ public abstract class AbstractScheduler {
             }
             long failCount = 0;
             long maxFailCount = maxTimeout / 5000L + 36;
-            while (true) {
+            while (!Thread.currentThread().isInterrupted()) {
                 for (int i = 0; i < concurrentCount; i++) {
                     if (flags[i]) {
                         TableTaskInfo task = dispatcher.getObj(i, 0);
@@ -136,14 +137,35 @@ public abstract class AbstractScheduler {
                             flags[i] = false;
                             //初始化TaskBean，主要是定义TaskBean的回调函数
                             TableTask mockTaskBean = new TableTask(task, columnGroups, dataGroups, dispatcher.name(), i);
-                            mockTaskBean.setStatus(MockTaskStatus.PENDING);
-                            mockTaskBean.init(service, result -> {
-                                ((MockerDataSource) result.getDataSource()).clear();
-                                for (MockerFile fileManager : result.getFileManagers()) {
-                                    fileManager.close();
+                            mockTaskBean.getContext().setStatus(MockTaskStatus.PENDING);
+                            mockTaskBean.init(service, new AbstractCallBack<TableTaskContext>() {
+                                @Override
+                                public void doOnSuccess(TableTaskContext param) throws Throwable {
+                                    ((MockerDataSource) param.getDataSource()).clear();
+                                    for (MockerFile fileManager : param.getFileManagers()) {
+                                        fileManager.close();
+                                    }
+                                    flags[param.getTopIndex()] = true;
+                                    try {
+                                        onSuccess(param);
+                                    } catch (Throwable e) {
+                                        log.error("some errors happened when scheduler onSuccess executed", e);
+                                    }
                                 }
-                                flags[result.getTopIndex()] = true;
-                                callBack(result);
+
+                                @Override
+                                public void doOnFailure(TableTaskContext param, Throwable e) throws Throwable {
+                                    ((MockerDataSource) param.getDataSource()).clear();
+                                    for (MockerFile fileManager : param.getFileManagers()) {
+                                        fileManager.close();
+                                    }
+                                    flags[param.getTopIndex()] = true;
+                                    try {
+                                        onFailure(param, e);
+                                    } catch (Throwable e1) {
+                                        log.error("some errors happened when scheduler onFailure executed", e);
+                                    }
+                                }
                             });
                             if (service.isShutdown()) {
                                 ((MockerDataSource) task.getDataSource()).clear();
@@ -264,7 +286,14 @@ public abstract class AbstractScheduler {
      *
      * @param context mock任务的执行上下文
      */
-    protected abstract void callBack(TableTaskContext context);
+    protected abstract void onSuccess(TableTaskContext context);
+
+    /**
+     * 任务执行完成后调用的回调方法，任务失败时
+     *
+     * @param context mock任务的执行上下文
+     */
+    protected abstract void onFailure(TableTaskContext context, Throwable e);
 
     /**
      * 获取线程池对象，如果想使用默认的就可以直接返回null

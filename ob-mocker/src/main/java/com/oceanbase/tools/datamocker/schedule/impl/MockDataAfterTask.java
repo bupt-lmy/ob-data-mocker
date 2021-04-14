@@ -2,11 +2,10 @@ package com.oceanbase.tools.datamocker.schedule.impl;
 
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.sql.DataSource;
 
+import com.oceanbase.tools.datamocker.core.task.AbstractCallBack;
 import com.oceanbase.tools.datamocker.core.task.TableTaskContext;
 import com.oceanbase.tools.datamocker.core.task.TableTaskMetaData;
 import com.oceanbase.tools.datamocker.model.enums.ObModeType;
@@ -14,7 +13,6 @@ import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
 import com.oceanbase.tools.datamocker.schedule.AbstractMockTask;
 import com.oceanbase.tools.datamocker.util.SqlUtil;
-import com.oceanbase.tools.datamocker.util.SqlUtil.CallBack;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -25,11 +23,7 @@ import lombok.extern.slf4j.Slf4j;
  * @since OBMOCKER_snapshot_0.1.0
  */
 @Slf4j
-public class MockDataAfterTask extends AbstractMockTask<Long> {
-    /**
-     * 任务执行结果
-     */
-    private Boolean result = false;
+public class MockDataAfterTask extends AbstractMockTask {
     /**
      * 数据源
      */
@@ -46,12 +40,7 @@ public class MockDataAfterTask extends AbstractMockTask<Long> {
     }
 
     @Override
-    protected boolean isTaskSuccess() {
-        return this.result;
-    }
-
-    @Override
-    public Long execute(TableTaskMetaData metaData, TableTaskContext context) {
+    public Void execute(TableTaskMetaData metaData, TableTaskContext context) throws Throwable {
         log.info("begin execute mock after task");
         String sql;
         if (ObModeType.OB_ORACLE.equals(metaData.getDialectType())) {
@@ -61,13 +50,11 @@ public class MockDataAfterTask extends AbstractMockTask<Long> {
         } else {
             MockerException e = new MockerException(MockerError.INVALID_OB_MODE);
             log.error("fail to execute after task for mock", e);
-            this.result = false;
-            return null;
+            throw e;
         }
-        List<Long> returnVal = new ArrayList<>();
-        SqlUtil.executeQuery(this.dataSource, sql, null, new CallBack<ResultSet>() {
+        SqlUtil.executeQuery(this.dataSource, sql, null, new AbstractCallBack<ResultSet>() {
             @Override
-            public void onComplete(ResultSet resultSet) throws Exception {
+            public void doOnSuccess(ResultSet resultSet) throws Exception {
                 ResultSetMetaData md = resultSet.getMetaData();
                 if (md.getColumnCount() != 1) {
                     throw new MockerException(MockerError.ILLEGAL_RETURN_VALUE,
@@ -76,17 +63,16 @@ public class MockDataAfterTask extends AbstractMockTask<Long> {
                 }
                 if (resultSet.next()) {
                     long rowCount = resultSet.getLong(1);
-                    returnVal.add(rowCount);
+                    context.setCurrentRecordNum(rowCount);
                 }
-                result = true;
             }
 
             @Override
-            public void onFailure(Throwable e) {
+            public void doOnFailure(ResultSet resultSet, Throwable e) throws Throwable {
                 log.error("fail to execute after task for mock", e);
-                result = false;
+                throw e;
             }
         });
-        return returnVal.size() == 0 ? -1L : returnVal.get(0);
+        return null;
     }
 }

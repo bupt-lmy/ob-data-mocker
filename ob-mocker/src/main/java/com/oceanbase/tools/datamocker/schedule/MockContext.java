@@ -56,7 +56,7 @@ public class MockContext {
         synchronized (this.tables) {
             int length = this.tables.size();
             for (int i = 0; i < length; i++) {
-                if (taskId.equals(this.tables.get(i).getTaskId())) {
+                if (taskId.equals(this.tables.get(i).getTableTaskId())) {
                     this.tables.remove(i);
                     length--;
                 }

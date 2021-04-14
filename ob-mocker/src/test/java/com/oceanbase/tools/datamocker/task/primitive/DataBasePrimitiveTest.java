@@ -196,7 +196,7 @@ public class DataBasePrimitiveTest extends MockerTestBase {
     }
 
     @Test
-    public void testInsertDataForMysql() throws Exception {
+    public void testInsertDataForMysql() throws Throwable {
         List<Map<String, Pair<AbstractDataType, Object>>> rows = getRows(24);
         ObModeType dialectType = ObModeType.OB_MYSQL;
         DataBaseConfig config = getDBConfig(dialectType);
@@ -209,7 +209,7 @@ public class DataBasePrimitiveTest extends MockerTestBase {
     }
 
     @Test
-    public void testInsertDataForOracle() throws Exception {
+    public void testInsertDataForOracle() throws Throwable {
         List<Map<String, Pair<AbstractDataType, Object>>> rows = getRows(24);
         ObModeType dialectType = ObModeType.OB_ORACLE;
         DataBaseConfig config = getDBConfig(dialectType);

@@ -1,9 +1,7 @@
 package com.oceanbase.tools.datamocker.schedule.impl;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import com.oceanbase.tools.datamocker.core.task.TableTaskContext;
 import com.oceanbase.tools.datamocker.core.task.TableTaskMetaData;
@@ -22,7 +20,7 @@ import lombok.extern.slf4j.Slf4j;
  * @since OBMOCKER_snapshot_0.1.0
  */
 @Slf4j
-public class MockDataOutputTask extends AbstractMockTask<Map<String, Long>> {
+public class MockDataOutputTask extends AbstractMockTask {
     /**
      * 输出原语
      */
@@ -31,10 +29,6 @@ public class MockDataOutputTask extends AbstractMockTask<Map<String, Long>> {
      * 标记数据写出原语是否可写的标志位
      */
     private final List<Boolean> writerSymbols;
-    /**
-     * 任务是否成功标志
-     */
-    private Boolean isSuccess = Boolean.FALSE;
 
     public MockDataOutputTask(TableTaskMetaData metaData, TableTaskContext context, List<AbstractMockWriter> writers) {
         super(metaData, context);
@@ -51,19 +45,10 @@ public class MockDataOutputTask extends AbstractMockTask<Map<String, Long>> {
     }
 
     @Override
-    protected boolean isTaskSuccess() {
-        return this.isSuccess;
-    }
-
-    @Override
-    public Map<String, Long> execute(TableTaskMetaData metaData, TableTaskContext context) {
+    public Void execute(TableTaskMetaData metaData, TableTaskContext context) throws Exception {
         int length = this.writerSymbols.size();
-        Map<String, Long> returnVal = new HashMap<>();
-        for (AbstractMockWriter writer : this.writers) {
-            returnVal.put(writer.groupId(), 0L);
-        }
-        boolean exception = false;
-        while (!Thread.currentThread().isInterrupted() && this.interval() <= metaData.getTimeout()) {
+        Throwable exception = null;
+        while (!Thread.currentThread().isInterrupted() && this.interval() <= metaData.getTimeoutMilliseconds()) {
             try {
                 Boolean shouldBreak = Boolean.FALSE;
                 for (int i = 0; i < length; i++) {
@@ -73,9 +58,7 @@ public class MockDataOutputTask extends AbstractMockTask<Map<String, Long>> {
                         if (writeCounter == null) {
                             this.writerSymbols.set(i, Boolean.FALSE);
                         } else {
-                            Long value = returnVal.get(writer.groupId());
                             context.appendWriteInfo(new Pair<>(writer.groupId(), writeCounter));
-                            returnVal.put(writer.groupId(), value + writeCounter);
                         }
                     }
                     for (Boolean item : this.writerSymbols) {
@@ -85,27 +68,24 @@ public class MockDataOutputTask extends AbstractMockTask<Map<String, Long>> {
                 if (!shouldBreak) {
                     break;
                 }
-            } catch (Exception e) {
-                if (e instanceof InterruptedException) {
-                    if (!Thread.currentThread().isInterrupted()) {
-                        Thread.currentThread().interrupt();
-                    }
-                }
-                exception = true;
+            } catch (Throwable e) {
+                exception = e;
                 log.error("some errors occured when write data", e);
             }
         }
-        if (this.interval() >= metaData.getTimeout()) {
-            log.warn("data mock write thread has been terminated cause timeout, run {}ms", System.currentTimeMillis() - this.startTime());
+        if (exception != null) {
+            throw new Exception(exception);
+        }
+        if (this.interval() >= metaData.getTimeoutMilliseconds()) {
+            log.warn("data mock write thread has been terminated cause timeout. duration={}ms", interval());
         }
         if (Thread.currentThread().isInterrupted()) {
-            log.warn("data mock write thread has been interrupted, run {}ms", System.currentTimeMillis() - this.startTime());
-        } else if (this.interval() <= metaData.getTimeout()) {
-            if (!exception) {
-                this.isSuccess = Boolean.TRUE;
-            }
-            log.info("data mock write thread has been executed successfully, run {}ms", System.currentTimeMillis() - this.startTime());
+            log.warn("data mock write thread has been interrupted, run {}ms", interval());
+            throw new InterruptedException("data mock write thread has been interrupted by user");
         }
-        return returnVal;
+        if (this.interval() <= metaData.getTimeoutMilliseconds()) {
+            log.info("data mock write thread has been executed successfully. duration={}ms", interval());
+        }
+        return null;
     }
 }

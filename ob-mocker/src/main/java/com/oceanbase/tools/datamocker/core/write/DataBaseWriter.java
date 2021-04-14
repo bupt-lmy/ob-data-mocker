@@ -10,6 +10,7 @@ import java.util.Set;
 
 import javax.sql.DataSource;
 
+import com.oceanbase.tools.datamocker.core.task.AbstractCallBack;
 import com.oceanbase.tools.datamocker.datatype.AbstractDataType;
 import com.oceanbase.tools.datamocker.model.enums.ObModeType;
 import com.oceanbase.tools.datamocker.model.exception.MockerError;
@@ -17,7 +18,6 @@ import com.oceanbase.tools.datamocker.model.exception.MockerException;
 import com.oceanbase.tools.datamocker.util.DigestUtil;
 import com.oceanbase.tools.datamocker.util.Pair;
 import com.oceanbase.tools.datamocker.util.SqlUtil;
-import com.oceanbase.tools.datamocker.util.SqlUtil.CallBack;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -129,7 +129,7 @@ public class DataBaseWriter extends AbstractMockWriter {
      *
      * @throws SQLException 抛出表或数据库不存在异常
      */
-    private void preCheck() {
+    private void preCheck() throws Throwable {
         String descSql;
         if (ObModeType.OB_ORACLE.equals(this.dialectType)) {
             descSql = String.format("select count(*) from %s.\"%s\"", database, tableName);
@@ -138,19 +138,19 @@ public class DataBaseWriter extends AbstractMockWriter {
         } else {
             throw new MockerException(MockerError.INVALID_OB_MODE);
         }
-        SqlUtil.executeQuery(dataSource, descSql, null, new CallBack<ResultSet>() {
+        SqlUtil.executeQuery(dataSource, descSql, null, new AbstractCallBack<ResultSet>() {
             @Override
-            public void onComplete(ResultSet result) {}
+            public void doOnSuccess(ResultSet result) {}
 
             @Override
-            public void onFailure(Throwable e) {
+            public void doOnFailure(ResultSet result, Throwable e) {
                 throw new MockerException(e);
             }
         });
     }
 
     @Override
-    protected Long doWrite(List<Map<String, Pair<AbstractDataType, Object>>> rows) throws Exception {
+    protected Long doWrite(List<Map<String, Pair<AbstractDataType, Object>>> rows) throws Throwable {
         preCheck();
         Map<String, ?> firstRow = rows.get(0);
         Set<String> columnSet = firstRow.keySet();
@@ -197,9 +197,9 @@ public class DataBaseWriter extends AbstractMockWriter {
             params[j] = innerParam;
         }
         List<Long> returnVal = new ArrayList<>();
-        SqlUtil.executeBatch(dataSource, sqlBuffer.toString(), params, new CallBack<int[]>() {
+        SqlUtil.executeBatch(dataSource, sqlBuffer.toString(), params, new AbstractCallBack<int[]>() {
             @Override
-            public void onComplete(int[] result) {
+            public void doOnSuccess(int[] result) {
                 if (result != null) {
                     log.info("data base writer has writed a batch, effect row is {}", result.length);
                     returnVal.add((long) result.length);
@@ -209,7 +209,7 @@ public class DataBaseWriter extends AbstractMockWriter {
             }
 
             @Override
-            public void onFailure(Throwable e) {
+            public void doOnFailure(int[] result, Throwable e) {
                 log.error("some errors happen when write data", e);
                 throw new MockerException(e);
             }

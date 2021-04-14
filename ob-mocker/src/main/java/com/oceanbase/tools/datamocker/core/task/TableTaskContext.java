@@ -10,6 +10,7 @@ import java.util.concurrent.Future;
 
 import javax.sql.DataSource;
 
+import com.oceanbase.tools.datamocker.constraint.AbstractConstraint;
 import com.oceanbase.tools.datamocker.core.write.output.MockerFile;
 import com.oceanbase.tools.datamocker.datatype.AbstractDataType;
 import com.oceanbase.tools.datamocker.model.enums.MockTaskStatus;
@@ -37,7 +38,7 @@ public class TableTaskContext {
      * 任务ID
      */
     @Getter
-    private final String taskId;
+    private final String tableTaskId;
     /**
      * 批处理大小
      */
@@ -47,8 +48,7 @@ public class TableTaskContext {
      * mock数据当前的任务状态
      */
     @Getter
-    @Setter
-    private MockTaskStatus status;
+    private volatile MockTaskStatus status;
     /**
      * 一共要生成的数据量
      */
@@ -78,7 +78,7 @@ public class TableTaskContext {
      * 超时时间
      */
     @Getter
-    private final Long timeoutSeconds;
+    private final Long timeoutMilliseconds;
     /**
      * 句柄集合，用于控制线程任务
      */
@@ -121,10 +121,21 @@ public class TableTaskContext {
      */
     @Getter
     private final int topIndex;
+    /**
+     * 是否已经被关闭
+     */
+    @Getter
+    private volatile boolean shutdown;
+    /**
+     * 约束集合，用于承载约束对象集合
+     */
+    @Setter
+    @Getter
+    private List<AbstractConstraint> constraints;
 
     public TableTaskContext(TableTaskInfo taskInfo, String taskName, int index) {
         TableTaskMetaData metaData = taskInfo.getMetaData();
-        this.taskId = metaData.getTableTaskId();
+        this.tableTaskId = metaData.getTableTaskId();
         this.taskName = taskName;
         this.batchSize = metaData.getBatchSize();
         this.totalCount = metaData.getTotalCount();
@@ -132,7 +143,7 @@ public class TableTaskContext {
         this.tableName = metaData.getTableName();
         this.schema = metaData.getSchema();
         this.truncate = metaData.getShouldTruncate();
-        this.timeoutSeconds = metaData.getTimeout();
+        this.timeoutMilliseconds = metaData.getTimeoutMilliseconds();
         this.status = MockTaskStatus.CREATED;
         this.handlers = new LinkedList<>();
         this.writerName2writeCount = new HashMap<>();
@@ -161,9 +172,19 @@ public class TableTaskContext {
      *
      * @return 返回关闭的结果
      */
-    public Boolean shutdown() {
-        Boolean returnVal = Boolean.TRUE;
+    public boolean shutdown() {
         this.status = MockTaskStatus.CANCELED;
+        return terminate();
+    }
+
+    /**
+     * 结束所有正在执行的任务
+     *
+     * @return 返回执行结果
+     */
+    public synchronized boolean terminate() {
+        shutdown = true;
+        boolean returnVal = Boolean.TRUE;
         for (Future task : this.handlers) {
             if (!task.isCancelled() && !task.isDone()) {
                 returnVal &= task.cancel(true);
@@ -202,6 +223,15 @@ public class TableTaskContext {
                 throw new MockerException(MockerError.OPERATION_FAILURE, "all column readers have to generate same number of data");
             }
         }
+    }
+
+    /**
+     * 设置任务状态
+     *
+     * @param status 任务状态
+     */
+    public synchronized void setStatus(MockTaskStatus status) {
+        this.status = status;
     }
 
     /**

@@ -1,12 +1,12 @@
 package com.oceanbase.tools.datamocker.schedule.impl;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.sql.DataSource;
 
 import com.oceanbase.tools.datamocker.constraint.AbstractConstraint;
 import com.oceanbase.tools.datamocker.constraint.ConstraintFactory;
+import com.oceanbase.tools.datamocker.core.task.AbstractCallBack;
 import com.oceanbase.tools.datamocker.core.task.TableTaskContext;
 import com.oceanbase.tools.datamocker.core.task.TableTaskMetaData;
 import com.oceanbase.tools.datamocker.model.enums.ObModeType;
@@ -14,7 +14,6 @@ import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
 import com.oceanbase.tools.datamocker.schedule.AbstractMockTask;
 import com.oceanbase.tools.datamocker.util.SqlUtil;
-import com.oceanbase.tools.datamocker.util.SqlUtil.CallBack;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -25,11 +24,7 @@ import lombok.extern.slf4j.Slf4j;
  * @since OBMOCKER_0.1.0_snapshot
  */
 @Slf4j
-public class MockDataBeforeTask extends AbstractMockTask<List<AbstractConstraint>> {
-    /**
-     * 任务执行结果
-     */
-    private Boolean result = false;
+public class MockDataBeforeTask extends AbstractMockTask {
     /**
      * 数据源
      */
@@ -46,12 +41,7 @@ public class MockDataBeforeTask extends AbstractMockTask<List<AbstractConstraint
     }
 
     @Override
-    protected boolean isTaskSuccess() {
-        return this.result;
-    }
-
-    @Override
-    public List<AbstractConstraint> execute(TableTaskMetaData metaData, TableTaskContext context) {
+    public Void execute(TableTaskMetaData metaData, TableTaskContext context) throws Throwable {
         log.info("begin execute mock before task");
         //如果设置了清空表则需要重新加载约束
         if (Boolean.TRUE.equals(metaData.getShouldTruncate())) {
@@ -61,14 +51,13 @@ public class MockDataBeforeTask extends AbstractMockTask<List<AbstractConstraint
             } else if (ObModeType.OB_ORACLE.equals(metaData.getDialectType())) {
                 sql = String.format("delete from %s.\"%s\" where 1=1; ", metaData.getSchema(), metaData.getTableName());
             } else {
-                result = false;
-                log.error("fail to execute before task for mock", new MockerException(MockerError.INVALID_OB_MODE));
-                return null;
+                MockerException e = new MockerException(MockerError.INVALID_OB_MODE);
+                log.error("fail to execute before task for mock", e);
+                throw e;
             }
-            List<AbstractConstraint> returnVal = new ArrayList<>();
-            SqlUtil.executeUpdate(this.dataSource, sql, null, new CallBack<Integer>() {
+            SqlUtil.executeUpdate(this.dataSource, sql, null, new AbstractCallBack<Integer>() {
                 @Override
-                public void onComplete(Integer effectRow) {
+                public void doOnSuccess(Integer effectRow) throws Throwable {
                     log.info(String.format("truncate table %s.\"%s\" successfully, effect row is %d", metaData.getSchema(),
                             metaData.getTableName(), effectRow));
                     if (effectRow > 0) {
@@ -77,24 +66,19 @@ public class MockDataBeforeTask extends AbstractMockTask<List<AbstractConstraint
                             List<AbstractConstraint> customConstraint = factory.make(dataSource, metaData.getDialectType(),
                                     metaData.getSchema(), metaData.getTableName(), metaData.getTableSchema(),
                                     metaData.getTotalCount().intValue());
-                            if (customConstraint != null) {
-                                returnVal.addAll(customConstraint);
-                            }
+                            context.setConstraints(customConstraint);
                         }
                         log.info("reload constraints settings successfully");
                     }
-                    result = true;
                 }
 
                 @Override
-                public void onFailure(Throwable e) {
-                    result = false;
+                public void doOnFailure(Integer effectRow, Throwable e) throws Throwable {
                     log.error("fail to execute before task for mock", e);
+                    throw e;
                 }
             });
-            return returnVal;
         }
-        this.result = true;
         return null;
     }
 }

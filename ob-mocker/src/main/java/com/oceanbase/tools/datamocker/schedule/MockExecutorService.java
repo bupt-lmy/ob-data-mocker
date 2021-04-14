@@ -56,7 +56,7 @@ public class MockExecutorService {
         if (taskBean == null) {
             throw new MockerException(MockerError.PARAMETER_ERROR, "task bean for executor service can not be null");
         }
-        taskBean.setStatus(MockTaskStatus.RUNNING);
+        taskBean.getContext().setStatus(MockTaskStatus.RUNNING);
         submitCallable(taskBean.getBeforeTask(), taskBean.getContext());
         return taskBean.getContext();
     }
@@ -71,8 +71,10 @@ public class MockExecutorService {
         if (task == null || context == null) {
             throw new MockerException(MockerError.PARAMETER_ERROR, "callable or context for executor service can not be null");
         }
-        Future future = executor.submit(newTaskFor(task));
-        context.appendHandle(future);
+        if (!context.isShutdown() && !isShutdown()) {
+            Future future = executor.submit(newTaskFor(task));
+            context.appendHandle(future);
+        }
     }
 
     /**

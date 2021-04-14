@@ -145,7 +145,7 @@ public class MockerTaskOracleTest extends MockerTestBase {
     }
 
     @Test
-    public void testMockTask() throws Exception {
+    public void testMockTask() throws Throwable {
         AbstractTaskConfig config = getTask();
         AbstractMockerFactory factory = new ObMockerFactory(config);
         ObDataMocker mocker = factory.create();
@@ -161,7 +161,7 @@ public class MockerTaskOracleTest extends MockerTestBase {
                 for (TableTaskContext item : contexts) {
                     String interval = (System.currentTimeMillis() - start) / 1000 + "s";
                     System.out.println(
-                            String.format("[\"%s\" - \"%s\"] : %s - %s", item.getTaskName(), item.getTaskId(), item.getStatus(),
+                            String.format("[\"%s\" - \"%s\"] : %s - %s", item.getTaskName(), item.getTableTaskId(), item.getStatus(),
                                     interval));
                     if (MockTaskStatus.CANCELED.equals(item.getStatus()) || MockTaskStatus.FAILED.equals(item.getStatus())) {
                         return false;

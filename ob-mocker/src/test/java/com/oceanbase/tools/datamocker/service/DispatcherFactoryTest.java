@@ -245,7 +245,7 @@ public class DispatcherFactoryTest extends MockerTestBase {
     }
 
     @Test
-    public void testDispatcher() throws Exception {
+    public void testDispatcher() throws Throwable {
         AbstractTaskConfig config = getTask("EMP");
         AbstractMockerFactory factory = new ObMockerFactory(config);
         ObDataMocker mocker = factory.create();
@@ -253,7 +253,7 @@ public class DispatcherFactoryTest extends MockerTestBase {
     }
 
     @Test
-    public void testDispatcherWithVirtualColumn() throws Exception {
+    public void testDispatcherWithVirtualColumn() throws Throwable {
         AbstractTaskConfig config = getTask("EMP1");
         AbstractMockerFactory factory = new ObMockerFactory(config);
         thrown.expectMessage("virtual column \"EMP1.COL4\" for constraint is not support yet");
@@ -263,7 +263,7 @@ public class DispatcherFactoryTest extends MockerTestBase {
     }
 
     @Test
-    public void testDispatcherWithNullTable() throws Exception {
+    public void testDispatcherWithNullTable() throws Throwable {
         AbstractTaskConfig config = getTask("EMP2");
         AbstractMockerFactory factory = new ObMockerFactory(config);
         thrown.expectMessage("ORA-00942: table or view 'SYS.EMP2' does not exist");

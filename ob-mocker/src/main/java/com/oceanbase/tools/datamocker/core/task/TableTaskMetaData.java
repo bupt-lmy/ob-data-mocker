@@ -46,7 +46,7 @@ public class TableTaskMetaData {
     /**
      * 超时时间
      */
-    private final Long timeout;
+    private final Long timeoutMilliseconds;
     /**
      * 批处理大小
      */
@@ -62,7 +62,7 @@ public class TableTaskMetaData {
         this.tableName = tableConfig.tableName();
         this.schema = tableConfig.schemaName();
         this.shouldTruncate = tableConfig.truncated();
-        this.timeout = tableConfig.timeoutMilliseconds();
+        this.timeoutMilliseconds = tableConfig.timeoutMilliseconds();
         this.batchSize = tableConfig.maxBatchSize();
         this.totalCount = tableConfig.maxCount();
         this.tableTaskId = taskId + "-[" + columnIndex + "," + rowIndex + "]";

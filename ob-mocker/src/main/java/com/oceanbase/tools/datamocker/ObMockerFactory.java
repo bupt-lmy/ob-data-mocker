@@ -38,7 +38,7 @@ public class ObMockerFactory extends AbstractMockerFactory {
     }
 
     @Override
-    protected Dispatcher<TableTaskInfo> generate(AbstractTaskConfig taskConfig, String taskId) throws Exception {
+    protected Dispatcher<TableTaskInfo> generate(AbstractTaskConfig taskConfig, String taskId) throws Throwable {
         String taskName = taskConfig.taskName() == null ? getTaskName() : taskConfig.taskName();
         List<? extends AbstractTableConfig> tableConfigs = taskConfig.tasks();
         if (tableConfigs == null || tableConfigs.size() == 0) {

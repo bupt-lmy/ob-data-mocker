@@ -11,8 +11,10 @@ import com.alipay.oceanbase.jdbc.ServerPreparedStatement;
 import com.alipay.oceanbase.jdbc.extend.datatype.INTERVALDS;
 import com.alipay.oceanbase.jdbc.extend.datatype.INTERVALYM;
 
+import com.oceanbase.tools.datamocker.core.task.AbstractCallBack;
 import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * sql执行工具类，用于执行sql
@@ -21,6 +23,7 @@ import com.oceanbase.tools.datamocker.model.exception.MockerException;
  * @date 2021-01-26 21:59
  * @since OBMOCKER_snapshot_0.1.0
  */
+@Slf4j
 public class SqlUtil {
     /**
      * 执行sql查询
@@ -30,11 +33,12 @@ public class SqlUtil {
      * @param params     参数
      * @param callBack   回调函数
      */
-    public static void executeQuery(Connection connection, String sql, Object[] params, CallBack<ResultSet> callBack) {
+    public static void executeQuery(Connection connection, String sql, Object[] params, AbstractCallBack<ResultSet> callBack)
+            throws Throwable {
         if (connection == null || sql == null) {
             MockerException e = new MockerException(MockerError.PARAMETER_ERROR, "connection or sql can not be null");
             if (callBack != null) {
-                callBack.onFailure(e);
+                callBack.onFailure(null, e);
             }
             return;
         }
@@ -42,8 +46,9 @@ public class SqlUtil {
             connection.setAutoCommit(true);
         } catch (SQLException e) {
             if (callBack != null) {
-                callBack.onFailure(e);
+                callBack.onFailure(null, e);
             }
+            return;
         }
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             if (params != null) {
@@ -66,12 +71,17 @@ public class SqlUtil {
             }
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (callBack != null) {
-                    callBack.onComplete(resultSet);
+                    try {
+                        callBack.onSuccess(resultSet);
+                    } catch (Throwable e) {
+                        log.error("some errors happened when executeQuery call back method executed", e);
+                        throw e;
+                    }
                 }
             }
-        } catch (Exception e) {
+        } catch (Throwable e) {
             if (callBack != null) {
-                callBack.onFailure(e);
+                callBack.onFailure(null, e);
             }
         }
     }
@@ -84,19 +94,20 @@ public class SqlUtil {
      * @param params     参数
      * @param callBack   回调函数
      */
-    public static void executeQuery(DataSource dataSource, String sql, Object[] params, CallBack<ResultSet> callBack) {
+    public static void executeQuery(DataSource dataSource, String sql, Object[] params, AbstractCallBack<ResultSet> callBack)
+            throws Throwable {
         if (dataSource == null) {
             MockerException e = new MockerException(MockerError.PARAMETER_ERROR, "datasource can not be null");
             if (callBack != null) {
-                callBack.onFailure(e);
+                callBack.onFailure(null, e);
             }
             return;
         }
         try (Connection connection = dataSource.getConnection()) {
             executeQuery(connection, sql, params, callBack);
-        } catch (Exception e) {
+        } catch (Throwable e) {
             if (callBack != null) {
-                callBack.onFailure(e);
+                callBack.onFailure(null, e);
             }
         }
     }
@@ -109,11 +120,12 @@ public class SqlUtil {
      * @param params     参数
      * @param callBack   回调函数
      */
-    public static void executeUpdate(Connection connection, String sql, Object[] params, CallBack<Integer> callBack) {
+    public static void executeUpdate(Connection connection, String sql, Object[] params, AbstractCallBack<Integer> callBack)
+            throws Throwable {
         if (connection == null || sql == null) {
             MockerException e = new MockerException(MockerError.PARAMETER_ERROR, "connection or sql can not be null");
             if (callBack != null) {
-                callBack.onFailure(e);
+                callBack.onFailure(null, e);
             }
             return;
         }
@@ -121,8 +133,9 @@ public class SqlUtil {
             connection.setAutoCommit(true);
         } catch (SQLException e) {
             if (callBack != null) {
-                callBack.onFailure(e);
+                callBack.onFailure(null, e);
             }
+            return;
         }
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             if (params != null) {
@@ -144,11 +157,16 @@ public class SqlUtil {
                 }
             }
             if (callBack != null) {
-                callBack.onComplete(statement.executeUpdate());
+                try {
+                    callBack.onSuccess(statement.executeUpdate());
+                } catch (Throwable e) {
+                    log.error("some errors happened when executeUpdate onSuccess call back method executed", e);
+                    throw e;
+                }
             }
-        } catch (Exception e) {
+        } catch (Throwable e) {
             if (callBack != null) {
-                callBack.onFailure(e);
+                callBack.onFailure(null, e);
             }
         }
     }
@@ -161,19 +179,20 @@ public class SqlUtil {
      * @param params     参数
      * @param callBack   回调函数
      */
-    public static void executeUpdate(DataSource dataSource, String sql, Object[] params, CallBack<Integer> callBack) {
+    public static void executeUpdate(DataSource dataSource, String sql, Object[] params, AbstractCallBack<Integer> callBack)
+            throws Throwable {
         if (dataSource == null) {
             MockerException e = new MockerException(MockerError.PARAMETER_ERROR, "datasource can not be null");
             if (callBack != null) {
-                callBack.onFailure(e);
+                callBack.onFailure(null, e);
             }
             return;
         }
         try (Connection connection = dataSource.getConnection()) {
             executeUpdate(connection, sql, params, callBack);
-        } catch (Exception e) {
+        } catch (Throwable e) {
             if (callBack != null) {
-                callBack.onFailure(e);
+                callBack.onFailure(null, e);
             }
         }
     }
@@ -186,11 +205,12 @@ public class SqlUtil {
      * @param params     参数
      * @param callBack   回调函数
      */
-    public static void executeBatch(Connection connection, String sql, Object[][] params, CallBack<int[]> callBack) {
+    public static void executeBatch(Connection connection, String sql, Object[][] params, AbstractCallBack<int[]> callBack)
+            throws Throwable {
         if (connection == null || sql == null) {
             MockerException e = new MockerException(MockerError.PARAMETER_ERROR, "connection or sql can not be null");
             if (callBack != null) {
-                callBack.onFailure(e);
+                callBack.onFailure(null, e);
             }
             return;
         }
@@ -198,7 +218,7 @@ public class SqlUtil {
             connection.setAutoCommit(false);
         } catch (SQLException e) {
             if (callBack != null) {
-                callBack.onFailure(e);
+                callBack.onFailure(null, e);
             }
             return;
         }
@@ -235,11 +255,16 @@ public class SqlUtil {
             statement.clearBatch();
             statement.clearParameters();
             if (callBack != null) {
-                callBack.onComplete(result);
+                try {
+                    callBack.onSuccess(result);
+                } catch (Throwable e) {
+                    log.error("some errors happened when executeBatch onSuccess call back method executed", e);
+                    throw e;
+                }
             }
-        } catch (Exception e) {
+        } catch (Throwable e) {
             if (callBack != null) {
-                callBack.onFailure(e);
+                callBack.onFailure(null, e);
             }
         }
     }
@@ -252,44 +277,21 @@ public class SqlUtil {
      * @param params     参数
      * @param callBack   回调函数
      */
-    public static void executeBatch(DataSource dataSource, String sql, Object[][] params, CallBack<int[]> callBack) {
+    public static void executeBatch(DataSource dataSource, String sql, Object[][] params, AbstractCallBack<int[]> callBack)
+            throws Throwable {
         if (dataSource == null) {
             MockerException e = new MockerException(MockerError.PARAMETER_ERROR, "datasource can not be null");
             if (callBack != null) {
-                callBack.onFailure(e);
+                callBack.onFailure(null, e);
             }
             return;
         }
         try (Connection connection = dataSource.getConnection()) {
             executeBatch(connection, sql, params, callBack);
-        } catch (Exception e) {
+        } catch (Throwable e) {
             if (callBack != null) {
-                callBack.onFailure(e);
+                callBack.onFailure(null, e);
             }
         }
-    }
-
-    /**
-     * 回调函数
-     *
-     * @author yh263208
-     * @date 2021-01-27 10:16
-     * @since OBMOCKER_0.1.0_snapshot
-     */
-    public interface CallBack<T> {
-        /**
-         * sql执行完成后的回调函数
-         *
-         * @param result 返回回调结果
-         * @throws Exception 可能会抛出异常
-         */
-        void onComplete(T result) throws Exception;
-
-        /**
-         * 程序异常时的回调函数
-         *
-         * @param e 上层抛出的异常
-         */
-        void onFailure(Throwable e);
     }
 }

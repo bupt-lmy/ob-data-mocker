@@ -43,7 +43,6 @@ import com.oceanbase.tools.datamocker.schedule.impl.DefaultScheduler;
 import com.oceanbase.tools.datamocker.util.MockDataPipe;
 import com.oceanbase.tools.datamocker.util.MockerBuffer;
 import com.oceanbase.tools.datamocker.util.SqlUtil;
-import com.oceanbase.tools.datamocker.util.SqlUtil.CallBack;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
@@ -108,7 +107,7 @@ public abstract class AbstractMockerFactory {
      *
      * @throws Exception 可能会抛出异常
      */
-    public ObDataMocker create() throws Exception {
+    public ObDataMocker create() throws Throwable {
         return create(new DefaultScheduler(this.taskConfig.maxConnection()));
     }
 
@@ -118,7 +117,7 @@ public abstract class AbstractMockerFactory {
      * @param scheduler 调度器对象，用于线程资源的调度
      * @throws Exception 生成mocker对象可能会抛出异常
      */
-    public ObDataMocker create(AbstractScheduler scheduler) throws Exception {
+    public ObDataMocker create(AbstractScheduler scheduler) throws Throwable {
         if (scheduler == null) {
             throw new MockerException(MockerError.PARAMETER_ERROR, "scheduler for mocker factory can not be null");
         }
@@ -138,7 +137,7 @@ public abstract class AbstractMockerFactory {
      * @param taskId 任务Id
      * @return 返回分发器对象
      */
-    abstract protected Dispatcher<TableTaskInfo> generate(AbstractTaskConfig task, String taskId) throws Exception;
+    abstract protected Dispatcher<TableTaskInfo> generate(AbstractTaskConfig task, String taskId) throws Throwable;
 
     /**
      * 验证表的存在性
@@ -147,7 +146,7 @@ public abstract class AbstractMockerFactory {
      * @param schema 所在数据库或者schema
      * @throws MockerException 表存在性校验失败时抛出异常
      */
-    protected void validateTableFromDB(String schema, String table) {
+    protected void validateTableFromDB(String schema, String table) throws Throwable {
         if (this.innerDatasource == null) {
             return;
         }
@@ -159,14 +158,14 @@ public abstract class AbstractMockerFactory {
         } else {
             throw new MockerException(MockerError.INVALID_OB_MODE);
         }
-        SqlUtil.executeQuery(this.innerDatasource, sql, null, new CallBack<ResultSet>() {
+        SqlUtil.executeQuery(this.innerDatasource, sql, null, new AbstractCallBack<ResultSet>() {
             @Override
-            public void onComplete(ResultSet result) throws Exception {
+            public void doOnSuccess(ResultSet result) {
                 log.info(String.format("validate table %s.\"%s\" successfully", schema, table));
             }
 
             @Override
-            public void onFailure(Throwable e) {
+            public void doOnFailure(ResultSet result, Throwable e) {
                 log.error(String.format("fail to validate %s.\"%s\"", schema, table), e);
                 throw new MockerException(MockerError.OPERATION_FAILURE, e.getMessage());
             }
@@ -193,7 +192,7 @@ public abstract class AbstractMockerFactory {
      * @param tableConfig 表定义
      * @return 返回约束集合
      */
-    protected List<AbstractConstraint> getConstraints(AbstractTableConfig tableConfig, ObModeType dialectType) {
+    protected List<AbstractConstraint> getConstraints(AbstractTableConfig tableConfig, ObModeType dialectType) throws Throwable {
         if (tableConfig.constraints() != null) {
             return tableConfig.constraints();
         } else if (this.innerDatasource == null) {

@@ -84,7 +84,13 @@ public class DefaultScheduler extends AbstractScheduler {
     }
 
     @Override
-    protected void callBack(TableTaskContext context) {
+    protected void onSuccess(TableTaskContext context) {
+
+    }
+
+    @Override
+    protected void onFailure(TableTaskContext context, Throwable e) {
+
     }
 
     @Override

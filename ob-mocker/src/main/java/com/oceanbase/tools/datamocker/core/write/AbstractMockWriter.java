@@ -44,7 +44,7 @@ public abstract class AbstractMockWriter {
      *
      * @return 返回写出的数据条数
      */
-    public Long write() throws Exception {
+    public Long write() throws Throwable {
         if (this.dataPipe == null) {
             MockerException e = new MockerException(MockerError.PARAMETER_ERROR, "data pipe can not be null");
             log.error("can not read any data from pipe, cause the data pipe is null", e);
@@ -59,7 +59,7 @@ public abstract class AbstractMockWriter {
         return doWrite(rows);
     }
 
-    abstract protected Long doWrite(List<Map<String, Pair<AbstractDataType, Object>>> rows) throws Exception;
+    abstract protected Long doWrite(List<Map<String, Pair<AbstractDataType, Object>>> rows) throws Throwable;
 
     /**
      * mockwriter用于向数据库或脚本文件中输出数据，目前的输出源有两个，一个是数据库，一个是脚本文件。reader和writer构成了一个生产者和消费者模型，

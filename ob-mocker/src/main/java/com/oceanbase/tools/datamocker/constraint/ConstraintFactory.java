@@ -5,7 +5,6 @@ import java.lang.reflect.Modifier;
 import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -18,6 +17,7 @@ import java.util.stream.Collectors;
 import javax.sql.DataSource;
 
 import com.oceanbase.tools.datamocker.constraint.impl.UniqueConstraint;
+import com.oceanbase.tools.datamocker.core.task.AbstractCallBack;
 import com.oceanbase.tools.datamocker.datatype.AbstractDataType;
 import com.oceanbase.tools.datamocker.model.dbobject.ConstraintColumn;
 import com.oceanbase.tools.datamocker.model.dbobject.TableColumn;
@@ -27,7 +27,6 @@ import com.oceanbase.tools.datamocker.model.exception.MockerException;
 import com.oceanbase.tools.datamocker.util.Pair;
 import com.oceanbase.tools.datamocker.util.SerializeUtil;
 import com.oceanbase.tools.datamocker.util.SqlUtil;
-import com.oceanbase.tools.datamocker.util.SqlUtil.CallBack;
 import org.apache.commons.lang.StringUtils;
 
 /**
@@ -103,7 +102,7 @@ public abstract class ConstraintFactory {
     private static final ConstraintFactory UNIQUE_CONSTRAINT = new ConstraintFactory() {
         @Override
         public List<AbstractConstraint> make(DataSource dataSource, ObModeType dialectType, String database, String tableName,
-                Map<String, AbstractDataType> columnName2DataType, int totalCount) {
+                Map<String, AbstractDataType> columnName2DataType, int totalCount) throws Throwable {
             List<AbstractConstraint> constraints;
             if (ObModeType.OB_ORACLE.equals(dialectType)) {
                 constraints = getConstraints(dataSource, ORACLE_UNIQUE_CONSTRAINT_SQL, database, tableName, columnName2DataType, totalCount,
@@ -125,7 +124,7 @@ public abstract class ConstraintFactory {
     private static final ConstraintFactory PRIMARY_CONSTRAINT = new ConstraintFactory() {
         @Override
         public List<AbstractConstraint> make(DataSource dataSource, ObModeType dialectType, String database, String tableName,
-                Map<String, AbstractDataType> columnName2DataType, int totalCount) {
+                Map<String, AbstractDataType> columnName2DataType, int totalCount) throws Throwable {
             List<AbstractConstraint> constraints;
             if (ObModeType.OB_ORACLE.equals(dialectType)) {
                 constraints = getConstraints(dataSource, ORACLE_PRIMARY_CONSTRAINT_SQL, database, tableName, columnName2DataType,
@@ -147,12 +146,12 @@ public abstract class ConstraintFactory {
     private static final ConstraintFactory CHECK_CONSTRAINT = new ConstraintFactory() {
         @Override
         public List<AbstractConstraint> make(DataSource dataSource, ObModeType dialectType, String database, String tableName,
-                Map<String, AbstractDataType> columnName2DataType, int totalCount) {
+                Map<String, AbstractDataType> columnName2DataType, int totalCount) throws Throwable {
             String[] params = new String[] {database, tableName};
             if (ObModeType.OB_ORACLE.equals(dialectType)) {
-                SqlUtil.executeQuery(dataSource, ORACLE_CHECK_CONSTRAINT_SQL, params, new CallBack<ResultSet>() {
+                SqlUtil.executeQuery(dataSource, ORACLE_CHECK_CONSTRAINT_SQL, params, new AbstractCallBack<ResultSet>() {
                     @Override
-                    public void onComplete(ResultSet result) throws Exception {
+                    public void doOnSuccess(ResultSet result) throws Throwable {
                         List<ConstraintColumn> cols = SerializeUtil.getList(result, ConstraintColumn.class);
                         if (cols.size() != 0) {
                             /**
@@ -163,7 +162,7 @@ public abstract class ConstraintFactory {
                     }
 
                     @Override
-                    public void onFailure(Throwable e) {
+                    public void doOnFailure(ResultSet result, Throwable e) {
                         throw new MockerException(e);
                     }
                 });
@@ -183,12 +182,12 @@ public abstract class ConstraintFactory {
     private static final ConstraintFactory FOREIGN_CONSTRAINT = new ConstraintFactory() {
         @Override
         public List<AbstractConstraint> make(DataSource dataSource, ObModeType dialectType, String database, String tableName,
-                Map<String, AbstractDataType> columnName2DataType, int totalCount) {
+                Map<String, AbstractDataType> columnName2DataType, int totalCount) throws Throwable {
             if (ObModeType.OB_ORACLE.equals(dialectType)) {
                 String[] params = new String[] {database, tableName};
-                SqlUtil.executeQuery(dataSource, ORACLE_FOREIGN_CONSTRAINT_SQL, params, new CallBack<ResultSet>() {
+                SqlUtil.executeQuery(dataSource, ORACLE_FOREIGN_CONSTRAINT_SQL, params, new AbstractCallBack<ResultSet>() {
                     @Override
-                    public void onComplete(ResultSet result) throws Exception {
+                    public void doOnSuccess(ResultSet result) throws Throwable {
                         List<ConstraintColumn> cols = SerializeUtil.getList(result, ConstraintColumn.class);
                         if (cols.size() != 0) {
                             // oracle模式不支持带有外键的表的模拟数据，直接抛错
@@ -197,7 +196,7 @@ public abstract class ConstraintFactory {
                     }
 
                     @Override
-                    public void onFailure(Throwable e) {
+                    public void doOnFailure(ResultSet result, Throwable e) {
                         throw new MockerException(e);
                     }
                 });
@@ -237,7 +236,7 @@ public abstract class ConstraintFactory {
      * @param totalCount          一共要产生的数据量
      */
     abstract public List<AbstractConstraint> make(DataSource dataSource, ObModeType dialectType, String database, String tableName,
-            Map<String, AbstractDataType> columnName2DataType, int totalCount);
+            Map<String, AbstractDataType> columnName2DataType, int totalCount) throws Throwable;
 
     /**
      * 校验约束对象
@@ -276,11 +275,11 @@ public abstract class ConstraintFactory {
     }
 
     protected static List<AbstractConstraint> getConstraints(DataSource dataSource, String sql, String database,
-            String tableName, Map<String, AbstractDataType> columnName2DataType, int totalCount, Validation validation) {
+            String tableName, Map<String, AbstractDataType> columnName2DataType, int totalCount, Validation validation) throws Throwable {
         List<AbstractConstraint> constraints = new ArrayList<>();
-        SqlUtil.executeQuery(dataSource, sql, new String[] {database, tableName}, new CallBack<ResultSet>() {
+        SqlUtil.executeQuery(dataSource, sql, new String[] {database, tableName}, new AbstractCallBack<ResultSet>() {
             @Override
-            public void onComplete(ResultSet result) throws Exception {
+            public void doOnSuccess(ResultSet result) throws Throwable {
                 List<ConstraintColumn> cols = SerializeUtil.getList(result, ConstraintColumn.class);
                 Map<String, List<ConstraintColumn>> returnVal = reduce(cols);
                 Set<Entry<String, List<ConstraintColumn>>> entrySet = returnVal.entrySet();
@@ -314,7 +313,7 @@ public abstract class ConstraintFactory {
             }
 
             @Override
-            public void onFailure(Throwable e) {
+            public void doOnFailure(ResultSet result, Throwable e) {
                 throw new MockerException(e);
             }
         });
@@ -328,19 +327,19 @@ public abstract class ConstraintFactory {
      * @param table      表名
      * @return 返回已经存在的列
      */
-    private static Integer getTableRowCount(DataSource dataSource, String table) throws SQLException {
+    private static Integer getTableRowCount(DataSource dataSource, String table) throws Throwable {
         String sql = String.format("select count(*) from %s; ", table);
         List<Integer> returnVal = new ArrayList<>();
-        SqlUtil.executeQuery(dataSource, sql, null, new CallBack<ResultSet>() {
+        SqlUtil.executeQuery(dataSource, sql, null, new AbstractCallBack<ResultSet>() {
             @Override
-            public void onComplete(ResultSet result) throws Exception {
+            public void doOnSuccess(ResultSet result) throws Throwable {
                 while (result.next()) {
                     returnVal.add(result.getInt(1));
                 }
             }
 
             @Override
-            public void onFailure(Throwable e) {
+            public void doOnFailure(ResultSet result, Throwable e) {
                 throw new MockerException(e);
             }
         });
@@ -357,12 +356,12 @@ public abstract class ConstraintFactory {
      * @return 返回已经存在的列
      */
     private static void initConstraint(DataSource dataSource, List<ConstraintColumn> colsList, String table,
-            Map<String, AbstractDataType> columnName2DataType, AbstractConstraint constraint) {
+            Map<String, AbstractDataType> columnName2DataType, AbstractConstraint constraint) throws Throwable {
         String columnStr = colsList.stream().map(constraintsCols -> constraintsCols.getColumnName()).collect(
                 Collectors.joining(","));
-        SqlUtil.executeQuery(dataSource, String.format("select %s from %s; ", columnStr, table), null, new CallBack<ResultSet>() {
+        SqlUtil.executeQuery(dataSource, String.format("select %s from %s; ", columnStr, table), null, new AbstractCallBack<ResultSet>() {
             @Override
-            public void onComplete(ResultSet result) throws Exception {
+            public void doOnSuccess(ResultSet result) throws Throwable {
                 ResultSetMetaData metaData = result.getMetaData();
                 int count = metaData.getColumnCount();
                 while (result.next()) {
@@ -383,7 +382,7 @@ public abstract class ConstraintFactory {
             }
 
             @Override
-            public void onFailure(Throwable e) {
+            public void doOnFailure(ResultSet result, Throwable e) {
                 throw new MockerException(e);
             }
         });
@@ -450,7 +449,7 @@ interface Validation {
      * @param column     约束关联到的列
      * @return 返回校验结果
      */
-    void validate(DataSource dataSource, ConstraintColumn column);
+    void validate(DataSource dataSource, ConstraintColumn column) throws Throwable;
 }
 
 /**
@@ -470,11 +469,11 @@ class MysqlValidation implements Validation {
               + "DATA_SCALE,GENERATION_EXPRESSION from information_schema.columns where TABLE_SCHEMA=? and TABLE_NAME=? and COLUMN_NAME=?";
 
     @Override
-    public void validate(DataSource dataSource, ConstraintColumn cols) {
+    public void validate(DataSource dataSource, ConstraintColumn cols) throws Throwable {
         String[] params = new String[] {cols.getOwner(), cols.getTableName(), cols.getColumnName()};
-        SqlUtil.executeQuery(dataSource, MYSQL_VALIDATE_SQL, params, new CallBack<ResultSet>() {
+        SqlUtil.executeQuery(dataSource, MYSQL_VALIDATE_SQL, params, new AbstractCallBack<ResultSet>() {
             @Override
-            public void onComplete(ResultSet result) throws Exception {
+            public void doOnSuccess(ResultSet result) throws Throwable {
                 TableColumn tableCol = SerializeUtil.getObject(result, TableColumn.class);
                 if (StringUtils.isNotBlank(tableCol.getExpression())) {
                     throw new MockerException(MockerError.NOT_SUPPORT_FEATURE,
@@ -484,7 +483,7 @@ class MysqlValidation implements Validation {
             }
 
             @Override
-            public void onFailure(Throwable e) {
+            public void doOnFailure(ResultSet result, Throwable e) {
                 throw new MockerException(e);
             }
         });
@@ -505,11 +504,11 @@ class OracleValidation implements Validation {
     private static final String ORACLE_VALIDATE_SQL = "select * from all_tab_cols where owner=? and table_name=? and column_name=?";
 
     @Override
-    public void validate(DataSource dataSource, ConstraintColumn cols) {
+    public void validate(DataSource dataSource, ConstraintColumn cols) throws Throwable {
         String[] params = new String[] {cols.getOwner(), cols.getTableName(), cols.getColumnName()};
-        SqlUtil.executeQuery(dataSource, ORACLE_VALIDATE_SQL, params, new CallBack<ResultSet>() {
+        SqlUtil.executeQuery(dataSource, ORACLE_VALIDATE_SQL, params, new AbstractCallBack<ResultSet>() {
             @Override
-            public void onComplete(ResultSet result) throws Exception {
+            public void doOnSuccess(ResultSet result) throws Throwable {
                 TableColumn tableCol = SerializeUtil.getObject(result, TableColumn.class);
                 if ("YES".equals(tableCol.getVirtualColumn())) {
                     throw new MockerException(MockerError.NOT_SUPPORT_FEATURE,
@@ -519,7 +518,7 @@ class OracleValidation implements Validation {
             }
 
             @Override
-            public void onFailure(Throwable e) {
+            public void doOnFailure(ResultSet result, Throwable e) {
                 throw new MockerException(e);
             }
         });

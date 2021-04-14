@@ -228,7 +228,7 @@ public class MockBufferTest extends MockerTestBase {
                             break;
                         }
                     }
-                } catch (Exception e) {
+                } catch (Throwable e) {
                     e.printStackTrace();
                 }
             });
@@ -255,7 +255,7 @@ public class MockBufferTest extends MockerTestBase {
                             break;
                         }
                     }
-                } catch (Exception e) {
+                } catch (Throwable e) {
                     e.printStackTrace();
                 }
             });
