@@ -55,6 +55,10 @@ public class DefaultTableConfig extends AbstractTableConfig {
      * 数据写出地址
      */
     private String location;
+    /**
+     * 最大留存数量，设置内存中最大的批处理数据滞留数量
+     */
+    private int maxRetainedCount = -1;
 
     @Override
     protected Long maxRowCount() {
@@ -112,5 +116,10 @@ public class DefaultTableConfig extends AbstractTableConfig {
     @Override
     public List<AbstractConstraint> constraints() {
         return null;
+    }
+
+    @Override
+    public int maxRetainedCount() {
+        return maxRetainedCount;
     }
 }

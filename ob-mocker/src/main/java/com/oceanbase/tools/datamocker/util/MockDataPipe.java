@@ -19,7 +19,11 @@ public class MockDataPipe extends AbstractDataPipe<Map<String, Pair<AbstractData
     /**
      * 使用阻塞队列作为数据管道的底层实现方式
      */
-    private LinkedBlockingQueue<List<Map<String, Pair<AbstractDataType, Object>>>> queue = new LinkedBlockingQueue<>();
+    private final LinkedBlockingQueue<List<Map<String, Pair<AbstractDataType, Object>>>> queue = new LinkedBlockingQueue<>();
+
+    public MockDataPipe(int maxRetained) {
+        super(maxRetained);
+    }
 
     @Override
     public void doWrite(List<Map<String, Pair<AbstractDataType, Object>>> row, long timout, TimeUnit timeUnit) throws Exception {

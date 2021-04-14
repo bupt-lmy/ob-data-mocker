@@ -213,7 +213,7 @@ public class MockBufferTest extends MockerTestBase {
 
     @Test
     public void testDataBasePrimitive() throws IOException, InterruptedException {
-        AbstractDataPipe dataPipe = new MockDataPipe();
+        AbstractDataPipe dataPipe = new MockDataPipe(1);
         startDataGenerateTask(dataPipe, 256, 600);
         ObModeType dialectType = ObModeType.OB_ORACLE;
         DataBaseConfig config = getDBConfig(dialectType);
@@ -242,7 +242,7 @@ public class MockBufferTest extends MockerTestBase {
 
     @Test
     public void testScriptPrimitive() throws InterruptedException {
-        AbstractDataPipe dataPipe = new MockDataPipe();
+        AbstractDataPipe dataPipe = new MockDataPipe(1);
         startDataGenerateTask(dataPipe, 256, 123);
         SqlScriptWriter primitive = new SqlScriptWriter(manager, ObModeType.OB_ORACLE, "test", "emp");
         primitive.register(dataPipe);

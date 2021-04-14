@@ -127,4 +127,9 @@ public abstract class AbstractTableConfig {
      * @return 返回表约束集合
      */
     abstract public List<AbstractConstraint> constraints();
+
+    /**
+     * 最大留存数量，意为内存中最大滞留的批数据数量
+     */
+    abstract public int maxRetainedCount();
 }

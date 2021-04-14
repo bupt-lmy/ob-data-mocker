@@ -289,7 +289,7 @@ public abstract class AbstractMockerFactory {
         dataWriters.add(writer);
         Map<String, AbstractDataPipe> map = new HashMap<>();
         for (AbstractMockWriter item : dataWriters) {
-            AbstractDataPipe dataPipe = map.getOrDefault(item.groupId(), new MockDataPipe());
+            AbstractDataPipe dataPipe = map.getOrDefault(item.groupId(), new MockDataPipe(tableConfig.maxRetainedCount()));
             item.register(dataPipe);
             buffer.register(dataPipe);
         }

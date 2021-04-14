@@ -73,7 +73,7 @@ public class SqlScriptPrimitiveTest extends MockerTestBase {
     public void testSqlPrimitive() throws Throwable {
         List<Map<String, Pair<AbstractDataType, Object>>> list = getRows(48);
         SqlScriptWriter primitive = new SqlScriptWriter(manager, ObModeType.OB_ORACLE, "test", "emp");
-        AbstractDataPipe pipe = new MockDataPipe();
+        AbstractDataPipe pipe = new MockDataPipe(1);
         primitive.register(pipe);
         pipe.write(list);
         primitive.write();

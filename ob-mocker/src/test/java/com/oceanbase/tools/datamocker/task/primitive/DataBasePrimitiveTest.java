@@ -201,7 +201,7 @@ public class DataBasePrimitiveTest extends MockerTestBase {
         ObModeType dialectType = ObModeType.OB_MYSQL;
         DataBaseConfig config = getDBConfig(dialectType);
         DataBaseWriter primitive = new DataBaseWriter(mysqlDataSource, dialectType, config.getDefaultSchame(), tableName);
-        AbstractDataPipe pipe = new MockDataPipe();
+        AbstractDataPipe pipe = new MockDataPipe(1);
         primitive.register(pipe);
         pipe.write(rows);
         Long count = primitive.write();
@@ -214,7 +214,7 @@ public class DataBasePrimitiveTest extends MockerTestBase {
         ObModeType dialectType = ObModeType.OB_ORACLE;
         DataBaseConfig config = getDBConfig(dialectType);
         DataBaseWriter primitive = new DataBaseWriter(oracleDataSource, dialectType, config.getDefaultSchame(), tableName);
-        AbstractDataPipe pipe = new MockDataPipe();
+        AbstractDataPipe pipe = new MockDataPipe(1);
         primitive.register(pipe);
         pipe.write(rows);
         Long count = primitive.write();
