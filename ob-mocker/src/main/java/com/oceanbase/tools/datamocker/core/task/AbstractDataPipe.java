@@ -35,14 +35,19 @@ public abstract class AbstractDataPipe<T> {
     /**
      * 最大数量的条件控制对象
      */
-    private final Condition matchMaxSizeCondition;
+    private final Condition notFullCondition;
+    /**
+     * 数据管道全空条件控制对象
+     */
+    private final Condition notEmptyCondition;
 
     public AbstractDataPipe(int maxRetained) {
         if (maxRetained > 0) {
             this.maxRetained = maxRetained;
         }
         lock = new ReentrantLock();
-        matchMaxSizeCondition = lock.newCondition();
+        notFullCondition = lock.newCondition();
+        notEmptyCondition = lock.newCondition();
     }
 
     /**
@@ -63,15 +68,24 @@ public abstract class AbstractDataPipe<T> {
         try {
             while (size() >= maxRetained) {
                 log.warn(
-                        "the data pipeline has reached the upper limit, the thread will be suspended for up to 120 seconds. "
-                        + "maxRetained={},threadName={}",
-                        maxRetained, Thread.currentThread().getName());
-                matchMaxSizeCondition.await(120, TimeUnit.SECONDS);
+                        "the data pipeline has reached the upper limit, the thread will be suspended for up to 30 seconds. "
+                        + "currentSize={},maxRetained={},threadName={}", size(), maxRetained, Thread.currentThread().getName());
+                notFullCondition.await(30, TimeUnit.SECONDS);
             }
         } finally {
             lock.unlock();
         }
         doWrite(row, timout, timeUnit);
+        lock.lock();
+        try {
+            if (size() > 0) {
+                log.info("data pipeline is not empty, notify all thread. currentSize={},threadName={}", size(),
+                        Thread.currentThread().getName());
+                notEmptyCondition.signalAll();
+            }
+        } finally {
+            lock.unlock();
+        }
     }
 
     /**
@@ -115,17 +129,30 @@ public abstract class AbstractDataPipe<T> {
         }
         lock.lock();
         try {
-            if (size() < maxRetained) {
-                log.info(
-                        "the data in the current data pipeline is less than the maximum limit, and the suspended thread will be awakened."
-                        + " maxRetained={},threadName={}",
-                        maxRetained, Thread.currentThread().getName());
-                matchMaxSizeCondition.signalAll();
+            while (size() <= 0) {
+                log.warn(
+                        "data pipeline is empty, stop read from data pipeline for up to 30 seconds, thread await. currentSize={},"
+                        + "threadName={}",
+                        size(), Thread.currentThread().getName());
+                notEmptyCondition.await(30, TimeUnit.SECONDS);
             }
         } finally {
             lock.unlock();
         }
-        return doRead(timout, timeUnit);
+        List<T> returnVal = doRead(timout, timeUnit);
+        lock.lock();
+        try {
+            if (size() < maxRetained) {
+                log.info(
+                        "the data in the current data pipeline is less than the maximum limit, and the suspended thread will be awakened."
+                        + " currentSize={},maxRetained={},threadName={}", size(), maxRetained, Thread.currentThread().getName());
+                notFullCondition.signalAll();
+            }
+        } finally {
+            lock.unlock();
+        }
+        return returnVal;
+
     }
 
     /**
