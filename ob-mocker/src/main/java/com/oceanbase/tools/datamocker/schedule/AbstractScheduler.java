@@ -21,6 +21,7 @@ import com.oceanbase.tools.datamocker.model.enums.MockTaskStatus;
 import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 
 /**
  * 抽象调度器，通过实现该调度器实现任务的线程调度
@@ -191,6 +192,7 @@ public abstract class AbstractScheduler {
             }
             clearResource(dispatcher);
             log.info("schedule task has been executed successfully, total task executed is {}", totalCount);
+            MDC.clear();
             return totalCount;
         };
         this.service.submitCallable(scheduleTask);

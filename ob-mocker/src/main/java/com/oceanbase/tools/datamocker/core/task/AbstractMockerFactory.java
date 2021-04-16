@@ -46,6 +46,7 @@ import com.oceanbase.tools.datamocker.util.SqlUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
+import org.slf4j.MDC;
 
 /**
  * 抽象数据模拟器，用于new一个数据模拟器出来
@@ -125,6 +126,7 @@ public abstract class AbstractMockerFactory {
             validateTableFromDB(tableConfig.schemaName(), tableConfig.tableName());
         }
         String taskId = UUID.randomUUID().toString().toUpperCase();
+        MDC.put("mocktask.workspace", taskId);
         Dispatcher<TableTaskInfo> dispatcher = generate(this.taskConfig, taskId);
         this.innerDatasource.clear();
         return new ObDataMocker(dispatcher, scheduler);

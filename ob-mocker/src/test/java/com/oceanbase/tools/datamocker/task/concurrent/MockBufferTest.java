@@ -283,7 +283,11 @@ public class MockBufferTest extends MockerTestBase {
 
     @After
     public void clear() throws IOException, SQLException {
-        manager.clear();
+        try {
+            manager.clear();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         closeEnv(dataSource);
     }
 }

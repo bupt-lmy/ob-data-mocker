@@ -9,6 +9,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.Validate;
 
 /**
  * 抽象数据管道，用于在两个线程之间进行数据传递
@@ -40,6 +41,10 @@ public abstract class AbstractDataPipe<T> {
      * 数据管道全空条件控制对象
      */
     private final Condition notEmptyCondition;
+    /**
+     * 条件等待超时时间（秒）
+     */
+    private final static long CONDITION_TIMOUT_SECOND = 30;
 
     public AbstractDataPipe(int maxRetained) {
         if (maxRetained > 0) {
@@ -53,11 +58,13 @@ public abstract class AbstractDataPipe<T> {
     /**
      * 管道的写入方法，通过该方法向管道中写入一条记录
      *
-     * @param timout   最长阻塞时间
+     * @param timeout  最长阻塞时间
      * @param timeUnit 时间单位
      * @param row      写入的数据
      */
-    public void write(List<T> row, long timout, TimeUnit timeUnit) throws Exception {
+    public void write(List<T> row, long timeout, TimeUnit timeUnit) throws Exception {
+        Validate.isTrue(timeout >= 0, "timeout for pipeline write can not be negative");
+        Validate.notNull(timeUnit, "timeout can not be null");
         if (isClosed()) {
             throw new MockerException(MockerError.OPERATION_FAILURE, "data pipe has been closed");
         }
@@ -66,16 +73,20 @@ public abstract class AbstractDataPipe<T> {
         }
         lock.lock();
         try {
-            while (size() >= maxRetained) {
+            long maxLoopCount = TimeUnit.SECONDS.convert(timeout, timeUnit) / CONDITION_TIMOUT_SECOND + 1;
+            while (size() >= maxRetained && (maxLoopCount--) > 0) {
                 log.warn(
                         "the data pipeline has reached the upper limit, the thread will be suspended for up to 30 seconds. "
                         + "currentSize={},maxRetained={},threadName={}", size(), maxRetained, Thread.currentThread().getName());
-                notFullCondition.await(30, TimeUnit.SECONDS);
+                notFullCondition.await(CONDITION_TIMOUT_SECOND, TimeUnit.SECONDS);
+            }
+            if (maxLoopCount == -1) {
+                return;
             }
         } finally {
             lock.unlock();
         }
-        doWrite(row, timout, timeUnit);
+        doWrite(row, timeout, timeUnit);
         lock.lock();
         try {
             if (size() > 0) {
@@ -94,17 +105,17 @@ public abstract class AbstractDataPipe<T> {
      * @param row 写入的数据
      */
     public void write(List<T> row) throws Exception {
-        write(row, -1, null);
+        write(row, Long.MAX_VALUE, TimeUnit.SECONDS);
     }
 
     /**
      * 管道的写入方法实现类
      *
-     * @param timout   最长阻塞时间
+     * @param timeout  最长阻塞时间
      * @param timeUnit 时间单位
      * @param row      写入的数据
      */
-    abstract public void doWrite(List<T> row, long timout, TimeUnit timeUnit)
+    abstract public void doWrite(List<T> row, long timeout, TimeUnit timeUnit)
             throws Exception;
 
     /**
@@ -113,33 +124,40 @@ public abstract class AbstractDataPipe<T> {
      * @return 返回一条记录
      */
     public List<T> read() throws Exception {
-        return read(-1, null);
+        return read(Long.MAX_VALUE, TimeUnit.SECONDS);
     }
 
     /**
      * 管道的读取方法，通过该方法从管道中读出一条记录
      *
-     * @param timout   最长阻塞时间
+     * @param timeout  最长阻塞时间
      * @param timeUnit 时间单位
      * @return 返回一条记录
      */
-    public List<T> read(long timout, TimeUnit timeUnit) throws Exception {
+    public List<T> read(long timeout, TimeUnit timeUnit) throws Exception {
+        Validate.isTrue(timeout >= 0, "timeout for pipeline write can not be negative");
+        Validate.notNull(timeUnit, "timeout can not be null");
         if (isClosed() && size() == 0) {
             return null;
         }
         lock.lock();
         try {
-            while (size() <= 0) {
+            long maxLoopCount = TimeUnit.SECONDS.convert(timeout, timeUnit) / CONDITION_TIMOUT_SECOND + 1;
+            while (size() <= 0 && (maxLoopCount--) > 0) {
                 log.warn(
                         "data pipeline is empty, stop read from data pipeline for up to 30 seconds, thread await. currentSize={},"
                         + "threadName={}",
                         size(), Thread.currentThread().getName());
-                notEmptyCondition.await(30, TimeUnit.SECONDS);
+                notEmptyCondition.await(CONDITION_TIMOUT_SECOND, TimeUnit.SECONDS);
+            }
+            if (maxLoopCount == -1) {
+                log.warn("data read for pipeline is timeout. threadName={}", Thread.currentThread().getName());
+                return null;
             }
         } finally {
             lock.unlock();
         }
-        List<T> returnVal = doRead(timout, timeUnit);
+        List<T> returnVal = doRead(timeout, timeUnit);
         lock.lock();
         try {
             if (size() < maxRetained) {
@@ -158,11 +176,11 @@ public abstract class AbstractDataPipe<T> {
     /**
      * 管道的读出实现逻辑
      *
-     * @param timout   最长阻塞时间
+     * @param timeout  最长阻塞时间
      * @param timeUnit 时间单位
      * @return 返回读出的数据
      */
-    abstract public List<T> doRead(long timout, TimeUnit timeUnit) throws Exception;
+    abstract public List<T> doRead(long timeout, TimeUnit timeUnit) throws Exception;
 
     /**
      * 返回管道中数据的数量
