@@ -108,7 +108,7 @@ public abstract class AbstractMockerFactory {
      *
      * @throws Exception 可能会抛出异常
      */
-    public ObDataMocker create() throws Throwable {
+    public ObDataMocker create() {
         return create(new DefaultScheduler(this.taskConfig.maxConnection()));
     }
 
@@ -118,18 +118,22 @@ public abstract class AbstractMockerFactory {
      * @param scheduler 调度器对象，用于线程资源的调度
      * @throws Exception 生成mocker对象可能会抛出异常
      */
-    public ObDataMocker create(AbstractScheduler scheduler) throws Throwable {
+    public ObDataMocker create(AbstractScheduler scheduler) {
         if (scheduler == null) {
             throw new MockerException(MockerError.PARAMETER_ERROR, "scheduler for mocker factory can not be null");
         }
-        for (AbstractTableConfig tableConfig : this.taskConfig.tasks()) {
-            validateTableFromDB(tableConfig.schemaName(), tableConfig.tableName());
+        try {
+            for (AbstractTableConfig tableConfig : this.taskConfig.tasks()) {
+                validateTableFromDB(tableConfig.schemaName(), tableConfig.tableName());
+            }
+            String taskId = UUID.randomUUID().toString().toUpperCase();
+            MDC.put("mocktask.workspace", taskId);
+            Dispatcher<TableTaskInfo> dispatcher = generate(this.taskConfig, taskId);
+            this.innerDatasource.clear();
+            return new ObDataMocker(dispatcher, scheduler);
+        } catch (Throwable e) {
+            throw new MockerException(e);
         }
-        String taskId = UUID.randomUUID().toString().toUpperCase();
-        MDC.put("mocktask.workspace", taskId);
-        Dispatcher<TableTaskInfo> dispatcher = generate(this.taskConfig, taskId);
-        this.innerDatasource.clear();
-        return new ObDataMocker(dispatcher, scheduler);
     }
 
     /**
