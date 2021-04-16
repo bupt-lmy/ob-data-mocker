@@ -75,12 +75,10 @@ public abstract class AbstractDataPipe<T> {
         try {
             long maxLoopCount = TimeUnit.SECONDS.convert(timeout, timeUnit) / CONDITION_TIMOUT_SECOND + 1;
             while (size() >= maxRetained && (maxLoopCount--) > 0) {
-                log.warn(
-                        "the data pipeline has reached the upper limit, the thread will be suspended for up to 30 seconds. "
-                        + "currentSize={},maxRetained={},threadName={}", size(), maxRetained, Thread.currentThread().getName());
                 notFullCondition.await(CONDITION_TIMOUT_SECOND, TimeUnit.SECONDS);
             }
             if (maxLoopCount == -1) {
+                log.warn("timeout for pipeline write in, will return. currentSize={},maxRetained={},threadName={}", size(), maxRetained, Thread.currentThread().getName());
                 return;
             }
         } finally {
@@ -90,8 +88,6 @@ public abstract class AbstractDataPipe<T> {
         lock.lock();
         try {
             if (size() > 0) {
-                log.info("data pipeline is not empty, notify all thread. currentSize={},threadName={}", size(),
-                        Thread.currentThread().getName());
                 notEmptyCondition.signalAll();
             }
         } finally {
@@ -144,14 +140,10 @@ public abstract class AbstractDataPipe<T> {
         try {
             long maxLoopCount = TimeUnit.SECONDS.convert(timeout, timeUnit) / CONDITION_TIMOUT_SECOND + 1;
             while (size() <= 0 && (maxLoopCount--) > 0) {
-                log.warn(
-                        "data pipeline is empty, stop read from data pipeline for up to 30 seconds, thread await. currentSize={},"
-                        + "threadName={}",
-                        size(), Thread.currentThread().getName());
                 notEmptyCondition.await(CONDITION_TIMOUT_SECOND, TimeUnit.SECONDS);
             }
             if (maxLoopCount == -1) {
-                log.warn("data read for pipeline is timeout. threadName={}", Thread.currentThread().getName());
+                log.warn("timeout for pipeline read out, will return. currentSize={},maxRetained={},threadName={}", size(), maxRetained, Thread.currentThread().getName());
                 return null;
             }
         } finally {
@@ -161,9 +153,6 @@ public abstract class AbstractDataPipe<T> {
         lock.lock();
         try {
             if (size() < maxRetained) {
-                log.info(
-                        "the data in the current data pipeline is less than the maximum limit, and the suspended thread will be awakened."
-                        + " currentSize={},maxRetained={},threadName={}", size(), maxRetained, Thread.currentThread().getName());
                 notFullCondition.signalAll();
             }
         } finally {
