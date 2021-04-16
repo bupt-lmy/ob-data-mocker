@@ -69,6 +69,7 @@ public abstract class AbstractScheduler {
             flags[i] = true;
         }
         Callable<Integer> scheduleTask = () -> {
+            MDC.put("mocktask.workspace", context.getTaskId());
             int totalCount = 0;
             int total = 0;
             Long maxTimeout = 0L;

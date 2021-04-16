@@ -55,6 +55,10 @@ public class TableTaskMetaData {
      * 方言类型
      */
     private final ObModeType dialectType;
+    /**
+     * 任务id
+     * */
+    private final String taskId;
 
     public TableTaskMetaData(Map<String, AbstractDataType> tableSchema, AbstractTableConfig tableConfig, ObModeType dialectType,
             String taskId, int columnIndex, int rowIndex) {
@@ -67,5 +71,6 @@ public class TableTaskMetaData {
         this.totalCount = tableConfig.maxCount();
         this.tableTaskId = taskId + "-[" + columnIndex + "," + rowIndex + "]";
         this.dialectType = dialectType;
+        this.taskId = taskId;
     }
 }

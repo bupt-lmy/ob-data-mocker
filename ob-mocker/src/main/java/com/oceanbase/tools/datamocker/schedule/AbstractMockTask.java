@@ -8,6 +8,7 @@ import com.oceanbase.tools.datamocker.core.task.TableTaskContext;
 import com.oceanbase.tools.datamocker.core.task.TableTaskMetaData;
 import com.oceanbase.tools.datamocker.model.enums.MockTaskStatus;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 
 /**
  * 抽象操作任务，用于在mock任务开始前及结束前进行一些清理或初始化的操作
@@ -57,6 +58,7 @@ public abstract class AbstractMockTask implements Callable<Void> {
     @Override
     public Void call() {
         try {
+            MDC.put("mocktask.workspace", metaData.getTaskId());
             execute(metaData, context);
             if (this.callBack != null) {
                 try {

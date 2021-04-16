@@ -64,7 +64,7 @@ public abstract class AbstractMockerFactory {
     /**
      * 工厂类型的内部数据源，使用该数据源进行表存在性校验，约束等信息的校验
      */
-    private MockerDataSource innerDatasource;
+    private MockerDataSource innerDatasource = null;
     /**
      * 该数据源是业务数据源
      */
@@ -78,9 +78,6 @@ public abstract class AbstractMockerFactory {
         this.taskConfig = taskConfig;
         if (taskConfig == null) {
             throw new MockerException(MockerError.PARAMETER_ERROR, "input task config can not be null");
-        }
-        if (validateDbConfig(taskConfig.dbConfig())) {
-            this.innerDatasource = new MockerDataSource(taskConfig.dbConfig(), 3, 5, 3, null);
         }
         this.taskId2DataSource = new HashMap<>();
         this.taskId2MockerFiles = new HashMap<>();
@@ -123,11 +120,16 @@ public abstract class AbstractMockerFactory {
             throw new MockerException(MockerError.PARAMETER_ERROR, "scheduler for mocker factory can not be null");
         }
         try {
+            String taskId = UUID.randomUUID().toString().toUpperCase();
+            MDC.put("mocktask.workspace", taskId);
+            if (validateDbConfig(taskConfig.dbConfig())) {
+                if (this.innerDatasource == null) {
+                    this.innerDatasource = new MockerDataSource(taskConfig.dbConfig(), 3, 5, 3, null);
+                }
+            }
             for (AbstractTableConfig tableConfig : this.taskConfig.tasks()) {
                 validateTableFromDB(tableConfig.schemaName(), tableConfig.tableName());
             }
-            String taskId = UUID.randomUUID().toString().toUpperCase();
-            MDC.put("mocktask.workspace", taskId);
             Dispatcher<TableTaskInfo> dispatcher = generate(this.taskConfig, taskId);
             this.innerDatasource.clear();
             return new ObDataMocker(dispatcher, scheduler);
