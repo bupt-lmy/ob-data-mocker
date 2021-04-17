@@ -2,7 +2,6 @@ package com.oceanbase.tools.datamocker.core.task;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Random;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
@@ -45,7 +44,7 @@ public abstract class AbstractDataPipe<T> {
     private final Condition notEmptyCondition;
     /**
      * 条件等待超时时间
-     * */
+     */
     private final static long CONDITION_WAIT_TIMEOUTSEC = 5;
 
     public AbstractDataPipe(int maxRetained) {
