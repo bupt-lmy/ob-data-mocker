@@ -456,7 +456,7 @@
         }
       ],
       "maxRetainedCount": 1,
-      "totalCount": 2400,
+      "totalCount": 100,
       "strategy": "IGNORE",
       "batchSize": 240,
       "whetherTruncate": false,
