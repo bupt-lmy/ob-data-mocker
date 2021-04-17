@@ -35,15 +35,25 @@ public abstract class AbstractScheduler {
     /**
      * 线程池的初始大小
      */
-    private static final int CORE_POOL_SIZE = Runtime.getRuntime().availableProcessors();
+    private static final int CORE_POOL_SIZE;
     /**
      * 线程池的最大大小
      */
-    private static final int MAX_POOL_SIZE = Runtime.getRuntime().availableProcessors();
+    private static final int MAX_POOL_SIZE;
     /**
      * 线程池的对象封装
      */
     private MockExecutorService service;
+
+    static {
+        CORE_POOL_SIZE = 5;
+        int availableProcessors = Runtime.getRuntime().availableProcessors();
+        if (availableProcessors > CORE_POOL_SIZE) {
+            MAX_POOL_SIZE = availableProcessors;
+        } else {
+            MAX_POOL_SIZE = 5;
+        }
+    }
 
     public AbstractScheduler() {
         ThreadPoolExecutor executor = pool();
