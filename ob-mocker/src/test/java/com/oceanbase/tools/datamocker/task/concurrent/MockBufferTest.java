@@ -14,6 +14,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 
 import javax.sql.DataSource;
 
@@ -172,17 +173,17 @@ public class MockBufferTest extends MockerTestBase {
                 for (int i = 0; i < maxCount; i++) {
                     if (first.size() == 1) {
                         ColumnReader primitive = first.get(0);
-                        buffer.write(primitive.read());
+                        buffer.write(primitive.read(), Long.MAX_VALUE, TimeUnit.SECONDS);
                     } else {
                         Map<String, Pair<AbstractDataType, Object>> data = new HashMap<>(first.size());
                         for (ColumnReader primitive : first) {
                             Pair<String, Pair<AbstractDataType, Object>> pair = primitive.read();
                             data.put(pair.getKey(), pair.getValue());
                         }
-                        buffer.write(data);
+                        buffer.write(data, Long.MAX_VALUE, TimeUnit.SECONDS);
                     }
                 }
-                buffer.close();
+                buffer.close(0, TimeUnit.SECONDS);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -193,17 +194,17 @@ public class MockBufferTest extends MockerTestBase {
                 for (int i = 0; i < maxCount; i++) {
                     if (second.size() == 1) {
                         ColumnReader primitive = second.get(0);
-                        buffer.write(primitive.read());
+                        buffer.write(primitive.read(), Long.MAX_VALUE, TimeUnit.SECONDS);
                     } else {
                         Map<String, Pair<AbstractDataType, Object>> data = new HashMap<>(first.size());
                         for (ColumnReader primitive : second) {
                             Pair<String, Pair<AbstractDataType, Object>> pair = primitive.read();
                             data.put(pair.getKey(), pair.getValue());
                         }
-                        buffer.write(data);
+                        buffer.write(data, Long.MAX_VALUE, TimeUnit.SECONDS);
                     }
                 }
-                buffer.close();
+                buffer.close(0, TimeUnit.SECONDS);
             } catch (Exception e) {
                 e.printStackTrace();
             }

@@ -35,11 +35,11 @@ public abstract class AbstractScheduler {
     /**
      * 线程池的初始大小
      */
-    private static final int CORE_POOL_SIZE = 3;
+    private static final int CORE_POOL_SIZE = Runtime.getRuntime().availableProcessors();
     /**
      * 线程池的最大大小
      */
-    private static final int MAX_POOL_SIZE = 5;
+    private static final int MAX_POOL_SIZE = Runtime.getRuntime().availableProcessors();
     /**
      * 线程池的对象封装
      */

@@ -1,6 +1,8 @@
 package com.oceanbase.tools.datamocker.core.task;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
@@ -41,10 +43,6 @@ public abstract class AbstractDataPipe<T> {
      * 数据管道全空条件控制对象
      */
     private final Condition notEmptyCondition;
-    /**
-     * 条件等待超时时间（秒）
-     */
-    private final static long CONDITION_TIMOUT_SECOND = 30;
 
     public AbstractDataPipe(int maxRetained) {
         if (maxRetained > 0) {
@@ -73,12 +71,14 @@ public abstract class AbstractDataPipe<T> {
         }
         lock.lock();
         try {
-            long maxLoopCount = TimeUnit.SECONDS.convert(timeout, timeUnit) / CONDITION_TIMOUT_SECOND + 1;
+            long conditionTimeout = new Random().nextInt(25) + 5;
+            long maxLoopCount = TimeUnit.SECONDS.convert(timeout, timeUnit) / conditionTimeout + 1;
             while (size() >= maxRetained && (maxLoopCount--) > 0) {
-                notFullCondition.await(CONDITION_TIMOUT_SECOND, TimeUnit.SECONDS);
+                notFullCondition.await(conditionTimeout, TimeUnit.SECONDS);
             }
             if (maxLoopCount == -1) {
-                log.warn("timeout for pipeline write in, will return. currentSize={},maxRetained={},threadName={}", size(), maxRetained, Thread.currentThread().getName());
+                log.warn("timeout for pipeline write in, will return. currentSize={},maxRetained={},threadName={}", size(), maxRetained,
+                        Thread.currentThread().getName());
                 return;
             }
         } finally {
@@ -138,13 +138,15 @@ public abstract class AbstractDataPipe<T> {
         }
         lock.lock();
         try {
-            long maxLoopCount = TimeUnit.SECONDS.convert(timeout, timeUnit) / CONDITION_TIMOUT_SECOND + 1;
+            long conditionTimeout = new Random().nextInt(25) + 5;
+            long maxLoopCount = TimeUnit.SECONDS.convert(timeout, timeUnit) / conditionTimeout + 1;
             while (size() <= 0 && (maxLoopCount--) > 0) {
-                notEmptyCondition.await(CONDITION_TIMOUT_SECOND, TimeUnit.SECONDS);
+                notEmptyCondition.await(conditionTimeout, TimeUnit.SECONDS);
             }
             if (maxLoopCount == -1) {
-                log.warn("timeout for pipeline read out, will return. currentSize={},maxRetained={},threadName={}", size(), maxRetained, Thread.currentThread().getName());
-                return null;
+                log.warn("timeout for pipeline read out, will return. currentSize={},maxRetained={},threadName={}", size(), maxRetained,
+                        Thread.currentThread().getName());
+                return Collections.emptyList();
             }
         } finally {
             lock.unlock();

@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import com.oceanbase.tools.datamocker.constraint.AbstractConstraint;
 import com.oceanbase.tools.datamocker.core.read.ColumnReader;
@@ -109,7 +110,11 @@ public class MockDataGenTask extends AbstractMockTask {
                 }
                 if (passCheck) {
                     emptyLoopCount = 0L;
-                    buffer.write(columnNameToData);
+                    long writeTimeout = metaData.getTimeoutMilliseconds() - this.interval();
+                    if (writeTimeout <= 0) {
+                        writeTimeout = 2000;
+                    }
+                    buffer.write(columnNameToData, writeTimeout, TimeUnit.MILLISECONDS);
                     for (AbstractConstraint constraint : this.constraints) {
                         constraint.mark(columnNameToData);
                     }
@@ -126,7 +131,11 @@ public class MockDataGenTask extends AbstractMockTask {
             exception = e;
             log.error("some errors occured when mocking data", e);
         } finally {
-            buffer.close();
+            long writeTimeout = metaData.getTimeoutMilliseconds() - this.interval();
+            if (writeTimeout < 0) {
+                writeTimeout = 0;
+            }
+            buffer.close(writeTimeout, TimeUnit.MILLISECONDS);
         }
         if (exception != null) {
             throw exception;

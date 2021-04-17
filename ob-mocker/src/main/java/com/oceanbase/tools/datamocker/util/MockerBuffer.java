@@ -17,6 +17,7 @@ import com.oceanbase.tools.datamocker.datatype.AbstractDataType;
 import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.Validate;
 
 /**
  * mock数据的缓冲区，用于缓冲产生出的临时数据
@@ -134,10 +135,14 @@ public class MockerBuffer {
     /**
      * 向缓冲中写入列数据集合
      *
-     * @param data 列数据集合
+     * @param data     列数据集合
+     * @param timeout  写入超时时间
+     * @param timeUnit 时间单位
      * @throws InterruptedException 可能会被中断
      */
-    public void write(Map<String, Pair<AbstractDataType, Object>> data) throws Exception {
+    public void write(Map<String, Pair<AbstractDataType, Object>> data, long timeout, TimeUnit timeUnit) throws Exception {
+        Validate.notNull(timeUnit, "time unit for buffer write timeout can not be null");
+        Validate.isTrue(timeout > 0, "timeout for buffer write can not be negative");
         if (isClosed()) {
             throw new MockerException(MockerError.OPERATION_FAILURE, "buffer has been closed");
         }
@@ -151,7 +156,7 @@ public class MockerBuffer {
             for (Map.Entry<String, Pair<AbstractDataType, Object>> entry : entrySet) {
                 writeToCurrentRow(new Pair<>(entry.getKey(), entry.getValue()));
             }
-            reload();
+            reload(timeout, timeUnit);
         } finally {
             lock.unlock();
         }
@@ -161,13 +166,15 @@ public class MockerBuffer {
     /**
      * 向缓冲中写入一条列数据
      *
-     * @param column 列数据
+     * @param column   列数据
+     * @param timeout  写入超时时间
+     * @param timeUnit 时间单位
      * @throws InterruptedException 可能会被中断
      */
-    public void write(Pair<String, Pair<AbstractDataType, Object>> column) throws Exception {
+    public void write(Pair<String, Pair<AbstractDataType, Object>> column, long timeout, TimeUnit timeUnit) throws Exception {
         Map<String, Pair<AbstractDataType, Object>> inputRow = new HashMap<>();
         inputRow.putIfAbsent(column.getKey(), column.getValue());
-        write(inputRow);
+        write(inputRow, timeout, timeUnit);
     }
 
     /**
@@ -195,9 +202,11 @@ public class MockerBuffer {
     /**
      * 重加载游标行和行数据集合
      *
+     * @param timeout  写入超时时间
+     * @param timeUnit 时间单位
      * @throws InterruptedException 管道写入数据是一个阻塞操作，可能被中断
      */
-    private void reload() throws Exception {
+    private void reload(long timeout, TimeUnit timeUnit) throws Exception {
         if (this.currentRow.size() > this.columnSet.size()) {
             MockerException e = new MockerException(MockerError.UNKNOWN_COLUMN_NAME,
                     String.format("there are unknown columns in current column [%s]",
@@ -207,7 +216,7 @@ public class MockerBuffer {
         } else if (this.currentRow.size() == this.columnSet.size()) {
             this.rows.add(this.currentRow);
             if (this.rows.size() >= this.flushThreshold) {
-                this.flush();
+                this.flush(timeout, timeUnit);
             }
             this.currentRow = new HashMap<>();
         }
@@ -219,7 +228,7 @@ public class MockerBuffer {
      * @throws BrokenBarrierException 篱笆可能会被冲破
      * @throws InterruptedException 阻塞方法可能会被中断
      */
-    public void close() throws Exception {
+    public void close(long timeout, TimeUnit timeUnit) throws Exception {
         if (isClosed()) {
             return;
         }
@@ -228,7 +237,7 @@ public class MockerBuffer {
             if (!isClosed()) {
                 for (AbstractDataPipe dataPipe : this.dataPipes) {
                     if (!dataPipe.isClosed()) {
-                        dataPipe.write(this.rows);
+                        dataPipe.write(this.rows, timeout, timeUnit);
                         dataPipe.close();
                     }
                 }
@@ -249,12 +258,14 @@ public class MockerBuffer {
     /**
      * 强制刷新缓存，将行缓存中的数据全部刷新至管道中
      *
+     * @param timeout  写入超时时间
+     * @param timeUnit 时间单位
      * @throws InterruptedException 管道写入操作是一个阻塞操作，可能被中断
      */
-    public synchronized void flush() throws Exception {
+    public synchronized void flush(long timeout, TimeUnit timeUnit) throws Exception {
         if (dataPipes != null) {
             for (AbstractDataPipe dataPipe : dataPipes) {
-                dataPipe.write(this.rows);
+                dataPipe.write(this.rows, timeout, timeUnit);
             }
         }
         this.rows = new ArrayList<>(this.flushThreshold.intValue() * 2);

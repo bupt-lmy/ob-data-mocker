@@ -57,7 +57,7 @@ public class TableTaskMetaData {
     private final ObModeType dialectType;
     /**
      * 任务id
-     * */
+     */
     private final String taskId;
 
     public TableTaskMetaData(Map<String, AbstractDataType> tableSchema, AbstractTableConfig tableConfig, ObModeType dialectType,
