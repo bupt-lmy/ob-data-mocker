@@ -43,6 +43,10 @@ public abstract class AbstractDataPipe<T> {
      * 数据管道全空条件控制对象
      */
     private final Condition notEmptyCondition;
+    /**
+     * 条件等待超时时间
+     * */
+    private final static long CONDITION_WAIT_TIMEOUTSEC = 5;
 
     public AbstractDataPipe(int maxRetained) {
         if (maxRetained > 0) {
@@ -71,10 +75,9 @@ public abstract class AbstractDataPipe<T> {
         }
         lock.lock();
         try {
-            long conditionTimeout = new Random().nextInt(25) + 5;
-            long maxLoopCount = TimeUnit.SECONDS.convert(timeout, timeUnit) / conditionTimeout + 1;
+            long maxLoopCount = TimeUnit.SECONDS.convert(timeout, timeUnit) / CONDITION_WAIT_TIMEOUTSEC + 1;
             while (size() >= maxRetained && (maxLoopCount--) > 0) {
-                notFullCondition.await(conditionTimeout, TimeUnit.SECONDS);
+                notFullCondition.await(CONDITION_WAIT_TIMEOUTSEC, TimeUnit.SECONDS);
             }
             if (maxLoopCount == -1) {
                 log.warn("timeout for pipeline write in, will return. currentSize={},maxRetained={},threadName={}", size(), maxRetained,
@@ -138,10 +141,9 @@ public abstract class AbstractDataPipe<T> {
         }
         lock.lock();
         try {
-            long conditionTimeout = new Random().nextInt(25) + 5;
-            long maxLoopCount = TimeUnit.SECONDS.convert(timeout, timeUnit) / conditionTimeout + 1;
+            long maxLoopCount = TimeUnit.SECONDS.convert(timeout, timeUnit) / CONDITION_WAIT_TIMEOUTSEC + 1;
             while (size() <= 0 && (maxLoopCount--) > 0) {
-                notEmptyCondition.await(conditionTimeout, TimeUnit.SECONDS);
+                notEmptyCondition.await(CONDITION_WAIT_TIMEOUTSEC, TimeUnit.SECONDS);
             }
             if (maxLoopCount == -1) {
                 log.warn("timeout for pipeline read out, will return. currentSize={},maxRetained={},threadName={}", size(), maxRetained,
