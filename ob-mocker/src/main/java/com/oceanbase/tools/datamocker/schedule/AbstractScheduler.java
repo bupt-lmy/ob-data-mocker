@@ -21,6 +21,7 @@ import com.oceanbase.tools.datamocker.model.enums.MockTaskStatus;
 import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.Validate;
 import org.slf4j.MDC;
 
 /**
@@ -44,15 +45,11 @@ public abstract class AbstractScheduler {
      * 线程池的对象封装
      */
     private MockExecutorService service;
+    private final long startTimestamp;
 
     static {
-        CORE_POOL_SIZE = 5;
-        int availableProcessors = Runtime.getRuntime().availableProcessors();
-        if (availableProcessors > CORE_POOL_SIZE) {
-            MAX_POOL_SIZE = availableProcessors;
-        } else {
-            MAX_POOL_SIZE = 5;
-        }
+        CORE_POOL_SIZE = Math.max(Runtime.getRuntime().availableProcessors(), 5);
+        MAX_POOL_SIZE = CORE_POOL_SIZE;
     }
 
     public AbstractScheduler() {
@@ -61,7 +58,10 @@ public abstract class AbstractScheduler {
             executor = new ThreadPoolExecutor(CORE_POOL_SIZE, MAX_POOL_SIZE, 0, TimeUnit.MILLISECONDS,
                     new LinkedBlockingQueue<>(), new ThreadPoolExecutor.CallerRunsPolicy());
         }
+        Validate.isTrue(executor.getCorePoolSize() == executor.getMaximumPoolSize(), "core pool size has to be equal to max pool size");
+        Validate.isTrue(executor.getCorePoolSize() >= 5, "core pool size of thread pool can not be smaller than 5");
         service = new MockExecutorService(executor);
+        startTimestamp = System.currentTimeMillis();
     }
 
     /**
@@ -71,6 +71,7 @@ public abstract class AbstractScheduler {
      * @return 一共执行的任务数量
      */
     public MockContext execute(Dispatcher<TableTaskInfo> dispatcher) {
+        log.info("thread pool's initialization has been done. coreSize={},maxSize={}", CORE_POOL_SIZE, MAX_POOL_SIZE);
         MockContext context = new MockContext(this.service, dispatcher.taskId(), dispatcher.name(), dispatcher.totalCount());
         int concurrentCount = dispatcher.count();
         //标识数组，数组长度和tasks的任务队列数量相同，每一位分别用于标示对应任务队列中是否还有任务等待执行
@@ -83,10 +84,12 @@ public abstract class AbstractScheduler {
             int totalCount = 0;
             int total = 0;
             Long maxTimeout = 0L;
+            Long timeoutSum = 0L;
             for (int i = 0; i < dispatcher.count(); i++) {
                 for (int j = 0; j < dispatcher.getTaskSize(i); j++) {
                     TableTaskInfo tableTask = dispatcher.getObj(i, j);
                     Long timeout = tableTask.getMetaData().getTimeoutMilliseconds();
+                    timeoutSum += timeout;
                     if (maxTimeout < timeout) {
                         maxTimeout = timeout;
                     }
@@ -94,7 +97,7 @@ public abstract class AbstractScheduler {
             }
             long failCount = 0;
             long maxFailCount = maxTimeout / 5000L + 36;
-            while (!Thread.currentThread().isInterrupted()) {
+            while (!Thread.currentThread().isInterrupted() && interval() < timeoutSum) {
                 for (int i = 0; i < concurrentCount; i++) {
                     if (flags[i]) {
                         TableTaskInfo task = dispatcher.getObj(i, 0);
@@ -152,7 +155,7 @@ public abstract class AbstractScheduler {
                             mockTaskBean.getContext().setStatus(MockTaskStatus.PENDING);
                             mockTaskBean.init(service, new AbstractCallBack<TableTaskContext>() {
                                 @Override
-                                public void doOnSuccess(TableTaskContext param) throws Throwable {
+                                public void doOnSuccess(TableTaskContext param) {
                                     ((MockerDataSource) param.getDataSource()).clear();
                                     for (MockerFile fileManager : param.getFileManagers()) {
                                         fileManager.close();
@@ -166,7 +169,7 @@ public abstract class AbstractScheduler {
                                 }
 
                                 @Override
-                                public void doOnFailure(TableTaskContext param, Throwable e) throws Throwable {
+                                public void doOnFailure(TableTaskContext param, Throwable e) {
                                     ((MockerDataSource) param.getDataSource()).clear();
                                     for (MockerFile fileManager : param.getFileManagers()) {
                                         fileManager.close();
@@ -270,6 +273,15 @@ public abstract class AbstractScheduler {
                 }
             }
         }
+    }
+
+    /**
+     * 返回调度任务的历时
+     *
+     * @return 返回调度任务执行的时间
+     */
+    private long interval() {
+        return System.currentTimeMillis() - startTimestamp;
     }
 
     /**

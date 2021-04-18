@@ -157,7 +157,7 @@ public class TableTask {
 
                     @Override
                     public void doOnFailure(TableTaskContext param, Throwable e) throws Throwable {
-                        log.error("fail to execute data generate business task, task status is {}", param.getTotalDataGenerateCount(), e);
+                        log.error("fail to execute data generate business task, task status is {}", param.getStatus(), e);
                         startAfterTask(service, callBack);
                     }
                 });

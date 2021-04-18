@@ -87,6 +87,12 @@ public class MockDataGenTask extends AbstractMockTask {
 
     @Override
     public Void execute(TableTaskMetaData metaData, TableTaskContext context) throws Exception {
+        List<String> columnNames = new ArrayList<>();
+        this.readers.forEach(columnReader -> {
+            columnNames.add(columnReader.columnName());
+        });
+        log.info("data generate task is running. threadName={},columnName={}", Thread.currentThread().getName(),
+                String.join(",", columnNames));
         long counter = 0;
         // 循环空转计数器，通常空转超过totalCount还未写入任意一条数据则认为写入异常
         long emptyLoopCount = 0;

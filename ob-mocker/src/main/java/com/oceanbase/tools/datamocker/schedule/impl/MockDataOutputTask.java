@@ -46,6 +46,7 @@ public class MockDataOutputTask extends AbstractMockTask {
 
     @Override
     public Void execute(TableTaskMetaData metaData, TableTaskContext context) throws Exception {
+        log.info("data output task is running. threadName={}", Thread.currentThread().getName());
         int length = this.writerSymbols.size();
         Throwable exception = null;
         while (!Thread.currentThread().isInterrupted() && this.interval() <= metaData.getTimeoutMilliseconds()) {
