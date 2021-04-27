@@ -73,6 +73,7 @@ public abstract class AbstractScheduler {
     public MockContext execute(Dispatcher<TableTaskInfo> dispatcher) {
         log.info("thread pool's initialization has been done. coreSize={},maxSize={}", CORE_POOL_SIZE, MAX_POOL_SIZE);
         MockContext context = new MockContext(this.service, dispatcher.taskId(), dispatcher.name(), dispatcher.totalCount());
+        AbstractScheduler thisScheduler = this;
         int concurrentCount = dispatcher.count();
         //标识数组，数组长度和tasks的任务队列数量相同，每一位分别用于标示对应任务队列中是否还有任务等待执行
         boolean[] flags = new boolean[concurrentCount];
@@ -152,7 +153,6 @@ public abstract class AbstractScheduler {
                             flags[i] = false;
                             //初始化TaskBean，主要是定义TaskBean的回调函数
                             TableTask mockTaskBean = new TableTask(task, columnGroups, dataGroups, dispatcher.name(), i);
-                            AbstractScheduler thisScheduler = this;
                             mockTaskBean.getContext().setStatus(MockTaskStatus.PENDING);
                             mockTaskBean.init(service, new AbstractCallBack<TableTaskContext>() {
                                 @Override
