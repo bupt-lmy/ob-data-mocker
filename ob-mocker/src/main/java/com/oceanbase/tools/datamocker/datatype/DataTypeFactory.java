@@ -12,8 +12,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 
-import javax.xml.datatype.DatatypeFactory;
-
 import com.alipay.oceanbase.jdbc.extend.datatype.INTERVALYM;
 
 import com.oceanbase.tools.datamocker.datatype.mysql.MysqlBigIntType;
@@ -1451,7 +1449,7 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
         try {
             Field[] fields = DataTypeFactory.class.getDeclaredFields();
             for (Field field : fields) {
-                Object instance = field.get(DatatypeFactory.class);
+                Object instance = field.get(DataTypeFactory.class);
                 if (Modifier.isStatic(field.getModifiers()) && instance instanceof DataTypeFactory) {
                     FACTORYNAME_2_FACTORYINSTANCE.putIfAbsent(field.getName(), (DataTypeFactory) instance);
                 }

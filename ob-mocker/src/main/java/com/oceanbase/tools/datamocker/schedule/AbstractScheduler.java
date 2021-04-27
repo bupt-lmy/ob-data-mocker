@@ -152,6 +152,7 @@ public abstract class AbstractScheduler {
                             flags[i] = false;
                             //初始化TaskBean，主要是定义TaskBean的回调函数
                             TableTask mockTaskBean = new TableTask(task, columnGroups, dataGroups, dispatcher.name(), i);
+                            AbstractScheduler thisScheduler = this;
                             mockTaskBean.getContext().setStatus(MockTaskStatus.PENDING);
                             mockTaskBean.init(service, new AbstractCallBack<TableTaskContext>() {
                                 @Override
@@ -162,7 +163,7 @@ public abstract class AbstractScheduler {
                                     }
                                     flags[param.getTopIndex()] = true;
                                     try {
-                                        onSuccess(param);
+                                        thisScheduler.onSuccess(param);
                                     } catch (Throwable e) {
                                         log.error("some errors happened when scheduler onSuccess executed", e);
                                     }
@@ -176,7 +177,7 @@ public abstract class AbstractScheduler {
                                     }
                                     flags[param.getTopIndex()] = true;
                                     try {
-                                        onFailure(param, e);
+                                        thisScheduler.onFailure(param, e);
                                     } catch (Throwable e1) {
                                         log.error("some errors happened when scheduler onFailure executed", e);
                                     }
