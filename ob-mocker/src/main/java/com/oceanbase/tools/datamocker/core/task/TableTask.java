@@ -128,7 +128,7 @@ public class TableTask {
                     if (task instanceof MockDataGenTask) {
                         ((MockDataGenTask) task).setConstraints(param.getConstraints());
                     }
-                    if (!service.isShutdown()) {
+                    if (!service.isShutdown() && !context.isShutdown()) {
                         service.submitCallable(task, param);
                     } else {
                         log.warn("thread pool has been shut down, mock task will be exited");
@@ -176,10 +176,6 @@ public class TableTask {
 
                     @Override
                     public void doOnFailure(TableTaskContext param, Throwable e) throws Throwable {
-                        StringBuilder builder = new StringBuilder();
-                        for (Map.Entry<String, Long> item : param.getWriterName2writeCount().entrySet()) {
-                            builder.append("{\"" + item.getKey() + "\" : " + item.getValue() + "} ");
-                        }
                         log.error("fail to execute data write business task, task status is {}", param.getStatus(), e);
                         startAfterTask(service, callBack);
                     }
@@ -218,7 +214,7 @@ public class TableTask {
     private void startAfterTask(MockExecutorService service, AbstractCallBack callBack) throws Throwable {
         if (counter.incrementAndGet() == this.businessTasks.size()) {
             log.info("all mock business tasks has been executed, mock after task will begin");
-            if (!service.isShutdown()) {
+            if (!service.isShutdown() && !context.isShutdown()) {
                 service.submitCallable(this.afterTask, this.context);
             } else {
                 log.warn("thread pool has been shut down, mock task will be exited");
