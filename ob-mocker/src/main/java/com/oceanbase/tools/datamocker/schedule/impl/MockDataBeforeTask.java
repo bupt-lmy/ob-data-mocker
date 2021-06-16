@@ -13,6 +13,7 @@ import com.oceanbase.tools.datamocker.model.enums.ObModeType;
 import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
 import com.oceanbase.tools.datamocker.schedule.AbstractMockTask;
+import com.oceanbase.tools.datamocker.util.DbObjectNameUtil;
 import com.oceanbase.tools.datamocker.util.SqlUtil;
 import lombok.extern.slf4j.Slf4j;
 
@@ -47,9 +48,11 @@ public class MockDataBeforeTask extends AbstractMockTask {
         if (Boolean.TRUE.equals(metaData.getShouldTruncate())) {
             String sql;
             if (ObModeType.OB_MYSQL.equals(metaData.getDialectType())) {
-                sql = String.format("delete from `%s`.`%s` where 1=1; ", metaData.getSchema(), metaData.getTableName());
+                sql = String.format("delete from `%s`.`%s` where 1=1; ", DbObjectNameUtil.doubleCharToEscape(metaData.getSchema(), '`'),
+                        DbObjectNameUtil.doubleCharToEscape(metaData.getTableName(), '`'));
             } else if (ObModeType.OB_ORACLE.equals(metaData.getDialectType())) {
-                sql = String.format("delete from %s.\"%s\" where 1=1; ", metaData.getSchema(), metaData.getTableName());
+                sql = String.format("delete from \"%s\".\"%s\" where 1=1; ", DbObjectNameUtil.doubleCharToEscape(metaData.getSchema(), '"'),
+                        DbObjectNameUtil.doubleCharToEscape(metaData.getTableName(), '"'));
             } else {
                 MockerException e = new MockerException(MockerError.INVALID_OB_MODE);
                 log.error("fail to execute before task for mock", e);
@@ -58,7 +61,7 @@ public class MockDataBeforeTask extends AbstractMockTask {
             SqlUtil.executeUpdate(this.dataSource, sql, null, new AbstractCallBack<Integer>() {
                 @Override
                 public void doOnSuccess(Integer effectRow) throws Throwable {
-                    log.info(String.format("truncate table %s.\"%s\" successfully, effect row is %d", metaData.getSchema(),
+                    log.info(String.format("truncate table \"%s\".\"%s\" successfully, effect row is %d", metaData.getSchema(),
                             metaData.getTableName(), effectRow));
                     if (effectRow > 0) {
                         List<ConstraintFactory> factories = ConstraintFactory.listInstances();

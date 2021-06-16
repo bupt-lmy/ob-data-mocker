@@ -15,6 +15,7 @@ import com.oceanbase.tools.datamocker.datatype.AbstractDataType;
 import com.oceanbase.tools.datamocker.model.enums.ObModeType;
 import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
+import com.oceanbase.tools.datamocker.util.DbObjectNameUtil;
 import com.oceanbase.tools.datamocker.util.DigestUtil;
 import com.oceanbase.tools.datamocker.util.Pair;
 import com.oceanbase.tools.datamocker.util.SqlUtil;
@@ -132,9 +133,11 @@ public class DataBaseWriter extends AbstractMockWriter {
     private void preCheck() throws Throwable {
         String descSql;
         if (ObModeType.OB_ORACLE.equals(this.dialectType)) {
-            descSql = String.format("select count(*) from %s.\"%s\"", database, tableName);
+            descSql = String.format("select count(*) from \"%s\".\"%s\"", DbObjectNameUtil.doubleCharToEscape(database, '"'),
+                    DbObjectNameUtil.doubleCharToEscape(tableName, '"'));
         } else if (ObModeType.OB_MYSQL.equals(this.dialectType)) {
-            descSql = String.format("select count(*) from `%s`.`%s`", database, tableName);
+            descSql = String.format("select count(*) from `%s`.`%s`", DbObjectNameUtil.doubleCharToEscape(database, '`'),
+                    DbObjectNameUtil.doubleCharToEscape(tableName, '`'));
         } else {
             throw new MockerException(MockerError.INVALID_OB_MODE);
         }
@@ -157,18 +160,20 @@ public class DataBaseWriter extends AbstractMockWriter {
         List<String> columnList = new ArrayList<>(columnSet);
         StringBuffer sqlBuffer = null;
         if (ObModeType.OB_ORACLE.equals(this.dialectType)) {
-            sqlBuffer = new StringBuffer(String.format("insert into %s.\"%s\"(", database, tableName));
+            sqlBuffer = new StringBuffer(String.format("insert into \"%s\".\"%s\"(", DbObjectNameUtil.doubleCharToEscape(database, '"'),
+                    DbObjectNameUtil.doubleCharToEscape(tableName, '"')));
         } else if (ObModeType.OB_MYSQL.equals(this.dialectType)) {
-            sqlBuffer = new StringBuffer(String.format("insert into `%s`.`%s`(", database, tableName));
+            sqlBuffer = new StringBuffer(String.format("insert into `%s`.`%s`(", DbObjectNameUtil.doubleCharToEscape(database, '`'),
+                    DbObjectNameUtil.doubleCharToEscape(tableName, '`')));
         }
         int columnLength = columnList.size();
         for (int i = 0; i < columnLength; i++) {
             String columnName = columnList.get(i);
             if (i == columnLength - 1) {
                 if (ObModeType.OB_ORACLE.equals(this.dialectType)) {
-                    sqlBuffer.append(String.format("\"%s\") values (", columnName));
+                    sqlBuffer.append(String.format("\"%s\") values (", DbObjectNameUtil.doubleCharToEscape(columnName, '"')));
                 } else if (ObModeType.OB_MYSQL.equals(this.dialectType)) {
-                    sqlBuffer.append(String.format("`%s`) values (", columnName));
+                    sqlBuffer.append(String.format("`%s`) values (", DbObjectNameUtil.doubleCharToEscape(columnName, '`')));
                 }
                 for (int j = 0; j < columnLength; j++) {
                     if (j == columnLength - 1) {
@@ -179,9 +184,9 @@ public class DataBaseWriter extends AbstractMockWriter {
                 }
             } else {
                 if (ObModeType.OB_ORACLE.equals(this.dialectType)) {
-                    sqlBuffer.append(String.format("\"%s\", ", columnName));
+                    sqlBuffer.append(String.format("\"%s\", ", DbObjectNameUtil.doubleCharToEscape(columnName, '"')));
                 } else if (ObModeType.OB_MYSQL.equals(this.dialectType)) {
-                    sqlBuffer.append(String.format("`%s`, ", columnName));
+                    sqlBuffer.append(String.format("`%s`, ", DbObjectNameUtil.doubleCharToEscape(columnName, '`')));
                 }
             }
         }
@@ -204,14 +209,14 @@ public class DataBaseWriter extends AbstractMockWriter {
                     log.info("data base writer has writed a batch, effect row is {}", result.length);
                     returnVal.add((long) result.length);
                 } else {
-                    log.warn("database writer write process has been executed, nothing wrote");
+                    log.warn("database writer write process has been executed, nothing written");
                 }
             }
 
             @Override
-            public void doOnFailure(int[] result, Throwable e) {
+            public void doOnFailure(int[] result, Throwable e) throws Throwable {
                 log.error("some errors happen when write data", e);
-                throw new MockerException(e);
+                throw e;
             }
         });
         return returnVal.get(0);

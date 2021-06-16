@@ -189,7 +189,7 @@ public abstract class AbstractScheduler {
                                     manager.close();
                                 }
                                 clearResource(dispatcher);
-                                log.warn("task has been shut down, total task executed is {}", totalCount);
+                                log.warn("task has been shutdown, total task executed is {}", totalCount);
                                 return totalCount;
                             }
                             totalCount++;

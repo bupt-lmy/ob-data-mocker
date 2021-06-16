@@ -40,6 +40,7 @@ import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
 import com.oceanbase.tools.datamocker.schedule.AbstractScheduler;
 import com.oceanbase.tools.datamocker.schedule.impl.DefaultScheduler;
+import com.oceanbase.tools.datamocker.util.DbObjectNameUtil;
 import com.oceanbase.tools.datamocker.util.MockDataPipe;
 import com.oceanbase.tools.datamocker.util.MockerBuffer;
 import com.oceanbase.tools.datamocker.util.SqlUtil;
@@ -160,21 +161,23 @@ public abstract class AbstractMockerFactory {
         }
         String sql;
         if (ObModeType.OB_ORACLE.equals(this.taskConfig.obDialectType())) {
-            sql = String.format("select count(*) from %s.\"%s\"", schema, table);
+            sql = String.format("select count(*) from \"%s\".\"%s\"", DbObjectNameUtil.doubleCharToEscape(schema, '"'),
+                    DbObjectNameUtil.doubleCharToEscape(table, '"'));
         } else if (ObModeType.OB_MYSQL.equals(this.taskConfig.obDialectType())) {
-            sql = String.format("select count(*) from `%s`.`%s`", schema, table);
+            sql = String.format("select count(*) from `%s`.`%s`", DbObjectNameUtil.doubleCharToEscape(schema, '`'),
+                    DbObjectNameUtil.doubleCharToEscape(table, '`'));
         } else {
             throw new MockerException(MockerError.INVALID_OB_MODE);
         }
         SqlUtil.executeQuery(this.innerDatasource, sql, null, new AbstractCallBack<ResultSet>() {
             @Override
             public void doOnSuccess(ResultSet result) {
-                log.info(String.format("validate table %s.\"%s\" successfully", schema, table));
+                log.info(String.format("validate table \"%s\".\"%s\" successfully", schema, table));
             }
 
             @Override
             public void doOnFailure(ResultSet result, Throwable e) {
-                log.error(String.format("fail to validate %s.\"%s\"", schema, table), e);
+                log.error(String.format("fail to validate \"%s\".\"%s\"", schema, table), e);
                 throw new MockerException(MockerError.OPERATION_FAILURE, e.getMessage());
             }
         });

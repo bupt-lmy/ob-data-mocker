@@ -12,6 +12,7 @@ import com.oceanbase.tools.datamocker.model.enums.ObModeType;
 import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
 import com.oceanbase.tools.datamocker.schedule.AbstractMockTask;
+import com.oceanbase.tools.datamocker.util.DbObjectNameUtil;
 import com.oceanbase.tools.datamocker.util.SqlUtil;
 import lombok.extern.slf4j.Slf4j;
 
@@ -44,9 +45,11 @@ public class MockDataAfterTask extends AbstractMockTask {
         log.info("begin execute mock after task");
         String sql;
         if (ObModeType.OB_ORACLE.equals(metaData.getDialectType())) {
-            sql = String.format("select count(*) from %s.\"%s\"; ", metaData.getSchema(), metaData.getTableName());
+            sql = String.format("select count(*) from \"%s\".\"%s\"; ", DbObjectNameUtil.doubleCharToEscape(metaData.getSchema(), '"'),
+                    DbObjectNameUtil.doubleCharToEscape(metaData.getTableName(), '"'));
         } else if (ObModeType.OB_MYSQL.equals(metaData.getDialectType())) {
-            sql = String.format("select count(*) from `%s`.`%s`; ", metaData.getSchema(), metaData.getTableName());
+            sql = String.format("select count(*) from `%s`.`%s`; ", DbObjectNameUtil.doubleCharToEscape(metaData.getSchema(), '`'),
+                    DbObjectNameUtil.doubleCharToEscape(metaData.getTableName(), '`'));
         } else {
             MockerException e = new MockerException(MockerError.INVALID_OB_MODE);
             log.error("fail to execute after task for mock", e);
@@ -58,7 +61,7 @@ public class MockDataAfterTask extends AbstractMockTask {
                 ResultSetMetaData md = resultSet.getMetaData();
                 if (md.getColumnCount() != 1) {
                     throw new MockerException(MockerError.ILLEGAL_RETURN_VALUE,
-                            String.format("column count for \"select count(*) from %s.\"%s\" is not equal to one, [%d!=1]",
+                            String.format("column count for \"select count(*) from \"%s\".\"%s\" is not equal to one, [%d!=1]",
                                     metaData.getSchema(), metaData.getTableName(), md.getColumnCount()));
                 }
                 if (resultSet.next()) {

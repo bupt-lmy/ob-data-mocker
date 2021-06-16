@@ -24,10 +24,12 @@ import com.oceanbase.tools.datamocker.model.dbobject.TableColumn;
 import com.oceanbase.tools.datamocker.model.enums.ObModeType;
 import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
+import com.oceanbase.tools.datamocker.util.DbObjectNameUtil;
 import com.oceanbase.tools.datamocker.util.Pair;
 import com.oceanbase.tools.datamocker.util.SerializeUtil;
 import com.oceanbase.tools.datamocker.util.SqlUtil;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.Validate;
 
 /**
  * oracle模式下约束对象的工厂类，用于根据配置实例化出约束对象
@@ -106,9 +108,11 @@ public abstract class ConstraintFactory {
             List<AbstractConstraint> constraints;
             if (ObModeType.OB_ORACLE.equals(dialectType)) {
                 constraints = getConstraints(dataSource, ORACLE_UNIQUE_CONSTRAINT_SQL, database, tableName, columnName2DataType, totalCount,
+                        ObModeType.OB_ORACLE,
                         new OracleValidation());
             } else if (ObModeType.OB_MYSQL.equals(dialectType)) {
                 constraints = getConstraints(dataSource, MYSQL_UNIQUE_CONSTRAINT_SQL, database, tableName, columnName2DataType, totalCount,
+                        ObModeType.OB_MYSQL,
                         new MysqlValidation());
             } else {
                 throw new MockerException(MockerError.NOT_SUPPORT_FEATURE,
@@ -128,10 +132,10 @@ public abstract class ConstraintFactory {
             List<AbstractConstraint> constraints;
             if (ObModeType.OB_ORACLE.equals(dialectType)) {
                 constraints = getConstraints(dataSource, ORACLE_PRIMARY_CONSTRAINT_SQL, database, tableName, columnName2DataType,
-                        totalCount, null);
+                        totalCount, ObModeType.OB_ORACLE, null);
             } else if (ObModeType.OB_MYSQL.equals(dialectType)) {
                 constraints = getConstraints(dataSource, MYSQL_PRIMARY_CONSTRAINT_SQL, database, tableName, columnName2DataType,
-                        totalCount, null);
+                        totalCount, ObModeType.OB_MYSQL, null);
             } else {
                 throw new MockerException(MockerError.NOT_SUPPORT_FEATURE,
                         String.format("\"%s\" mode is not support yet", dialectType == null ? "null" : dialectType.name()));
@@ -275,7 +279,8 @@ public abstract class ConstraintFactory {
     }
 
     protected static List<AbstractConstraint> getConstraints(DataSource dataSource, String sql, String database,
-            String tableName, Map<String, AbstractDataType> columnName2DataType, int totalCount, Validation validation) throws Throwable {
+            String tableName, Map<String, AbstractDataType> columnName2DataType, int totalCount, ObModeType obModeType,
+            Validation validation) throws Throwable {
         List<AbstractConstraint> constraints = new ArrayList<>();
         SqlUtil.executeQuery(dataSource, sql, new String[] {database, tableName}, new AbstractCallBack<ResultSet>() {
             @Override
@@ -304,10 +309,10 @@ public abstract class ConstraintFactory {
                         }
                         columnMap.put(item.getTableName(), map);
                     }
-                    Integer existCount = getTableRowCount(dataSource, tableName);
+                    Integer existCount = getTableRowCount(dataSource, tableName, obModeType);
                     AbstractConstraint constraint = new UniqueConstraint(entry.getKey(), database, tableName, columnMap,
                             totalCount + existCount);
-                    initConstraint(dataSource, colsList, tableName, columnName2DataType, constraint);
+                    initConstraint(dataSource, colsList, tableName, columnName2DataType, constraint, obModeType);
                     constraints.add(constraint);
                 }
             }
@@ -327,8 +332,12 @@ public abstract class ConstraintFactory {
      * @param table      表名
      * @return 返回已经存在的列
      */
-    private static Integer getTableRowCount(DataSource dataSource, String table) throws Throwable {
-        String sql = String.format("select count(*) from %s; ", table);
+    private static Integer getTableRowCount(DataSource dataSource, String table, ObModeType modeType) throws Throwable {
+        Validate.notNull(modeType, "ObModeType can not be null for ConstraintFactory#getTableRowCount");
+        String sql = String.format("select count(*) from \"%s\"; ", DbObjectNameUtil.doubleCharToEscape(table, '"'));
+        if (ObModeType.OB_MYSQL.equals(modeType)) {
+            sql = String.format("select count(*) from `%s`; ", DbObjectNameUtil.doubleCharToEscape(table, '`'));
+        }
         List<Integer> returnVal = new ArrayList<>();
         SqlUtil.executeQuery(dataSource, sql, null, new AbstractCallBack<ResultSet>() {
             @Override
@@ -356,10 +365,19 @@ public abstract class ConstraintFactory {
      * @return 返回已经存在的列
      */
     private static void initConstraint(DataSource dataSource, List<ConstraintColumn> colsList, String table,
-            Map<String, AbstractDataType> columnName2DataType, AbstractConstraint constraint) throws Throwable {
-        String columnStr = colsList.stream().map(constraintsCols -> constraintsCols.getColumnName()).collect(
-                Collectors.joining(","));
-        SqlUtil.executeQuery(dataSource, String.format("select %s from %s; ", columnStr, table), null, new AbstractCallBack<ResultSet>() {
+            Map<String, AbstractDataType> columnName2DataType, AbstractConstraint constraint, ObModeType obModeType) throws Throwable {
+        Validate.notNull(obModeType, "OBModeType can not be null for ConstraintFactory#initConstraint");
+        String columnStr = colsList.stream().map(column -> {
+            if (ObModeType.OB_ORACLE.equals(obModeType)) {
+                return "\"" + DbObjectNameUtil.doubleCharToEscape(column.getColumnName(), '"') + "\"";
+            }
+            return "`" + DbObjectNameUtil.doubleCharToEscape(column.getColumnName(), '`') + "`";
+        }).collect(Collectors.joining(","));
+        String querySql = String.format("select %s from \"%s\"; ", columnStr, DbObjectNameUtil.doubleCharToEscape(table, '"'));
+        if (ObModeType.OB_MYSQL.equals(obModeType)) {
+            querySql = String.format("select %s from `%s`; ", columnStr, DbObjectNameUtil.doubleCharToEscape(table, '`'));
+        }
+        SqlUtil.executeQuery(dataSource, querySql, null, new AbstractCallBack<ResultSet>() {
             @Override
             public void doOnSuccess(ResultSet result) throws Throwable {
                 ResultSetMetaData metaData = result.getMetaData();
