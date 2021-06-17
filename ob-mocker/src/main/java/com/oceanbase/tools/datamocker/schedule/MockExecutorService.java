@@ -28,7 +28,7 @@ public class MockExecutorService {
 
     public MockExecutorService(ThreadPoolExecutor executor) {
         if (executor == null) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "executor for mock executor service can not be null");
+            throw new MockerException(MockerError.PARAMETER_ERROR, "Executor for mock executor service can not be null");
         }
         this.executor = executor;
     }
@@ -54,7 +54,7 @@ public class MockExecutorService {
      */
     public synchronized TableTaskContext submit(TableTask taskBean) {
         if (taskBean == null) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "task bean for executor service can not be null");
+            throw new MockerException(MockerError.PARAMETER_ERROR, "Task bean for executor service can not be null");
         }
         taskBean.getContext().setStatus(MockTaskStatus.RUNNING);
         submitCallable(taskBean.getBeforeTask(), taskBean.getContext());
@@ -69,7 +69,7 @@ public class MockExecutorService {
      */
     public synchronized <V> void submitCallable(Callable<V> task, TableTaskContext context) {
         if (task == null || context == null) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "callable or context for executor service can not be null");
+            throw new MockerException(MockerError.PARAMETER_ERROR, "Callable or context for executor service can not be null");
         }
         if (!context.isShutdown() && !isShutdown()) {
             Future future = executor.submit(newTaskFor(task));
@@ -84,7 +84,7 @@ public class MockExecutorService {
      */
     public synchronized <V> void submitCallable(Callable<V> task) {
         if (task == null) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "callable or context for executor service can not be null");
+            throw new MockerException(MockerError.PARAMETER_ERROR, "Callable or context for executor service can not be null");
         }
         executor.submit(newTaskFor(task));
     }
@@ -92,7 +92,7 @@ public class MockExecutorService {
     @Deprecated
     public synchronized <V> void submit(Runnable task, V result, TableTaskContext context) {
         if (task == null) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "callable for executor service can not be null");
+            throw new MockerException(MockerError.PARAMETER_ERROR, "Callable for executor service can not be null");
         }
         RunnableFuture<V> f = newTaskFor(task, result);
         Future future = executor.submit(f);

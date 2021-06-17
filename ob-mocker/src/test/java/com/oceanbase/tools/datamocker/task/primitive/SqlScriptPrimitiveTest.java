@@ -81,21 +81,21 @@ public class SqlScriptPrimitiveTest extends MockerTestBase {
 
     @Test
     public void testPrimitiveWithoutDataSource() {
-        expect.expectMessage("file manager can not be null");
+        expect.expectMessage("File manager can not be null");
         expect.expect(MockerException.class);
         SqlScriptWriter primitive = new SqlScriptWriter(null, null, null, null);
     }
 
     @Test
     public void testPrimitiveWithoutDatabase() {
-        expect.expectMessage("database can not be null");
+        expect.expectMessage("Database can not be null");
         expect.expect(MockerException.class);
         SqlScriptWriter primitive = new SqlScriptWriter(manager, ObModeType.OB_ORACLE, null, null);
     }
 
     @Test
     public void testPrimitiveWithouttable() throws IOException {
-        expect.expectMessage("table name can not be null");
+        expect.expectMessage("Table name can not be null");
         expect.expect(MockerException.class);
         ObModeType dialectType = ObModeType.OB_ORACLE;
         SqlScriptWriter primitive = new SqlScriptWriter(manager, dialectType, "test", null);

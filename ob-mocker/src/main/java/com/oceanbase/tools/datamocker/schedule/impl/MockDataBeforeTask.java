@@ -34,7 +34,7 @@ public class MockDataBeforeTask extends AbstractMockTask {
     public MockDataBeforeTask(TableTaskMetaData metaData, TableTaskContext context, DataSource dataSource) {
         super(metaData, context);
         if (dataSource == null) {
-            MockerException e = new MockerException(MockerError.PARAMETER_ERROR, "data source can not be null");
+            MockerException e = new MockerException(MockerError.PARAMETER_ERROR, "Datasource can not be null");
             log.error("fail to init mock data before task, data source can not be null", e);
             throw e;
         }

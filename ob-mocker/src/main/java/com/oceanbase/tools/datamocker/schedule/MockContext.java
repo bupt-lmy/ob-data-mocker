@@ -25,7 +25,7 @@ public class MockContext {
         this.totalTableTaskCount = totalTableTaskCount;
         tables = new LinkedList<>();
         if (service == null) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "thread pool for schedule context can not be null");
+            throw new MockerException(MockerError.PARAMETER_ERROR, "Thread pool for schedule context can not be null");
         }
         this.service = service;
     }

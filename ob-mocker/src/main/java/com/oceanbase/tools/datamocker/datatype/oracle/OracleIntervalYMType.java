@@ -39,7 +39,7 @@ public class OracleIntervalYMType extends AbstractDataType<INTERVALYM, Integer> 
         } else {
             if (scale > 9 || scale < 0) {
                 throw new MockerException(MockerError.PARAMETER_ERROR,
-                        "scale for inter year to month can not be larger than 9 or smaller than 0");
+                        "Scale for inter year to month can not be larger than 9 or smaller than 0");
             }
             this.scale = scale;
         }
@@ -76,7 +76,7 @@ public class OracleIntervalYMType extends AbstractDataType<INTERVALYM, Integer> 
         byte yearLen = value.getBytes()[value.getBytes().length - 1];
         if (yearLen > this.scale) {
             throw new MockerException(MockerError.VALUE_OUT_OFRANGE,
-                    String.format("scale for interval year(%d) to month is out of bound, [%d>%d]", this.scale, yearLen, this.scale));
+                    String.format("Scale for interval year(%d) to month is out of bound, [%d>%d]", this.scale, yearLen, this.scale));
         }
         return value;
     }

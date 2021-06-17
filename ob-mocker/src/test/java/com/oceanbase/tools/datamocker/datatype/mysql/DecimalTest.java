@@ -103,7 +103,7 @@ public class DecimalTest extends MockerTestBase {
         Assert.assertTrue(decimal.distinctLimit() == 99999L);
         int minValue = -10;
         int maxValue = 20;
-        thrown.expectMessage("max or min value -10 for data type decimal(5, 3) is out of range [0,99.99950]");
+        thrown.expectMessage("Max or min value -10 for data type decimal(5, 3) is out of range [0,99.99950]");
         thrown.expect(MockerException.class);
         decimal.setLowValue(new BigDecimal(minValue));
         decimal.setHighValue(new BigDecimal(maxValue));
@@ -111,21 +111,21 @@ public class DecimalTest extends MockerTestBase {
 
     @Test
     public void testUnsignedDecimalWithErrInput() {
-        thrown.expectMessage("precision for decaimal can not larger than 65 or smaller than 0");
+        thrown.expectMessage("Precision for decaimal can not larger than 65 or smaller than 0");
         thrown.expect(MockerException.class);
         new MysqlDecimalType(-1, 3, new UniformGenerator(), null, false, false);
     }
 
     @Test
     public void testUnsignedDecimalWithErrInput1() {
-        thrown.expectMessage("scale for decimal can not larger than 30 or smaller than 0");
+        thrown.expectMessage("Scale for decimal can not larger than 30 or smaller than 0");
         thrown.expect(MockerException.class);
         new MysqlDecimalType(1, -3, new UniformGenerator(), null, false, false);
     }
 
     @Test
     public void testUnsignedDecimalWithErrInput2() {
-        thrown.expectMessage("scale can not be bigger than precision");
+        thrown.expectMessage("Scale can not be bigger than precision");
         thrown.expect(MockerException.class);
         new MysqlDecimalType(5, 8, new UniformGenerator(), null, false, false);
     }

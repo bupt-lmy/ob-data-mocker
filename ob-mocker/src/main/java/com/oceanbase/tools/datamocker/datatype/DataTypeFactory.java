@@ -236,11 +236,11 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
         @Override
         protected MysqlBinaryType newInstance(CharDataTypeConfig config, ByteGeneratorBase generator) {
             if (config.getWidth() == null) {
-                throw new MockerException(MockerError.PARAMETER_ERROR, "width for varbinary can not be null");
+                throw new MockerException(MockerError.PARAMETER_ERROR, "Width for varbinary can not be null");
             }
             if (config.getWidth() > 1048576) {
                 throw new MockerException(MockerError.PARAMETER_ERROR,
-                        String.format("width for varbinary is too big (max = %d)", config.getWidth()));
+                        String.format("Width for varbinary is too big (max = %d)", config.getWidth()));
             }
             MysqlBinaryType returnValue = new MysqlBinaryType(null, config.getAllowNull(), config.getWidth(), generator);
             if (config.getLowValue() != null) {
@@ -265,15 +265,15 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
         @Override
         protected MysqlBinaryType newInstance(CharDataTypeConfig config, ByteGeneratorBase generator) {
             if (config.getWidth() == null) {
-                throw new MockerException(MockerError.PARAMETER_ERROR, "width for bit can not be null");
+                throw new MockerException(MockerError.PARAMETER_ERROR, "Width for bit can not be null");
             }
             if (config.getWidth() > 64) {
                 throw new MockerException(MockerError.PARAMETER_ERROR,
-                        String.format("width for bit is too big (max = %d)", config.getWidth()));
+                        String.format("Width for bit is too big (max = %d)", config.getWidth()));
             }
             int byteWidth = config.getWidth() / 8;
             if (byteWidth <= 0) {
-                throw new MockerException(MockerError.PARAMETER_ERROR, "byte width can not be equal to or smaller than zero");
+                throw new MockerException(MockerError.PARAMETER_ERROR, "Byte width can not be equal to or smaller than zero");
             }
             MysqlBinaryType returnValue = new MysqlBinaryType(null, config.getAllowNull(), byteWidth, generator);
             if (config.getLowValue() != null) {
@@ -298,11 +298,11 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
         @Override
         protected MysqlBinaryType newInstance(CharDataTypeConfig config, ByteGeneratorBase generator) {
             if (config.getWidth() == null) {
-                throw new MockerException(MockerError.PARAMETER_ERROR, "width for binary can not be null");
+                throw new MockerException(MockerError.PARAMETER_ERROR, "Width for binary can not be null");
             }
             if (config.getWidth() > 256) {
                 throw new MockerException(MockerError.PARAMETER_ERROR,
-                        String.format("width for binary is too big (max = %d)", config.getWidth()));
+                        String.format("Width for binary is too big (max = %d)", config.getWidth()));
             }
             MysqlBinaryType returnValue = new MysqlBinaryType(null, config.getAllowNull(), config.getWidth(), generator);
             if (config.getLowValue() != null) {
@@ -416,7 +416,7 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
         protected MysqlTextType newInstance(CharDataTypeConfig config, CharGeneratorBase generator) {
             String charset = config.getCharset();
             if (charset == null) {
-                throw new MockerException(MockerError.PARAMETER_ERROR, "error parameters for longtext");
+                throw new MockerException(MockerError.PARAMETER_ERROR, "Error parameters for longtext");
             }
             CharsetType charsetType = CharsetType.valueOf(charset);
             MysqlTextType returnValue = new MysqlTextType(4096, (String) config.getDefaultValue(), config.getAllowNull(),
@@ -444,7 +444,7 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
         protected MysqlTextType newInstance(CharDataTypeConfig config, CharGeneratorBase generator) {
             String charset = config.getCharset();
             if (charset == null) {
-                throw new MockerException(MockerError.PARAMETER_ERROR, "error parametes for mediumtext");
+                throw new MockerException(MockerError.PARAMETER_ERROR, "Error parametes for mediumtext");
             }
             CharsetType charsetType = CharsetType.valueOf(charset);
             MysqlTextType returnValue = new MysqlTextType(4096, (String) config.getDefaultValue(), config.getAllowNull(),
@@ -472,7 +472,7 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
         protected MysqlTextType newInstance(CharDataTypeConfig config, CharGeneratorBase generator) {
             String charset = config.getCharset();
             if (charset == null) {
-                throw new MockerException(MockerError.PARAMETER_ERROR, "error parametes for text");
+                throw new MockerException(MockerError.PARAMETER_ERROR, "Error parametes for text");
             }
             CharsetType charsetType = CharsetType.valueOf(charset);
             MysqlTextType returnValue = new MysqlTextType(4096, (String) config.getDefaultValue(), config.getAllowNull(),
@@ -500,7 +500,7 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
         protected MysqlTextType newInstance(CharDataTypeConfig config, CharGeneratorBase generator) {
             String charset = config.getCharset();
             if (charset == null) {
-                throw new MockerException(MockerError.PARAMETER_ERROR, "error parametes for tinytext");
+                throw new MockerException(MockerError.PARAMETER_ERROR, "Error parametes for tinytext");
             }
             CharsetType charsetType = CharsetType.valueOf(charset);
             MysqlTextType returnValue = new MysqlTextType(255, (String) config.getDefaultValue(), config.getAllowNull(),
@@ -529,7 +529,7 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
             String charset = config.getCharset();
             Integer length = config.getWidth();
             if (length == null || charset == null) {
-                throw new MockerException(MockerError.PARAMETER_ERROR, "error parametes for VARCHAR");
+                throw new MockerException(MockerError.PARAMETER_ERROR, "Error parametes for VARCHAR");
             }
             CharsetType charsetType = CharsetType.valueOf(charset);
             MysqlVarCharType returnValue = new MysqlVarCharType(length, (String) config.getDefaultValue(), config.getAllowNull(),
@@ -558,7 +558,7 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
             String charset = config.getCharset();
             Integer length = config.getWidth();
             if (length == null || charset == null) {
-                throw new MockerException(MockerError.PARAMETER_ERROR, "error parametes for CHAR");
+                throw new MockerException(MockerError.PARAMETER_ERROR, "Error parametes for CHAR");
             }
             CharsetType charsetType = CharsetType.valueOf(charset);
             MysqlCharType returnValue = new MysqlCharType(length, (String) config.getDefaultValue(), config.getAllowNull(),
@@ -586,7 +586,7 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
         @Override
         protected MysqlFloatType newInstance(DigitDataTypeConfig config, DigitalGeneratorBase generator) {
             if (config.getScale() != null && config.getPrecision() == null) {
-                throw new MockerException(MockerError.PARAMETER_ERROR, "param settings is illegal for double");
+                throw new MockerException(MockerError.PARAMETER_ERROR, "Param settings is illegal for double");
             }
             Integer scale = config.getScale() == null ? -1 : config.getScale();
             Integer precision = config.getPrecision() == null ? -1 : config.getPrecision();
@@ -618,7 +618,7 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
         @Override
         protected MysqlFloatType newInstance(DigitDataTypeConfig config, DigitalGeneratorBase generator) {
             if (config.getScale() != null && config.getPrecision() == null) {
-                throw new MockerException(MockerError.PARAMETER_ERROR, "param settings is illegal for double");
+                throw new MockerException(MockerError.PARAMETER_ERROR, "Param settings is illegal for double");
             }
             Integer scale = config.getScale() == null ? -1 : config.getScale();
             Integer precision = config.getPrecision() == null ? -1 : config.getPrecision();
@@ -650,7 +650,7 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
         @Override
         protected MysqlFloatType newInstance(DigitDataTypeConfig config, DigitalGeneratorBase generator) {
             if (config.getScale() != null && config.getPrecision() == null) {
-                throw new MockerException(MockerError.PARAMETER_ERROR, "param settings is illegal for float");
+                throw new MockerException(MockerError.PARAMETER_ERROR, "Param settings is illegal for float");
             }
             Integer scale = config.getScale() == null ? -1 : config.getScale();
             Integer precision = config.getPrecision() == null ? -1 : config.getPrecision();
@@ -681,7 +681,7 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
         @Override
         protected MysqlFloatType newInstance(DigitDataTypeConfig config, DigitalGeneratorBase generator) {
             if (config.getScale() != null && config.getPrecision() == null) {
-                throw new MockerException(MockerError.PARAMETER_ERROR, "param settings is illegal for float");
+                throw new MockerException(MockerError.PARAMETER_ERROR, "Param settings is illegal for float");
             }
             Integer scale = config.getScale() == null ? -1 : config.getScale();
             Integer precision = config.getPrecision() == null ? -1 : config.getPrecision();
@@ -713,7 +713,7 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
         @Override
         protected MysqlDecimalType newInstance(DigitDataTypeConfig config, DigitalGeneratorBase generator) {
             if (config.getScale() != null && config.getPrecision() == null) {
-                throw new MockerException(MockerError.PARAMETER_ERROR, "param settings is illegal for decimal");
+                throw new MockerException(MockerError.PARAMETER_ERROR, "Param settings is illegal for decimal");
             }
             Integer scale = config.getScale() == null ? 0 : config.getScale();
             Integer precision = config.getPrecision() == null ? 10 : config.getPrecision();
@@ -742,7 +742,7 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
         @Override
         protected MysqlDecimalType newInstance(DigitDataTypeConfig config, DigitalGeneratorBase generator) {
             if (config.getScale() != null && config.getPrecision() == null) {
-                throw new MockerException(MockerError.PARAMETER_ERROR, "param settings is illegal for decimal");
+                throw new MockerException(MockerError.PARAMETER_ERROR, "Param settings is illegal for decimal");
             }
             Integer scale = config.getScale() == null ? 0 : config.getScale();
             Integer precision = config.getPrecision() == null ? 10 : config.getPrecision();
@@ -1303,7 +1303,7 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
             String charset = config.getCharset();
             Integer length = config.getWidth();
             if (length == null || charset == null) {
-                throw new MockerException(MockerError.PARAMETER_ERROR, "error parametes for VARCHAR2");
+                throw new MockerException(MockerError.PARAMETER_ERROR, "Error parametes for VARCHAR2");
             }
             CharsetType charsetType = CharsetType.valueOf(charset);
             OracleNvarCharType returnValue = new OracleNvarCharType(generator, length, (String) config.getDefaultValue(),
@@ -1333,7 +1333,7 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
             String charset = config.getCharset();
             Integer length = config.getWidth();
             if (length == null || charset == null) {
-                throw new MockerException(MockerError.PARAMETER_ERROR, "error parametes for VARCHAR2");
+                throw new MockerException(MockerError.PARAMETER_ERROR, "Error parametes for VARCHAR2");
             }
             CharsetType charsetType = CharsetType.valueOf(charset);
             OracleVarCharType returnValue = new OracleVarCharType(generator, length, (String) config.getDefaultValue(),
@@ -1363,7 +1363,7 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
             String charset = config.getCharset();
             Integer length = config.getWidth();
             if (length == null || charset == null) {
-                throw new MockerException(MockerError.PARAMETER_ERROR, "error parametes for VARCHAR");
+                throw new MockerException(MockerError.PARAMETER_ERROR, "Error parametes for VARCHAR");
             }
             CharsetType charsetType = CharsetType.valueOf(charset);
             OracleVarCharType returnValue = new OracleVarCharType(generator, length, (String) config.getDefaultValue(),
@@ -1393,7 +1393,7 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
             String charset = config.getCharset();
             Integer length = config.getWidth();
             if (length == null || charset == null) {
-                throw new MockerException(MockerError.PARAMETER_ERROR, "error parametes for CHAR");
+                throw new MockerException(MockerError.PARAMETER_ERROR, "Error parametes for CHAR");
             }
             CharsetType charsetType = CharsetType.valueOf(charset);
             OracleCharType returnValue = new OracleCharType(length, (String) config.getDefaultValue(), config.getAllowNull(), charsetType,
@@ -1423,7 +1423,7 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
             Integer scale = config.getScale() == null ? 0 : config.getScale();
             Integer precision = config.getPrecision();
             if (precision == null) {
-                throw new MockerException(MockerError.PARAMETER_ERROR, "error parametes for NUMBER");
+                throw new MockerException(MockerError.PARAMETER_ERROR, "Error parametes for NUMBER");
             }
             BigDecimal defaultValue = null;
             if (config.getDefaultValue() != null) {
@@ -1475,12 +1475,12 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
     public T make(V config) {
         try {
             if (config == null || config.getGenerator() == null) {
-                throw new MockerException(MockerError.PARAMETER_ERROR, "generator or generator builder can not be null");
+                throw new MockerException(MockerError.PARAMETER_ERROR, "Generator or generator builder can not be null");
             }
             GeneratorFactory factory = GeneratorFactory.getInstance(config.getGenerator());
             K generator = (K) factory.make(config.getGenParams());
             if (generator == null) {
-                throw new MockerException(MockerError.PARAMETER_ERROR, "generator can not be null");
+                throw new MockerException(MockerError.PARAMETER_ERROR, "Generator can not be null");
             }
             return newInstance(config, generator);
         } catch (Exception e) {

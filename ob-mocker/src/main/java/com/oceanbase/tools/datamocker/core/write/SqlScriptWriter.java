@@ -85,7 +85,7 @@ public class SqlScriptWriter extends AbstractMockWriter {
         this.tableName = tableName;
         this.manager = manager;
         if (groupId == null) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "group id can not be null");
+            throw new MockerException(MockerError.PARAMETER_ERROR, "Group id can not be null");
         }
         this.groupId = groupId;
     }
@@ -102,17 +102,17 @@ public class SqlScriptWriter extends AbstractMockWriter {
     private void validateParam(MockerFile manager, ObModeType dialectType, String database,
             String tableName) {
         if (manager == null) {
-            MockerException e = new MockerException(MockerError.PARAMETER_ERROR, "file manager can not be null");
+            MockerException e = new MockerException(MockerError.PARAMETER_ERROR, "File manager can not be null");
             log.error("file manager for sql script writer is necessary", e);
             throw e;
         }
         if (database == null) {
-            MockerException e = new MockerException(MockerError.PARAMETER_ERROR, "database can not be null");
+            MockerException e = new MockerException(MockerError.PARAMETER_ERROR, "Database can not be null");
             log.error("database for sql script writer is necessary", e);
             throw e;
         }
         if (tableName == null) {
-            MockerException e = new MockerException(MockerError.PARAMETER_ERROR, "table name can not be null");
+            MockerException e = new MockerException(MockerError.PARAMETER_ERROR, "Table name can not be null");
             log.error("table name for sql script writer is necessary", e);
             throw e;
         }
@@ -164,7 +164,7 @@ public class SqlScriptWriter extends AbstractMockWriter {
                 String value = pair.getKey().toString(pair.getValue());
                 if (value == null) {
                     throw new MockerException(MockerError.ILLEGAL_RETURN_VALUE,
-                            String.format("value for column \"%s\" is null", columnName));
+                            String.format("Value for column \"%s\" is null", columnName));
                 }
                 if (i == columnLength - 1) {
                     buffer.append(String.format("%s); ", value));

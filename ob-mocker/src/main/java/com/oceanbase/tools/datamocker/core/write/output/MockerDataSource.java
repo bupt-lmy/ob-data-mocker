@@ -107,10 +107,10 @@ public class MockerDataSource implements DataSource {
         this.config = config;
         if (minPoolSize <= 0 || maxPoolSize <= 0 || increaseStep <= 0) {
             throw new MockerException(MockerError.PARAMETER_ERROR,
-                    "min pool size, max pool size or increase step can not be equal to or less than zero");
+                    "Min pool size, max pool size or increase step can not be equal to or less than zero");
         }
         if (minPoolSize > maxPoolSize) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "min pool size can not be bigger than max pool size");
+            throw new MockerException(MockerError.PARAMETER_ERROR, "Min pool size can not be bigger than max pool size");
         }
         this.minPoolSize = minPoolSize;
         this.increaseStep = increaseStep;
@@ -146,7 +146,7 @@ public class MockerDataSource implements DataSource {
     private void validate(DataBaseConfig config) {
         if (StringUtils.isBlank(config.getHost()) || StringUtils.isBlank(config.getUser()) || StringUtils.isBlank(config.getPassword())
             || StringUtils.isBlank(config.getDefaultSchame()) || config.getPort() == null) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "database's config is illegal");
+            throw new MockerException(MockerError.PARAMETER_ERROR, "Database's config is illegal");
         }
     }
 

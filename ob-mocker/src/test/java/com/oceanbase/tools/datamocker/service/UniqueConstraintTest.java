@@ -78,14 +78,14 @@ public class UniqueConstraintTest extends MockerTestBase {
             list.add(row);
         }
         thrown.expect(MockerException.class);
-        thrown.expectMessage("count for unique constraint can not be equal to or smaller than zero");
+        thrown.expectMessage("Count for unique constraint can not be equal to or smaller than zero");
         UniqueConstraint unique = new UniqueConstraint(constaintName, database, tableName, getColumns(), list, 0);
     }
 
     @Test
     public void testUniqueConstraintWithIllegalCount() {
         thrown.expect(MockerException.class);
-        thrown.expectMessage("count for unique constraint can not be equal to or smaller than zero");
+        thrown.expectMessage("Count for unique constraint can not be equal to or smaller than zero");
         UniqueConstraint unique = new UniqueConstraint(constaintName, database, tableName, getColumns(), -100);
     }
 
@@ -122,7 +122,7 @@ public class UniqueConstraintTest extends MockerTestBase {
         UniqueConstraint unique = new UniqueConstraint(constaintName, database, tableName, getColumns(), list, 15000);
         Map<String, Pair<AbstractDataType, Object>> row = list.get(0);
         row.remove("COL3");
-        thrown.expectMessage("input constraint's columns must contain init constraint's columns");
+        thrown.expectMessage("Input constraint's columns must contain init constraint's columns");
         thrown.expect(MockerException.class);
         Assert.assertNull(unique.check(row));
     }

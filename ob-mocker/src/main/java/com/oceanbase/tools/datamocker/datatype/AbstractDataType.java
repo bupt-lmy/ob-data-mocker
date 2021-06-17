@@ -180,11 +180,11 @@ public abstract class AbstractDataType<T, V extends Comparable> {
         V highValue = maxValueForType();
         if (lowValue == null || highValue == null) {
             throw new MockerException(MockerError.ILLEGAL_RETURN_VALUE,
-                    "lowest or highest value can not be null for data type " + toString());
+                    "Lowest or highest value can not be null for data type " + toString());
         }
         if (value.compareTo(lowValue) < 0 || value.compareTo(highValue) > 0) {
             throw new MockerException(MockerError.VALUE_OUT_OFRANGE,
-                    String.format("max or min value %s for data type %s is out of range [%s,%s]",
+                    String.format("Max or min value %s for data type %s is out of range [%s,%s]",
                             value.toString(), toString(), lowValue.toString(), highValue.toString()));
         }
     }
@@ -198,7 +198,7 @@ public abstract class AbstractDataType<T, V extends Comparable> {
         validateValue(value);
         if (value.compareTo(highValue()) > 0) {
             throw new MockerException(MockerError.VALUE_OUT_OFRANGE,
-                    String.format("min value can not be bigger than max value \"%s\" for data type %s", highValue().toString(),
+                    String.format("Min value can not be bigger than max value \"%s\" for data type %s", highValue().toString(),
                             toString()));
         }
         this.lowValue = value;
@@ -213,7 +213,7 @@ public abstract class AbstractDataType<T, V extends Comparable> {
         validateValue(value);
         if (value.compareTo(lowValue()) < 0) {
             throw new MockerException(MockerError.VALUE_OUT_OFRANGE,
-                    String.format("max value can not be smaller than min value \"%s\" for data type %s", lowValue().toString(),
+                    String.format("Max value can not be smaller than min value \"%s\" for data type %s", lowValue().toString(),
                             toString()));
         }
         this.highValue = value;
@@ -226,14 +226,14 @@ public abstract class AbstractDataType<T, V extends Comparable> {
      */
     public T acquire() {
         if (generator == null) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "generator can not be null");
+            throw new MockerException(MockerError.PARAMETER_ERROR, "Generator can not be null");
         }
         if (this.preCheck == null) {
             this.preCheck = generator.preCheck(lowValue(), highValue());
         }
         if (this.preCheck == null || !this.preCheck) {
             throw new MockerException(MockerError.PARAMETER_ERROR,
-                    String.format("data check of column \"%s\" for generator is not passed", this));
+                    String.format("Data check of column \"%s\" for generator is not passed", this));
         }
         return preTreat(generator.next(lowValue(), highValue()));
     }

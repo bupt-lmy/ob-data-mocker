@@ -36,7 +36,7 @@ public class SqlUtil {
     public static void executeQuery(Connection connection, String sql, Object[] params, AbstractCallBack<ResultSet> callBack)
             throws Throwable {
         if (connection == null || sql == null) {
-            MockerException e = new MockerException(MockerError.PARAMETER_ERROR, "connection or sql can not be null");
+            MockerException e = new MockerException(MockerError.PARAMETER_ERROR, "Connection or SQL can not be null");
             if (callBack != null) {
                 callBack.onFailure(null, e);
             }
@@ -57,7 +57,7 @@ public class SqlUtil {
                     if (params[i] instanceof INTERVALYM || params[i] instanceof INTERVALDS) {
                         if (!(statement instanceof ServerPreparedStatement)) {
                             throw new MockerException(MockerError.NOT_SUPPORT_FEATURE,
-                                    "ob server have to support ps protocol for INTERVALYM or INTERVALDS");
+                                    "OceanBase have to support PS protocol for INTERVALYM or INTERVALDS");
                         }
                         if (params[i] instanceof INTERVALYM) {
                             ((ServerPreparedStatement) statement).setINTERVALYM(i + 1, (INTERVALYM) params[i]);
@@ -97,7 +97,7 @@ public class SqlUtil {
     public static void executeQuery(DataSource dataSource, String sql, Object[] params, AbstractCallBack<ResultSet> callBack)
             throws Throwable {
         if (dataSource == null) {
-            MockerException e = new MockerException(MockerError.PARAMETER_ERROR, "datasource can not be null");
+            MockerException e = new MockerException(MockerError.PARAMETER_ERROR, "Datasource can not be null");
             if (callBack != null) {
                 callBack.onFailure(null, e);
             }
@@ -123,7 +123,7 @@ public class SqlUtil {
     public static void executeUpdate(Connection connection, String sql, Object[] params, AbstractCallBack<Integer> callBack)
             throws Throwable {
         if (connection == null || sql == null) {
-            MockerException e = new MockerException(MockerError.PARAMETER_ERROR, "connection or sql can not be null");
+            MockerException e = new MockerException(MockerError.PARAMETER_ERROR, "Connection or SQL can not be null");
             if (callBack != null) {
                 callBack.onFailure(null, e);
             }
@@ -144,7 +144,7 @@ public class SqlUtil {
                     if (params[i] instanceof INTERVALYM || params[i] instanceof INTERVALDS) {
                         if (!(statement instanceof ServerPreparedStatement)) {
                             throw new MockerException(MockerError.NOT_SUPPORT_FEATURE,
-                                    "ob server have to support ps protocol for INTERVALYM or INTERVALDS");
+                                    "OceanBase have to support ps protocol for INTERVALYM or INTERVALDS");
                         }
                         if (params[i] instanceof INTERVALYM) {
                             ((ServerPreparedStatement) statement).setINTERVALYM(i + 1, (INTERVALYM) params[i]);
@@ -182,7 +182,7 @@ public class SqlUtil {
     public static void executeUpdate(DataSource dataSource, String sql, Object[] params, AbstractCallBack<Integer> callBack)
             throws Throwable {
         if (dataSource == null) {
-            MockerException e = new MockerException(MockerError.PARAMETER_ERROR, "datasource can not be null");
+            MockerException e = new MockerException(MockerError.PARAMETER_ERROR, "Datasource can not be null");
             if (callBack != null) {
                 callBack.onFailure(null, e);
             }
@@ -208,7 +208,7 @@ public class SqlUtil {
     public static void executeBatch(Connection connection, String sql, Object[][] params, AbstractCallBack<int[]> callBack)
             throws Throwable {
         if (connection == null || sql == null) {
-            MockerException e = new MockerException(MockerError.PARAMETER_ERROR, "connection or sql can not be null");
+            MockerException e = new MockerException(MockerError.PARAMETER_ERROR, "Connection or sql can not be null");
             if (callBack != null) {
                 callBack.onFailure(null, e);
             }
@@ -224,20 +224,20 @@ public class SqlUtil {
         }
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             if (params == null) {
-                throw new MockerException(MockerError.FAIL_TO_EXECUTE_SQL, "param can not be null for batch update");
+                throw new MockerException(MockerError.FAIL_TO_EXECUTE_SQL, "Param can not be null for batch update");
             }
             int length = params.length;
             for (int i = 0; i < length; i++) {
                 Object[] innerParams = params[i];
                 if (innerParams == null) {
-                    throw new MockerException(MockerError.FAIL_TO_EXECUTE_SQL, "param can not be null for batch update");
+                    throw new MockerException(MockerError.FAIL_TO_EXECUTE_SQL, "Param can not be null for batch update");
                 }
                 int innerLength = innerParams.length;
                 for (int j = 0; j < innerLength; j++) {
                     if (innerParams[j] instanceof INTERVALYM || innerParams[j] instanceof INTERVALDS) {
                         if (!(statement instanceof ServerPreparedStatement)) {
                             throw new MockerException(MockerError.NOT_SUPPORT_FEATURE,
-                                    "ob server have to support ps protocol for INTERVALYM or INTERVALDS");
+                                    "OceanBase have to support PS protocol for INTERVALYM or INTERVALDS");
                         }
                         if (innerParams[j] instanceof INTERVALYM) {
                             ((ServerPreparedStatement) statement).setINTERVALYM(j + 1, (INTERVALYM) innerParams[j]);
@@ -280,7 +280,7 @@ public class SqlUtil {
     public static void executeBatch(DataSource dataSource, String sql, Object[][] params, AbstractCallBack<int[]> callBack)
             throws Throwable {
         if (dataSource == null) {
-            MockerException e = new MockerException(MockerError.PARAMETER_ERROR, "datasource can not be null");
+            MockerException e = new MockerException(MockerError.PARAMETER_ERROR, "Datasource can not be null");
             if (callBack != null) {
                 callBack.onFailure(null, e);
             }

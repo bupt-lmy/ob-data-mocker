@@ -96,7 +96,7 @@ public class OracleNumberType extends AbstractDigitDataType<BigDecimal> {
      */
     private BigDecimal maxOrMinForNumber() {
         if (precision > 38 || precision < 0 || scale < -84 || scale > 127) {
-            throw new MockerException("precision or scale is out of range");
+            throw new MockerException("Precision or scale is out of range");
         }
         BigDecimal secondPartMaxValue;
         int interval = precision - scale;

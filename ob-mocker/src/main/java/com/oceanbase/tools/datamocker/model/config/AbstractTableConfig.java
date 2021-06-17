@@ -30,12 +30,12 @@ public abstract class AbstractTableConfig {
      */
     public Long maxCount() {
         if (maxRowCount() == null) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "max count can not be null");
+            throw new MockerException(MockerError.PARAMETER_ERROR, "Max count can not be null");
         }
         if (maxRowCount() < 0) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "max count can not be smaller than zero");
+            throw new MockerException(MockerError.PARAMETER_ERROR, "Max count can not be smaller than zero");
         } else if (maxRowCount() > 1000000) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "max count can not be bigger than 1000000");
+            throw new MockerException(MockerError.PARAMETER_ERROR, "Max count can not be bigger than 1000000");
         }
         return maxRowCount();
     }
@@ -61,12 +61,12 @@ public abstract class AbstractTableConfig {
      */
     public Long maxBatchSize() {
         if (batchSize() == null) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "batch size can not be null");
+            throw new MockerException(MockerError.PARAMETER_ERROR, "Batch size can not be null");
         }
         if (batchSize() < 0) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "batch size can not be smaller than zero");
+            throw new MockerException(MockerError.PARAMETER_ERROR, "Batch size can not be smaller than zero");
         } else if (batchSize() > 100000) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "batch size can not be bigger than 100000");
+            throw new MockerException(MockerError.PARAMETER_ERROR, "Batch size can not be bigger than 100000");
         }
         return batchSize();
     }

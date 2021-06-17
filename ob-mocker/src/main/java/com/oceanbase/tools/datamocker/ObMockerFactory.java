@@ -42,7 +42,7 @@ public class ObMockerFactory extends AbstractMockerFactory {
         String taskName = taskConfig.taskName() == null ? getTaskName() : taskConfig.taskName();
         List<? extends AbstractTableConfig> tableConfigs = taskConfig.tasks();
         if (tableConfigs == null || tableConfigs.size() == 0) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "table task's count can not be null or zero");
+            throw new MockerException(MockerError.PARAMETER_ERROR, "Table task's count can not be null or zero");
         }
         ObModeType obModeType = taskConfig.obDialectType();
         Dispatcher<TableTaskInfo> dispatcher = new Dispatcher<>(tableConfigs.size(), taskName, taskId);

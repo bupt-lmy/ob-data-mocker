@@ -42,10 +42,10 @@ public class ObDataMocker {
      */
     public MockContext start() {
         if (this.scheduler == null) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "scheduler for ob mocker can not be null");
+            throw new MockerException(MockerError.PARAMETER_ERROR, "Scheduler for ob mocker can not be null");
         }
         if (this.dispatcher == null) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "mock task dispatcher can not be null");
+            throw new MockerException(MockerError.PARAMETER_ERROR, "Mock task dispatcher can not be null");
         }
         return scheduler.execute(dispatcher);
     }

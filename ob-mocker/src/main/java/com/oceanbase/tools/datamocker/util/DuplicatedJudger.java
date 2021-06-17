@@ -34,7 +34,7 @@ public class DuplicatedJudger {
     public DuplicatedJudger(int count) {
         if (count <= 0) {
             throw new MockerException(MockerError.PARAMETER_ERROR,
-                    "count for DuplicatedJudger can not be equal to or smaleer than zero");
+                    "Count for DuplicatedJudger can not be equal to or smaleer than zero");
         }
         if (count < 10000) {
             this.set = new HashSet();
@@ -56,7 +56,7 @@ public class DuplicatedJudger {
     public boolean add(Object obj) {
         if (++this.cursor > this.maxCount) {
             throw new MockerException(MockerError.OPERATION_FAILURE,
-                    String.format("the max count for DuplicatedJudger is %d, can not add more", this.maxCount));
+                    String.format("The max count for DuplicatedJudger is %d, can not add more", this.maxCount));
         }
         if (this.set != null) {
             return this.set.add(obj);

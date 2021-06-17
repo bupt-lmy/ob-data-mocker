@@ -63,10 +63,10 @@ public class StepDateCharGenerator extends CharGeneratorBase {
             String timezone) {
         super(caseOption);
         if (startTime >= endTime) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "start time stamp can not be later than end time stamp");
+            throw new MockerException(MockerError.PARAMETER_ERROR, "Start time stamp can not be later than end time stamp");
         }
         if (startTime < 0) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "time stamp can not be smaller than zero");
+            throw new MockerException(MockerError.PARAMETER_ERROR, "Time stamp can not be smaller than zero");
         }
         this.startTime = startTime;
         this.endTime = endTime;
@@ -116,7 +116,7 @@ public class StepDateCharGenerator extends CharGeneratorBase {
             if (cycle) {
                 timestamp = this.endTime;
             } else {
-                throw new MockerException(MockerError.OPERATION_FAILURE, "can not generate more unique date");
+                throw new MockerException(MockerError.OPERATION_FAILURE, "Can not generate more unique date");
             }
         }
         return timestamp;
@@ -137,7 +137,7 @@ public class StepDateCharGenerator extends CharGeneratorBase {
             if (cycle) {
                 timestamp = this.startTime;
             } else {
-                throw new MockerException(MockerError.OPERATION_FAILURE, "can not generate more unique date");
+                throw new MockerException(MockerError.OPERATION_FAILURE, "Can not generate more unique date");
             }
         }
         return timestamp;

@@ -33,10 +33,10 @@ public class MockRow {
      */
     public MockColumn get(String name) {
         if (StringUtils.isBlank(name)) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "name for mock row can not be null or empty");
+            throw new MockerException(MockerError.PARAMETER_ERROR, "Name for mock row can not be null or empty");
         }
         if (row == null) {
-            throw new MockerException(MockerError.UNKNOWN_ERROR, "mock row is null, unknown error");
+            throw new MockerException(MockerError.UNKNOWN_ERROR, "Mock row is null, unknown error");
         }
         return this.row.get(name);
     }
@@ -49,7 +49,7 @@ public class MockRow {
      */
     public MockColumn putIfAbsent(String columnName, MockColumn data) {
         if (this.row == null) {
-            throw new MockerException(MockerError.UNKNOWN_ERROR, "mock row is null, unknown error");
+            throw new MockerException(MockerError.UNKNOWN_ERROR, "Mock row is null, unknown error");
         }
         return this.row.putIfAbsent(columnName, data);
     }
@@ -61,7 +61,7 @@ public class MockRow {
      */
     public int size() {
         if (this.row == null) {
-            throw new MockerException(MockerError.UNKNOWN_ERROR, "mock row is null, unknown error");
+            throw new MockerException(MockerError.UNKNOWN_ERROR, "Mock row is null, unknown error");
         }
         return this.row.size();
     }

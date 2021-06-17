@@ -54,7 +54,7 @@ public class SerializeUtil {
         }
         if (resultList.get(0).size() != columnList.size()) {
             throw new MockerException(MockerError.OPERATION_FAILURE,
-                    String.format("result set's length \"%d\" is not equal to the length of the column names \"%d\"",
+                    String.format("Result set's length \"%d\" is not equal to the length of the column names \"%d\"",
                             resultList.get(0).size(),
                             columnList.size()));
         }
@@ -97,7 +97,7 @@ public class SerializeUtil {
         }
         if (resultList.size() != columnList.size()) {
             throw new MockerException(MockerError.OPERATION_FAILURE,
-                    String.format("result set's length \"%d\" is not equal to the length of the column names \"%d\"", resultList.size(),
+                    String.format("Result set's length \"%d\" is not equal to the length of the column names \"%d\"", resultList.size(),
                             columnList.size()));
         }
         int columnLength = columnList.size();

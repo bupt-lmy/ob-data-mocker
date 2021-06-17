@@ -67,7 +67,7 @@ public abstract class AbstractDataPipe<T> {
         Validate.isTrue(timeout >= 0, "timeout for pipeline write can not be negative");
         Validate.notNull(timeUnit, "timeout can not be null");
         if (isClosed()) {
-            throw new MockerException(MockerError.OPERATION_FAILURE, "data pipe has been closed");
+            throw new MockerException(MockerError.OPERATION_FAILURE, "Data pipe has been closed");
         }
         if (row == null) {
             return;

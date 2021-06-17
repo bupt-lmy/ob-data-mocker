@@ -36,7 +36,7 @@ public class MysqlTimeType extends AbstractDateDataType<Timestamp> {
     public MysqlTimeType(DateGeneratorBase<Timestamp> generator, int scale, Timestamp defaultValue, Boolean allowNull) {
         super(generator, ObModeType.OB_MYSQL, defaultValue, allowNull);
         if (scale < 0 || scale > 6) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "scale for time can not smaller than zero or bigger than six");
+            throw new MockerException(MockerError.PARAMETER_ERROR, "Scale for time can not smaller than zero or bigger than six");
         }
         this.scale = scale;
         generator.setScale(scale);

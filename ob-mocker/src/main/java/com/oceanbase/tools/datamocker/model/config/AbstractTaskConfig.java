@@ -46,10 +46,10 @@ public abstract class AbstractTaskConfig {
     public int minConnection() {
         if (connectionInitCount() < 3) {
             throw new MockerException(MockerError.PARAMETER_ERROR,
-                    "min connection count for connection pool can not be smaller than 3");
+                    "Min connection count for connection pool can not be smaller than 3");
         }
         if (connectionInitCount() > connectionMaxCount()) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "min connection count can not bigger than max connection count");
+            throw new MockerException(MockerError.PARAMETER_ERROR, "Min connection count can not bigger than max connection count");
         }
         return connectionInitCount();
     }
@@ -57,17 +57,17 @@ public abstract class AbstractTaskConfig {
     public int maxConnection() {
         if (connectionMaxCount() < 5) {
             throw new MockerException(MockerError.PARAMETER_ERROR,
-                    "max connection count for connection pool can not be smaller than 5");
+                    "Max connection count for connection pool can not be smaller than 5");
         }
         if (connectionMaxCount() < connectionInitCount()) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "max connection count can not smaller than min connection count");
+            throw new MockerException(MockerError.PARAMETER_ERROR, "Max connection count can not smaller than min connection count");
         }
         return connectionMaxCount();
     }
 
     public int connectionIncreasementStep() {
         if (connectionIncreaseStepCount() < 0) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "connection pool's increase step can not be smaller than zero");
+            throw new MockerException(MockerError.PARAMETER_ERROR, "Connection pool's increase step can not be smaller than zero");
         }
         return connectionIncreaseStepCount();
     }

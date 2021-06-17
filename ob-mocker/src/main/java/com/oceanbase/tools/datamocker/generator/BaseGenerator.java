@@ -94,7 +94,7 @@ public abstract class BaseGenerator<T extends Comparable, V> {
                     return defaultValue();
                 }
                 if ((loopCount++) >= 100) {
-                    throw new MockerException(MockerError.OPERATION_FAILURE, "data generator get too much null data");
+                    throw new MockerException(MockerError.OPERATION_FAILURE, "Data generator get too much null data");
                 }
             } else {
                 return returnVal;

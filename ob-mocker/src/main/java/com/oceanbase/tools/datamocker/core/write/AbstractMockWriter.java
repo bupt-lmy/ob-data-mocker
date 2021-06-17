@@ -32,7 +32,7 @@ public abstract class AbstractMockWriter {
      */
     public void register(AbstractDataPipe dataPipe) {
         if (dataPipe == null) {
-            MockerException e = new MockerException(MockerError.PARAMETER_ERROR, "data pipe can not be null");
+            MockerException e = new MockerException(MockerError.PARAMETER_ERROR, "Data pipe can not be null");
             log.error("data pipe for sql script writer is necessary", e);
             throw e;
         }
@@ -46,7 +46,7 @@ public abstract class AbstractMockWriter {
      */
     public Long write() throws Throwable {
         if (this.dataPipe == null) {
-            MockerException e = new MockerException(MockerError.PARAMETER_ERROR, "data pipe can not be null");
+            MockerException e = new MockerException(MockerError.PARAMETER_ERROR, "Data pipe can not be null");
             log.error("can not read any data from pipe, cause the data pipe is null", e);
             throw e;
         }

@@ -49,11 +49,11 @@ public class MysqlDecimalType extends AbstractDigitDataType<BigDecimal> {
      */
     private void validate(int precision, int scale) {
         if (precision <= 0 || precision > 65) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "precision for decaimal can not larger than 65 or smaller than 0");
+            throw new MockerException(MockerError.PARAMETER_ERROR, "Precision for decaimal can not larger than 65 or smaller than 0");
         } else if (scale < 0 || scale > 30) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "scale for decimal can not larger than 30 or smaller than 0");
+            throw new MockerException(MockerError.PARAMETER_ERROR, "Scale for decimal can not larger than 30 or smaller than 0");
         } else if (precision < scale) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "scale can not be bigger than precision");
+            throw new MockerException(MockerError.PARAMETER_ERROR, "Scale can not be bigger than precision");
         }
     }
 

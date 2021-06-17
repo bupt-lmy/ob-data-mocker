@@ -69,17 +69,17 @@ public class MockDataGenTask extends AbstractMockTask {
      */
     private void validateParam(MockerBuffer buffer, List<ColumnReader> readers, List<AbstractConstraint> constraints) {
         if (buffer == null) {
-            MockerException e = new MockerException(MockerError.PARAMETER_ERROR, "buffer for business task can not be null");
+            MockerException e = new MockerException(MockerError.PARAMETER_ERROR, "Buffer for business task can not be null");
             log.error("errors happen when init mock business task", e);
             throw e;
         }
         if (readers == null) {
-            MockerException e = new MockerException(MockerError.PARAMETER_ERROR, "column readers for business task can not be null");
+            MockerException e = new MockerException(MockerError.PARAMETER_ERROR, "Column readers for business task can not be null");
             log.error("errors happen when init mock business task", e);
             throw e;
         }
         if (constraints == null) {
-            MockerException e = new MockerException(MockerError.PARAMETER_ERROR, "constraints for business task can not be null");
+            MockerException e = new MockerException(MockerError.PARAMETER_ERROR, "Constraints for business task can not be null");
             log.error("errors happen when init mock business task", e);
             throw e;
         }
@@ -127,7 +127,7 @@ public class MockDataGenTask extends AbstractMockTask {
                 }
                 if (emptyLoopCount > metaData.getTotalCount() * 100 || emptyLoopCount > 1000000) {
                     throw new MockerException(MockerError.UNKNOWN_ERROR, String.format(
-                            "data generation cycle idling %d exceeds the maximum number of data generation %d, too much data cannot pass "
+                            "Data generation cycle idling %d exceeds the maximum number of data generation %d, too much data cannot pass "
                             + "the constraint check, data generation is terminated",
                             emptyLoopCount, metaData.getTotalCount() * 100));
                 }

@@ -43,7 +43,7 @@ public class UniqueConstraint extends AbstractConstraint {
         super(constraintName, database, tableName, consColumns);
         if (count <= 0) {
             throw new MockerException(MockerError.PARAMETER_ERROR,
-                    "count for unique constraint can not be equal to or smaller than zero");
+                    "Count for unique constraint can not be equal to or smaller than zero");
         }
         this.judger = new DuplicatedJudger(count);
     }
@@ -59,7 +59,7 @@ public class UniqueConstraint extends AbstractConstraint {
         super(constraintName, database, tableName, consColumns, rows);
         if (count <= 0) {
             throw new MockerException(MockerError.PARAMETER_ERROR,
-                    "count for unique constraint can not be equal to or smaller than zero");
+                    "Count for unique constraint can not be equal to or smaller than zero");
         }
         if (rows != null && rows.size() != 0) {
             this.judger = new DuplicatedJudger(rows.size() + count);
@@ -105,7 +105,7 @@ public class UniqueConstraint extends AbstractConstraint {
             Pair<AbstractDataType, ?> value = row.get(column);
             if (value == null) {
                 throw new MockerException(MockerError.OPERATION_FAILURE,
-                        String.format("data for unique constraint have to have same column list \"%s\"",
+                        String.format("Data for unique constraint have to have same column list \"%s\"",
                                 sortedList.stream().collect(Collectors.joining(","))));
             }
             Object convertVal = value.getKey().convert(value.getValue());

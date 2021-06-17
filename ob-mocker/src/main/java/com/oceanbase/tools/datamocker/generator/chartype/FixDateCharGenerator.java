@@ -34,7 +34,7 @@ public class FixDateCharGenerator extends CharGeneratorBase {
     public FixDateCharGenerator(CharCaseOption caseOption, long timestamp, String timezone) {
         super(caseOption);
         if (timestamp < 0) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "time stamp can not be smaller than zero");
+            throw new MockerException(MockerError.PARAMETER_ERROR, "Timestamp can not be smaller than zero");
         }
         this.timestamp = timestamp;
         if (StringUtils.isNotBlank(timezone)) {

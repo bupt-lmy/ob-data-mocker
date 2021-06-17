@@ -87,7 +87,7 @@ public class DataBaseWriter extends AbstractMockWriter {
         this.database = database;
         this.tableName = tableName;
         if (groupId == null) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "group id can not be null");
+            throw new MockerException(MockerError.PARAMETER_ERROR, "Group id can not be null");
         }
         this.groupId = groupId;
     }
@@ -103,17 +103,17 @@ public class DataBaseWriter extends AbstractMockWriter {
      */
     private void validate(DataSource dataSource, ObModeType dialectType, String database, String tableName) {
         if (dataSource == null) {
-            MockerException e = new MockerException(MockerError.PARAMETER_ERROR, "data source can not be null");
+            MockerException e = new MockerException(MockerError.PARAMETER_ERROR, "Datasource can not be null");
             log.error("data source for DB writeIn writer is necessary", e);
             throw e;
         }
         if (database == null) {
-            MockerException e = new MockerException(MockerError.PARAMETER_ERROR, "database can not be null");
+            MockerException e = new MockerException(MockerError.PARAMETER_ERROR, "Database can not be null");
             log.error("database for DB writeIn writer is necessary", e);
             throw e;
         }
         if (tableName == null) {
-            MockerException e = new MockerException(MockerError.PARAMETER_ERROR, "table name can not be null");
+            MockerException e = new MockerException(MockerError.PARAMETER_ERROR, "Table name can not be null");
             log.error("table name for DB writeIn writer is necessary", e);
             throw e;
         }

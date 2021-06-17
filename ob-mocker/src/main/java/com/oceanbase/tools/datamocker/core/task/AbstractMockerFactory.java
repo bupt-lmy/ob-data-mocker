@@ -78,7 +78,7 @@ public abstract class AbstractMockerFactory {
     public AbstractMockerFactory(AbstractTaskConfig taskConfig) throws SQLException {
         this.taskConfig = taskConfig;
         if (taskConfig == null) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "input task config can not be null");
+            throw new MockerException(MockerError.PARAMETER_ERROR, "Input task config can not be null");
         }
         this.taskId2DataSource = new HashMap<>();
         this.taskId2MockerFiles = new HashMap<>();
@@ -118,7 +118,7 @@ public abstract class AbstractMockerFactory {
      */
     public ObDataMocker create(AbstractScheduler scheduler) {
         if (scheduler == null) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "scheduler for mocker factory can not be null");
+            throw new MockerException(MockerError.PARAMETER_ERROR, "Scheduler for mocker factory can not be null");
         }
         try {
             String taskId = UUID.randomUUID().toString().toUpperCase();

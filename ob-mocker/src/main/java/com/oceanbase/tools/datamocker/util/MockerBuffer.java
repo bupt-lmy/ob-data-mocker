@@ -67,10 +67,10 @@ public class MockerBuffer {
 
     public MockerBuffer(Map<String, AbstractDataType> tableSchema, Long batchSize, int concurrent) {
         if (batchSize < 0 || concurrent < 0) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "batch size or concurrent size can not be null");
+            throw new MockerException(MockerError.PARAMETER_ERROR, "Batch size or concurrent size can not be null");
         }
         if (tableSchema == null || tableSchema.size() == 0) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "table schame can not be null or empty");
+            throw new MockerException(MockerError.PARAMETER_ERROR, "Table schame can not be null or empty");
         }
         this.columnSet = tableSchema.keySet();
         this.rows = new ArrayList<>(batchSize.intValue() * 2);
@@ -81,10 +81,10 @@ public class MockerBuffer {
 
     public MockerBuffer(Map<String, AbstractDataType> tableSchema, Long batchSize) {
         if (batchSize < 0) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "batch size can not be null");
+            throw new MockerException(MockerError.PARAMETER_ERROR, "Batch size can not be null");
         }
         if (tableSchema == null || tableSchema.size() == 0) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "table schame can not be null or empty");
+            throw new MockerException(MockerError.PARAMETER_ERROR, "Table schame can not be null or empty");
         }
         this.columnSet = tableSchema.keySet();
         this.rows = new ArrayList<>(batchSize.intValue() * 2);
@@ -101,10 +101,10 @@ public class MockerBuffer {
      */
     public synchronized void setConcurrent(int count) {
         if (this.hasSet) {
-            throw new MockerException(MockerError.OPERATION_FAILURE, "concurrent count can not be set repeatedly");
+            throw new MockerException(MockerError.OPERATION_FAILURE, "Concurrent count can not be set repeatedly");
         }
         if (count < 0) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "concurrent for mock buffer can not be smaller than zero");
+            throw new MockerException(MockerError.PARAMETER_ERROR, "Concurrent for mock buffer can not be smaller than zero");
         }
         this.synchronizer = new CyclicBarrier(count, null);
     }
@@ -144,7 +144,7 @@ public class MockerBuffer {
         Validate.notNull(timeUnit, "time unit for buffer write timeout can not be null");
         Validate.isTrue(timeout > 0, "timeout for buffer write can not be negative");
         if (isClosed()) {
-            throw new MockerException(MockerError.OPERATION_FAILURE, "buffer has been closed");
+            throw new MockerException(MockerError.OPERATION_FAILURE, "Buffer has been closed");
         }
         this.hasSet = Boolean.TRUE;
         lock.lock();
@@ -185,13 +185,13 @@ public class MockerBuffer {
     private void writeToCurrentRow(Pair<String, Pair<AbstractDataType, Object>> column) {
         if (!this.columnSet.contains(column.getKey())) {
             MockerException e = new MockerException(MockerError.UNKNOWN_COLUMN_NAME,
-                    String.format("custom column \"%s\" is not in column set [%s]", column,
+                    String.format("Custom column \"%s\" is not in column set [%s]", column,
                             this.columnSet.stream().collect(Collectors.joining(","))));
             log.error("column error", e);
             throw e;
         }
         if (this.currentRow.get(column.getKey()) != null) {
-            MockerException e = new MockerException(MockerError.PARAMETER_ERROR, String.format("custom column \"%s\" is duplicate",
+            MockerException e = new MockerException(MockerError.PARAMETER_ERROR, String.format("Custom column \"%s\" is duplicate",
                     column.getKey()));
             log.error("column error", e);
             throw e;
@@ -209,7 +209,7 @@ public class MockerBuffer {
     private void reload(long timeout, TimeUnit timeUnit) throws Exception {
         if (this.currentRow.size() > this.columnSet.size()) {
             MockerException e = new MockerException(MockerError.UNKNOWN_COLUMN_NAME,
-                    String.format("there are unknown columns in current column [%s]",
+                    String.format("There are unknown columns in current column [%s]",
                             this.currentRow.keySet().stream().collect(Collectors.joining(","))));
             log.error("column error", e);
             throw e;

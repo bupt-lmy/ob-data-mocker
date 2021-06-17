@@ -174,21 +174,21 @@ public class DataBasePrimitiveTest extends MockerTestBase {
 
     @Test
     public void testPrimitiveWithoutDataSource() {
-        expect.expectMessage("data source can not be null");
+        expect.expectMessage("Datasource can not be null");
         expect.expect(MockerException.class);
         AbstractMockWriter primitive = new DataBaseWriter(null, null, null, null);
     }
 
     @Test
     public void testPrimitiveWithoutDatabase() {
-        expect.expectMessage("database can not be null");
+        expect.expectMessage("Database can not be null");
         expect.expect(MockerException.class);
         AbstractMockWriter primitive = new DataBaseWriter(oracleDataSource, ObModeType.OB_ORACLE, null, null);
     }
 
     @Test
     public void testPrimitiveWithouttable() throws IOException {
-        expect.expectMessage("table name can not be null");
+        expect.expectMessage("Table name can not be null");
         expect.expect(MockerException.class);
         ObModeType dialectType = ObModeType.OB_ORACLE;
         DataBaseConfig config = getDBConfig(dialectType);

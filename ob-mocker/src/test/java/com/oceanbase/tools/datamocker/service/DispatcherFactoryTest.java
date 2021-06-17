@@ -256,7 +256,7 @@ public class DispatcherFactoryTest extends MockerTestBase {
     public void testDispatcherWithVirtualColumn() throws Throwable {
         AbstractTaskConfig config = getTask("EMP1");
         AbstractMockerFactory factory = new ObMockerFactory(config);
-        thrown.expectMessage("virtual column \"EMP1.COL4\" for constraint is not support yet");
+        thrown.expectMessage("Virtual column \"EMP1.COL4\" for constraint is not support yet");
         thrown.expect(MockerException.class);
         ObDataMocker mocker = factory.create();
         Assert.assertEquals(1, mocker.size());

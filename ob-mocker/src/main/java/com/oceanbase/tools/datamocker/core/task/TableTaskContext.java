@@ -220,7 +220,7 @@ public class TableTaskContext {
             this.totalDataGenerateCount = result;
         } else {
             if (!this.totalDataGenerateCount.equals(result)) {
-                throw new MockerException(MockerError.OPERATION_FAILURE, "all column readers have to generate same number of data");
+                throw new MockerException(MockerError.OPERATION_FAILURE, "All column readers have to generate same number of data");
             }
         }
     }

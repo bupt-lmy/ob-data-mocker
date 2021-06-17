@@ -45,7 +45,7 @@ public class DupUtilTest extends MockerTestBase {
     @Test
     public void testDupUtilWithNegativeCount() {
         thrown.expect(MockerException.class);
-        thrown.expectMessage("count for DuplicatedJudger can not be equal to or smaleer than zero");
+        thrown.expectMessage("Count for DuplicatedJudger can not be equal to or smaleer than zero");
         DuplicatedJudger util = new DuplicatedJudger(-1);
     }
 
@@ -55,7 +55,7 @@ public class DupUtilTest extends MockerTestBase {
         DuplicatedJudger dupUtil = new DuplicatedJudger(count);
         for (int i = 0; i < count + 1; i++) {
             if (i == count) {
-                thrown.expectMessage(String.format("the max count for DuplicatedJudger is %d, can not add more", count));
+                thrown.expectMessage(String.format("The max count for DuplicatedJudger is %d, can not add more", count));
                 thrown.expect(MockerException.class);
             }
             dupUtil.add(UUID.randomUUID().toString());

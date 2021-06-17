@@ -84,7 +84,7 @@ public class BitMapTest extends MockerTestBase {
 
     @Test
     public void testBitMapWithIllegalCount() {
-        thrown.expectMessage("the capacity of the bitmap can not be equal to or smaller than zero");
+        thrown.expectMessage("Capacity of the bitmap can not be equal to or smaller than zero");
         thrown.expect(MockerException.class);
         BitMap bitMap = new BitMap(0);
     }

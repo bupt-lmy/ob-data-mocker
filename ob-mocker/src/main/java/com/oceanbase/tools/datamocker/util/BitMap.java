@@ -33,7 +33,7 @@ public class BitMap {
     public BitMap(int count) {
         if (count <= 0) {
             throw new MockerException(MockerError.PARAMETER_ERROR,
-                    "the capacity of the bitmap can not be equal to or smaller than zero");
+                    "Capacity of the bitmap can not be equal to or smaller than zero");
         }
         int pow = new Double(String.valueOf(Math.log(count) / Math.log(2))).intValue() + 1;
         int factorPow = new Double(String.valueOf(Math.log(INCREASE_FACTOR) / Math.log(2))).intValue();

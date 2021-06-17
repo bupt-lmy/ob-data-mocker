@@ -62,7 +62,7 @@ public class OracleDateType extends AbstractDateDataType<Date> {
     protected Long limitForType(Date minDate, Date maxDate) {
         long interval = maxDate.getTime() - minDate.getTime();
         if (interval < 0) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "time interval can not be smaller than zero");
+            throw new MockerException(MockerError.PARAMETER_ERROR, "Time interval can not be smaller than zero");
         }
         return interval / 1000;
     }

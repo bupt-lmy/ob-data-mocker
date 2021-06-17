@@ -49,11 +49,11 @@ public class MysqlFloatType extends AbstractDigitDataType<BigDecimal> {
      */
     private void validate(int precision, int scale) {
         if (precision < -1 || precision > 53) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "precision for float can not larger than 53 or smaller than 0");
+            throw new MockerException(MockerError.PARAMETER_ERROR, "Precision for float can not larger than 53 or smaller than 0");
         } else if (scale < -1 || scale > 30) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "scale for float can not larger than 30 or smaller than 0");
+            throw new MockerException(MockerError.PARAMETER_ERROR, "Scale for float can not larger than 30 or smaller than 0");
         } else if (precision < scale) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "scale can not be bigger than precision");
+            throw new MockerException(MockerError.PARAMETER_ERROR, "Scale can not be bigger than precision");
         }
     }
 
@@ -97,7 +97,7 @@ public class MysqlFloatType extends AbstractDigitDataType<BigDecimal> {
             }
             return new BigDecimal("0");
         } else {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "error precision or scale for float");
+            throw new MockerException(MockerError.PARAMETER_ERROR, "Wrong precision or scale for float");
         }
     }
 
@@ -111,7 +111,7 @@ public class MysqlFloatType extends AbstractDigitDataType<BigDecimal> {
                     .setScale(0, BigDecimal.ROUND_DOWN);
             return Long.valueOf(result.toPlainString());
         } else {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "error precision or scale for float");
+            throw new MockerException(MockerError.PARAMETER_ERROR, "Wrong precision or scale for float");
         }
     }
 
@@ -125,7 +125,7 @@ public class MysqlFloatType extends AbstractDigitDataType<BigDecimal> {
         } else if (this.precision >= 0 && this.scale >= 0) {
             return value.setScale(scale, BigDecimal.ROUND_HALF_DOWN);
         } else {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "error precision or scale for float");
+            throw new MockerException(MockerError.PARAMETER_ERROR, "Wrong precision or scale for float");
         }
     }
 
@@ -139,7 +139,7 @@ public class MysqlFloatType extends AbstractDigitDataType<BigDecimal> {
         } else if (this.precision >= 0 && this.scale >= 0) {
             return value.setScale(scale, BigDecimal.ROUND_HALF_DOWN).toPlainString();
         } else {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "error precision or scale for float");
+            throw new MockerException(MockerError.PARAMETER_ERROR, "Wrong precision or scale for float");
         }
     }
 
@@ -150,7 +150,7 @@ public class MysqlFloatType extends AbstractDigitDataType<BigDecimal> {
         } else if (this.precision >= 0 && this.scale >= 0) {
             return String.format("decimal(%d, %d)", this.precision, this.scale);
         } else {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "error precision or scale for float");
+            throw new MockerException(MockerError.PARAMETER_ERROR, "Wrong precision or scale for float");
         }
     }
 

@@ -31,7 +31,7 @@ public class ColumnReader<T> extends AbstractMockReader<T> {
     public ColumnReader(AbstractDataType<T, ?> dataType, String columnName, String groupId) {
         if (dataType == null || columnName == null) {
             throw new MockerException(MockerError.PARAMETER_ERROR,
-                    "abstract data type or column name for column reader can not be null");
+                    "Abstract data type or column name for column reader can not be null");
         }
         this.dataType = dataType;
         this.columnName = columnName;

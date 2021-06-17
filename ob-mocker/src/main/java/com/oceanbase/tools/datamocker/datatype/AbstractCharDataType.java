@@ -76,10 +76,10 @@ public abstract class AbstractCharDataType extends AbstractDataType<String, Inte
      */
     public void validateParam(CharsetType charsetType, Integer length) {
         if (charsetType == null) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "char set for data type can not be null");
+            throw new MockerException(MockerError.PARAMETER_ERROR, "Char set for data type can not be null");
         }
         if (length == null || length <= 0) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "data type length can not be null or smaller than zero");
+            throw new MockerException(MockerError.PARAMETER_ERROR, "Datatype length can not be null or smaller than zero");
         }
     }
 
@@ -171,7 +171,7 @@ public abstract class AbstractCharDataType extends AbstractDataType<String, Inte
         }
         if (realLength > maxLength) {
             throw new MockerException(MockerError.VALUE_OUT_OFRANGE,
-                    String.format("the length of then generator's value is bigger than bound [0,%d]", maxLength));
+                    String.format("The length of then generator's value is bigger than bound [0,%d]", maxLength));
         }
         return value;
     }

@@ -244,13 +244,13 @@ public abstract class AbstractScheduler {
     private boolean validateThreadResource(Set<Set<String>> columnGroups, Map<Set<String>, Integer> dataGroups, int active, int max) {
         int freeResource = max - active;
         if (freeResource < 0) {
-            throw new MockerException(MockerError.UNKNOWN_ERROR, "free resource thread pool size is smaller than zero");
+            throw new MockerException(MockerError.UNKNOWN_ERROR, "Free resource thread pool size is smaller than zero");
         }
         int required = columnGroups.size();
         Set<Map.Entry<Set<String>, Integer>> entrySet = dataGroups.entrySet();
         for (Map.Entry<Set<String>, Integer> entry : entrySet) {
             if (entry.getValue() <= 0) {
-                throw new MockerException(MockerError.PARAMETER_ERROR, "thread count can not be smaller than zero");
+                throw new MockerException(MockerError.PARAMETER_ERROR, "Thread count can not be smaller than zero");
             }
             required += entry.getValue();
         }
@@ -270,7 +270,7 @@ public abstract class AbstractScheduler {
             for (int j = i + 1; j < middle.size(); j++) {
                 copyObj.retainAll(middle.get(j));
                 if (copyObj.size() != 0) {
-                    throw new MockerException(MockerError.PARAMETER_ERROR, "column group set is illegal");
+                    throw new MockerException(MockerError.PARAMETER_ERROR, "Column group set is illegal");
                 }
             }
         }

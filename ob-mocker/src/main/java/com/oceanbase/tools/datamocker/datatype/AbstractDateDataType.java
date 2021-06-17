@@ -101,9 +101,9 @@ public abstract class AbstractDateDataType<T extends Comparable> extends Abstrac
             return null;
         }
         if (value.compareTo(lowValue()) < 0) {
-            throw new MockerException(MockerError.ILLEGAL_RETURN_VALUE, "date can not be smaller than low value");
+            throw new MockerException(MockerError.ILLEGAL_RETURN_VALUE, "Date can not be smaller than low value");
         } else if (value.compareTo(highValue()) > 0) {
-            throw new MockerException(MockerError.ILLEGAL_RETURN_VALUE, "date can not be bigger than high value");
+            throw new MockerException(MockerError.ILLEGAL_RETURN_VALUE, "Date can not be bigger than high value");
         }
         return value;
     }

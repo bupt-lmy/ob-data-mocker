@@ -60,15 +60,15 @@ public abstract class AbstractConstraint {
 
     private Map<String, Integer> validateConsColumns(String table, Map<String, Map<String, Integer>> consColumns) {
         if (table == null) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, String.format("table name for constraint can not be null", table));
+            throw new MockerException(MockerError.PARAMETER_ERROR, String.format("Table name for constraint can not be null", table));
         }
         if (consColumns == null || consColumns.size() == 0) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "constraint columns can not be null or empty");
+            throw new MockerException(MockerError.PARAMETER_ERROR, "Constraint columns can not be null or empty");
         }
         Map<String, Integer> columns = consColumns.get(table);
         if (columns == null) {
             throw new MockerException(MockerError.PARAMETER_ERROR,
-                    String.format("constraint columns for table \"%s\" can not be null or empty", table));
+                    String.format("Constraint columns for table \"%s\" can not be null or empty", table));
         }
         return columns;
     }
@@ -90,7 +90,7 @@ public abstract class AbstractConstraint {
      */
     public boolean mark(Map<String, Pair<AbstractDataType, Object>> value) {
         if (value == null || value.size() == 0) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "value can not be null for mark method");
+            throw new MockerException(MockerError.PARAMETER_ERROR, "Value can not be null for mark method");
         }
         Map<String, Integer> columns = validateConsColumns(tableName, this.tableName2ConstrantColumns);
         return doCheck(columns, value, true);
@@ -109,7 +109,7 @@ public abstract class AbstractConstraint {
         for (String column : initCons) {
             if (!valueCons.contains(column)) {
                 throw new MockerException(MockerError.PARAMETER_ERROR,
-                        String.format("input constraint's columns must contain init constraint's columns, [%s]!=[%s]",
+                        String.format("Input constraint's columns must contain init constraint's columns, [%s]!=[%s]",
                                 initCons.stream().collect(Collectors.joining(",")),
                                 valueCons.stream().collect(Collectors.joining(","))));
             }

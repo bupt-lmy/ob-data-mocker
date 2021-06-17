@@ -38,10 +38,10 @@ public class StepNumGenerator extends CharGeneratorBase {
         super(caseOption);
         if (start == null || end == null || step == null || cycle == null) {
             throw new MockerException(MockerError.PARAMETER_ERROR,
-                    "start or end or step or cycle for step number generator can not be null");
+                    "Start or end or step or cycle for step number generator can not be null");
         }
         if (start.compareTo(end) >= 0) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "start for step number generator can not be bigger than end");
+            throw new MockerException(MockerError.PARAMETER_ERROR, "Start for step number generator can not be bigger than end");
         }
         this.start = start;
         this.end = end;
@@ -54,10 +54,10 @@ public class StepNumGenerator extends CharGeneratorBase {
         int min = this.start.toString().length();
         int max = this.end.toString().length();
         if (min > maxLength) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "start number is illegal");
+            throw new MockerException(MockerError.PARAMETER_ERROR, "Start number is illegal");
         }
         if (max < minLength) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "end number is illegal");
+            throw new MockerException(MockerError.PARAMETER_ERROR, "End number is illegal");
         }
         if (min < minLength) {
             this.start = new Double(Math.pow(10, minLength - 1)).longValue();
@@ -91,7 +91,7 @@ public class StepNumGenerator extends CharGeneratorBase {
             if (cycle) {
                 current = this.end;
             } else {
-                throw new MockerException(MockerError.OPERATION_FAILURE, "can not generate more unique date");
+                throw new MockerException(MockerError.OPERATION_FAILURE, "Can not generate more unique date");
             }
         }
         return current;
@@ -112,7 +112,7 @@ public class StepNumGenerator extends CharGeneratorBase {
             if (cycle) {
                 current = this.start;
             } else {
-                throw new MockerException(MockerError.OPERATION_FAILURE, "can not generate more unique date");
+                throw new MockerException(MockerError.OPERATION_FAILURE, "Can not generate more unique date");
             }
         }
         return current;

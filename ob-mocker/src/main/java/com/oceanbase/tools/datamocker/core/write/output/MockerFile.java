@@ -35,7 +35,7 @@ public class MockerFile {
         file = new File(fileName);
         if (file.exists()) {
             if (!file.delete()) {
-                throw new MockerException(MockerError.OPERATION_FAILURE, "fail to delete a file \"%s\"");
+                throw new MockerException(MockerError.OPERATION_FAILURE, "Fail to delete a file \"%s\"");
             }
         }
         create(file);
@@ -96,7 +96,7 @@ public class MockerFile {
      */
     synchronized public long write(byte[] bytes, int offset, int length, boolean immediateFlush) throws IOException {
         if (this.output == null) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "file output stream can not be null");
+            throw new MockerException(MockerError.PARAMETER_ERROR, "File output stream can not be null");
         }
         this.output.write(bytes, offset, length);
         if (immediateFlush) {

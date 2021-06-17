@@ -76,7 +76,7 @@ public abstract class AbstractByteDataType extends AbstractDataType<byte[], Inte
         Integer maxLength = highValue();
         if (value.length > maxLength) {
             throw new MockerException(MockerError.VALUE_OUT_OFRANGE,
-                    String.format("the length of then generator's value is bigger than bound [0,%d]", maxLength));
+                    String.format("The length of then generator's value is bigger than bound [0,%d]", maxLength));
         }
         return value;
     }

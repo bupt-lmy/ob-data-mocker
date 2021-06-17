@@ -170,7 +170,7 @@ public class ConstraintFactoryTest extends MockerTestBase {
     @Test
     public void testCConstraintFactoryForOracle() throws Throwable {
         Map<String, AbstractDataType> schema = getSchema();
-        thrown.expectMessage("check constraint is not support yet");
+        thrown.expectMessage("Check constraint is not support yet");
         thrown.expect(MockerException.class);
         List<AbstractConstraint> list = ConstraintFactory.getInstance("CHECK_CONSTRAINT").make(oracleDatasource, ObModeType.OB_ORACLE,
                 "SYS", "EMP", schema,
@@ -182,7 +182,7 @@ public class ConstraintFactoryTest extends MockerTestBase {
     public void testFConstraintFactoryForOracle() throws Throwable {
         Map<String, AbstractDataType> schema = getSchema();
         thrown.expect(MockerException.class);
-        thrown.expectMessage("foreign constraint is not support yet");
+        thrown.expectMessage("Foreign constraint is not support yet");
         List<AbstractConstraint> list = ConstraintFactory.getInstance("FOREIGN_CONSTRAINT").make(oracleDatasource, ObModeType.OB_ORACLE,
                 "SYS", "EMP1", schema,
                 15000);
@@ -193,7 +193,7 @@ public class ConstraintFactoryTest extends MockerTestBase {
     public void testConstraintFactoryWithVirtualColForOracle() throws Throwable {
         Map<String, AbstractDataType> schema = getSchema();
         thrown.expect(MockerException.class);
-        thrown.expectMessage("virtual column \"EMP1.COL4\" for constraint is not support yet");
+        thrown.expectMessage("Virtual column \"EMP1.COL4\" for constraint is not support yet");
         List<AbstractConstraint> list = ConstraintFactory.getInstance("UNIQUE_CONSTRAINT").make(oracleDatasource, ObModeType.OB_ORACLE,
                 "SYS", "EMP1", schema,
                 15000);
@@ -222,7 +222,7 @@ public class ConstraintFactoryTest extends MockerTestBase {
     public void testConstraintFactoryWithVirtualColForMysql() throws Throwable {
         Map<String, AbstractDataType> schema = getSchema();
         thrown.expect(MockerException.class);
-        thrown.expectMessage("virtual column \"emp1.col4\" for constraint is not support yet");
+        thrown.expectMessage("Virtual column \"emp1.col4\" for constraint is not support yet");
         List<AbstractConstraint> list = ConstraintFactory.getInstance("UNIQUE_CONSTRAINT").make(mysqlDatasource, ObModeType.OB_MYSQL,
                 "test", "emp1", schema,
                 15000);

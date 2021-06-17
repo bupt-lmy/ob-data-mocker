@@ -126,10 +126,10 @@ public abstract class GeneratorFactory<T extends BaseGenerator, V extends Object
         @Override
         public StepNumByteGenerator make(Map<String, Object> params) {
             if (params == null) {
-                throw new MockerException(MockerError.PARAMETER_ERROR, "generator params for step date generator can not be null");
+                throw new MockerException(MockerError.PARAMETER_ERROR, "Generator params for step date generator can not be null");
             }
             if (params.get("start") == null || params.get("end") == null || params.get("step") == null) {
-                throw new MockerException(MockerError.PARAMETER_ERROR, "start, end or step for step number generator can not be null");
+                throw new MockerException(MockerError.PARAMETER_ERROR, "Start, end or step for step number generator can not be null");
             }
             Long start = Long.valueOf(params.get("start").toString());
             Long end = Long.valueOf(params.get("end").toString());
@@ -146,25 +146,25 @@ public abstract class GeneratorFactory<T extends BaseGenerator, V extends Object
         @Override
         public RandomNumByteGenerator make(Map<String, Object> params) {
             if (params == null) {
-                throw new MockerException(MockerError.PARAMETER_ERROR, "generator params for step date generator can not be null");
+                throw new MockerException(MockerError.PARAMETER_ERROR, "Generator params for step date generator can not be null");
             }
             if (params.get("start") == null || params.get("end") == null) {
-                throw new MockerException(MockerError.PARAMETER_ERROR, "start or end for random number generator can not be null");
+                throw new MockerException(MockerError.PARAMETER_ERROR, "Start or end for random number generator can not be null");
             }
             BigDecimal start = new BigDecimal(params.get("start").toString());
             BigDecimal end = new BigDecimal(params.get("end").toString());
             if (start.compareTo(end) > 0) {
                 throw new MockerException(MockerError.PARAMETER_ERROR,
-                        String.format("low value can not bigger than high value [%s>%s]", start.toPlainString(),
+                        String.format("Low value can not bigger than high value [%s>%s]", start.toPlainString(),
                                 end.toPlainString()));
             }
             if (start.compareTo(new BigDecimal(Long.MIN_VALUE)) < 0) {
                 throw new MockerException(MockerError.PARAMETER_ERROR,
-                        String.format("start value for random number generator can not be smaller than %d", Long.MIN_VALUE));
+                        String.format("Start value for random number generator can not be smaller than %d", Long.MIN_VALUE));
             }
             if (end.compareTo(new BigDecimal(Long.MAX_VALUE)) > 0) {
                 throw new MockerException(MockerError.PARAMETER_ERROR,
-                        String.format("end value for random number generator can not be bigger than %d", Long.MAX_VALUE));
+                        String.format("End value for random number generator can not be bigger than %d", Long.MAX_VALUE));
             }
             return new RandomNumByteGenerator(CharCaseOption.DEFAULT, start.longValue(), end.longValue());
         }
@@ -177,11 +177,11 @@ public abstract class GeneratorFactory<T extends BaseGenerator, V extends Object
         @Override
         public StepDateByteGenerator make(Map<String, Object> params) {
             if (params == null) {
-                throw new MockerException(MockerError.PARAMETER_ERROR, "generator params for step date generator can not be null");
+                throw new MockerException(MockerError.PARAMETER_ERROR, "Generator params for step date generator can not be null");
             }
             if (params.get("startTime") == null || params.get("endTime") == null || params.get("step") == null) {
                 throw new MockerException(MockerError.PARAMETER_ERROR,
-                        "startTime, endTime or step for step date generator can not be null");
+                        "StartTime, endTime or step for step date generator can not be null");
             }
             Long startTime = Long.valueOf(params.get("startTime").toString());
             Long endTime = Long.valueOf(params.get("endTime").toString());
@@ -201,10 +201,10 @@ public abstract class GeneratorFactory<T extends BaseGenerator, V extends Object
         @Override
         public FixDateByteGenerator make(Map<String, Object> params) {
             if (params == null) {
-                throw new MockerException(MockerError.PARAMETER_ERROR, "generator params for fix date generator can not be null");
+                throw new MockerException(MockerError.PARAMETER_ERROR, "Generator params for fix date generator can not be null");
             }
             if (params.get("timestamp") == null) {
-                throw new MockerException(MockerError.PARAMETER_ERROR, "timestamp for fix date generator can not be null");
+                throw new MockerException(MockerError.PARAMETER_ERROR, "Timestamp for fix date generator can not be null");
             }
             Long timestamp = Long.valueOf(params.get("timestamp").toString());
             String timezone = params.get("timezone") == null ? null : params.get("timezone").toString();
@@ -219,11 +219,11 @@ public abstract class GeneratorFactory<T extends BaseGenerator, V extends Object
         @Override
         public RandomDateByteGenerator make(Map<String, Object> params) {
             if (params == null) {
-                throw new MockerException(MockerError.PARAMETER_ERROR, "generator params for random date generator can not be null");
+                throw new MockerException(MockerError.PARAMETER_ERROR, "Generator params for random date generator can not be null");
             }
             if (params.get("startTime") == null || params.get("endTime") == null) {
                 throw new MockerException(MockerError.PARAMETER_ERROR,
-                        "startTime or endTime for random date generator can not be null");
+                        "StartTime or endTime for random date generator can not be null");
             }
             Long startTime = Long.valueOf(params.get("startTime").toString());
             Long endTime = Long.valueOf(params.get("endTime").toString());
@@ -253,12 +253,12 @@ public abstract class GeneratorFactory<T extends BaseGenerator, V extends Object
         @Override
         public FixByteGenerator make(Map<String, String> params) {
             if (params == null) {
-                throw new MockerException(MockerError.PARAMETER_ERROR, "generator parameters can not be null");
+                throw new MockerException(MockerError.PARAMETER_ERROR, "Generator parameters can not be null");
             }
             String caseType = params.getOrDefault("caseOption", CharCaseOption.DEFAULT.name());
             String fixText = params.get("fixText");
             if (fixText == null || fixText.length() == 0) {
-                throw new MockerException(MockerError.PARAMETER_ERROR, "fix text can not be null or empty");
+                throw new MockerException(MockerError.PARAMETER_ERROR, "Fix text can not be null or empty");
             }
             CharCaseOption type = CharCaseOption.valueOf(caseType);
             return new FixByteGenerator(type, fixText);
@@ -287,12 +287,12 @@ public abstract class GeneratorFactory<T extends BaseGenerator, V extends Object
         @Override
         public RegExpByteGenerator make(Map<String, String> params) {
             if (params == null) {
-                throw new MockerException(MockerError.PARAMETER_ERROR, "generator for reg exp generator can not be null");
+                throw new MockerException(MockerError.PARAMETER_ERROR, "Generator for reg exp generator can not be null");
             }
             CharCaseOption type = CharCaseOption.valueOf(params.getOrDefault("caseOption", CharCaseOption.DEFAULT.name()));
             String regText = params.get("regText");
             if (regText == null) {
-                throw new MockerException(MockerError.PARAMETER_ERROR, "reg text can not be null");
+                throw new MockerException(MockerError.PARAMETER_ERROR, "Reg text can not be null");
             }
             return new RegExpByteGenerator(type, regText);
         }
@@ -305,10 +305,10 @@ public abstract class GeneratorFactory<T extends BaseGenerator, V extends Object
         @Override
         public StepTimestampGenerator make(Map<String, Object> params) {
             if (params == null) {
-                throw new MockerException(MockerError.PARAMETER_ERROR, "generator params for step date generator can not be null");
+                throw new MockerException(MockerError.PARAMETER_ERROR, "Generator params for step date generator can not be null");
             }
             if (params.get("step") == null) {
-                throw new MockerException(MockerError.PARAMETER_ERROR, "step for step date generator can not be null");
+                throw new MockerException(MockerError.PARAMETER_ERROR, "Step for step date generator can not be null");
             }
             Long realStep = Long.valueOf(params.get("step").toString());
             Boolean cycle = (Boolean) params.getOrDefault("round", Boolean.TRUE);
@@ -333,7 +333,7 @@ public abstract class GeneratorFactory<T extends BaseGenerator, V extends Object
 
         @Override
         public FixIntervalYMGenerator make(Map<String, String> params) {
-            throw new MockerException(MockerError.NOT_SUPPORT_FEATURE, "fix interval year to month has not been supported yet");
+            throw new MockerException(MockerError.NOT_SUPPORT_FEATURE, "Fix interval year to month has not been supported yet");
             //if (params == null) {
             //    throw new MockerException(MockerError.PARAMETER_ERROR, "param for fix INTERVALYM generator can not be null");
             //}
@@ -348,10 +348,10 @@ public abstract class GeneratorFactory<T extends BaseGenerator, V extends Object
         @Override
         public FixTimestampGenerator make(Map<String, Object> params) {
             if (params == null) {
-                throw new MockerException(MockerError.PARAMETER_ERROR, "param for fix date generator can not be null");
+                throw new MockerException(MockerError.PARAMETER_ERROR, "Param for fix date generator can not be null");
             }
             if (params.get("timestamp") == null) {
-                throw new MockerException(MockerError.PARAMETER_ERROR, "time stamp for fix date generator can not be null");
+                throw new MockerException(MockerError.PARAMETER_ERROR, "Time stamp for fix date generator can not be null");
             }
             Long timestamp = Long.valueOf(params.get("timestamp").toString());
             return new FixTimestampGenerator(timestamp);
@@ -365,10 +365,10 @@ public abstract class GeneratorFactory<T extends BaseGenerator, V extends Object
         @Override
         public StepDateGenerator make(Map<String, Object> params) {
             if (params == null) {
-                throw new MockerException(MockerError.PARAMETER_ERROR, "generator params for step date generator can not be null");
+                throw new MockerException(MockerError.PARAMETER_ERROR, "Generator params for step date generator can not be null");
             }
             if (params.get("step") == null) {
-                throw new MockerException(MockerError.PARAMETER_ERROR, "step for step date generator can not be null");
+                throw new MockerException(MockerError.PARAMETER_ERROR, "Step for step date generator can not be null");
             }
             Long realStep = Long.valueOf(params.get("step").toString());
             Boolean cycle = (Boolean) params.getOrDefault("round", Boolean.TRUE);
@@ -394,10 +394,10 @@ public abstract class GeneratorFactory<T extends BaseGenerator, V extends Object
         @Override
         public FixDateGenerator make(Map<String, Object> params) {
             if (params == null) {
-                throw new MockerException(MockerError.PARAMETER_ERROR, "param for fix date generator can not be null");
+                throw new MockerException(MockerError.PARAMETER_ERROR, "Param for fix date generator can not be null");
             }
             if (params.get("timestamp") == null) {
-                throw new MockerException(MockerError.PARAMETER_ERROR, "time stamp for fix date generator can not be null");
+                throw new MockerException(MockerError.PARAMETER_ERROR, "Time stamp for fix date generator can not be null");
             }
             Long timestamp = Long.valueOf(params.get("timestamp").toString());
             return new FixDateGenerator(timestamp);
@@ -412,10 +412,10 @@ public abstract class GeneratorFactory<T extends BaseGenerator, V extends Object
         @Override
         public StepNumGenerator make(Map<String, Object> params) {
             if (params == null) {
-                throw new MockerException(MockerError.PARAMETER_ERROR, "generator params for step date generator can not be null");
+                throw new MockerException(MockerError.PARAMETER_ERROR, "Generator params for step date generator can not be null");
             }
             if (params.get("start") == null || params.get("end") == null || params.get("step") == null) {
-                throw new MockerException(MockerError.PARAMETER_ERROR, "start, end or step for step number generator can not be null");
+                throw new MockerException(MockerError.PARAMETER_ERROR, "Start, end or step for step number generator can not be null");
             }
             Long start = Long.valueOf(params.get("start").toString());
             Long end = Long.valueOf(params.get("end").toString());
@@ -432,25 +432,25 @@ public abstract class GeneratorFactory<T extends BaseGenerator, V extends Object
         @Override
         public RandomNumGenerator make(Map<String, Object> params) {
             if (params == null) {
-                throw new MockerException(MockerError.PARAMETER_ERROR, "generator params for step date generator can not be null");
+                throw new MockerException(MockerError.PARAMETER_ERROR, "Generator params for step date generator can not be null");
             }
             if (params.get("start") == null || params.get("end") == null) {
-                throw new MockerException(MockerError.PARAMETER_ERROR, "start or end for random number generator can not be null");
+                throw new MockerException(MockerError.PARAMETER_ERROR, "Start or end for random number generator can not be null");
             }
             BigDecimal start = new BigDecimal(params.get("start").toString());
             BigDecimal end = new BigDecimal(params.get("end").toString());
             if (start.compareTo(end) > 0) {
                 throw new MockerException(MockerError.PARAMETER_ERROR,
-                        String.format("low value can not bigger than high value [%s>%s]", start.toPlainString(),
+                        String.format("Low value can not bigger than high value [%s>%s]", start.toPlainString(),
                                 end.toPlainString()));
             }
             if (start.compareTo(new BigDecimal(Long.MIN_VALUE)) < 0) {
                 throw new MockerException(MockerError.PARAMETER_ERROR,
-                        String.format("start value for random number generator can not be smaller than %d", Long.MIN_VALUE));
+                        String.format("Start value for random number generator can not be smaller than %d", Long.MIN_VALUE));
             }
             if (end.compareTo(new BigDecimal(Long.MAX_VALUE)) > 0) {
                 throw new MockerException(MockerError.PARAMETER_ERROR,
-                        String.format("end value for random number generator can not be bigger than %d", Long.MAX_VALUE));
+                        String.format("End value for random number generator can not be bigger than %d", Long.MAX_VALUE));
             }
             return new RandomNumGenerator(CharCaseOption.DEFAULT, start.longValue(), end.longValue());
         }
@@ -463,11 +463,11 @@ public abstract class GeneratorFactory<T extends BaseGenerator, V extends Object
         @Override
         public StepDateCharGenerator make(Map<String, Object> params) {
             if (params == null) {
-                throw new MockerException(MockerError.PARAMETER_ERROR, "generator params for step date generator can not be null");
+                throw new MockerException(MockerError.PARAMETER_ERROR, "Generator params for step date generator can not be null");
             }
             if (params.get("startTime") == null || params.get("endTime") == null || params.get("step") == null) {
                 throw new MockerException(MockerError.PARAMETER_ERROR,
-                        "startTime, endTime or step for step date generator can not be null");
+                        "StartTime, endTime or step for step date generator can not be null");
             }
             Long startTime = Long.valueOf(params.get("startTime").toString());
             Long endTime = Long.valueOf(params.get("endTime").toString());
@@ -487,10 +487,10 @@ public abstract class GeneratorFactory<T extends BaseGenerator, V extends Object
         @Override
         public FixDateCharGenerator make(Map<String, Object> params) {
             if (params == null) {
-                throw new MockerException(MockerError.PARAMETER_ERROR, "generator params for fix date generator can not be null");
+                throw new MockerException(MockerError.PARAMETER_ERROR, "Generator params for fix date generator can not be null");
             }
             if (params.get("timestamp") == null) {
-                throw new MockerException(MockerError.PARAMETER_ERROR, "timestamp for fix date generator can not be null");
+                throw new MockerException(MockerError.PARAMETER_ERROR, "Timestamp for fix date generator can not be null");
             }
             Long timestamp = Long.valueOf(params.get("timestamp").toString());
             String timezone = params.get("timezone") == null ? null : params.get("timezone").toString();
@@ -505,11 +505,11 @@ public abstract class GeneratorFactory<T extends BaseGenerator, V extends Object
         @Override
         public RandomDateCharGenerator make(Map<String, Object> params) {
             if (params == null) {
-                throw new MockerException(MockerError.PARAMETER_ERROR, "generator params for random date generator can not be null");
+                throw new MockerException(MockerError.PARAMETER_ERROR, "Generator params for random date generator can not be null");
             }
             if (params.get("startTime") == null || params.get("endTime") == null) {
                 throw new MockerException(MockerError.PARAMETER_ERROR,
-                        "startTime or endTime for random date generator can not be null");
+                        "StartTime or endTime for random date generator can not be null");
             }
             Long startTime = Long.valueOf(params.get("startTime").toString());
             Long endTime = Long.valueOf(params.get("endTime").toString());
@@ -539,12 +539,12 @@ public abstract class GeneratorFactory<T extends BaseGenerator, V extends Object
         @Override
         public FixCharGenerator make(Map<String, String> params) {
             if (params == null) {
-                throw new MockerException(MockerError.PARAMETER_ERROR, "generator parameters can not be null");
+                throw new MockerException(MockerError.PARAMETER_ERROR, "Generator parameters can not be null");
             }
             String caseType = params.getOrDefault("caseOption", CharCaseOption.DEFAULT.name());
             String fixText = params.get("fixText");
             if (fixText == null || fixText.length() == 0) {
-                throw new MockerException(MockerError.PARAMETER_ERROR, "fix text can not be null or empty");
+                throw new MockerException(MockerError.PARAMETER_ERROR, "Fix text can not be null or empty");
             }
             CharCaseOption type = CharCaseOption.valueOf(caseType);
             return new FixCharGenerator(type, fixText);
@@ -558,12 +558,12 @@ public abstract class GeneratorFactory<T extends BaseGenerator, V extends Object
         @Override
         public RegExpGenerator make(Map<String, String> params) {
             if (params == null) {
-                throw new MockerException(MockerError.PARAMETER_ERROR, "generator for reg exp generator can not be null");
+                throw new MockerException(MockerError.PARAMETER_ERROR, "Generator for reg exp generator can not be null");
             }
             CharCaseOption type = CharCaseOption.valueOf(params.getOrDefault("caseOption", CharCaseOption.DEFAULT.name()));
             String regText = params.get("regText");
             if (regText == null) {
-                throw new MockerException(MockerError.PARAMETER_ERROR, "reg text can not be null");
+                throw new MockerException(MockerError.PARAMETER_ERROR, "Reg text can not be null");
             }
             return new RegExpGenerator(type, regText);
         }
@@ -591,10 +591,10 @@ public abstract class GeneratorFactory<T extends BaseGenerator, V extends Object
         @Override
         public StepGenerator make(Map<String, Object> params) {
             if (params == null) {
-                throw new MockerException(MockerError.PARAMETER_ERROR, "generator params for step generator can not be null");
+                throw new MockerException(MockerError.PARAMETER_ERROR, "Generator params for step generator can not be null");
             }
             if (params.get("step") == null) {
-                throw new MockerException(MockerError.PARAMETER_ERROR, "step for step generator can not be null");
+                throw new MockerException(MockerError.PARAMETER_ERROR, "Step for step generator can not be null");
             }
             Double step = Double.valueOf(params.get("step").toString());
             Boolean cycle = (Boolean) params.getOrDefault("round", Boolean.TRUE);
@@ -609,10 +609,10 @@ public abstract class GeneratorFactory<T extends BaseGenerator, V extends Object
         @Override
         public FixNumGenerator make(Map<String, Object> params) {
             if (params == null) {
-                throw new MockerException(MockerError.PARAMETER_ERROR, "param for fix generator can not be null");
+                throw new MockerException(MockerError.PARAMETER_ERROR, "Param for fix generator can not be null");
             }
             if (params.get("fixNum") == null) {
-                throw new MockerException(MockerError.PARAMETER_ERROR, "fix number for fix generator can not be null");
+                throw new MockerException(MockerError.PARAMETER_ERROR, "Fix number for fix generator can not be null");
             }
             BigDecimal fixNum = new BigDecimal(params.get("fixNum").toString());
             return new FixNumGenerator(fixNum);

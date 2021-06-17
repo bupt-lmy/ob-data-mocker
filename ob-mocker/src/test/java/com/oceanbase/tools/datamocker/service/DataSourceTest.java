@@ -130,7 +130,7 @@ public class DataSourceTest extends MockerTestBase {
     public void testDataSourceWithIllegalParam() throws IOException, SQLException {
         DataBaseConfig config = getDBConfig(ObModeType.OB_MYSQL);
         config.setHost(null);
-        expect.expectMessage("database's config is illegal");
+        expect.expectMessage("Database's config is illegal");
         expect.expect(MockerException.class);
         DataSource dataSource = new MockerDataSource(config, 3, 5, 2, params);
     }
@@ -138,7 +138,7 @@ public class DataSourceTest extends MockerTestBase {
     @Test
     public void testDataSourceWithIllegalPoolSize() throws IOException, SQLException {
         DataBaseConfig config = getDBConfig(ObModeType.OB_MYSQL);
-        expect.expectMessage("min pool size, max pool size or increase step can not be equal to or less than zero");
+        expect.expectMessage("Min pool size, max pool size or increase step can not be equal to or less than zero");
         expect.expect(MockerException.class);
         DataSource dataSource = new MockerDataSource(config, -3, -5, -4, params);
     }
@@ -146,7 +146,7 @@ public class DataSourceTest extends MockerTestBase {
     @Test
     public void testDataSourceWithIllegalPoolSize2() throws IOException, SQLException {
         DataBaseConfig config = getDBConfig(ObModeType.OB_MYSQL);
-        expect.expectMessage("min pool size can not be bigger than max pool size");
+        expect.expectMessage("Min pool size can not be bigger than max pool size");
         expect.expect(MockerException.class);
         DataSource dataSource = new MockerDataSource(config, 10, 5, 4, params);
     }

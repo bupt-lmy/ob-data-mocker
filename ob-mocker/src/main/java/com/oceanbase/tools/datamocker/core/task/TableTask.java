@@ -94,7 +94,7 @@ public class TableTask {
                 }
             }
             if (entry.getValue() <= 0) {
-                throw new MockerException(MockerError.PARAMETER_ERROR, "task size can not be equal to or smaller than zero");
+                throw new MockerException(MockerError.PARAMETER_ERROR, "Task size can not be equal to or smaller than zero");
             }
             for (int i = 0; i < entry.getValue(); i++) {
                 MockDataOutputTask outputTask = new MockDataOutputTask(taskBean.getMetaData(), this.context, writers);
@@ -116,7 +116,7 @@ public class TableTask {
     public void init(MockExecutorService service, AbstractCallBack<TableTaskContext> callBack) {
         if (callBack == null || service == null) {
             throw new MockerException(MockerError.PARAMETER_ERROR,
-                    "call back method or executor service can not be null for mock task bean");
+                    "Call back method or executor service can not be null for mock task bean");
         }
         TableTask thisTaskBean = this;
         beforeTask.bind(new AbstractCallBack<TableTaskContext>() {
@@ -132,7 +132,7 @@ public class TableTask {
                         service.submitCallable(task, param);
                     } else {
                         log.warn("thread pool has been shut down, mock task will be exited");
-                        callBack.onFailure(param, new MockerException("thread pool has been shutdown"));
+                        callBack.onFailure(param, new MockerException("Thread pool has been shutdown"));
                     }
                 }
             }
@@ -181,7 +181,7 @@ public class TableTask {
                     }
                 });
             } else {
-                throw new MockerException(MockerError.PARAMETER_ERROR, "unknown business task type");
+                throw new MockerException(MockerError.PARAMETER_ERROR, "Unknown business task type");
             }
         }
         afterTask.bind(new AbstractCallBack<TableTaskContext>() {
@@ -218,7 +218,7 @@ public class TableTask {
                 service.submitCallable(this.afterTask, this.context);
             } else {
                 log.warn("thread pool has been shut down, mock task will be exited");
-                callBack.onFailure(this.context, new MockerException("thread pool has been shutdown"));
+                callBack.onFailure(this.context, new MockerException("Thread pool has been shutdown"));
             }
         }
     }

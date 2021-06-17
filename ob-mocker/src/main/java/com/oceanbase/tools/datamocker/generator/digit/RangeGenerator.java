@@ -31,7 +31,7 @@ public class RangeGenerator extends DigitalGeneratorBase<BigDecimal> {
     public RangeGenerator(Map<Range<BigDecimal>, Double> weightMap) {
         this.weightMap = weightMap;
         if (weightMap == null) {
-            throw new MockerException("weight map can not be null");
+            throw new MockerException("Weight map can not be null");
         }
         Set<Range<BigDecimal>> keySet = weightMap.keySet();
         Iterator<Range<BigDecimal>> iter = keySet.iterator();
@@ -41,7 +41,7 @@ public class RangeGenerator extends DigitalGeneratorBase<BigDecimal> {
             result += weightMap.get(key);
         }
         if (result <= 1.0 && Math.abs(result - 1.0) > 0.01) {
-            throw new MockerException("weight values have to be added to one");
+            throw new MockerException("Weight values have to be added to one");
         }
     }
 
@@ -63,9 +63,9 @@ public class RangeGenerator extends DigitalGeneratorBase<BigDecimal> {
             }
         }
         if (validate == null) {
-            throw new MockerException(MockerError.VALUE_OUT_OFRANGE, "input range info is illegal");
+            throw new MockerException(MockerError.VALUE_OUT_OFRANGE, "Input range info is illegal");
         } else if (!validate) {
-            throw new MockerException(MockerError.VALUE_OUT_OFRANGE, "input range info is illegal");
+            throw new MockerException(MockerError.VALUE_OUT_OFRANGE, "Input range info is illegal");
         }
         return true;
     }

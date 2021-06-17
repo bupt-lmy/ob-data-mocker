@@ -34,7 +34,7 @@ public class MockDataOutputTask extends AbstractMockTask {
     public MockDataOutputTask(TableTaskMetaData metaData, TableTaskContext context, List<AbstractMockWriter> writers) {
         super(metaData, context);
         if (writers == null || writers.size() == 0) {
-            MockerException e = new MockerException(MockerError.PARAMETER_ERROR, "data writer can not be null or empty");
+            MockerException e = new MockerException(MockerError.PARAMETER_ERROR, "Data writer can not be null or empty");
             log.error("some errors occured when init mock data output task", e);
             throw e;
         }

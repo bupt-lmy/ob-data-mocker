@@ -21,7 +21,7 @@ public class FixNumGenerator extends DigitalGeneratorBase<BigDecimal> {
 
     public FixNumGenerator(BigDecimal fixNum) {
         if (fixNum == null) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "fix number for fix num generator can not be null");
+            throw new MockerException(MockerError.PARAMETER_ERROR, "Fix number for FixNumGenerator can not be null");
         }
         this.fixNum = fixNum;
     }

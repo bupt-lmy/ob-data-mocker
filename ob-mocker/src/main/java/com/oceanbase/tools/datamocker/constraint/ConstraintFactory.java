@@ -161,7 +161,7 @@ public abstract class ConstraintFactory {
                             /**
                              * oracle模式不支持检查约束的模拟数据
                              * */
-                            throw new MockerException(MockerError.NOT_SUPPORT_FEATURE, "check constraint is not support yet");
+                            throw new MockerException(MockerError.NOT_SUPPORT_FEATURE, "Check constraint is not support yet");
                         }
                     }
 
@@ -195,7 +195,7 @@ public abstract class ConstraintFactory {
                         List<ConstraintColumn> cols = SerializeUtil.getList(result, ConstraintColumn.class);
                         if (cols.size() != 0) {
                             // oracle模式不支持带有外键的表的模拟数据，直接抛错
-                            throw new MockerException(MockerError.NOT_SUPPORT_FEATURE, "foreign constraint is not support yet");
+                            throw new MockerException(MockerError.NOT_SUPPORT_FEATURE, "Foreign constraint is not support yet");
                         }
                     }
 
@@ -272,7 +272,7 @@ public abstract class ConstraintFactory {
             }
             if (limitCount < totalCount) {
                 throw new MockerException(MockerError.PARAMETER_ERROR,
-                        String.format("the given data generator can only generate %d unique data for cols {%s}, but the goal is %d",
+                        String.format("The given data generator can only generate %d unique data for cols {%s}, but the goal is %d",
                                 limitCount.intValue(), colSet.stream().collect(Collectors.joining(", ")), totalCount));
             }
         }
@@ -305,7 +305,7 @@ public abstract class ConstraintFactory {
                             Long position = (Long) item.getPosition();
                             map.putIfAbsent(item.getColumnName(), position.intValue());
                         } else {
-                            throw new MockerException(MockerError.ILLEGAL_RETURN_VALUE, "position's type is not support");
+                            throw new MockerException(MockerError.ILLEGAL_RETURN_VALUE, "Position's type is not support");
                         }
                         columnMap.put(item.getTableName(), map);
                     }
@@ -389,7 +389,7 @@ public abstract class ConstraintFactory {
                         AbstractDataType dataType = columnName2DataType.get(columnName);
                         if (dataType == null) {
                             throw new MockerException(MockerError.ILLEGAL_RETURN_VALUE,
-                                    String.format("data type for column \"%s.%s\" can not be null", table, columnName));
+                                    String.format("Data type for column \"%s.%s\" can not be null", table, columnName));
                         }
                         Object value = result.getObject(i + 1);
                         row.putIfAbsent(columnName, new Pair<>(dataType, value));
@@ -495,7 +495,7 @@ class MysqlValidation implements Validation {
                 TableColumn tableCol = SerializeUtil.getObject(result, TableColumn.class);
                 if (StringUtils.isNotBlank(tableCol.getExpression())) {
                     throw new MockerException(MockerError.NOT_SUPPORT_FEATURE,
-                            String.format("virtual column \"%s.%s\" for constraint is not support yet", tableCol.getTableName(),
+                            String.format("Virtual column \"%s.%s\" for constraint is not support yet", tableCol.getTableName(),
                                     tableCol.getColumnName()));
                 }
             }
@@ -530,7 +530,7 @@ class OracleValidation implements Validation {
                 TableColumn tableCol = SerializeUtil.getObject(result, TableColumn.class);
                 if ("YES".equals(tableCol.getVirtualColumn())) {
                     throw new MockerException(MockerError.NOT_SUPPORT_FEATURE,
-                            String.format("virtual column \"%s.%s\" for constraint is not support yet", tableCol.getTableName(),
+                            String.format("Virtual column \"%s.%s\" for constraint is not support yet", tableCol.getTableName(),
                                     tableCol.getColumnName()));
                 }
             }

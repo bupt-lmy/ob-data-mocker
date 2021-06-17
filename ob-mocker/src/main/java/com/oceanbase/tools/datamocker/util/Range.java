@@ -21,7 +21,7 @@ public class Range<T extends Comparable> {
 
     public Range(T min, T max) {
         if (min.compareTo(max) > 0) {
-            throw new MockerException("min value can not be bigger than max value");
+            throw new MockerException("Min value can not be bigger than max value");
         }
         this.min = min;
         this.max = max;
