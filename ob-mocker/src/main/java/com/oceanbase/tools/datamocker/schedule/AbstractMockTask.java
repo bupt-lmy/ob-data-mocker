@@ -94,7 +94,9 @@ public abstract class AbstractMockTask implements Callable<Void> {
                     context.setStatus(MockTaskStatus.FAILED);
                 }
             } else {
-                context.setStatus(MockTaskStatus.FAILED);
+                if (!MockTaskStatus.CANCELED.equals(context.getStatus())) {
+                    context.setStatus(MockTaskStatus.FAILED);
+                }
             }
             context.terminate();
             if (this.callBack != null) {

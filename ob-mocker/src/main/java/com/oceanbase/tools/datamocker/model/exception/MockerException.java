@@ -12,10 +12,6 @@ public class MockerException extends RuntimeException {
      * 错误码
      */
     private String errorCode;
-    /**
-     * 原始的错误
-     */
-    private Throwable originalThrowable;
 
     /**
      * 异常构造函数
@@ -62,18 +58,9 @@ public class MockerException extends RuntimeException {
      * @param originalThrowable 原始的异常抛出类
      */
     public MockerException(Throwable originalThrowable) {
-        super(originalThrowable);
-        this.originalThrowable = originalThrowable;
+        super(originalThrowable.getMessage());
+        this.initCause(originalThrowable);
         this.errorCode = MockerError.UNKNOWN_ERROR.name();
-    }
-
-    /**
-     * 获取原始的异常对象
-     *
-     * @return 返回原始的异常对象
-     */
-    public Throwable getOriginalThrowable() {
-        return this.originalThrowable;
     }
 
     /**
@@ -82,4 +69,5 @@ public class MockerException extends RuntimeException {
     public String getErrorCode() {
         return this.errorCode;
     }
+
 }

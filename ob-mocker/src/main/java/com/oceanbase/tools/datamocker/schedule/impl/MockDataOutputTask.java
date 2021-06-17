@@ -72,6 +72,9 @@ public class MockDataOutputTask extends AbstractMockTask {
             } catch (Throwable e) {
                 exception = e;
                 log.error("some errors occured when write data", e);
+                if (e instanceof InterruptedException) {
+                    Thread.currentThread().interrupt();
+                }
             }
         }
         if (exception != null) {
