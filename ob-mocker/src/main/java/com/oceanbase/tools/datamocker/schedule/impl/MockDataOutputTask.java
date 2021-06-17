@@ -6,6 +6,7 @@ import java.util.List;
 import com.oceanbase.tools.datamocker.core.task.TableTaskContext;
 import com.oceanbase.tools.datamocker.core.task.TableTaskMetaData;
 import com.oceanbase.tools.datamocker.core.write.AbstractMockWriter;
+import com.oceanbase.tools.datamocker.model.enums.MockTaskStatus;
 import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
 import com.oceanbase.tools.datamocker.schedule.AbstractMockTask;
@@ -72,7 +73,7 @@ public class MockDataOutputTask extends AbstractMockTask {
             } catch (Throwable e) {
                 exception = e;
                 log.error("some errors occured when write data", e);
-                if (e instanceof InterruptedException) {
+                if (e instanceof InterruptedException || MockTaskStatus.CANCELED.equals(context.getStatus())) {
                     Thread.currentThread().interrupt();
                 }
             }
