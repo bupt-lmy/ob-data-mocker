@@ -207,7 +207,7 @@ public abstract class AbstractScheduler {
                 }
             }
             clearResource(dispatcher);
-            log.info("Scheduled task execution completed, totalTaskExecuted={}", totalCount);
+            log.info("Scheduled task execution completed, totalTaskExecuted={}, duration={}", totalCount, getDuration());
             MDC.clear();
             return totalCount;
         };
@@ -284,6 +284,24 @@ public abstract class AbstractScheduler {
      */
     private long interval() {
         return System.currentTimeMillis() - startTimestamp;
+    }
+
+    /**
+     * Get duration string value
+     *
+     * @return duration string value
+     * */
+    private String getDuration() {
+        long minMillis = 60 * 1000L;
+        long hourMills = minMillis * 60;
+        long duration = interval();
+        if (duration < minMillis) {
+            return String.format("%.2f s", duration / 1000.0);
+        } else if (duration < hourMills) {
+            return String.format("%.2f min", duration / 1000.0 / 60);
+        } else {
+            return String.format("%.2f hrs", duration / 1000.0 / 60 / 60);
+        }
     }
 
     /**
