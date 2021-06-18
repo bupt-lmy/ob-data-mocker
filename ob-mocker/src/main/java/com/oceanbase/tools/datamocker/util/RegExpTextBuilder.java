@@ -47,7 +47,7 @@ public class RegExpTextBuilder {
      */
     public RegExpTextBuilder(String regex, Random random) {
         if (StringUtils.isBlank(regex) || random == null) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "reg exp or random obj can not be null");
+            throw new MockerException(MockerError.PARAMETER_ERROR, "RegExp or random obj can not be null");
         }
         this.automaton = new RegExp(requote(regex)).toAutomaton();
         this.random = random;
@@ -94,7 +94,7 @@ public class RegExpTextBuilder {
                     return builder.toString();
                 } else {
                     throw new MockerException(
-                            String.format("reached accept state before min length (current = %d < min = %d)", walkLength, minLength));
+                            String.format("Reached accept state before min length (current = %d < min = %d)", walkLength, minLength));
                 }
             }
             List<Transition> nonFinalTransitions = transitions.stream()
@@ -124,7 +124,7 @@ public class RegExpTextBuilder {
             return builder.toString();
         } else {
             throw new MockerException(String.format(
-                    "exceeded max walk length (%d) before reaching an accept state: target length was %d (min length = %d)", maxLength,
+                    "Exceeded max walk length (%d) before reaching an accept state: target length was %d (min length = %d)", maxLength,
                     targetLength, minLength));
         }
     }

@@ -25,10 +25,10 @@ public class RandomNumGenerator extends CharGeneratorBase {
     public RandomNumGenerator(CharCaseOption caseOption, Long start, Long end) {
         super(caseOption);
         if (start == null || end == null) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "start or end for random number generator can not be null");
+            throw new MockerException(MockerError.PARAMETER_ERROR, "Start or end for random number generator can not be null");
         }
         if (start.compareTo(end) >= 0) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "start for random number generator can not be bigger than end");
+            throw new MockerException(MockerError.PARAMETER_ERROR, "Start for random number generator can not be bigger than end");
         }
         this.start = start;
         this.end = end;
@@ -39,10 +39,10 @@ public class RandomNumGenerator extends CharGeneratorBase {
         int min = this.start.toString().length();
         int max = this.end.toString().length();
         if (min > maxLength) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "start number is illegal");
+            throw new MockerException(MockerError.PARAMETER_ERROR, "Start number is illegal");
         }
         if (max < minLength) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "end number is illegal");
+            throw new MockerException(MockerError.PARAMETER_ERROR, "End number is illegal");
         }
         if (min < minLength) {
             this.start = new Double(Math.pow(10, minLength - 1)).longValue();
@@ -58,7 +58,7 @@ public class RandomNumGenerator extends CharGeneratorBase {
         Long interval = end - start;
         Long result = new Double(Math.random() * interval + start).longValue();
         if (result.toString().length() < minLength || result.toString().length() > maxLength) {
-            throw new MockerException("number result for random number generator is illegal");
+            throw new MockerException("Number result for random number generator is illegal");
         }
         return result.toString();
     }

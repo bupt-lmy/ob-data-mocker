@@ -28,7 +28,7 @@ public class StepGenerator extends DigitalGeneratorBase<BigDecimal> {
 
     public StepGenerator(double step, boolean round) {
         if (step == 0) {
-            throw new MockerException("step can not be zero");
+            throw new MockerException("Step can not be zero");
         }
         this.step = step;
         this.round = round;
@@ -36,7 +36,7 @@ public class StepGenerator extends DigitalGeneratorBase<BigDecimal> {
 
     public StepGenerator(double step) {
         if (step == 0) {
-            throw new MockerException("step can not be zero");
+            throw new MockerException("Step can not be zero");
         }
         this.step = step;
         this.round = false;
@@ -67,7 +67,7 @@ public class StepGenerator extends DigitalGeneratorBase<BigDecimal> {
             if (round) {
                 currentDigit = maxValue;
             } else {
-                throw new MockerException("can not generate more unique number");
+                throw new MockerException("Can not generate more unique number");
             }
         }
         return currentDigit;
@@ -90,7 +90,7 @@ public class StepGenerator extends DigitalGeneratorBase<BigDecimal> {
             if (round) {
                 currentDigit = minValue;
             } else {
-                throw new MockerException("can not generate more unique number");
+                throw new MockerException("Can not generate more unique number");
             }
         }
         return currentDigit;

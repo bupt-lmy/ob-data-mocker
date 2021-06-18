@@ -33,7 +33,7 @@ public class FixIntervalYMGenerator extends BaseGenerator<Integer, INTERVALYM> {
 
     public FixIntervalYMGenerator(String fixText) {
         if (fixText == null) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "interval value for generator can not be null");
+            throw new MockerException(MockerError.PARAMETER_ERROR, "Interval value for generator can not be null");
         }
         this.fixText = fixText;
     }
@@ -44,17 +44,17 @@ public class FixIntervalYMGenerator extends BaseGenerator<Integer, INTERVALYM> {
         if (matcher.find()) {
             String intervalVal = matcher.group(1);
             if (intervalVal == null || intervalVal.length() == 0) {
-                throw new MockerException(MockerError.PARAMETER_ERROR, "interval value is illegal for INTERVALYM");
+                throw new MockerException(MockerError.PARAMETER_ERROR, "Interval value is illegal for INTERVALYM");
             }
             int yearLen = intervalVal.split("\\-")[0].length();
             if (yearLen < leftLimit || yearLen > rightLimit) {
                 throw new MockerException(MockerError.PARAMETER_ERROR,
-                        String.format("interval value \"%s\" is out of bound for limit [%d,%d]", intervalVal, leftLimit, rightLimit));
+                        String.format("Interval value \"%s\" is out of bound for limit [%d,%d]", intervalVal, leftLimit, rightLimit));
             }
             this.value = intervalVal;
         } else {
             throw new MockerException(MockerError.PARAMETER_ERROR,
-                    String.format("fix text \"%s\" for INTERVAL YEAR TO MONTH is illegal, value pattern is \"%s\"", this.fixText,
+                    String.format("Fix text \"%s\" for INTERVAL YEAR TO MONTH is illegal, value pattern is \"%s\"", this.fixText,
                             "INTERVAL 'integer [- integer]' {YEAR | MONTH} [(precision)][TO {YEAR | MONTH}]"));
         }
         return true;

@@ -81,7 +81,7 @@ public class MockerFile {
         if (!file.getParentFile().exists()) {
             if (!file.getParentFile().mkdirs()) {
                 throw new MockerException(MockerError.OPERATION_FAILURE,
-                        String.format("fail to create dir \"%s\"", file.getParent()));
+                        String.format("Fail to create dir \"%s\"", file.getParent()));
             }
         }
         file.createNewFile();

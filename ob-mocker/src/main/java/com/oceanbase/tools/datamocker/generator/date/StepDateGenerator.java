@@ -72,7 +72,7 @@ public class StepDateGenerator extends DateGeneratorBase<Date> {
             if (cycle) {
                 timestamp = endTime;
             } else {
-                throw new MockerException(MockerError.OPERATION_FAILURE, "can not generate more unique date");
+                throw new MockerException(MockerError.OPERATION_FAILURE, "Can not generate more unique date");
             }
         }
         return timestamp;
@@ -93,7 +93,7 @@ public class StepDateGenerator extends DateGeneratorBase<Date> {
             if (cycle) {
                 timestamp = startTime;
             } else {
-                throw new MockerException(MockerError.OPERATION_FAILURE, "can not generate more unique date");
+                throw new MockerException(MockerError.OPERATION_FAILURE, "Can not generate more unique date");
             }
         }
         return timestamp;

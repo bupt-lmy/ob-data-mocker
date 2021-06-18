@@ -29,7 +29,7 @@ public class MysqlCharType extends AbstractCharDataType {
         super(generator, ObModeType.OB_MYSQL, charsetType, length, defaultValue, allowNull, isUnicode);
         if (length > 256 || length <= 0) {
             throw new MockerException(MockerError.PARAMETER_ERROR,
-                    "length for char type of mysql can not be larger than 256 or smaller than 0");
+                    "Length for char type of mysql can not be larger than 256 or smaller than 0");
         }
     }
 
@@ -44,7 +44,7 @@ public class MysqlCharType extends AbstractCharDataType {
         super(ObModeType.OB_MYSQL, charsetType, length, defaultValue, allowNull, isUnicode);
         if (length > 256 || length <= 0) {
             throw new MockerException(MockerError.PARAMETER_ERROR,
-                    "length for char type of mysql can not be larger than 256 or smaller than 0");
+                    "Length for char type of mysql can not be larger than 256 or smaller than 0");
         }
     }
 

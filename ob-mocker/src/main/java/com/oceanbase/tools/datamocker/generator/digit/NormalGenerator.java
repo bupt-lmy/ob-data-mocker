@@ -38,9 +38,9 @@ public class NormalGenerator extends DigitalGeneratorBase<BigDecimal> {
     public Boolean preCheck(BigDecimal minValue, BigDecimal maxValue) {
         BigDecimal avg = new BigDecimal(Double.toString(average));
         if (avg.compareTo(minValue) < 0) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "avg value is illegal for min value");
+            throw new MockerException(MockerError.PARAMETER_ERROR, "Avg value is illegal for min value");
         } else if (avg.compareTo(maxValue) >= 0) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "avg value is illegal for max value");
+            throw new MockerException(MockerError.PARAMETER_ERROR, "Avg value is illegal for max value");
         }
         return true;
     }
