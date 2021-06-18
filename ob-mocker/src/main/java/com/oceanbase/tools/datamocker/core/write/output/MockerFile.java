@@ -65,9 +65,9 @@ public class MockerFile {
     public void close() {
         try {
             this.output.close();
-            log.info("file manager will be shut down, file manager has been closed");
+            log.info("File manager has been successfully closed");
         } catch (IOException e) {
-            log.error("fail to close a out put stream", e);
+            log.error("File manager has been closed failed", e);
         }
     }
 

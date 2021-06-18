@@ -35,7 +35,8 @@ public class DefaultScheduler extends AbstractScheduler {
     protected Set<Set<String>> scheduleColumnTask(Set<String> groups, int active, int core, int max) {
         int allocate = (int) ((max - active) * 0.7) - 1;
         if (allocate <= 0) {
-            log.error("fail to schedule task, free thread resource is {}, which is equal to or smaller than zero", allocate);
+            log.error("The scheduling task failed because the idle thread resources are less than or equal to zero, freeThreadCount={}",
+                    allocate);
             return null;
         }
         int size = groups.size();
@@ -72,7 +73,8 @@ public class DefaultScheduler extends AbstractScheduler {
     protected Map<Set<String>, Integer> scheduleDataTask(Set<String> groups, int active, int core, int max) {
         int allocate = (int) ((max - active) * 0.7) - 1;
         if (allocate <= 0) {
-            log.error("fail to schedule task, free thread resource is {}, which is equal to or smaller than zero", allocate);
+            log.error("The scheduling task failed because the idle thread resources are less than or equal to zero, freeThreadCount={}",
+                    allocate);
             return null;
         }
         if (allocate > this.maxConnectionSize - 2) {

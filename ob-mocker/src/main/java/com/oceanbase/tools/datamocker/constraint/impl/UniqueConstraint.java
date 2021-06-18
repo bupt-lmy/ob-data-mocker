@@ -87,7 +87,7 @@ public class UniqueConstraint extends AbstractConstraint {
         }
         if (markable) {
             if (!judger.add(checkValue)) {
-                log.warn(String.format("fail to add row \"%s\" to dup util", checkValue));
+                log.warn("Fail to add row to DuplicatedJudger, row={}", checkValue);
             }
         }
         return true;

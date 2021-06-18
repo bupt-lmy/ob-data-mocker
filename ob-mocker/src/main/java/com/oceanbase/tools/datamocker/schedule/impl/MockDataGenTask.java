@@ -70,17 +70,17 @@ public class MockDataGenTask extends AbstractMockTask {
     private void validateParam(MockerBuffer buffer, List<ColumnReader> readers, List<AbstractConstraint> constraints) {
         if (buffer == null) {
             MockerException e = new MockerException(MockerError.PARAMETER_ERROR, "Buffer for business task can not be null");
-            log.error("errors happen when init mock business task", e);
+            log.error("Initialization of the data generation task failed because the buffer is null", e);
             throw e;
         }
         if (readers == null) {
             MockerException e = new MockerException(MockerError.PARAMETER_ERROR, "Column readers for business task can not be null");
-            log.error("errors happen when init mock business task", e);
+            log.error("Initialization of the data generation task failed because the column reader list is null", e);
             throw e;
         }
         if (constraints == null) {
             MockerException e = new MockerException(MockerError.PARAMETER_ERROR, "Constraints for business task can not be null");
-            log.error("errors happen when init mock business task", e);
+            log.error("Initialization of the data generation task failed because the constraint list is null", e);
             throw e;
         }
     }
@@ -91,7 +91,7 @@ public class MockDataGenTask extends AbstractMockTask {
         this.readers.forEach(columnReader -> {
             columnNames.add(columnReader.columnName());
         });
-        log.info("data generate task is running. threadName={},columnName={}", Thread.currentThread().getName(),
+        log.info("Start the data generation task, threadName={},columnName={}", Thread.currentThread().getName(),
                 String.join(",", columnNames));
         long counter = 0;
         // 循环空转计数器，通常空转超过totalCount还未写入任意一条数据则认为写入异常
@@ -135,7 +135,7 @@ public class MockDataGenTask extends AbstractMockTask {
             counter--;
         } catch (Exception e) {
             exception = e;
-            log.error("some errors occured when mocking data", e);
+            log.error("Data generation task execution failed", e);
         } finally {
             long writeTimeout = metaData.getTimeoutMilliseconds() - this.interval();
             if (writeTimeout < 0) {
@@ -147,15 +147,15 @@ public class MockDataGenTask extends AbstractMockTask {
             throw exception;
         }
         if (Thread.currentThread().isInterrupted()) {
-            log.warn("data mock business thread has been interrupted, {} data have been generated, run {}ms", counter, interval());
+            log.warn("Data generation task execution is interrupted, totalDataGenerated={}, duration={}ms", counter, interval());
             throw new InterruptedException("data mock business has been interrupted by user");
         }
         if (this.interval() >= metaData.getTimeoutMilliseconds()) {
-            log.warn("data mock business thread has been terminated cause timeout, {} data have been generated, run {}ms", counter,
+            log.warn("Data generation task execution timed out, totalDataGenerated={}, duration={}ms", counter,
                     interval());
         }
         if (counter >= metaData.getTotalCount()) {
-            log.info("data mock business thread has been executed successfully, {} data have been generated, run {}ms", counter,
+            log.info("Data generation task is executed successfully, totalDataGenerated={}, duration={}ms", counter,
                     interval());
         }
         context.appendDataGenInfo(counter);

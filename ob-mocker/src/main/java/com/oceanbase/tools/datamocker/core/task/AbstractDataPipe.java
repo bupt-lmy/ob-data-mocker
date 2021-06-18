@@ -79,7 +79,8 @@ public abstract class AbstractDataPipe<T> {
                 notFullCondition.await(CONDITION_WAIT_TIMEOUTSEC, TimeUnit.SECONDS);
             }
             if (maxLoopCount == -1) {
-                log.warn("timeout for pipeline write in, will return. currentSize={},maxRetained={},threadName={}", size(), maxRetained,
+                log.warn("Data pipeline write operation timed out and will return, currentSize={}, maxRetained={}, threadName={}", size(),
+                        maxRetained,
                         Thread.currentThread().getName());
                 return;
             }
@@ -145,7 +146,8 @@ public abstract class AbstractDataPipe<T> {
                 notEmptyCondition.await(CONDITION_WAIT_TIMEOUTSEC, TimeUnit.SECONDS);
             }
             if (maxLoopCount == -1) {
-                log.warn("timeout for pipeline read out, will return. currentSize={},maxRetained={},threadName={}", size(), maxRetained,
+                log.warn("Data pipeline read operation timed out and will return, currentSize={}, maxRetained={}, threadName={}", size(),
+                        maxRetained,
                         Thread.currentThread().getName());
                 return Collections.emptyList();
             }

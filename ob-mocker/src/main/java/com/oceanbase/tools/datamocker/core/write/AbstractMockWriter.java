@@ -33,7 +33,7 @@ public abstract class AbstractMockWriter {
     public void register(AbstractDataPipe dataPipe) {
         if (dataPipe == null) {
             MockerException e = new MockerException(MockerError.PARAMETER_ERROR, "Data pipe can not be null");
-            log.error("data pipe for sql script writer is necessary", e);
+            log.error("MockWriter is not bound to data pipeline", e);
             throw e;
         }
         this.dataPipe = dataPipe;
@@ -47,7 +47,7 @@ public abstract class AbstractMockWriter {
     public Long write() throws Throwable {
         if (this.dataPipe == null) {
             MockerException e = new MockerException(MockerError.PARAMETER_ERROR, "Data pipe can not be null");
-            log.error("can not read any data from pipe, cause the data pipe is null", e);
+            log.error("Fail to read any data from the data pipe because the data pipe is null", e);
             throw e;
         }
         List<Map<String, Pair<AbstractDataType, Object>>> rows = this.dataPipe.read(10, TimeUnit.SECONDS);

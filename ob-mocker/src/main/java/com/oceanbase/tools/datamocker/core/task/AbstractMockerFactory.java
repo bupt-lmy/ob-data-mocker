@@ -172,12 +172,12 @@ public abstract class AbstractMockerFactory {
         SqlUtil.executeQuery(this.innerDatasource, sql, null, new AbstractCallBack<ResultSet>() {
             @Override
             public void doOnSuccess(ResultSet result) {
-                log.info(String.format("validate table \"%s\".\"%s\" successfully", schema, table));
+                log.info("Verify the existence of the database table successfully, schema={}, table={}", schema, table);
             }
 
             @Override
             public void doOnFailure(ResultSet result, Throwable e) {
-                log.error(String.format("fail to validate \"%s\".\"%s\"", schema, table), e);
+                log.error("Fail to verify the existence of database table, schema={}, table={}", schema, table, e);
                 throw new MockerException(MockerError.OPERATION_FAILURE, e.getMessage());
             }
         });

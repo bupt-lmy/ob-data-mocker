@@ -103,17 +103,17 @@ public class SqlScriptWriter extends AbstractMockWriter {
             String tableName) {
         if (manager == null) {
             MockerException e = new MockerException(MockerError.PARAMETER_ERROR, "File manager can not be null");
-            log.error("file manager for sql script writer is necessary", e);
+            log.error("SQL script writer is missing file manager", e);
             throw e;
         }
         if (database == null) {
             MockerException e = new MockerException(MockerError.PARAMETER_ERROR, "Database can not be null");
-            log.error("database for sql script writer is necessary", e);
+            log.error("SQL script writer is missing schema name", e);
             throw e;
         }
         if (tableName == null) {
             MockerException e = new MockerException(MockerError.PARAMETER_ERROR, "Table name can not be null");
-            log.error("table name for sql script writer is necessary", e);
+            log.error("SQL script writer is missing table name", e);
             throw e;
         }
         if (dialectType != null) {

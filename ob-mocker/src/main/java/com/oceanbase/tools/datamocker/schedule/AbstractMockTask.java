@@ -67,13 +67,13 @@ public abstract class AbstractMockTask implements Callable<Void> {
                     boolean shutdownResult = context.terminate();
                     context.setStatus(MockTaskStatus.FAILED);
                     log.error(
-                            "some errors happened when onSuccess call back method executed, context has been shutdown. shutdownResult={},"
+                            "Some errors happened when onSuccess call back method executed, context has been shutdown. shutdownResult={},"
                             + "status={}", shutdownResult, "FAILED", e);
                 }
             }
             return null;
         } catch (Throwable e) {
-            log.error("some errors happened when mock task executed", e);
+            log.error("Fail to execute mock data task", e);
             Throwable exception = e;
             while (true) {
                 if (exception instanceof InterruptedException) {
@@ -89,7 +89,7 @@ public abstract class AbstractMockTask implements Callable<Void> {
                     /**
                      * data mock task has been interrupted
                      */
-                    log.warn("data mock business thread has been interrupted. duration={}ms,status={}", interval(), context.getStatus());
+                    log.warn("Mock data task is interrupted, duration={}ms,status={}", interval(), context.getStatus());
                 } else {
                     context.setStatus(MockTaskStatus.FAILED);
                 }
@@ -104,7 +104,7 @@ public abstract class AbstractMockTask implements Callable<Void> {
                 try {
                     this.callBack.onFailure(context, e);
                 } catch (Throwable e1) {
-                    log.error("some errors happend when execute onFailure call back method. status={}", finalStatus, e);
+                    log.error("Some errors happend when execute onFailure call back method. status={}", finalStatus, e);
                 }
                 context.setStatus(finalStatus);
             }

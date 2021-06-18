@@ -122,8 +122,8 @@ public class TableTask {
         beforeTask.bind(new AbstractCallBack<TableTaskContext>() {
             @Override
             public void doOnSuccess(TableTaskContext param) throws Throwable {
-                log.info("mock before has been executed, task's status is {}, begin to execute business tasks",
-                        MockTaskStatus.RUNNING.name());
+                log.info("The Mock data preparation task has been completed, and the business task has begun to run, taskStatus={}",
+                        MockTaskStatus.RUNNING);
                 for (AbstractMockTask task : thisTaskBean.businessTasks) {
                     if (task instanceof MockDataGenTask) {
                         ((MockDataGenTask) task).setConstraints(param.getConstraints());
@@ -131,7 +131,7 @@ public class TableTask {
                     if (!service.isShutdown() && !context.isShutdown()) {
                         service.submitCallable(task, param);
                     } else {
-                        log.warn("thread pool has been shut down, mock task will be exited");
+                        log.warn("The thread pool has been closed, and the mock data task will exit");
                         callBack.onFailure(param, new MockerException("Thread pool has been shutdown"));
                     }
                 }
@@ -139,8 +139,8 @@ public class TableTask {
 
             @Override
             public void doOnFailure(TableTaskContext param, Throwable e) throws Throwable {
-                log.error("fail to execute mock before task, task status is {}, mock business tasks will not be droped", param.getStatus(),
-                        e);
+                log.error("The mock data preparation task fails to execute, and the business task will not be executed, taskStatus={}",
+                        param.getStatus(), e);
                 callBack.onFailure(param, e);
             }
         });
@@ -150,14 +150,14 @@ public class TableTask {
                 businessTask.bind(new AbstractCallBack<TableTaskContext>() {
                     @Override
                     public void doOnSuccess(TableTaskContext param) throws Throwable {
-                        log.info("data generate business task has been executed completely, generate {} items totally, task status is {}",
+                        log.info("Data generation task completed, numberOfDataGeneration={}, taskStatus={}",
                                 param.getTotalDataGenerateCount(), param.getStatus());
                         startAfterTask(service, callBack);
                     }
 
                     @Override
                     public void doOnFailure(TableTaskContext param, Throwable e) throws Throwable {
-                        log.error("fail to execute data generate business task, task status is {}", param.getStatus(), e);
+                        log.error("Data generation task execution failed, taskStatus={}", param.getStatus(), e);
                         startAfterTask(service, callBack);
                     }
                 });
@@ -169,14 +169,13 @@ public class TableTask {
                         for (Map.Entry<String, Long> item : param.getWriterName2writeCount().entrySet()) {
                             builder.append("{\"" + item.getKey() + "\" : " + item.getValue() + "} ");
                         }
-                        log.info("data write business task has been executed completely, generate {}items totally, task status is {}",
-                                builder.toString(), param.getStatus());
+                        log.info("Data writing task is completed, taskStatus={}, writingInfo={}", param.getStatus(), builder.toString());
                         startAfterTask(service, callBack);
                     }
 
                     @Override
                     public void doOnFailure(TableTaskContext param, Throwable e) throws Throwable {
-                        log.error("fail to execute data write business task, task status is {}", param.getStatus(), e);
+                        log.error("Fail to execute data writing task, taskStatus={}", param.getStatus(), e);
                         startAfterTask(service, callBack);
                     }
                 });
@@ -191,15 +190,14 @@ public class TableTask {
                         thisTaskBean.getStatus())) {
                     param.setStatus(MockTaskStatus.SUCCESS);
                 }
-                log.info("mock after task has been executed successfully, current record size is {}, task status is {}",
-                        param.getCurrentRecordNum(),
-                        param.getStatus());
+                log.info("The mock data destruction task is executed successfully, currentRecordNum={}, taskStatus={}",
+                        param.getCurrentRecordNum(), param.getStatus());
                 callBack.onSuccess(param);
             }
 
             @Override
             public void doOnFailure(TableTaskContext param, Throwable e) throws Throwable {
-                log.error("fail to execute mock after task, task status is {}", param.getStatus(), e);
+                log.error("Failed to execute simulation data destruction task, taskStatus={}", param.getStatus(), e);
                 callBack.onFailure(param, e);
             }
         });
@@ -213,11 +211,11 @@ public class TableTask {
      */
     private void startAfterTask(MockExecutorService service, AbstractCallBack callBack) throws Throwable {
         if (counter.incrementAndGet() == this.businessTasks.size()) {
-            log.info("all mock business tasks has been executed, mock after task will begin");
+            log.info("All mock data business tasks are completed, and the destructuring task is started");
             if (!service.isShutdown() && !context.isShutdown()) {
                 service.submitCallable(this.afterTask, this.context);
             } else {
-                log.warn("thread pool has been shut down, mock task will be exited");
+                log.warn("The thread pool has been closed, and the mock data task will exit");
                 callBack.onFailure(this.context, new MockerException("Thread pool has been shutdown"));
             }
         }

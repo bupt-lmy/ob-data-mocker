@@ -34,7 +34,7 @@ public class MockDataAfterTask extends AbstractMockTask {
         super(metaData, context);
         if (dataSource == null) {
             MockerException e = new MockerException(MockerError.PARAMETER_ERROR, "Datasource can not be null");
-            log.error("fail to init mock data after task, datasource can not be null", e);
+            log.error("The initialization of the mock data destruction task failed because the data source could not be found", e);
             throw e;
         }
         this.dataSource = dataSource;
@@ -42,7 +42,7 @@ public class MockDataAfterTask extends AbstractMockTask {
 
     @Override
     public Void execute(TableTaskMetaData metaData, TableTaskContext context) throws Throwable {
-        log.info("begin execute mock after task");
+        log.info("Start the mock data destruction task");
         String sql;
         if (ObModeType.OB_ORACLE.equals(metaData.getDialectType())) {
             sql = String.format("select count(*) from \"%s\".\"%s\"; ", DbObjectNameUtil.doubleCharToEscape(metaData.getSchema(), '"'),
@@ -52,7 +52,8 @@ public class MockDataAfterTask extends AbstractMockTask {
                     DbObjectNameUtil.doubleCharToEscape(metaData.getTableName(), '`'));
         } else {
             MockerException e = new MockerException(MockerError.INVALID_OB_MODE);
-            log.error("fail to execute after task for mock", e);
+            log.error("Fail to execute mock data destruction task because the ObModeType is illegal, obModeType={}",
+                    metaData.getDialectType(), e);
             throw e;
         }
         SqlUtil.executeQuery(this.dataSource, sql, null, new AbstractCallBack<ResultSet>() {
@@ -72,7 +73,7 @@ public class MockDataAfterTask extends AbstractMockTask {
 
             @Override
             public void doOnFailure(ResultSet resultSet, Throwable e) throws Throwable {
-                log.error("fail to execute after task for mock", e);
+                log.error("Fail to execute mock data destruction task", e);
                 throw e;
             }
         });

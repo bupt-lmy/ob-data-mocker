@@ -179,7 +179,7 @@ public class MockerDataSource implements DataSource {
             DriverManager.setLoginTimeout(15);
             Class.forName(className);
         } catch (ClassNotFoundException e) {
-            log.error("fail to init datasource", e);
+            log.error("Data source initialization failed", e);
         }
     }
 
@@ -213,28 +213,31 @@ public class MockerDataSource implements DataSource {
             }
             if (liveConnectionCount < minPoolSize) {
                 int interval = minPoolSize - liveConnectionCount;
-                log.info("current live connection's count is {}, begin to init pool size to {}, triggered by thread \"{}\"",
-                        liveConnectionCount,
-                        liveConnectionCount + interval, Thread.currentThread().getName());
+                log.info(
+                        "The number of surviving connections is less than the minimum number of connections, start adding connections, "
+                        + "liveConnectionsCount={}, minPoolSize={}, triggeredThreadName={}",
+                        liveConnectionCount, liveConnectionCount + interval, Thread.currentThread().getName());
                 for (int i = 0; i < interval; i++) {
                     this.connectionPool.push(getConnection(username.toString(), this.config.getPassword()));
                 }
             } else if (liveConnectionCount > maxPoolSize) {
                 int count = Math.min(liveConnectionCount - maxPoolSize, connectionPool.size());
-                log.info("current live connection's count is {}, begin to reduce pool size to {}, triggered by \"{}\"", liveConnectionCount,
-                        liveConnectionCount - count, Thread.currentThread().getName());
+                log.info(
+                        "The number of surviving connections is greater than the maximum number of connections, start to reduce the "
+                        + "number of connections, liveConnectionsCount={}, maxPoolSize={}, triggeredThreadName={}",
+                        liveConnectionCount, liveConnectionCount - count, Thread.currentThread().getName());
                 for (int i = 0; i < count; i++) {
                     try {
                         connectionPool.pop().close();
                     } catch (SQLException e) {
-                        log.error("fail to close a connection", e);
+                        log.error("Fail to close the connection", e);
                     }
                 }
             } else {
                 int realStep = Math.min(maxPoolSize - liveConnectionCount, this.increaseStep);
-                log.info("current live connection's count is {}, begin to increase pool size to {}, triggered by \"{}\"",
-                        liveConnectionCount,
-                        liveConnectionCount + realStep, Thread.currentThread().getName());
+                log.info(
+                        "The number of surviving connections is between the maximum and minimum values, and the connections begin to expand, liveConnectionsCount={}, targetPoolSize={}, triggeredThreadName={}",
+                        liveConnectionCount, liveConnectionCount + realStep, Thread.currentThread().getName());
                 for (int i = 0; i < realStep; i++) {
                     this.connectionPool.push(getConnection(username.toString(), this.config.getPassword()));
                 }
@@ -243,7 +246,7 @@ public class MockerDataSource implements DataSource {
                 noMoreConnection.signalAll();
             }
         } catch (SQLException e) {
-            log.error("some errors happen when refresh connection pool", e);
+            log.error("Fail to refresh connection pool", e);
         } finally {
             lock.unlock();
         }
@@ -254,10 +257,12 @@ public class MockerDataSource implements DataSource {
         lock.lock();
         try {
             if (this.connectionPool.size() == 0) {
-                log.warn("there are no more connections for thread \"{}\" in pool, need to refresh", Thread.currentThread().getName());
+                log.warn("There are no more connections available in the connection pool, start refreshing, triggeredThreadName={}",
+                        Thread.currentThread().getName());
                 refresh();
                 if (this.connectionPool.size() == 0) {
-                    log.warn("fail to free any connections from pool, current thread \"{}\" await", Thread.currentThread().getName());
+                    log.warn("No connection is released from the connection pool, the thread starts to wait, threadName={}",
+                            Thread.currentThread().getName());
                     noMoreConnection.await(3, TimeUnit.SECONDS);
                     return getConnection();
                 }
@@ -267,12 +272,13 @@ public class MockerDataSource implements DataSource {
                 return getConnection();
             }
             this.connectionInUse.add(connection);
-            log.info(
-                    "thread \"{}\" get connection from pool successfully, current pool size is {}, current size of connection in use is {}",
+            log.debug(
+                    "The thread gets the database connection from the connection pool successfully, threadName={}, currentPoolSize={}, "
+                    + "connectionInUseSize={}",
                     Thread.currentThread().getName(), this.connectionPool.size(), this.connectionInUse.size());
             return connection;
         } catch (InterruptedException e) {
-            log.error("some errors happen when wait on read lock", e);
+            log.error("Thread waiting for connection pool read lock failed, threadName={}", Thread.currentThread().getName(), e);
             throw new SQLException(e.getMessage());
         } finally {
             lock.unlock();
@@ -286,21 +292,21 @@ public class MockerDataSource implements DataSource {
         if (lock.tryLock()) {
             try {
                 int count = connectionPool.size();
-                log.info("connection pool will be shut down, there are {} connections in pool, needed to be close", count);
+                log.info("The database connection pool will be closed, the free database connection needs to be closed, currentPoolSize={}",
+                        count);
                 int clearSize = 0;
                 for (int i = 0; i < count; i++) {
                     try {
                         connectionPool.pop().close();
                         clearSize++;
                     } catch (SQLException e) {
-                        log.error("fail to clear connection", e);
+                        log.error("Fail to close the connection", e);
                     }
                 }
-                log.info("connection pool will be shut down, {} connections have been closed successfully, {} connections failed",
-                        clearSize,
+                log.info("Free database connection closed completely, clearConnectionCount={}, failedConnectionCount={}", clearSize,
                         count - clearSize);
                 count = this.connectionInUse.size();
-                log.info("connection pool will be shut down, there are {} connections in use, needed to be close", count);
+                log.info("The database connection in use will be closed, connectionInUseCount={}", count);
                 clearSize = 0;
                 int closeSize = 0;
                 int inUseCount = this.connectionInUse.size();
@@ -313,12 +319,11 @@ public class MockerDataSource implements DataSource {
                             closeSize++;
                         }
                     } catch (SQLException e) {
-                        log.error("fail to clear connection in use", e);
+                        log.error("Fail to close the connection in use", e);
                     }
                 }
                 log.info(
-                        "connection pool will be shut down, {} connections in use have been closed successfully, {} connections has been "
-                        + "closed by business thread, {} connections failed",
+                        "The database connection pool is closed successfully, clearConnectionSize={}, closedByThreadConnectionSize={}, failedConnectionCount={}",
                         clearSize, closeSize, count - clearSize - closeSize);
             } finally {
                 lock.unlock();

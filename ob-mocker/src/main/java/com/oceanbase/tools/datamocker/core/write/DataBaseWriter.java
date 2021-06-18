@@ -104,17 +104,17 @@ public class DataBaseWriter extends AbstractMockWriter {
     private void validate(DataSource dataSource, ObModeType dialectType, String database, String tableName) {
         if (dataSource == null) {
             MockerException e = new MockerException(MockerError.PARAMETER_ERROR, "Datasource can not be null");
-            log.error("data source for DB writeIn writer is necessary", e);
+            log.error("JDBC writer is missing data source", e);
             throw e;
         }
         if (database == null) {
             MockerException e = new MockerException(MockerError.PARAMETER_ERROR, "Database can not be null");
-            log.error("database for DB writeIn writer is necessary", e);
+            log.error("JDBC writer is missing schema name", e);
             throw e;
         }
         if (tableName == null) {
             MockerException e = new MockerException(MockerError.PARAMETER_ERROR, "Table name can not be null");
-            log.error("table name for DB writeIn writer is necessary", e);
+            log.error("JDBC writer is missing table name", e);
             throw e;
         }
         if (dialectType != null) {
@@ -206,16 +206,16 @@ public class DataBaseWriter extends AbstractMockWriter {
             @Override
             public void doOnSuccess(int[] result) {
                 if (result != null) {
-                    log.info("data base writer has writed a batch, effect row is {}", result.length);
+                    log.info("JDBC writer writes a batch successfully, effectRow={}", result.length);
                     returnVal.add((long) result.length);
                 } else {
-                    log.warn("database writer write process has been executed, nothing written");
+                    log.warn("JDBC writer has finished writing, but no data has been written");
                 }
             }
 
             @Override
             public void doOnFailure(int[] result, Throwable e) throws Throwable {
-                log.error("some errors happen when write data", e);
+                log.error("JDBC writer failed to write", e);
                 throw e;
             }
         });

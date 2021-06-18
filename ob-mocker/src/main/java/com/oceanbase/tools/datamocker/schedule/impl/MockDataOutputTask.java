@@ -35,7 +35,7 @@ public class MockDataOutputTask extends AbstractMockTask {
         super(metaData, context);
         if (writers == null || writers.size() == 0) {
             MockerException e = new MockerException(MockerError.PARAMETER_ERROR, "Data writer can not be null or empty");
-            log.error("some errors occured when init mock data output task", e);
+            log.error("Initialization of data output task failed because the mocker writers is null or empty", e);
             throw e;
         }
         this.writers = writers;
@@ -47,7 +47,7 @@ public class MockDataOutputTask extends AbstractMockTask {
 
     @Override
     public Void execute(TableTaskMetaData metaData, TableTaskContext context) throws Exception {
-        log.info("data output task is running. threadName={}", Thread.currentThread().getName());
+        log.info("Start the data output task, threadName={}", Thread.currentThread().getName());
         int length = this.writerSymbols.size();
         Throwable exception = null;
         while (!Thread.currentThread().isInterrupted() && this.interval() <= metaData.getTimeoutMilliseconds()) {
@@ -72,7 +72,7 @@ public class MockDataOutputTask extends AbstractMockTask {
                 }
             } catch (Throwable e) {
                 exception = e;
-                log.error("some errors occured when write data", e);
+                log.error("Data output task execution failed", e);
                 if (e instanceof InterruptedException || MockTaskStatus.CANCELED.equals(context.getStatus())) {
                     Thread.currentThread().interrupt();
                 }
@@ -82,14 +82,14 @@ public class MockDataOutputTask extends AbstractMockTask {
             throw new Exception(exception);
         }
         if (this.interval() >= metaData.getTimeoutMilliseconds()) {
-            log.warn("data mock write thread has been terminated cause timeout. duration={}ms", interval());
+            log.warn("Data output task execution timed out, duration={}ms", interval());
         }
         if (Thread.currentThread().isInterrupted()) {
-            log.warn("data mock write thread has been interrupted, run {}ms", interval());
+            log.warn("Data output task execution is interrupted, duration={}ms", interval());
             throw new InterruptedException("data mock write thread has been interrupted by user");
         }
         if (this.interval() <= metaData.getTimeoutMilliseconds()) {
-            log.info("data mock write thread has been executed successfully. duration={}ms", interval());
+            log.info("Data output task is executed successfully, duration={}ms", interval());
         }
         return null;
     }

@@ -71,7 +71,7 @@ public abstract class AbstractScheduler {
      * @return 一共执行的任务数量
      */
     public MockContext execute(Dispatcher<TableTaskInfo> dispatcher) {
-        log.info("thread pool's initialization has been done. coreSize={},maxSize={}", CORE_POOL_SIZE, MAX_POOL_SIZE);
+        log.info("Thread pool's initialization has been done. coreSize={},maxSize={}", CORE_POOL_SIZE, MAX_POOL_SIZE);
         MockContext context = new MockContext(this.service, dispatcher.taskId(), dispatcher.name(), dispatcher.totalCount());
         AbstractScheduler thisScheduler = this;
         int concurrentCount = dispatcher.count();
@@ -107,10 +107,10 @@ public abstract class AbstractScheduler {
                                     service.getCorePoolSize(), service.getMaximumPoolSize());
                             if (dataGroups == null) {
                                 Thread.sleep(5000);
-                                log.warn("no enough thread resource available for table task bean at \"{}\".\"{}\" table, will retry",
+                                log.warn("Insufficient thread resources, will retry, schema={}, tableName={}",
                                         task.getMetaData().getTableSchema(), task.getMetaData().getTableName());
                                 if ((failCount++) > maxFailCount) {
-                                    log.warn("no task is successfully scheduled for more than {} minutes, the schedule thread exits",
+                                    log.warn("Task scheduling operation timed out, the scheduling thread will exit, timeout={} min",
                                             maxTimeout / 60000 + 3);
                                     clearResource(dispatcher);
                                     return totalCount;
@@ -125,10 +125,10 @@ public abstract class AbstractScheduler {
                                     service.getActiveCount() + currentActive, service.getCorePoolSize(), service.getMaximumPoolSize());
                             if (columnGroups == null) {
                                 Thread.sleep(5000);
-                                log.warn("no enough thread resource available for table task bean at \"{}\".\"{}\" table, will retry",
+                                log.warn("Insufficient thread resources, will retry, schema={}, tableName={}",
                                         task.getMetaData().getTableSchema(), task.getMetaData().getTableName());
                                 if ((failCount++) > maxFailCount) {
-                                    log.warn("no task is successfully scheduled for more than {} minutes, the schedule thread exits",
+                                    log.warn("Task scheduling operation timed out, the scheduling thread will exit, timeout={} min",
                                             maxTimeout / 60000 + 3);
                                     clearResource(dispatcher);
                                     return totalCount;
@@ -143,9 +143,10 @@ public abstract class AbstractScheduler {
                                 for (Map.Entry<Set<String>, Integer> entry : entrySet) {
                                     required += entry.getValue();
                                 }
-                                log.warn("the thread resource requirement {} which schedule algorithm give is illegal for current "
-                                         + "available thread resource {}, the schedule thread exits", required,
-                                        this.service.getMaximumPoolSize() - service.getActiveCount());
+                                log.warn(
+                                        "The thread resource requirements given by the custom scheduling algorithm exceed the currently "
+                                        + "available thread resources, requiredThreadCount={}, availableThreadCount={}",
+                                        required, this.service.getMaximumPoolSize() - service.getActiveCount());
                                 clearResource(dispatcher);
                                 return totalCount;
                             }
@@ -165,7 +166,7 @@ public abstract class AbstractScheduler {
                                     try {
                                         thisScheduler.onSuccess(param);
                                     } catch (Throwable e) {
-                                        log.error("some errors happened when scheduler onSuccess executed", e);
+                                        log.error("Some errors happened when scheduler onSuccess executed", e);
                                     }
                                 }
 
@@ -179,7 +180,7 @@ public abstract class AbstractScheduler {
                                     try {
                                         thisScheduler.onFailure(param, e);
                                     } catch (Throwable e1) {
-                                        log.error("some errors happened when scheduler onFailure executed", e);
+                                        log.error("Some errors happened when scheduler onFailure executed", e);
                                     }
                                 }
                             });
@@ -189,7 +190,7 @@ public abstract class AbstractScheduler {
                                     manager.close();
                                 }
                                 clearResource(dispatcher);
-                                log.warn("task has been shutdown, total task executed is {}", totalCount);
+                                log.warn("Task has been shutdown, total task executed is {}", totalCount);
                                 return totalCount;
                             }
                             totalCount++;
@@ -206,7 +207,7 @@ public abstract class AbstractScheduler {
                 }
             }
             clearResource(dispatcher);
-            log.info("schedule task has been executed successfully, total task executed is {}", totalCount);
+            log.info("Scheduled task execution completed, totalTaskExecuted={}", totalCount);
             MDC.clear();
             return totalCount;
         };

@@ -35,7 +35,7 @@ public class MockDataBeforeTask extends AbstractMockTask {
         super(metaData, context);
         if (dataSource == null) {
             MockerException e = new MockerException(MockerError.PARAMETER_ERROR, "Datasource can not be null");
-            log.error("fail to init mock data before task, data source can not be null", e);
+            log.error("The mock data preparation task failed to initialize because the data source could not be found", e);
             throw e;
         }
         this.dataSource = dataSource;
@@ -43,7 +43,7 @@ public class MockDataBeforeTask extends AbstractMockTask {
 
     @Override
     public Void execute(TableTaskMetaData metaData, TableTaskContext context) throws Throwable {
-        log.info("begin execute mock before task");
+        log.info("Start the mock data preparation task");
         //如果设置了清空表则需要重新加载约束
         if (Boolean.TRUE.equals(metaData.getShouldTruncate())) {
             String sql;
@@ -55,14 +55,15 @@ public class MockDataBeforeTask extends AbstractMockTask {
                         DbObjectNameUtil.doubleCharToEscape(metaData.getTableName(), '"'));
             } else {
                 MockerException e = new MockerException(MockerError.INVALID_OB_MODE);
-                log.error("fail to execute before task for mock", e);
+                log.error("Fail to execute mock data preparation task because the ObModeType is illegal, obModeType={}",
+                        metaData.getDialectType(), e);
                 throw e;
             }
             SqlUtil.executeUpdate(this.dataSource, sql, null, new AbstractCallBack<Integer>() {
                 @Override
                 public void doOnSuccess(Integer effectRow) throws Throwable {
-                    log.info(String.format("truncate table \"%s\".\"%s\" successfully, effect row is %d", metaData.getSchema(),
-                            metaData.getTableName(), effectRow));
+                    log.info("Truncate table successfully, schema={}, tableName={}, effectRow={}", metaData.getSchema(),
+                            metaData.getTableName(), effectRow);
                     if (effectRow > 0) {
                         List<ConstraintFactory> factories = ConstraintFactory.listInstances();
                         for (ConstraintFactory factory : factories) {
@@ -71,13 +72,13 @@ public class MockDataBeforeTask extends AbstractMockTask {
                                     metaData.getTotalCount().intValue());
                             context.setConstraints(customConstraint);
                         }
-                        log.info("reload constraints settings successfully");
+                        log.info("Reload constraint succeeded");
                     }
                 }
 
                 @Override
                 public void doOnFailure(Integer effectRow, Throwable e) throws Throwable {
-                    log.error("fail to execute before task for mock", e);
+                    log.error("Fail to execute mock data preparation task", e);
                     throw e;
                 }
             });

@@ -74,7 +74,7 @@ public class SqlUtil {
                     try {
                         callBack.onSuccess(resultSet);
                     } catch (Throwable e) {
-                        log.error("some errors happened when executeQuery call back method executed", e);
+                        log.error("Some errors happened when executeQuery call back method executed", e);
                         throw e;
                     }
                 }
@@ -160,7 +160,7 @@ public class SqlUtil {
                 try {
                     callBack.onSuccess(statement.executeUpdate());
                 } catch (Throwable e) {
-                    log.error("some errors happened when executeUpdate onSuccess call back method executed", e);
+                    log.error("Some errors happened when executeUpdate onSuccess call back method executed", e);
                     throw e;
                 }
             }
@@ -258,7 +258,7 @@ public class SqlUtil {
                 try {
                     callBack.onSuccess(result);
                 } catch (Throwable e) {
-                    log.error("some errors happened when executeBatch onSuccess call back method executed", e);
+                    log.error("Some errors happened when executeBatch onSuccess call back method executed", e);
                     throw e;
                 }
             }

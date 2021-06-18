@@ -187,13 +187,13 @@ public class MockerBuffer {
             MockerException e = new MockerException(MockerError.UNKNOWN_COLUMN_NAME,
                     String.format("Custom column \"%s\" is not in column set [%s]", column,
                             this.columnSet.stream().collect(Collectors.joining(","))));
-            log.error("column error", e);
+            log.error("Column error", e);
             throw e;
         }
         if (this.currentRow.get(column.getKey()) != null) {
             MockerException e = new MockerException(MockerError.PARAMETER_ERROR, String.format("Custom column \"%s\" is duplicate",
                     column.getKey()));
-            log.error("column error", e);
+            log.error("Column error", e);
             throw e;
         }
         this.currentRow.putIfAbsent(column.getKey(), column.getValue());
@@ -211,7 +211,7 @@ public class MockerBuffer {
             MockerException e = new MockerException(MockerError.UNKNOWN_COLUMN_NAME,
                     String.format("There are unknown columns in current column [%s]",
                             this.currentRow.keySet().stream().collect(Collectors.joining(","))));
-            log.error("column error", e);
+            log.error("Column error", e);
             throw e;
         } else if (this.currentRow.size() == this.columnSet.size()) {
             this.rows.add(this.currentRow);
