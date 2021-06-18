@@ -15,7 +15,7 @@ public class RegExpGenerator extends CharGeneratorBase {
     /**
      * 正则表达式字符串生成工具类，用于生成符合正则表达式的字符串
      */
-    private RegExpTextBuilder builder;
+    private final RegExpTextBuilder builder;
 
     /**
      * 构造函数

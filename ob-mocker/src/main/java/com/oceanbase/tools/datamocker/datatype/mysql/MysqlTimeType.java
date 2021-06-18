@@ -51,11 +51,7 @@ public class MysqlTimeType extends AbstractDateDataType<Timestamp> {
         super(generator, ObModeType.OB_MYSQL, defaultValue, allowNull);
         this.scale = 3;
         generator.setScale(this.scale);
-        if (scale > 3) {
-            generator.setTimeUnit(TimeUnit.MILLISECONDS);
-        } else {
-            generator.setTimeUnit(TimeUnit.SECONDS);
-        }
+        generator.setTimeUnit(TimeUnit.SECONDS);
     }
 
     /**

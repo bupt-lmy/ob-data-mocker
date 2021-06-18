@@ -25,11 +25,11 @@ public class MockerFile {
     /**
      * 文件输出流
      */
-    private FileOutputStream output;
+    private final FileOutputStream output;
     /**
      * 脚本类型
      */
-    private ScriptType scriptType;
+    private final ScriptType scriptType;
 
     public MockerFile(String fileName, ScriptType scriptType) throws IOException {
         file = new File(fileName);

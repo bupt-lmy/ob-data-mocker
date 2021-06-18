@@ -11,7 +11,7 @@ public class MockerException extends RuntimeException {
     /**
      * 错误码
      */
-    private String errorCode;
+    private final String errorCode;
 
     /**
      * 异常构造函数

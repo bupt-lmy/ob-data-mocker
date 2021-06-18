@@ -50,7 +50,7 @@ public class MockerDataSource implements DataSource {
     /**
      * 驱动名称，使用OB默认的驱动
      */
-    private final static String className = "com.alipay.oceanbase.obproxy.mysql.jdbc.Driver";
+    private final static String DRIVER_CLASS_NAME = "com.alipay.oceanbase.obproxy.mysql.jdbc.Driver";
     /**
      * 数据库连接池初始化时新建连接的数量
      */
@@ -74,11 +74,11 @@ public class MockerDataSource implements DataSource {
     /**
      * 数据库里连接读锁
      */
-    private ReentrantLock lock = new ReentrantLock();
+    private final ReentrantLock lock = new ReentrantLock();
     /**
      * 等待条件，当连接池中没有更多连接可用时，调用线程在这个条件上挂起
      */
-    private Condition noMoreConnection = lock.newCondition();
+    private final Condition noMoreConnection = lock.newCondition();
 
     /**
      * 根据数据库连接配置信息构造一个连接池
@@ -124,7 +124,7 @@ public class MockerDataSource implements DataSource {
      * 初始化线程池，首先创建一个连接查看db是否可用
      */
     private void initPool() throws SQLException {
-        StringBuffer username = new StringBuffer(this.config.getUser());
+        StringBuilder username = new StringBuilder(this.config.getUser());
         if (StringUtils.isNotBlank(this.config.getTenant())) {
             username.append("@")
                     .append(this.config.getTenant());
@@ -156,7 +156,7 @@ public class MockerDataSource implements DataSource {
      * @return 返回数据库连接URL
      */
     private String genJDBCUrl() {
-        StringBuffer buffer = new StringBuffer("jdbc:oceanbase://");
+        StringBuilder buffer = new StringBuilder("jdbc:oceanbase://");
         buffer.append(this.config.getHost())
                 .append(":")
                 .append(this.config.getPort())
@@ -177,7 +177,7 @@ public class MockerDataSource implements DataSource {
     static {
         try {
             DriverManager.setLoginTimeout(15);
-            Class.forName(className);
+            Class.forName(DRIVER_CLASS_NAME);
         } catch (ClassNotFoundException e) {
             log.error("Data source initialization failed", e);
         }
@@ -202,7 +202,7 @@ public class MockerDataSource implements DataSource {
                 int realIndex = deleteIndex.get(i) - i;
                 connectionInUse.remove(realIndex);
             }
-            StringBuffer username = new StringBuffer(this.config.getUser());
+            StringBuilder username = new StringBuilder(this.config.getUser());
             if (StringUtils.isNotBlank(this.config.getTenant())) {
                 username.append("@")
                         .append(this.config.getTenant());

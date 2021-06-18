@@ -25,7 +25,7 @@ public class Dispatcher<T> {
      * 锁对象，该数据封装对象使用数组来维护多个栈的栈顶指针，由于数组不能动态地改变大小，因此每当程序要对栈顶指针
      * 数组进行维护时就获取该锁，防止多个线程并发地修改栈顶指针数组造成竞争条件
      */
-    private ReentrantLock lock = new ReentrantLock();
+    private final ReentrantLock lock = new ReentrantLock();
     /**
      * 栈顶指针数据的长度，同时也可以用来描述当前并发任务的多少
      */

@@ -59,7 +59,7 @@ public enum MockerError {
     /**
      * 错误信息
      */
-    private String msg;
+    private final String msg;
 
     MockerError(String msg) {
         this.msg = msg;

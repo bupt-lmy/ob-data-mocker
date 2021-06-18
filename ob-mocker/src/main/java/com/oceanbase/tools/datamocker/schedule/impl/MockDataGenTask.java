@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import com.oceanbase.tools.datamocker.constraint.AbstractConstraint;
 import com.oceanbase.tools.datamocker.core.read.ColumnReader;
@@ -87,12 +88,8 @@ public class MockDataGenTask extends AbstractMockTask {
 
     @Override
     public Void execute(TableTaskMetaData metaData, TableTaskContext context) throws Exception {
-        List<String> columnNames = new ArrayList<>();
-        this.readers.forEach(columnReader -> {
-            columnNames.add(columnReader.columnName());
-        });
-        log.info("Start the data generation task, threadName={},columnName={}", Thread.currentThread().getName(),
-                String.join(",", columnNames));
+        List<String> columnNames = this.readers.stream().map(ColumnReader::columnName).collect(Collectors.toList());
+        log.info("Start the data generation task, threadName={},columnName={}", Thread.currentThread().getName(), columnNames);
         long counter = 0;
         // 循环空转计数器，通常空转超过totalCount还未写入任意一条数据则认为写入异常
         long emptyLoopCount = 0;

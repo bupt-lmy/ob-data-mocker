@@ -64,8 +64,8 @@ public abstract class AbstractDataPipe<T> {
      * @param row      写入的数据
      */
     public void write(List<T> row, long timeout, TimeUnit timeUnit) throws Exception {
-        Validate.isTrue(timeout >= 0, "timeout for pipeline write can not be negative");
-        Validate.notNull(timeUnit, "timeout can not be null");
+        Validate.isTrue(timeout >= 0, "Timeout for pipeline write can not be negative");
+        Validate.notNull(timeUnit, "Timeout can not be null");
         if (isClosed()) {
             throw new MockerException(MockerError.OPERATION_FAILURE, "Data pipe has been closed");
         }
@@ -134,8 +134,8 @@ public abstract class AbstractDataPipe<T> {
      * @return 返回一条记录
      */
     public List<T> read(long timeout, TimeUnit timeUnit) throws Exception {
-        Validate.isTrue(timeout >= 0, "timeout for pipeline write can not be negative");
-        Validate.notNull(timeUnit, "timeout can not be null");
+        Validate.isTrue(timeout >= 0, "Timeout for pipeline write can not be negative");
+        Validate.notNull(timeUnit, "Timeout can not be null");
         if (isClosed() && size() == 0) {
             return null;
         }

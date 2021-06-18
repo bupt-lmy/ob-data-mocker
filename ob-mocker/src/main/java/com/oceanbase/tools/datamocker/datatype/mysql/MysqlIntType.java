@@ -30,7 +30,7 @@ public class MysqlIntType extends AbstractDigitDataType<BigDecimal> {
     @Override
     protected Long limitForType(BigDecimal lowValue, BigDecimal highValue) {
         BigDecimal interval = highValue.subtract(lowValue);
-        return Long.valueOf(interval.toPlainString()) + 1;
+        return Long.parseLong(interval.toPlainString()) + 1;
     }
 
     /**

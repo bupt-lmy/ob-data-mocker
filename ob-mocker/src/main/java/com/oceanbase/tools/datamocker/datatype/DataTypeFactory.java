@@ -78,17 +78,17 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
             Date defaultValue = null;
             Object val = config.getDefaultValue();
             if (val != null) {
-                defaultValue = new Date(Long.valueOf(val.toString()));
+                defaultValue = new Date(Long.parseLong(val.toString()));
             }
             MysqlYearType returnValue = new MysqlYearType(generator, scale, defaultValue, config.getAllowNull());
             if (config.getTimezone() != null) {
                 returnValue.setTimeZone(TimeZone.getTimeZone(config.getTimezone()));
             }
             if (config.getLowValue() != null) {
-                returnValue.setLowValue(new Date(Long.valueOf(config.getLowValue().toString())));
+                returnValue.setLowValue(new Date(Long.parseLong(config.getLowValue().toString())));
             }
             if (config.getHighValue() != null) {
-                returnValue.setHighValue(new Date(Long.valueOf(config.getHighValue().toString())));
+                returnValue.setHighValue(new Date(Long.parseLong(config.getHighValue().toString())));
             }
             return returnValue;
         }
@@ -111,17 +111,17 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
             Timestamp defaultValue = null;
             Object val = config.getDefaultValue();
             if (val != null) {
-                defaultValue = new Timestamp(Long.valueOf(val.toString()));
+                defaultValue = new Timestamp(Long.parseLong(val.toString()));
             }
             MysqlDateTimeType returnValue = new MysqlDateTimeType(generator, scale, defaultValue, config.getAllowNull());
             if (config.getTimezone() != null) {
                 returnValue.setTimeZone(TimeZone.getTimeZone(config.getTimezone()));
             }
             if (config.getLowValue() != null) {
-                returnValue.setLowValue(new Timestamp(Long.valueOf(config.getLowValue().toString())));
+                returnValue.setLowValue(new Timestamp(Long.parseLong(config.getLowValue().toString())));
             }
             if (config.getHighValue() != null) {
-                returnValue.setHighValue(new Timestamp(Long.valueOf(config.getHighValue().toString())));
+                returnValue.setHighValue(new Timestamp(Long.parseLong(config.getHighValue().toString())));
             }
             return returnValue;
         }
@@ -143,17 +143,17 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
             Timestamp defaultValue = null;
             Object val = config.getDefaultValue();
             if (val != null) {
-                defaultValue = new Timestamp(Long.valueOf(val.toString()));
+                defaultValue = new Timestamp(Long.parseLong(val.toString()));
             }
             MysqlTimeType returnValue = new MysqlTimeType(generator, scale, defaultValue, config.getAllowNull());
             if (config.getTimezone() != null) {
                 returnValue.setTimeZone(TimeZone.getTimeZone(config.getTimezone()));
             }
             if (config.getLowValue() != null) {
-                returnValue.setLowValue(new Timestamp(Long.valueOf(config.getLowValue().toString())));
+                returnValue.setLowValue(new Timestamp(Long.parseLong(config.getLowValue().toString())));
             }
             if (config.getHighValue() != null) {
-                returnValue.setHighValue(new Timestamp(Long.valueOf(config.getHighValue().toString())));
+                returnValue.setHighValue(new Timestamp(Long.parseLong(config.getHighValue().toString())));
             }
             return returnValue;
         }
@@ -176,17 +176,17 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
             Timestamp defaultValue = null;
             Object val = config.getDefaultValue();
             if (val != null) {
-                defaultValue = new Timestamp(Long.valueOf(val.toString()));
+                defaultValue = new Timestamp(Long.parseLong(val.toString()));
             }
             MysqlTimestampType returnValue = new MysqlTimestampType(generator, scale, defaultValue, config.getAllowNull());
             if (config.getTimezone() != null) {
                 returnValue.setTimeZone(TimeZone.getTimeZone(config.getTimezone()));
             }
             if (config.getLowValue() != null) {
-                returnValue.setLowValue(new Timestamp(Long.valueOf(config.getLowValue().toString())));
+                returnValue.setLowValue(new Timestamp(Long.parseLong(config.getLowValue().toString())));
             }
             if (config.getHighValue() != null) {
-                returnValue.setHighValue(new Timestamp(Long.valueOf(config.getHighValue().toString())));
+                returnValue.setHighValue(new Timestamp(Long.parseLong(config.getHighValue().toString())));
             }
             return returnValue;
         }
@@ -207,17 +207,17 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
             Date defaultValue = null;
             Object val = config.getDefaultValue();
             if (val != null) {
-                defaultValue = new Date(Long.valueOf(val.toString()));
+                defaultValue = new Date(Long.parseLong(val.toString()));
             }
             MysqlDateType returnValue = new MysqlDateType(generator, defaultValue, config.getAllowNull());
             if (config.getTimezone() != null) {
                 returnValue.setTimeZone(TimeZone.getTimeZone(config.getTimezone()));
             }
             if (config.getLowValue() != null) {
-                returnValue.setLowValue(new Date(Long.valueOf(config.getLowValue().toString())));
+                returnValue.setLowValue(new Date(Long.parseLong(config.getLowValue().toString())));
             }
             if (config.getHighValue() != null) {
-                returnValue.setHighValue(new Date(Long.valueOf(config.getHighValue().toString())));
+                returnValue.setHighValue(new Date(Long.parseLong(config.getHighValue().toString())));
             }
             return returnValue;
         }
@@ -1113,17 +1113,17 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
             Timestamp defaultValue = null;
             Object val = config.getDefaultValue();
             if (val != null) {
-                defaultValue = new Timestamp(Long.valueOf(val.toString()));
+                defaultValue = new Timestamp(Long.parseLong(val.toString()));
             }
             OracleTimestampType returnValue = new OracleTimestampType(generator, scale, defaultValue, config.getAllowNull());
             if (config.getTimezone() != null) {
                 returnValue.setTimeZone(TimeZone.getTimeZone(config.getTimezone()));
             }
             if (config.getLowValue() != null) {
-                returnValue.setLowValue(new Timestamp(Long.valueOf(config.getLowValue().toString())));
+                returnValue.setLowValue(new Timestamp(Long.parseLong(config.getLowValue().toString())));
             }
             if (config.getHighValue() != null) {
-                returnValue.setHighValue(new Timestamp(Long.valueOf(config.getHighValue().toString())));
+                returnValue.setHighValue(new Timestamp(Long.parseLong(config.getHighValue().toString())));
             }
             return returnValue;
         }
@@ -1149,17 +1149,17 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
             Timestamp defaultValue = null;
             Object val = config.getDefaultValue();
             if (val != null) {
-                defaultValue = new Timestamp(Long.valueOf(val.toString()));
+                defaultValue = new Timestamp(Long.parseLong(val.toString()));
             }
             OracleTimestampType returnValue = new OracleTimestampType(generator, scale, defaultValue, config.getAllowNull());
             if (config.getTimezone() != null) {
                 returnValue.setTimeZone(TimeZone.getTimeZone(config.getTimezone()));
             }
             if (config.getLowValue() != null) {
-                returnValue.setLowValue(new Timestamp(Long.valueOf(config.getLowValue().toString())));
+                returnValue.setLowValue(new Timestamp(Long.parseLong(config.getLowValue().toString())));
             }
             if (config.getHighValue() != null) {
-                returnValue.setHighValue(new Timestamp(Long.valueOf(config.getHighValue().toString())));
+                returnValue.setHighValue(new Timestamp(Long.parseLong(config.getHighValue().toString())));
             }
             return returnValue;
         }
@@ -1182,17 +1182,17 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
             Timestamp defaultValue = null;
             Object val = config.getDefaultValue();
             if (val != null) {
-                defaultValue = new Timestamp(Long.valueOf(val.toString()));
+                defaultValue = new Timestamp(Long.parseLong(val.toString()));
             }
             OracleTimestampType returnValue = new OracleTimestampType(generator, scale, defaultValue, config.getAllowNull());
             if (config.getTimezone() != null) {
                 returnValue.setTimeZone(TimeZone.getTimeZone(config.getTimezone()));
             }
             if (config.getLowValue() != null) {
-                returnValue.setLowValue(new Timestamp(Long.valueOf(config.getLowValue().toString())));
+                returnValue.setLowValue(new Timestamp(Long.parseLong(config.getLowValue().toString())));
             }
             if (config.getHighValue() != null) {
-                returnValue.setHighValue(new Timestamp(Long.valueOf(config.getHighValue().toString())));
+                returnValue.setHighValue(new Timestamp(Long.parseLong(config.getHighValue().toString())));
             }
             return returnValue;
         }
@@ -1213,17 +1213,17 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
             Date defaultValue = null;
             Object val = config.getDefaultValue();
             if (val != null) {
-                defaultValue = new Date(Long.valueOf(val.toString()));
+                defaultValue = new Date(Long.parseLong(val.toString()));
             }
             OracleDateType returnValue = new OracleDateType(generator, defaultValue, config.getAllowNull());
             if (config.getTimezone() != null) {
                 returnValue.setTimeZone(TimeZone.getTimeZone(config.getTimezone()));
             }
             if (config.getLowValue() != null) {
-                returnValue.setLowValue(new Date(Long.valueOf(config.getLowValue().toString())));
+                returnValue.setLowValue(new Date(Long.parseLong(config.getLowValue().toString())));
             }
             if (config.getHighValue() != null) {
-                returnValue.setHighValue(new Date(Long.valueOf(config.getHighValue().toString())));
+                returnValue.setHighValue(new Date(Long.parseLong(config.getHighValue().toString())));
             }
             return returnValue;
         }

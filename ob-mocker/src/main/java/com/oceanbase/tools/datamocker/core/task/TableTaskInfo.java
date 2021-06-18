@@ -25,31 +25,31 @@ public class TableTaskInfo {
     /**
      * 表生成任务的元数据信息
      */
-    private TableTaskMetaData metaData;
+    private final TableTaskMetaData metaData;
     /**
      * mock数据缓冲对象
      */
-    private MockerBuffer buffer;
+    private final MockerBuffer buffer;
     /**
      * 列数据生成原语集合对象
      */
-    private List<ColumnReader> columnReaders;
+    private final List<ColumnReader> columnReaders;
     /**
      * 数据写出原语，用于向数据库中写入数据
      */
-    private List<AbstractMockWriter> dataWriters;
+    private final List<AbstractMockWriter> dataWriters;
     /**
      * 约束集合，用于描述该表中的约束信息
      */
-    private List<AbstractConstraint> constraints;
+    private final List<AbstractConstraint> constraints;
     /**
      * 数据源头
      */
-    private DataSource dataSource;
+    private final DataSource dataSource;
     /**
      * 文件管理器
      */
-    private List<MockerFile> fileManagers;
+    private final List<MockerFile> fileManagers;
 
     /**
      * 构造方法，用于构造出一个表任务bean对象

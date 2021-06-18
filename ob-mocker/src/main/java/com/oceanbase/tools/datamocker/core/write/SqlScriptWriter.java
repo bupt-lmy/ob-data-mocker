@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import com.oceanbase.tools.datamocker.core.write.output.MockerFile;
 import com.oceanbase.tools.datamocker.datatype.AbstractDataType;
@@ -30,11 +29,11 @@ public class SqlScriptWriter extends AbstractMockWriter {
     /**
      * 写入的目标库，如果建连接的时候指定了目标库该值也可以不填写
      */
-    private String database;
+    private final String database;
     /**
      * 写入的目标表，该参数必传，指定传入的目标表
      */
-    private String tableName;
+    private final String tableName;
     /**
      * OB的方言模式，默认为oracle模式
      */
@@ -174,7 +173,7 @@ public class SqlScriptWriter extends AbstractMockWriter {
             }
             sqlList.add(buffer.append("\n").toString());
         }
-        String result = sqlList.stream().collect(Collectors.joining());
+        String result = String.join("", sqlList);
         this.manager.write(result.getBytes(), 0, result.getBytes().length, true);
         return (long) rows.size();
     }

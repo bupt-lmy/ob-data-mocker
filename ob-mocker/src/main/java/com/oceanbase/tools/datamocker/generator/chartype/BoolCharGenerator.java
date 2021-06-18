@@ -14,7 +14,7 @@ public class BoolCharGenerator extends CharGeneratorBase {
     /**
      * 定值布尔类型，若不传则为null，代表随机布尔类型
      */
-    private Boolean fixBool;
+    private final Boolean fixBool;
 
     public BoolCharGenerator(CharCaseOption caseType, String fixBool) {
         super(caseType);

@@ -20,7 +20,7 @@ public abstract class AbstractDataType<T, V extends Comparable> {
     /**
      * 是否允许空值
      */
-    private Boolean allowNull;
+    private final Boolean allowNull;
     /**
      * 预检查结果缓存
      */

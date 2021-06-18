@@ -2,7 +2,6 @@ package com.oceanbase.tools.datamocker.constraint.impl;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -128,9 +127,7 @@ public class UniqueConstraint extends AbstractConstraint {
         List<String> sortedList = new ArrayList<>();
         List<Map.Entry<String, Integer>> entryList = new ArrayList<>(map.entrySet());
         Collections.sort(entryList, (o1, o2) -> o1.getValue().compareTo(o2.getValue()));
-        Iterator<Map.Entry<String, Integer>> iter = entryList.iterator();
-        while (iter.hasNext()) {
-            Map.Entry<String, Integer> entry = iter.next();
+        for (Map.Entry<String, Integer> entry : entryList) {
             sortedList.add(entry.getKey());
         }
         return sortedList;

@@ -75,7 +75,7 @@ public abstract class AbstractMockerFactory {
      */
     private Map<String, List<MockerFile>> taskId2MockerFiles;
 
-    public AbstractMockerFactory(AbstractTaskConfig taskConfig) throws SQLException {
+    public AbstractMockerFactory(AbstractTaskConfig taskConfig) {
         this.taskConfig = taskConfig;
         if (taskConfig == null) {
             throw new MockerException(MockerError.PARAMETER_ERROR, "Input task config can not be null");
@@ -262,8 +262,8 @@ public abstract class AbstractMockerFactory {
      * @return 返回数据源
      */
     protected synchronized List<MockerFile> getFileManager(String tableTaskId, AbstractTableConfig tableConfig) throws IOException {
-        Validate.notEmpty(tableTaskId, "table task id can not be null");
-        Validate.notNull(tableConfig, "table config can not be null");
+        Validate.notEmpty(tableTaskId, "Table task id can not be null");
+        Validate.notNull(tableConfig, "Table config can not be null");
         List<MockerFile> returnVal = taskId2MockerFiles.get(tableTaskId);
         if (returnVal == null) {
             returnVal = new LinkedList<>();
@@ -285,7 +285,7 @@ public abstract class AbstractMockerFactory {
      */
     protected List<AbstractMockWriter> getDataWriter(AbstractTableConfig tableConfig, MockerBuffer buffer, List<MockerFile> managers,
             DataSource ds) {
-        Validate.notNull(managers, "mocker file manager list can not be null");
+        Validate.notNull(managers, "Mocker file manager list can not be null");
         List<AbstractMockWriter> dataWriters = new ArrayList<>();
         for (MockerFile manager : managers) {
             SqlScriptWriter writer = new SqlScriptWriter(manager, this.taskConfig.obDialectType(), tableConfig.schemaName(),

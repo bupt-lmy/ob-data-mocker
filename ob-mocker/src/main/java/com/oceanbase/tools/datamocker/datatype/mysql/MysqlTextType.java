@@ -43,6 +43,6 @@ public class MysqlTextType extends AbstractCharDataType {
 
     @Override
     public String toString() {
-        return String.format("text", this.maxValueForType());
+        return "text";
     }
 }

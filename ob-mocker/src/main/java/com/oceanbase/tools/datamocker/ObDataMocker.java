@@ -18,11 +18,11 @@ public class ObDataMocker {
     /**
      * mock数据任务对象，用于封装多表任务之间的拓扑关系
      */
-    private Dispatcher<TableTaskInfo> dispatcher;
+    private final Dispatcher<TableTaskInfo> dispatcher;
     /**
      * 调度器，用于向各个表生成任务调度线程资源
      */
-    private AbstractScheduler scheduler;
+    private final AbstractScheduler scheduler;
 
     /**
      * 保护类型的构造函数，不能让用户通过new的方式手动创建

@@ -33,15 +33,15 @@ public class DataBaseWriter extends AbstractMockWriter {
     /**
      * 获取一个数据库连接池，使用该连接池获取数据库连接进行数据写入
      */
-    private DataSource dataSource;
+    private final DataSource dataSource;
     /**
      * 写入的目标库，如果建连接的时候指定了目标库该值也可以不填写
      */
-    private String database;
+    private final String database;
     /**
      * 写入的目标表，该参数必传，指定传入的目标表
      */
-    private String tableName;
+    private final String tableName;
     /**
      * OB的方言模式，默认为oracle模式
      */
@@ -49,7 +49,7 @@ public class DataBaseWriter extends AbstractMockWriter {
     /**
      * 分组ID
      */
-    private String groupId;
+    private final String groupId;
 
     /**
      * 构造函数写入一个数据源，该数据源是必须的
