@@ -40,15 +40,16 @@ public class TableTaskInfo {
      * Construction method, used to construct a table task bean object
      *
      * @param columnReaders list of column reader
-     * @param dataWriters   list of writers
-     * @param constraints   list of constraint
-     * @param buffer        buffer object
-     * @param dataSource    datasource
-     * @param fileManagers  list file manager
-     * @param metaData      meta data for table task
+     * @param dataWriters list of writers
+     * @param constraints list of constraint
+     * @param buffer buffer object
+     * @param dataSource datasource
+     * @param fileManagers list file manager
+     * @param metaData meta data for table task
      */
     public TableTaskInfo(List<ColumnReader> columnReaders, List<AbstractMockWriter> dataWriters,
-            List<AbstractConstraint> constraints, MockerBuffer buffer, DataSource dataSource, List<MockerFile> fileManagers,
+            List<AbstractConstraint> constraints, MockerBuffer buffer, DataSource dataSource,
+            List<MockerFile> fileManagers,
             TableTaskMetaData metaData) {
         this.columnReaders = columnReaders;
         this.dataWriters = dataWriters;

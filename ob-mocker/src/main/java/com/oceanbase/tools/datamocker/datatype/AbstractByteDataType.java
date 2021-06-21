@@ -17,20 +17,23 @@ import com.oceanbase.tools.datamocker.util.DigestUtil;
  */
 public abstract class AbstractByteDataType extends AbstractDataType<byte[], Integer> {
     /**
-     * The constructor of the abstract base class, where you need to pass in the random
-     * data generator bound to this data type, and specify the OB mode corresponding to the data type and the database type in this mode
+     * The constructor of the abstract base class, where you need to pass in the random data generator
+     * bound to this data type, and specify the OB mode corresponding to the data type and the database
+     * type in this mode
      *
-     * @param generator   Byte type data generator
+     * @param generator Byte type data generator
      * @param dialectType OB dialect type
-     * @param allowNull   Whether to allow null values
+     * @param allowNull Whether to allow null values
      */
-    public AbstractByteDataType(ByteGeneratorBase generator, ObModeType dialectType, byte[] defaultValue, Boolean allowNull) {
+    public AbstractByteDataType(ByteGeneratorBase generator, ObModeType dialectType, byte[] defaultValue,
+            Boolean allowNull) {
         super(generator, dialectType, defaultValue, allowNull);
     }
 
     /**
-     * The constructor of the abstract base class, where you need to pass in the random data generator bound to this data type,
-     * and specify the OB mode corresponding to the data type and the database type in this mode
+     * The constructor of the abstract base class, where you need to pass in the random data generator
+     * bound to this data type, and specify the OB mode corresponding to the data type and the database
+     * type in this mode
      *
      * @param dialectType OB dialect type
      * @param defaultValue default value for byte data type
@@ -51,8 +54,8 @@ public abstract class AbstractByteDataType extends AbstractDataType<byte[], Inte
     }
 
     /**
-     * The maximum amount of unique data that this type can generate under
-     * the constraints of the specified data generator
+     * The maximum amount of unique data that this type can generate under the constraints of the
+     * specified data generator
      *
      * @return Return specific value
      */

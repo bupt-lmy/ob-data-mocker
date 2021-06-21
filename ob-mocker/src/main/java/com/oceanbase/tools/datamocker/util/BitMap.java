@@ -17,7 +17,8 @@ public class BitMap {
      */
     private final byte[] bytes;
     /**
-     * Amplification factor, used to increase the capacity of the bitmap array and reduce the probability of hash collision
+     * Amplification factor, used to increase the capacity of the bitmap array and reduce the
+     * probability of hash collision
      */
     private static final int INCREASE_FACTOR = 4;
     /**

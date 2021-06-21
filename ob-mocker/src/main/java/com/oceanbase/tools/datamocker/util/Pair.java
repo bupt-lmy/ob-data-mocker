@@ -3,9 +3,8 @@ package com.oceanbase.tools.datamocker.util;
 import java.util.UUID;
 
 /**
- * A custom Java object is used to represent the Java pairing.
- * The Pair provided by jfxrt.jar does not exist on many versions of jdk,
- * causing great compilation difficulties
+ * A custom Java object is used to represent the Java pairing. The Pair provided by jfxrt.jar does
+ * not exist on many versions of jdk, causing great compilation difficulties
  *
  * @author yh263208
  * @date 2020-12-31 17:50

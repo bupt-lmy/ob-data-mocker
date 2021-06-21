@@ -31,16 +31,16 @@ public abstract class AbstractConstraint {
     private String tableName;
     /**
      * The name of the column to which the constraint is associated. The database has a position
-     * description for the column to which the constraint is associated. That is, the column to
-     * which the constraint is associated is in the position of the constraint, and the column to
-     * which a constraint is associated may not only be in one table Here, the Key of the outer Map
-     * represents the table name, used to indicate which table the constraint-related column is in,
-     * and the inner Map is used to indicate the position of the constraint-related column in a
-     * table in the constraint, Key represents the column name, and value represents The position
-     * of the constraint is meaningful for constraint checking, because if a unique constraint
-     * is established on two columns, then the positional relationship between the two columns
-     * in the constraint is necessary, because AB and BA are obviously in compliance with the
-     * constraint even if They just swapped positions
+     * description for the column to which the constraint is associated. That is, the column to which
+     * the constraint is associated is in the position of the constraint, and the column to which a
+     * constraint is associated may not only be in one table Here, the Key of the outer Map represents
+     * the table name, used to indicate which table the constraint-related column is in, and the inner
+     * Map is used to indicate the position of the constraint-related column in a table in the
+     * constraint, Key represents the column name, and value represents The position of the constraint
+     * is meaningful for constraint checking, because if a unique constraint is established on two
+     * columns, then the positional relationship between the two columns in the constraint is necessary,
+     * because AB and BA are obviously in compliance with the constraint even if They just swapped
+     * positions
      */
     private Map<String, Map<String, Integer>> tableName2ConstrantColumns;
 
@@ -55,7 +55,8 @@ public abstract class AbstractConstraint {
     }
 
     protected AbstractConstraint(String constraintName, String database, String tableName,
-            Map<String, Map<String, Integer>> tableName2ConstrantColumns, List<Map<String, Pair<AbstractDataType, Object>>> rows) {
+            Map<String, Map<String, Integer>> tableName2ConstrantColumns,
+            List<Map<String, Pair<AbstractDataType, Object>>> rows) {
         this.constraintName = constraintName;
         this.database = database;
         Map<String, Integer> columns = validateConsColumns(tableName, tableName2ConstrantColumns);
@@ -89,8 +90,8 @@ public abstract class AbstractConstraint {
     }
 
     /**
-     * Mark method, used to mark a row of data. If you call this method which means
-     * that this row of data will be effective
+     * Mark method, used to mark a row of data. If you call this method which means that this row of
+     * data will be effective
      *
      * @param value row of data
      * @return marked row of data
@@ -106,11 +107,12 @@ public abstract class AbstractConstraint {
     /**
      * Verify if the input data is legal
      *
-     * @param columns             Column info list
+     * @param columns Column info list
      * @param columnName2DataPair input data
      * @throws MockerException exception will be thrown when error occured
      */
-    private void validateInput(Map<String, Integer> columns, Map<String, Pair<AbstractDataType, Object>> columnName2DataPair) {
+    private void validateInput(Map<String, Integer> columns,
+            Map<String, Pair<AbstractDataType, Object>> columnName2DataPair) {
         Set<String> initCons = columns.keySet();
         Set<String> valueCons = columnName2DataPair.keySet();
         for (String column : initCons) {
@@ -131,7 +133,8 @@ public abstract class AbstractConstraint {
         return this.constraintName;
     }
 
-    abstract protected void initWithRows(Map<String, Integer> columns, List<Map<String, Pair<AbstractDataType, Object>>> rows);
+    abstract protected void initWithRows(Map<String, Integer> columns,
+            List<Map<String, Pair<AbstractDataType, Object>>> rows);
 
     abstract protected boolean doCheck(Map<String, Integer> columns, Map<String, Pair<AbstractDataType, Object>> value,
             Boolean markable);

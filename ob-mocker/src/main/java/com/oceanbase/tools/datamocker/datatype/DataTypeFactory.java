@@ -65,1380 +65,1447 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
     /**
      * The year type in mysql mode
      */
-    private static final DataTypeFactory OB_MYSQL_YEAR = new DataTypeFactory<MysqlYearType, DateDataTypeConfig, DateGeneratorBase>() {
+    private static final DataTypeFactory OB_MYSQL_YEAR =
+            new DataTypeFactory<MysqlYearType, DateDataTypeConfig, DateGeneratorBase>() {
 
-        @Override
-        public String name() {
-            return "OB_MYSQL_YEAR";
-        }
+                @Override
+                public String name() {
+                    return "OB_MYSQL_YEAR";
+                }
 
-        @Override
-        protected MysqlYearType newInstance(DateDataTypeConfig config, DateGeneratorBase generator) {
-            int scale = config.getScale() == null ? 3 : config.getScale();
-            Date defaultValue = null;
-            Object val = config.getDefaultValue();
-            if (val != null) {
-                defaultValue = new Date(Long.parseLong(val.toString()));
-            }
-            MysqlYearType returnValue = new MysqlYearType(generator, scale, defaultValue, config.getAllowNull());
-            if (config.getTimezone() != null) {
-                returnValue.setTimeZone(TimeZone.getTimeZone(config.getTimezone()));
-            }
-            if (config.getLowValue() != null) {
-                returnValue.setLowValue(new Date(Long.parseLong(config.getLowValue().toString())));
-            }
-            if (config.getHighValue() != null) {
-                returnValue.setHighValue(new Date(Long.parseLong(config.getHighValue().toString())));
-            }
-            return returnValue;
-        }
-    };
+                @Override
+                protected MysqlYearType newInstance(DateDataTypeConfig config, DateGeneratorBase generator) {
+                    int scale = config.getScale() == null ? 3 : config.getScale();
+                    Date defaultValue = null;
+                    Object val = config.getDefaultValue();
+                    if (val != null) {
+                        defaultValue = new Date(Long.parseLong(val.toString()));
+                    }
+                    MysqlYearType returnValue =
+                            new MysqlYearType(generator, scale, defaultValue, config.getAllowNull());
+                    if (config.getTimezone() != null) {
+                        returnValue.setTimeZone(TimeZone.getTimeZone(config.getTimezone()));
+                    }
+                    if (config.getLowValue() != null) {
+                        returnValue.setLowValue(new Date(Long.parseLong(config.getLowValue().toString())));
+                    }
+                    if (config.getHighValue() != null) {
+                        returnValue.setHighValue(new Date(Long.parseLong(config.getHighValue().toString())));
+                    }
+                    return returnValue;
+                }
+            };
 
     /**
      * The datetime type in mysql mode
      */
-    private static final DataTypeFactory OB_MYSQL_DATETIME
-            = new DataTypeFactory<MysqlDateTimeType, DateDataTypeConfig, DateGeneratorBase>() {
+    private static final DataTypeFactory OB_MYSQL_DATETIME =
+            new DataTypeFactory<MysqlDateTimeType, DateDataTypeConfig, DateGeneratorBase>() {
 
-        @Override
-        public String name() {
-            return "OB_MYSQL_DATETIME";
-        }
+                @Override
+                public String name() {
+                    return "OB_MYSQL_DATETIME";
+                }
 
-        @Override
-        protected MysqlDateTimeType newInstance(DateDataTypeConfig config, DateGeneratorBase generator) {
-            int scale = config.getScale() == null ? 0 : config.getScale();
-            Timestamp defaultValue = null;
-            Object val = config.getDefaultValue();
-            if (val != null) {
-                defaultValue = new Timestamp(Long.parseLong(val.toString()));
-            }
-            MysqlDateTimeType returnValue = new MysqlDateTimeType(generator, scale, defaultValue, config.getAllowNull());
-            if (config.getTimezone() != null) {
-                returnValue.setTimeZone(TimeZone.getTimeZone(config.getTimezone()));
-            }
-            if (config.getLowValue() != null) {
-                returnValue.setLowValue(new Timestamp(Long.parseLong(config.getLowValue().toString())));
-            }
-            if (config.getHighValue() != null) {
-                returnValue.setHighValue(new Timestamp(Long.parseLong(config.getHighValue().toString())));
-            }
-            return returnValue;
-        }
-    };
+                @Override
+                protected MysqlDateTimeType newInstance(DateDataTypeConfig config, DateGeneratorBase generator) {
+                    int scale = config.getScale() == null ? 0 : config.getScale();
+                    Timestamp defaultValue = null;
+                    Object val = config.getDefaultValue();
+                    if (val != null) {
+                        defaultValue = new Timestamp(Long.parseLong(val.toString()));
+                    }
+                    MysqlDateTimeType returnValue =
+                            new MysqlDateTimeType(generator, scale, defaultValue, config.getAllowNull());
+                    if (config.getTimezone() != null) {
+                        returnValue.setTimeZone(TimeZone.getTimeZone(config.getTimezone()));
+                    }
+                    if (config.getLowValue() != null) {
+                        returnValue.setLowValue(new Timestamp(Long.parseLong(config.getLowValue().toString())));
+                    }
+                    if (config.getHighValue() != null) {
+                        returnValue.setHighValue(new Timestamp(Long.parseLong(config.getHighValue().toString())));
+                    }
+                    return returnValue;
+                }
+            };
 
     /**
      * The time type in mysql mode
      */
-    private static final DataTypeFactory OB_MYSQL_TIME = new DataTypeFactory<MysqlTimeType, DateDataTypeConfig, DateGeneratorBase>() {
+    private static final DataTypeFactory OB_MYSQL_TIME =
+            new DataTypeFactory<MysqlTimeType, DateDataTypeConfig, DateGeneratorBase>() {
 
-        @Override
-        public String name() {
-            return "OB_MYSQL_TIME";
-        }
+                @Override
+                public String name() {
+                    return "OB_MYSQL_TIME";
+                }
 
-        @Override
-        protected MysqlTimeType newInstance(DateDataTypeConfig config, DateGeneratorBase generator) {
-            int scale = config.getScale() == null ? 3 : config.getScale();
-            Timestamp defaultValue = null;
-            Object val = config.getDefaultValue();
-            if (val != null) {
-                defaultValue = new Timestamp(Long.parseLong(val.toString()));
-            }
-            MysqlTimeType returnValue = new MysqlTimeType(generator, scale, defaultValue, config.getAllowNull());
-            if (config.getTimezone() != null) {
-                returnValue.setTimeZone(TimeZone.getTimeZone(config.getTimezone()));
-            }
-            if (config.getLowValue() != null) {
-                returnValue.setLowValue(new Timestamp(Long.parseLong(config.getLowValue().toString())));
-            }
-            if (config.getHighValue() != null) {
-                returnValue.setHighValue(new Timestamp(Long.parseLong(config.getHighValue().toString())));
-            }
-            return returnValue;
-        }
-    };
+                @Override
+                protected MysqlTimeType newInstance(DateDataTypeConfig config, DateGeneratorBase generator) {
+                    int scale = config.getScale() == null ? 3 : config.getScale();
+                    Timestamp defaultValue = null;
+                    Object val = config.getDefaultValue();
+                    if (val != null) {
+                        defaultValue = new Timestamp(Long.parseLong(val.toString()));
+                    }
+                    MysqlTimeType returnValue =
+                            new MysqlTimeType(generator, scale, defaultValue, config.getAllowNull());
+                    if (config.getTimezone() != null) {
+                        returnValue.setTimeZone(TimeZone.getTimeZone(config.getTimezone()));
+                    }
+                    if (config.getLowValue() != null) {
+                        returnValue.setLowValue(new Timestamp(Long.parseLong(config.getLowValue().toString())));
+                    }
+                    if (config.getHighValue() != null) {
+                        returnValue.setHighValue(new Timestamp(Long.parseLong(config.getHighValue().toString())));
+                    }
+                    return returnValue;
+                }
+            };
 
     /**
      * The timestamp type in mysql mode
      */
-    private static final DataTypeFactory OB_MYSQL_TIMESTAMP
-            = new DataTypeFactory<MysqlTimestampType, DateDataTypeConfig, DateGeneratorBase>() {
+    private static final DataTypeFactory OB_MYSQL_TIMESTAMP =
+            new DataTypeFactory<MysqlTimestampType, DateDataTypeConfig, DateGeneratorBase>() {
 
-        @Override
-        public String name() {
-            return "OB_MYSQL_TIMESTAMP";
-        }
+                @Override
+                public String name() {
+                    return "OB_MYSQL_TIMESTAMP";
+                }
 
-        @Override
-        protected MysqlTimestampType newInstance(DateDataTypeConfig config, DateGeneratorBase generator) {
-            int scale = config.getScale() == null ? 3 : config.getScale();
-            Timestamp defaultValue = null;
-            Object val = config.getDefaultValue();
-            if (val != null) {
-                defaultValue = new Timestamp(Long.parseLong(val.toString()));
-            }
-            MysqlTimestampType returnValue = new MysqlTimestampType(generator, scale, defaultValue, config.getAllowNull());
-            if (config.getTimezone() != null) {
-                returnValue.setTimeZone(TimeZone.getTimeZone(config.getTimezone()));
-            }
-            if (config.getLowValue() != null) {
-                returnValue.setLowValue(new Timestamp(Long.parseLong(config.getLowValue().toString())));
-            }
-            if (config.getHighValue() != null) {
-                returnValue.setHighValue(new Timestamp(Long.parseLong(config.getHighValue().toString())));
-            }
-            return returnValue;
-        }
-    };
+                @Override
+                protected MysqlTimestampType newInstance(DateDataTypeConfig config, DateGeneratorBase generator) {
+                    int scale = config.getScale() == null ? 3 : config.getScale();
+                    Timestamp defaultValue = null;
+                    Object val = config.getDefaultValue();
+                    if (val != null) {
+                        defaultValue = new Timestamp(Long.parseLong(val.toString()));
+                    }
+                    MysqlTimestampType returnValue =
+                            new MysqlTimestampType(generator, scale, defaultValue, config.getAllowNull());
+                    if (config.getTimezone() != null) {
+                        returnValue.setTimeZone(TimeZone.getTimeZone(config.getTimezone()));
+                    }
+                    if (config.getLowValue() != null) {
+                        returnValue.setLowValue(new Timestamp(Long.parseLong(config.getLowValue().toString())));
+                    }
+                    if (config.getHighValue() != null) {
+                        returnValue.setHighValue(new Timestamp(Long.parseLong(config.getHighValue().toString())));
+                    }
+                    return returnValue;
+                }
+            };
 
     /**
      * The date type in mysql mode
      */
-    private static final DataTypeFactory OB_MYSQL_DATE = new DataTypeFactory<MysqlDateType, DateDataTypeConfig, DateGeneratorBase>() {
+    private static final DataTypeFactory OB_MYSQL_DATE =
+            new DataTypeFactory<MysqlDateType, DateDataTypeConfig, DateGeneratorBase>() {
 
-        @Override
-        public String name() {
-            return "OB_MYSQL_DATE";
-        }
+                @Override
+                public String name() {
+                    return "OB_MYSQL_DATE";
+                }
 
-        @Override
-        protected MysqlDateType newInstance(DateDataTypeConfig config, DateGeneratorBase generator) {
-            Date defaultValue = null;
-            Object val = config.getDefaultValue();
-            if (val != null) {
-                defaultValue = new Date(Long.parseLong(val.toString()));
-            }
-            MysqlDateType returnValue = new MysqlDateType(generator, defaultValue, config.getAllowNull());
-            if (config.getTimezone() != null) {
-                returnValue.setTimeZone(TimeZone.getTimeZone(config.getTimezone()));
-            }
-            if (config.getLowValue() != null) {
-                returnValue.setLowValue(new Date(Long.parseLong(config.getLowValue().toString())));
-            }
-            if (config.getHighValue() != null) {
-                returnValue.setHighValue(new Date(Long.parseLong(config.getHighValue().toString())));
-            }
-            return returnValue;
-        }
-    };
+                @Override
+                protected MysqlDateType newInstance(DateDataTypeConfig config, DateGeneratorBase generator) {
+                    Date defaultValue = null;
+                    Object val = config.getDefaultValue();
+                    if (val != null) {
+                        defaultValue = new Date(Long.parseLong(val.toString()));
+                    }
+                    MysqlDateType returnValue = new MysqlDateType(generator, defaultValue, config.getAllowNull());
+                    if (config.getTimezone() != null) {
+                        returnValue.setTimeZone(TimeZone.getTimeZone(config.getTimezone()));
+                    }
+                    if (config.getLowValue() != null) {
+                        returnValue.setLowValue(new Date(Long.parseLong(config.getLowValue().toString())));
+                    }
+                    if (config.getHighValue() != null) {
+                        returnValue.setHighValue(new Date(Long.parseLong(config.getHighValue().toString())));
+                    }
+                    return returnValue;
+                }
+            };
 
     /**
      * The varbinary type in mysql mode
      */
-    private static final DataTypeFactory OB_MYSQL_VARBINARY
-            = new DataTypeFactory<MysqlBinaryType, CharDataTypeConfig, ByteGeneratorBase>() {
-        @Override
-        public String name() {
-            return "OB_MYSQL_VARBINARY";
-        }
+    private static final DataTypeFactory OB_MYSQL_VARBINARY =
+            new DataTypeFactory<MysqlBinaryType, CharDataTypeConfig, ByteGeneratorBase>() {
+                @Override
+                public String name() {
+                    return "OB_MYSQL_VARBINARY";
+                }
 
-        @Override
-        protected MysqlBinaryType newInstance(CharDataTypeConfig config, ByteGeneratorBase generator) {
-            if (config.getWidth() == null) {
-                throw new MockerException(MockerError.PARAMETER_ERROR, "Width for varbinary can not be null");
-            }
-            if (config.getWidth() > 1048576) {
-                throw new MockerException(MockerError.PARAMETER_ERROR,
-                        String.format("Width for varbinary is too big (max = %d)", config.getWidth()));
-            }
-            MysqlBinaryType returnValue = new MysqlBinaryType(null, config.getAllowNull(), config.getWidth(), generator);
-            if (config.getLowValue() != null) {
-                returnValue.setLowValue((Integer) config.getLowValue());
-            }
-            if (config.getHighValue() != null) {
-                returnValue.setHighValue((Integer) config.getHighValue());
-            }
-            return returnValue;
-        }
-    };
+                @Override
+                protected MysqlBinaryType newInstance(CharDataTypeConfig config, ByteGeneratorBase generator) {
+                    if (config.getWidth() == null) {
+                        throw new MockerException(MockerError.PARAMETER_ERROR, "Width for varbinary can not be null");
+                    }
+                    if (config.getWidth() > 1048576) {
+                        throw new MockerException(MockerError.PARAMETER_ERROR,
+                                String.format("Width for varbinary is too big (max = %d)", config.getWidth()));
+                    }
+                    MysqlBinaryType returnValue =
+                            new MysqlBinaryType(null, config.getAllowNull(), config.getWidth(), generator);
+                    if (config.getLowValue() != null) {
+                        returnValue.setLowValue((Integer) config.getLowValue());
+                    }
+                    if (config.getHighValue() != null) {
+                        returnValue.setHighValue((Integer) config.getHighValue());
+                    }
+                    return returnValue;
+                }
+            };
 
     /**
      * The bit type in mysql mode
      */
-    private static final DataTypeFactory OB_MYSQL_BIT = new DataTypeFactory<MysqlBinaryType, CharDataTypeConfig, ByteGeneratorBase>() {
-        @Override
-        public String name() {
-            return "OB_MYSQL_BIT";
-        }
+    private static final DataTypeFactory OB_MYSQL_BIT =
+            new DataTypeFactory<MysqlBinaryType, CharDataTypeConfig, ByteGeneratorBase>() {
+                @Override
+                public String name() {
+                    return "OB_MYSQL_BIT";
+                }
 
-        @Override
-        protected MysqlBinaryType newInstance(CharDataTypeConfig config, ByteGeneratorBase generator) {
-            if (config.getWidth() == null) {
-                throw new MockerException(MockerError.PARAMETER_ERROR, "Width for bit can not be null");
-            }
-            if (config.getWidth() > 64) {
-                throw new MockerException(MockerError.PARAMETER_ERROR,
-                        String.format("Width for bit is too big (max = %d)", config.getWidth()));
-            }
-            int byteWidth = config.getWidth() / 8;
-            if (byteWidth <= 0) {
-                throw new MockerException(MockerError.PARAMETER_ERROR, "Byte width can not be equal to or smaller than zero");
-            }
-            MysqlBinaryType returnValue = new MysqlBinaryType(null, config.getAllowNull(), byteWidth, generator);
-            if (config.getLowValue() != null) {
-                returnValue.setLowValue((Integer) config.getLowValue() / 8);
-            }
-            if (config.getHighValue() != null) {
-                returnValue.setHighValue((Integer) config.getHighValue() / 8);
-            }
-            return returnValue;
-        }
-    };
+                @Override
+                protected MysqlBinaryType newInstance(CharDataTypeConfig config, ByteGeneratorBase generator) {
+                    if (config.getWidth() == null) {
+                        throw new MockerException(MockerError.PARAMETER_ERROR, "Width for bit can not be null");
+                    }
+                    if (config.getWidth() > 64) {
+                        throw new MockerException(MockerError.PARAMETER_ERROR,
+                                String.format("Width for bit is too big (max = %d)", config.getWidth()));
+                    }
+                    int byteWidth = config.getWidth() / 8;
+                    if (byteWidth <= 0) {
+                        throw new MockerException(MockerError.PARAMETER_ERROR,
+                                "Byte width can not be equal to or smaller than zero");
+                    }
+                    MysqlBinaryType returnValue =
+                            new MysqlBinaryType(null, config.getAllowNull(), byteWidth, generator);
+                    if (config.getLowValue() != null) {
+                        returnValue.setLowValue((Integer) config.getLowValue() / 8);
+                    }
+                    if (config.getHighValue() != null) {
+                        returnValue.setHighValue((Integer) config.getHighValue() / 8);
+                    }
+                    return returnValue;
+                }
+            };
 
     /**
      * The binary type in mysql mode
      */
-    private static final DataTypeFactory OB_MYSQL_BINARY = new DataTypeFactory<MysqlBinaryType, CharDataTypeConfig, ByteGeneratorBase>() {
-        @Override
-        public String name() {
-            return "OB_MYSQL_BINARY";
-        }
+    private static final DataTypeFactory OB_MYSQL_BINARY =
+            new DataTypeFactory<MysqlBinaryType, CharDataTypeConfig, ByteGeneratorBase>() {
+                @Override
+                public String name() {
+                    return "OB_MYSQL_BINARY";
+                }
 
-        @Override
-        protected MysqlBinaryType newInstance(CharDataTypeConfig config, ByteGeneratorBase generator) {
-            if (config.getWidth() == null) {
-                throw new MockerException(MockerError.PARAMETER_ERROR, "Width for binary can not be null");
-            }
-            if (config.getWidth() > 256) {
-                throw new MockerException(MockerError.PARAMETER_ERROR,
-                        String.format("Width for binary is too big (max = %d)", config.getWidth()));
-            }
-            MysqlBinaryType returnValue = new MysqlBinaryType(null, config.getAllowNull(), config.getWidth(), generator);
-            if (config.getLowValue() != null) {
-                returnValue.setLowValue((Integer) config.getLowValue());
-            }
-            if (config.getHighValue() != null) {
-                returnValue.setHighValue((Integer) config.getHighValue());
-            }
-            return returnValue;
-        }
-    };
+                @Override
+                protected MysqlBinaryType newInstance(CharDataTypeConfig config, ByteGeneratorBase generator) {
+                    if (config.getWidth() == null) {
+                        throw new MockerException(MockerError.PARAMETER_ERROR, "Width for binary can not be null");
+                    }
+                    if (config.getWidth() > 256) {
+                        throw new MockerException(MockerError.PARAMETER_ERROR,
+                                String.format("Width for binary is too big (max = %d)", config.getWidth()));
+                    }
+                    MysqlBinaryType returnValue =
+                            new MysqlBinaryType(null, config.getAllowNull(), config.getWidth(), generator);
+                    if (config.getLowValue() != null) {
+                        returnValue.setLowValue((Integer) config.getLowValue());
+                    }
+                    if (config.getHighValue() != null) {
+                        returnValue.setHighValue((Integer) config.getHighValue());
+                    }
+                    return returnValue;
+                }
+            };
 
     /**
      * The longblob type in mysql mode
      */
-    private static final DataTypeFactory OB_MYSQL_LONGBLOB = new DataTypeFactory<MysqlBlobType, CharDataTypeConfig, ByteGeneratorBase>() {
-        @Override
-        public String name() {
-            return "OB_MYSQL_LONGBLOB";
-        }
+    private static final DataTypeFactory OB_MYSQL_LONGBLOB =
+            new DataTypeFactory<MysqlBlobType, CharDataTypeConfig, ByteGeneratorBase>() {
+                @Override
+                public String name() {
+                    return "OB_MYSQL_LONGBLOB";
+                }
 
-        @Override
-        protected MysqlBlobType newInstance(CharDataTypeConfig config, ByteGeneratorBase generator) {
-            MysqlBlobType returnValue = new MysqlBlobType(8192, null, config.getAllowNull(), generator);
-            if (config.getLowValue() != null) {
-                returnValue.setLowValue((Integer) config.getLowValue());
-            }
-            if (config.getHighValue() != null) {
-                returnValue.setHighValue((Integer) config.getHighValue());
-            }
-            return returnValue;
-        }
-    };
+                @Override
+                protected MysqlBlobType newInstance(CharDataTypeConfig config, ByteGeneratorBase generator) {
+                    MysqlBlobType returnValue = new MysqlBlobType(8192, null, config.getAllowNull(), generator);
+                    if (config.getLowValue() != null) {
+                        returnValue.setLowValue((Integer) config.getLowValue());
+                    }
+                    if (config.getHighValue() != null) {
+                        returnValue.setHighValue((Integer) config.getHighValue());
+                    }
+                    return returnValue;
+                }
+            };
 
     /**
      * The mediumblob type in mysql mode
      */
-    private static final DataTypeFactory OB_MYSQL_MEDIUMBLOB = new DataTypeFactory<MysqlBlobType, CharDataTypeConfig, ByteGeneratorBase>() {
-        @Override
-        public String name() {
-            return "OB_MYSQL_MEDIUMBLOB";
-        }
+    private static final DataTypeFactory OB_MYSQL_MEDIUMBLOB =
+            new DataTypeFactory<MysqlBlobType, CharDataTypeConfig, ByteGeneratorBase>() {
+                @Override
+                public String name() {
+                    return "OB_MYSQL_MEDIUMBLOB";
+                }
 
-        @Override
-        protected MysqlBlobType newInstance(CharDataTypeConfig config, ByteGeneratorBase generator) {
-            MysqlBlobType returnValue = new MysqlBlobType(8192, null, config.getAllowNull(), generator);
-            if (config.getLowValue() != null) {
-                returnValue.setLowValue((Integer) config.getLowValue());
-            }
-            if (config.getHighValue() != null) {
-                returnValue.setHighValue((Integer) config.getHighValue());
-            }
-            return returnValue;
-        }
-    };
+                @Override
+                protected MysqlBlobType newInstance(CharDataTypeConfig config, ByteGeneratorBase generator) {
+                    MysqlBlobType returnValue = new MysqlBlobType(8192, null, config.getAllowNull(), generator);
+                    if (config.getLowValue() != null) {
+                        returnValue.setLowValue((Integer) config.getLowValue());
+                    }
+                    if (config.getHighValue() != null) {
+                        returnValue.setHighValue((Integer) config.getHighValue());
+                    }
+                    return returnValue;
+                }
+            };
 
     /**
      * The blob type in mysql mode
      */
-    private static final DataTypeFactory OB_MYSQL_BLOB = new DataTypeFactory<MysqlBlobType, CharDataTypeConfig, ByteGeneratorBase>() {
-        @Override
-        public String name() {
-            return "OB_MYSQL_BLOB";
-        }
+    private static final DataTypeFactory OB_MYSQL_BLOB =
+            new DataTypeFactory<MysqlBlobType, CharDataTypeConfig, ByteGeneratorBase>() {
+                @Override
+                public String name() {
+                    return "OB_MYSQL_BLOB";
+                }
 
-        @Override
-        protected MysqlBlobType newInstance(CharDataTypeConfig config, ByteGeneratorBase generator) {
-            MysqlBlobType returnValue = new MysqlBlobType(4096, null, config.getAllowNull(), generator);
-            if (config.getLowValue() != null) {
-                returnValue.setLowValue((Integer) config.getLowValue());
-            }
-            if (config.getHighValue() != null) {
-                returnValue.setHighValue((Integer) config.getHighValue());
-            }
-            return returnValue;
-        }
-    };
+                @Override
+                protected MysqlBlobType newInstance(CharDataTypeConfig config, ByteGeneratorBase generator) {
+                    MysqlBlobType returnValue = new MysqlBlobType(4096, null, config.getAllowNull(), generator);
+                    if (config.getLowValue() != null) {
+                        returnValue.setLowValue((Integer) config.getLowValue());
+                    }
+                    if (config.getHighValue() != null) {
+                        returnValue.setHighValue((Integer) config.getHighValue());
+                    }
+                    return returnValue;
+                }
+            };
 
     /**
      * The tinyblob type in mysql mode
      */
-    private static final DataTypeFactory OB_MYSQL_TINYBLOB = new DataTypeFactory<MysqlBlobType, CharDataTypeConfig, ByteGeneratorBase>() {
-        @Override
-        public String name() {
-            return "OB_MYSQL_TINYBLOB";
-        }
+    private static final DataTypeFactory OB_MYSQL_TINYBLOB =
+            new DataTypeFactory<MysqlBlobType, CharDataTypeConfig, ByteGeneratorBase>() {
+                @Override
+                public String name() {
+                    return "OB_MYSQL_TINYBLOB";
+                }
 
-        @Override
-        protected MysqlBlobType newInstance(CharDataTypeConfig config, ByteGeneratorBase generator) {
-            MysqlBlobType returnValue = new MysqlBlobType(255, null, config.getAllowNull(), generator);
-            if (config.getLowValue() != null) {
-                returnValue.setLowValue((Integer) config.getLowValue());
-            }
-            if (config.getHighValue() != null) {
-                returnValue.setHighValue((Integer) config.getHighValue());
-            }
-            return returnValue;
-        }
-    };
+                @Override
+                protected MysqlBlobType newInstance(CharDataTypeConfig config, ByteGeneratorBase generator) {
+                    MysqlBlobType returnValue = new MysqlBlobType(255, null, config.getAllowNull(), generator);
+                    if (config.getLowValue() != null) {
+                        returnValue.setLowValue((Integer) config.getLowValue());
+                    }
+                    if (config.getHighValue() != null) {
+                        returnValue.setHighValue((Integer) config.getHighValue());
+                    }
+                    return returnValue;
+                }
+            };
 
     /**
      * The longtext type in mysql mode
      */
-    private static final DataTypeFactory OB_MYSQL_LONGTEXT = new DataTypeFactory<MysqlTextType, CharDataTypeConfig, CharGeneratorBase>() {
-        @Override
-        public String name() {
-            return "OB_MYSQL_LONGTEXT";
-        }
+    private static final DataTypeFactory OB_MYSQL_LONGTEXT =
+            new DataTypeFactory<MysqlTextType, CharDataTypeConfig, CharGeneratorBase>() {
+                @Override
+                public String name() {
+                    return "OB_MYSQL_LONGTEXT";
+                }
 
-        @Override
-        protected MysqlTextType newInstance(CharDataTypeConfig config, CharGeneratorBase generator) {
-            String charset = config.getCharset();
-            if (charset == null) {
-                throw new MockerException(MockerError.PARAMETER_ERROR, "Error parameters for longtext");
-            }
-            CharsetType charsetType = CharsetType.valueOf(charset);
-            MysqlTextType returnValue = new MysqlTextType(4096, (String) config.getDefaultValue(), config.getAllowNull(),
-                    charsetType, generator, false);
-            if (config.getLowValue() != null) {
-                returnValue.setLowValue((Integer) config.getLowValue());
-            }
-            if (config.getHighValue() != null) {
-                returnValue.setHighValue((Integer) config.getHighValue());
-            }
-            return returnValue;
-        }
-    };
+                @Override
+                protected MysqlTextType newInstance(CharDataTypeConfig config, CharGeneratorBase generator) {
+                    String charset = config.getCharset();
+                    if (charset == null) {
+                        throw new MockerException(MockerError.PARAMETER_ERROR, "Error parameters for longtext");
+                    }
+                    CharsetType charsetType = CharsetType.valueOf(charset);
+                    MysqlTextType returnValue =
+                            new MysqlTextType(4096, (String) config.getDefaultValue(), config.getAllowNull(),
+                                    charsetType, generator, false);
+                    if (config.getLowValue() != null) {
+                        returnValue.setLowValue((Integer) config.getLowValue());
+                    }
+                    if (config.getHighValue() != null) {
+                        returnValue.setHighValue((Integer) config.getHighValue());
+                    }
+                    return returnValue;
+                }
+            };
 
     /**
      * The mediumtext type in mysql mode
      */
-    private static final DataTypeFactory OB_MYSQL_MEDIUMTEXT = new DataTypeFactory<MysqlTextType, CharDataTypeConfig, CharGeneratorBase>() {
-        @Override
-        public String name() {
-            return "OB_MYSQL_MEDIUMTEXT";
-        }
+    private static final DataTypeFactory OB_MYSQL_MEDIUMTEXT =
+            new DataTypeFactory<MysqlTextType, CharDataTypeConfig, CharGeneratorBase>() {
+                @Override
+                public String name() {
+                    return "OB_MYSQL_MEDIUMTEXT";
+                }
 
-        @Override
-        protected MysqlTextType newInstance(CharDataTypeConfig config, CharGeneratorBase generator) {
-            String charset = config.getCharset();
-            if (charset == null) {
-                throw new MockerException(MockerError.PARAMETER_ERROR, "Error parametes for mediumtext");
-            }
-            CharsetType charsetType = CharsetType.valueOf(charset);
-            MysqlTextType returnValue = new MysqlTextType(4096, (String) config.getDefaultValue(), config.getAllowNull(),
-                    charsetType, generator, false);
-            if (config.getLowValue() != null) {
-                returnValue.setLowValue((Integer) config.getLowValue());
-            }
-            if (config.getHighValue() != null) {
-                returnValue.setHighValue((Integer) config.getHighValue());
-            }
-            return returnValue;
-        }
-    };
+                @Override
+                protected MysqlTextType newInstance(CharDataTypeConfig config, CharGeneratorBase generator) {
+                    String charset = config.getCharset();
+                    if (charset == null) {
+                        throw new MockerException(MockerError.PARAMETER_ERROR, "Error parametes for mediumtext");
+                    }
+                    CharsetType charsetType = CharsetType.valueOf(charset);
+                    MysqlTextType returnValue =
+                            new MysqlTextType(4096, (String) config.getDefaultValue(), config.getAllowNull(),
+                                    charsetType, generator, false);
+                    if (config.getLowValue() != null) {
+                        returnValue.setLowValue((Integer) config.getLowValue());
+                    }
+                    if (config.getHighValue() != null) {
+                        returnValue.setHighValue((Integer) config.getHighValue());
+                    }
+                    return returnValue;
+                }
+            };
 
     /**
      * The text type in mysql mode
      */
-    private static final DataTypeFactory OB_MYSQL_TEXT = new DataTypeFactory<MysqlTextType, CharDataTypeConfig, CharGeneratorBase>() {
-        @Override
-        public String name() {
-            return "OB_MYSQL_TEXT";
-        }
+    private static final DataTypeFactory OB_MYSQL_TEXT =
+            new DataTypeFactory<MysqlTextType, CharDataTypeConfig, CharGeneratorBase>() {
+                @Override
+                public String name() {
+                    return "OB_MYSQL_TEXT";
+                }
 
-        @Override
-        protected MysqlTextType newInstance(CharDataTypeConfig config, CharGeneratorBase generator) {
-            String charset = config.getCharset();
-            if (charset == null) {
-                throw new MockerException(MockerError.PARAMETER_ERROR, "Error parametes for text");
-            }
-            CharsetType charsetType = CharsetType.valueOf(charset);
-            MysqlTextType returnValue = new MysqlTextType(4096, (String) config.getDefaultValue(), config.getAllowNull(),
-                    charsetType, generator, false);
-            if (config.getLowValue() != null) {
-                returnValue.setLowValue((Integer) config.getLowValue());
-            }
-            if (config.getHighValue() != null) {
-                returnValue.setHighValue((Integer) config.getHighValue());
-            }
-            return returnValue;
-        }
-    };
+                @Override
+                protected MysqlTextType newInstance(CharDataTypeConfig config, CharGeneratorBase generator) {
+                    String charset = config.getCharset();
+                    if (charset == null) {
+                        throw new MockerException(MockerError.PARAMETER_ERROR, "Error parametes for text");
+                    }
+                    CharsetType charsetType = CharsetType.valueOf(charset);
+                    MysqlTextType returnValue =
+                            new MysqlTextType(4096, (String) config.getDefaultValue(), config.getAllowNull(),
+                                    charsetType, generator, false);
+                    if (config.getLowValue() != null) {
+                        returnValue.setLowValue((Integer) config.getLowValue());
+                    }
+                    if (config.getHighValue() != null) {
+                        returnValue.setHighValue((Integer) config.getHighValue());
+                    }
+                    return returnValue;
+                }
+            };
 
     /**
      * The tinytext type in mysql mode
      */
-    private static final DataTypeFactory OB_MYSQL_TINYTEXT = new DataTypeFactory<MysqlTextType, CharDataTypeConfig, CharGeneratorBase>() {
-        @Override
-        public String name() {
-            return "OB_MYSQL_TINYTEXT";
-        }
+    private static final DataTypeFactory OB_MYSQL_TINYTEXT =
+            new DataTypeFactory<MysqlTextType, CharDataTypeConfig, CharGeneratorBase>() {
+                @Override
+                public String name() {
+                    return "OB_MYSQL_TINYTEXT";
+                }
 
-        @Override
-        protected MysqlTextType newInstance(CharDataTypeConfig config, CharGeneratorBase generator) {
-            String charset = config.getCharset();
-            if (charset == null) {
-                throw new MockerException(MockerError.PARAMETER_ERROR, "Error parametes for tinytext");
-            }
-            CharsetType charsetType = CharsetType.valueOf(charset);
-            MysqlTextType returnValue = new MysqlTextType(255, (String) config.getDefaultValue(), config.getAllowNull(),
-                    charsetType, generator, false);
-            if (config.getLowValue() != null) {
-                returnValue.setLowValue((Integer) config.getLowValue());
-            }
-            if (config.getHighValue() != null) {
-                returnValue.setHighValue((Integer) config.getHighValue());
-            }
-            return returnValue;
-        }
-    };
+                @Override
+                protected MysqlTextType newInstance(CharDataTypeConfig config, CharGeneratorBase generator) {
+                    String charset = config.getCharset();
+                    if (charset == null) {
+                        throw new MockerException(MockerError.PARAMETER_ERROR, "Error parametes for tinytext");
+                    }
+                    CharsetType charsetType = CharsetType.valueOf(charset);
+                    MysqlTextType returnValue =
+                            new MysqlTextType(255, (String) config.getDefaultValue(), config.getAllowNull(),
+                                    charsetType, generator, false);
+                    if (config.getLowValue() != null) {
+                        returnValue.setLowValue((Integer) config.getLowValue());
+                    }
+                    if (config.getHighValue() != null) {
+                        returnValue.setHighValue((Integer) config.getHighValue());
+                    }
+                    return returnValue;
+                }
+            };
 
     /**
      * The varchar type in mysql mode
      */
-    private static final DataTypeFactory OB_MYSQL_VARCHAR = new DataTypeFactory<MysqlVarCharType, CharDataTypeConfig, CharGeneratorBase>() {
-        @Override
-        public String name() {
-            return "OB_MYSQL_VARCHAR";
-        }
+    private static final DataTypeFactory OB_MYSQL_VARCHAR =
+            new DataTypeFactory<MysqlVarCharType, CharDataTypeConfig, CharGeneratorBase>() {
+                @Override
+                public String name() {
+                    return "OB_MYSQL_VARCHAR";
+                }
 
-        @Override
-        protected MysqlVarCharType newInstance(CharDataTypeConfig config, CharGeneratorBase generator) {
-            String charset = config.getCharset();
-            Integer length = config.getWidth();
-            if (length == null || charset == null) {
-                throw new MockerException(MockerError.PARAMETER_ERROR, "Error parametes for VARCHAR");
-            }
-            CharsetType charsetType = CharsetType.valueOf(charset);
-            MysqlVarCharType returnValue = new MysqlVarCharType(length, (String) config.getDefaultValue(), config.getAllowNull(),
-                    charsetType, generator, false);
-            if (config.getLowValue() != null) {
-                returnValue.setLowValue((Integer) config.getLowValue());
-            }
-            if (config.getHighValue() != null) {
-                returnValue.setHighValue((Integer) config.getHighValue());
-            }
-            return returnValue;
-        }
-    };
+                @Override
+                protected MysqlVarCharType newInstance(CharDataTypeConfig config, CharGeneratorBase generator) {
+                    String charset = config.getCharset();
+                    Integer length = config.getWidth();
+                    if (length == null || charset == null) {
+                        throw new MockerException(MockerError.PARAMETER_ERROR, "Error parametes for VARCHAR");
+                    }
+                    CharsetType charsetType = CharsetType.valueOf(charset);
+                    MysqlVarCharType returnValue =
+                            new MysqlVarCharType(length, (String) config.getDefaultValue(), config.getAllowNull(),
+                                    charsetType, generator, false);
+                    if (config.getLowValue() != null) {
+                        returnValue.setLowValue((Integer) config.getLowValue());
+                    }
+                    if (config.getHighValue() != null) {
+                        returnValue.setHighValue((Integer) config.getHighValue());
+                    }
+                    return returnValue;
+                }
+            };
 
     /**
      * The char type in mysql mode
      */
-    private static final DataTypeFactory OB_MYSQL_CHAR = new DataTypeFactory<MysqlCharType, CharDataTypeConfig, CharGeneratorBase>() {
-        @Override
-        public String name() {
-            return "OB_MYSQL_CHAR";
-        }
+    private static final DataTypeFactory OB_MYSQL_CHAR =
+            new DataTypeFactory<MysqlCharType, CharDataTypeConfig, CharGeneratorBase>() {
+                @Override
+                public String name() {
+                    return "OB_MYSQL_CHAR";
+                }
 
-        @Override
-        protected MysqlCharType newInstance(CharDataTypeConfig config, CharGeneratorBase generator) {
-            String charset = config.getCharset();
-            Integer length = config.getWidth();
-            if (length == null || charset == null) {
-                throw new MockerException(MockerError.PARAMETER_ERROR, "Error parametes for CHAR");
-            }
-            CharsetType charsetType = CharsetType.valueOf(charset);
-            MysqlCharType returnValue = new MysqlCharType(length, (String) config.getDefaultValue(), config.getAllowNull(),
-                    charsetType, generator, false);
-            if (config.getLowValue() != null) {
-                returnValue.setLowValue((Integer) config.getLowValue());
-            }
-            if (config.getHighValue() != null) {
-                returnValue.setHighValue((Integer) config.getHighValue());
-            }
-            return returnValue;
-        }
-    };
+                @Override
+                protected MysqlCharType newInstance(CharDataTypeConfig config, CharGeneratorBase generator) {
+                    String charset = config.getCharset();
+                    Integer length = config.getWidth();
+                    if (length == null || charset == null) {
+                        throw new MockerException(MockerError.PARAMETER_ERROR, "Error parametes for CHAR");
+                    }
+                    CharsetType charsetType = CharsetType.valueOf(charset);
+                    MysqlCharType returnValue =
+                            new MysqlCharType(length, (String) config.getDefaultValue(), config.getAllowNull(),
+                                    charsetType, generator, false);
+                    if (config.getLowValue() != null) {
+                        returnValue.setLowValue((Integer) config.getLowValue());
+                    }
+                    if (config.getHighValue() != null) {
+                        returnValue.setHighValue((Integer) config.getHighValue());
+                    }
+                    return returnValue;
+                }
+            };
 
     /**
      * The double unsigned type in mysql mode
      */
-    private static final DataTypeFactory OB_MYSQL_DOUBLE_UNSIGNED
-            = new DataTypeFactory<MysqlFloatType, DigitDataTypeConfig, DigitalGeneratorBase>() {
-        @Override
-        public String name() {
-            return "OB_MYSQL_DOUBLE_UNSIGNED";
-        }
+    private static final DataTypeFactory OB_MYSQL_DOUBLE_UNSIGNED =
+            new DataTypeFactory<MysqlFloatType, DigitDataTypeConfig, DigitalGeneratorBase>() {
+                @Override
+                public String name() {
+                    return "OB_MYSQL_DOUBLE_UNSIGNED";
+                }
 
-        @Override
-        protected MysqlFloatType newInstance(DigitDataTypeConfig config, DigitalGeneratorBase generator) {
-            if (config.getScale() != null && config.getPrecision() == null) {
-                throw new MockerException(MockerError.PARAMETER_ERROR, "Param settings is illegal for double");
-            }
-            Integer scale = config.getScale() == null ? -1 : config.getScale();
-            Integer precision = config.getPrecision() == null ? -1 : config.getPrecision();
-            if (scale == -1 && precision != -1) {
-                precision = -1;
-            }
-            BigDecimal defaultValue = config.getDefaultValue() == null ? null : new BigDecimal(config.getDefaultValue().toString());
-            MysqlFloatType returnValue = new MysqlFloatType(precision, scale, generator, defaultValue, config.getAllowNull(), false);
-            if (config.getLowValue() != null) {
-                returnValue.setLowValue(new BigDecimal(config.getLowValue().toString()));
-            }
-            if (config.getHighValue() != null) {
-                returnValue.setHighValue(new BigDecimal(config.getHighValue().toString()));
-            }
-            return returnValue;
-        }
-    };
+                @Override
+                protected MysqlFloatType newInstance(DigitDataTypeConfig config, DigitalGeneratorBase generator) {
+                    if (config.getScale() != null && config.getPrecision() == null) {
+                        throw new MockerException(MockerError.PARAMETER_ERROR, "Param settings is illegal for double");
+                    }
+                    Integer scale = config.getScale() == null ? -1 : config.getScale();
+                    Integer precision = config.getPrecision() == null ? -1 : config.getPrecision();
+                    if (scale == -1 && precision != -1) {
+                        precision = -1;
+                    }
+                    BigDecimal defaultValue = config.getDefaultValue() == null ? null
+                            : new BigDecimal(config.getDefaultValue().toString());
+                    MysqlFloatType returnValue =
+                            new MysqlFloatType(precision, scale, generator, defaultValue, config.getAllowNull(), false);
+                    if (config.getLowValue() != null) {
+                        returnValue.setLowValue(new BigDecimal(config.getLowValue().toString()));
+                    }
+                    if (config.getHighValue() != null) {
+                        returnValue.setHighValue(new BigDecimal(config.getHighValue().toString()));
+                    }
+                    return returnValue;
+                }
+            };
 
     /**
      * The double type in mysql mode
      */
-    private static final DataTypeFactory OB_MYSQL_DOUBLE
-            = new DataTypeFactory<MysqlFloatType, DigitDataTypeConfig, DigitalGeneratorBase>() {
-        @Override
-        public String name() {
-            return "OB_MYSQL_DOUBLE";
-        }
+    private static final DataTypeFactory OB_MYSQL_DOUBLE =
+            new DataTypeFactory<MysqlFloatType, DigitDataTypeConfig, DigitalGeneratorBase>() {
+                @Override
+                public String name() {
+                    return "OB_MYSQL_DOUBLE";
+                }
 
-        @Override
-        protected MysqlFloatType newInstance(DigitDataTypeConfig config, DigitalGeneratorBase generator) {
-            if (config.getScale() != null && config.getPrecision() == null) {
-                throw new MockerException(MockerError.PARAMETER_ERROR, "Param settings is illegal for double");
-            }
-            Integer scale = config.getScale() == null ? -1 : config.getScale();
-            Integer precision = config.getPrecision() == null ? -1 : config.getPrecision();
-            if (scale == -1 && precision != -1) {
-                precision = -1;
-            }
-            BigDecimal defaultValue = config.getDefaultValue() == null ? null : new BigDecimal(config.getDefaultValue().toString());
-            MysqlFloatType returnValue = new MysqlFloatType(precision, scale, generator, defaultValue, config.getAllowNull(), true);
-            if (config.getLowValue() != null) {
-                returnValue.setLowValue(new BigDecimal(config.getLowValue().toString()));
-            }
-            if (config.getHighValue() != null) {
-                returnValue.setHighValue(new BigDecimal(config.getHighValue().toString()));
-            }
-            return returnValue;
-        }
-    };
+                @Override
+                protected MysqlFloatType newInstance(DigitDataTypeConfig config, DigitalGeneratorBase generator) {
+                    if (config.getScale() != null && config.getPrecision() == null) {
+                        throw new MockerException(MockerError.PARAMETER_ERROR, "Param settings is illegal for double");
+                    }
+                    Integer scale = config.getScale() == null ? -1 : config.getScale();
+                    Integer precision = config.getPrecision() == null ? -1 : config.getPrecision();
+                    if (scale == -1 && precision != -1) {
+                        precision = -1;
+                    }
+                    BigDecimal defaultValue = config.getDefaultValue() == null ? null
+                            : new BigDecimal(config.getDefaultValue().toString());
+                    MysqlFloatType returnValue =
+                            new MysqlFloatType(precision, scale, generator, defaultValue, config.getAllowNull(), true);
+                    if (config.getLowValue() != null) {
+                        returnValue.setLowValue(new BigDecimal(config.getLowValue().toString()));
+                    }
+                    if (config.getHighValue() != null) {
+                        returnValue.setHighValue(new BigDecimal(config.getHighValue().toString()));
+                    }
+                    return returnValue;
+                }
+            };
 
     /**
      * The float unsigned type in mysql mode
      */
-    private static final DataTypeFactory OB_MYSQL_FLOAT_UNSIGNED
-            = new DataTypeFactory<MysqlFloatType, DigitDataTypeConfig, DigitalGeneratorBase>() {
-        @Override
-        public String name() {
-            return "OB_MYSQL_FLOAT_UNSIGNED";
-        }
+    private static final DataTypeFactory OB_MYSQL_FLOAT_UNSIGNED =
+            new DataTypeFactory<MysqlFloatType, DigitDataTypeConfig, DigitalGeneratorBase>() {
+                @Override
+                public String name() {
+                    return "OB_MYSQL_FLOAT_UNSIGNED";
+                }
 
-        @Override
-        protected MysqlFloatType newInstance(DigitDataTypeConfig config, DigitalGeneratorBase generator) {
-            if (config.getScale() != null && config.getPrecision() == null) {
-                throw new MockerException(MockerError.PARAMETER_ERROR, "Param settings is illegal for float");
-            }
-            Integer scale = config.getScale() == null ? -1 : config.getScale();
-            Integer precision = config.getPrecision() == null ? -1 : config.getPrecision();
-            if (scale == -1 && precision != -1) {
-                precision = -1;
-            }
-            BigDecimal defaultValue = config.getDefaultValue() == null ? null : new BigDecimal(config.getDefaultValue().toString());
-            MysqlFloatType returnValue = new MysqlFloatType(precision, scale, generator, defaultValue, config.getAllowNull(), false);
-            if (config.getLowValue() != null) {
-                returnValue.setLowValue(new BigDecimal(config.getLowValue().toString()));
-            }
-            if (config.getHighValue() != null) {
-                returnValue.setHighValue(new BigDecimal(config.getHighValue().toString()));
-            }
-            return returnValue;
-        }
-    };
+                @Override
+                protected MysqlFloatType newInstance(DigitDataTypeConfig config, DigitalGeneratorBase generator) {
+                    if (config.getScale() != null && config.getPrecision() == null) {
+                        throw new MockerException(MockerError.PARAMETER_ERROR, "Param settings is illegal for float");
+                    }
+                    Integer scale = config.getScale() == null ? -1 : config.getScale();
+                    Integer precision = config.getPrecision() == null ? -1 : config.getPrecision();
+                    if (scale == -1 && precision != -1) {
+                        precision = -1;
+                    }
+                    BigDecimal defaultValue = config.getDefaultValue() == null ? null
+                            : new BigDecimal(config.getDefaultValue().toString());
+                    MysqlFloatType returnValue =
+                            new MysqlFloatType(precision, scale, generator, defaultValue, config.getAllowNull(), false);
+                    if (config.getLowValue() != null) {
+                        returnValue.setLowValue(new BigDecimal(config.getLowValue().toString()));
+                    }
+                    if (config.getHighValue() != null) {
+                        returnValue.setHighValue(new BigDecimal(config.getHighValue().toString()));
+                    }
+                    return returnValue;
+                }
+            };
 
     /**
      * The float type in mysql mode
      */
-    private static final DataTypeFactory OB_MYSQL_FLOAT = new DataTypeFactory<MysqlFloatType, DigitDataTypeConfig, DigitalGeneratorBase>() {
-        @Override
-        public String name() {
-            return "OB_MYSQL_FLOAT";
-        }
+    private static final DataTypeFactory OB_MYSQL_FLOAT =
+            new DataTypeFactory<MysqlFloatType, DigitDataTypeConfig, DigitalGeneratorBase>() {
+                @Override
+                public String name() {
+                    return "OB_MYSQL_FLOAT";
+                }
 
-        @Override
-        protected MysqlFloatType newInstance(DigitDataTypeConfig config, DigitalGeneratorBase generator) {
-            if (config.getScale() != null && config.getPrecision() == null) {
-                throw new MockerException(MockerError.PARAMETER_ERROR, "Param settings is illegal for float");
-            }
-            Integer scale = config.getScale() == null ? -1 : config.getScale();
-            Integer precision = config.getPrecision() == null ? -1 : config.getPrecision();
-            if (scale == -1 && precision != -1) {
-                precision = -1;
-            }
-            BigDecimal defaultValue = config.getDefaultValue() == null ? null : new BigDecimal(config.getDefaultValue().toString());
-            MysqlFloatType returnValue = new MysqlFloatType(precision, scale, generator, defaultValue, config.getAllowNull(), true);
-            if (config.getLowValue() != null) {
-                returnValue.setLowValue(new BigDecimal(config.getLowValue().toString()));
-            }
-            if (config.getHighValue() != null) {
-                returnValue.setHighValue(new BigDecimal(config.getHighValue().toString()));
-            }
-            return returnValue;
-        }
-    };
+                @Override
+                protected MysqlFloatType newInstance(DigitDataTypeConfig config, DigitalGeneratorBase generator) {
+                    if (config.getScale() != null && config.getPrecision() == null) {
+                        throw new MockerException(MockerError.PARAMETER_ERROR, "Param settings is illegal for float");
+                    }
+                    Integer scale = config.getScale() == null ? -1 : config.getScale();
+                    Integer precision = config.getPrecision() == null ? -1 : config.getPrecision();
+                    if (scale == -1 && precision != -1) {
+                        precision = -1;
+                    }
+                    BigDecimal defaultValue = config.getDefaultValue() == null ? null
+                            : new BigDecimal(config.getDefaultValue().toString());
+                    MysqlFloatType returnValue =
+                            new MysqlFloatType(precision, scale, generator, defaultValue, config.getAllowNull(), true);
+                    if (config.getLowValue() != null) {
+                        returnValue.setLowValue(new BigDecimal(config.getLowValue().toString()));
+                    }
+                    if (config.getHighValue() != null) {
+                        returnValue.setHighValue(new BigDecimal(config.getHighValue().toString()));
+                    }
+                    return returnValue;
+                }
+            };
 
     /**
      * The decimal unsigned type in mysql mode
      */
-    private static final DataTypeFactory OB_MYSQL_DECIMAL_UNSIGNED
-            = new DataTypeFactory<MysqlDecimalType, DigitDataTypeConfig, DigitalGeneratorBase>() {
-        @Override
-        public String name() {
-            return "OB_MYSQL_DECIMAL_UNSIGNED";
-        }
+    private static final DataTypeFactory OB_MYSQL_DECIMAL_UNSIGNED =
+            new DataTypeFactory<MysqlDecimalType, DigitDataTypeConfig, DigitalGeneratorBase>() {
+                @Override
+                public String name() {
+                    return "OB_MYSQL_DECIMAL_UNSIGNED";
+                }
 
-        @Override
-        protected MysqlDecimalType newInstance(DigitDataTypeConfig config, DigitalGeneratorBase generator) {
-            if (config.getScale() != null && config.getPrecision() == null) {
-                throw new MockerException(MockerError.PARAMETER_ERROR, "Param settings is illegal for decimal");
-            }
-            Integer scale = config.getScale() == null ? 0 : config.getScale();
-            Integer precision = config.getPrecision() == null ? 10 : config.getPrecision();
-            BigDecimal defaultValue = config.getDefaultValue() == null ? null : new BigDecimal(config.getDefaultValue().toString());
-            MysqlDecimalType returnValue = new MysqlDecimalType(precision, scale, generator, defaultValue, config.getAllowNull(), false);
-            if (config.getLowValue() != null) {
-                returnValue.setLowValue(new BigDecimal(config.getLowValue().toString()));
-            }
-            if (config.getHighValue() != null) {
-                returnValue.setHighValue(new BigDecimal(config.getHighValue().toString()));
-            }
-            return returnValue;
-        }
-    };
+                @Override
+                protected MysqlDecimalType newInstance(DigitDataTypeConfig config, DigitalGeneratorBase generator) {
+                    if (config.getScale() != null && config.getPrecision() == null) {
+                        throw new MockerException(MockerError.PARAMETER_ERROR, "Param settings is illegal for decimal");
+                    }
+                    Integer scale = config.getScale() == null ? 0 : config.getScale();
+                    Integer precision = config.getPrecision() == null ? 10 : config.getPrecision();
+                    BigDecimal defaultValue = config.getDefaultValue() == null ? null
+                            : new BigDecimal(config.getDefaultValue().toString());
+                    MysqlDecimalType returnValue = new MysqlDecimalType(precision, scale, generator, defaultValue,
+                            config.getAllowNull(), false);
+                    if (config.getLowValue() != null) {
+                        returnValue.setLowValue(new BigDecimal(config.getLowValue().toString()));
+                    }
+                    if (config.getHighValue() != null) {
+                        returnValue.setHighValue(new BigDecimal(config.getHighValue().toString()));
+                    }
+                    return returnValue;
+                }
+            };
 
     /**
      * The decimal type in mysql mode
      */
-    private static final DataTypeFactory OB_MYSQL_DECIMAL
-            = new DataTypeFactory<MysqlDecimalType, DigitDataTypeConfig, DigitalGeneratorBase>() {
-        @Override
-        public String name() {
-            return "OB_MYSQL_DECIMAL";
-        }
+    private static final DataTypeFactory OB_MYSQL_DECIMAL =
+            new DataTypeFactory<MysqlDecimalType, DigitDataTypeConfig, DigitalGeneratorBase>() {
+                @Override
+                public String name() {
+                    return "OB_MYSQL_DECIMAL";
+                }
 
-        @Override
-        protected MysqlDecimalType newInstance(DigitDataTypeConfig config, DigitalGeneratorBase generator) {
-            if (config.getScale() != null && config.getPrecision() == null) {
-                throw new MockerException(MockerError.PARAMETER_ERROR, "Param settings is illegal for decimal");
-            }
-            Integer scale = config.getScale() == null ? 0 : config.getScale();
-            Integer precision = config.getPrecision() == null ? 10 : config.getPrecision();
-            BigDecimal defaultValue = config.getDefaultValue() == null ? null : new BigDecimal(config.getDefaultValue().toString());
-            MysqlDecimalType returnValue = new MysqlDecimalType(precision, scale, generator, defaultValue, config.getAllowNull(), true);
-            if (config.getLowValue() != null) {
-                returnValue.setLowValue(new BigDecimal(config.getLowValue().toString()));
-            }
-            if (config.getHighValue() != null) {
-                returnValue.setHighValue(new BigDecimal(config.getHighValue().toString()));
-            }
-            return returnValue;
-        }
-    };
+                @Override
+                protected MysqlDecimalType newInstance(DigitDataTypeConfig config, DigitalGeneratorBase generator) {
+                    if (config.getScale() != null && config.getPrecision() == null) {
+                        throw new MockerException(MockerError.PARAMETER_ERROR, "Param settings is illegal for decimal");
+                    }
+                    Integer scale = config.getScale() == null ? 0 : config.getScale();
+                    Integer precision = config.getPrecision() == null ? 10 : config.getPrecision();
+                    BigDecimal defaultValue = config.getDefaultValue() == null ? null
+                            : new BigDecimal(config.getDefaultValue().toString());
+                    MysqlDecimalType returnValue = new MysqlDecimalType(precision, scale, generator, defaultValue,
+                            config.getAllowNull(), true);
+                    if (config.getLowValue() != null) {
+                        returnValue.setLowValue(new BigDecimal(config.getLowValue().toString()));
+                    }
+                    if (config.getHighValue() != null) {
+                        returnValue.setHighValue(new BigDecimal(config.getHighValue().toString()));
+                    }
+                    return returnValue;
+                }
+            };
 
     /**
      * The bigint unsigned type in mysql mode
      */
-    private static final DataTypeFactory OB_MYSQL_BIGINT_UNSIGNED
-            = new DataTypeFactory<MysqlBigIntType, DigitDataTypeConfig, DigitalGeneratorBase>() {
-        @Override
-        public String name() {
-            return "OB_MYSQL_BIGINT_UNSIGNED";
-        }
+    private static final DataTypeFactory OB_MYSQL_BIGINT_UNSIGNED =
+            new DataTypeFactory<MysqlBigIntType, DigitDataTypeConfig, DigitalGeneratorBase>() {
+                @Override
+                public String name() {
+                    return "OB_MYSQL_BIGINT_UNSIGNED";
+                }
 
-        @Override
-        protected MysqlBigIntType newInstance(DigitDataTypeConfig config, DigitalGeneratorBase generator) {
-            BigDecimal defaultValue = null;
-            if (config.getDefaultValue() != null) {
-                defaultValue = new BigDecimal(config.getDefaultValue().toString());
-            }
-            MysqlBigIntType returnValue = new MysqlBigIntType(generator, defaultValue, config.getAllowNull(), false);
-            if (config.getLowValue() != null) {
-                returnValue.setLowValue(new BigDecimal(config.getLowValue().toString()));
-            }
-            if (config.getHighValue() != null) {
-                returnValue.setHighValue(new BigDecimal(config.getHighValue().toString()));
-            }
-            return returnValue;
-        }
-    };
+                @Override
+                protected MysqlBigIntType newInstance(DigitDataTypeConfig config, DigitalGeneratorBase generator) {
+                    BigDecimal defaultValue = null;
+                    if (config.getDefaultValue() != null) {
+                        defaultValue = new BigDecimal(config.getDefaultValue().toString());
+                    }
+                    MysqlBigIntType returnValue =
+                            new MysqlBigIntType(generator, defaultValue, config.getAllowNull(), false);
+                    if (config.getLowValue() != null) {
+                        returnValue.setLowValue(new BigDecimal(config.getLowValue().toString()));
+                    }
+                    if (config.getHighValue() != null) {
+                        returnValue.setHighValue(new BigDecimal(config.getHighValue().toString()));
+                    }
+                    return returnValue;
+                }
+            };
 
     /**
      * The int type in mysql mode
      */
-    private static final DataTypeFactory OB_MYSQL_BIGINT
-            = new DataTypeFactory<MysqlBigIntType, DigitDataTypeConfig, DigitalGeneratorBase>() {
-        @Override
-        public String name() {
-            return "OB_MYSQL_BIGINT";
-        }
+    private static final DataTypeFactory OB_MYSQL_BIGINT =
+            new DataTypeFactory<MysqlBigIntType, DigitDataTypeConfig, DigitalGeneratorBase>() {
+                @Override
+                public String name() {
+                    return "OB_MYSQL_BIGINT";
+                }
 
-        @Override
-        protected MysqlBigIntType newInstance(DigitDataTypeConfig config, DigitalGeneratorBase generator) {
-            BigDecimal defaultValue = null;
-            if (config.getDefaultValue() != null) {
-                defaultValue = new BigDecimal(config.getDefaultValue().toString());
-            }
-            MysqlBigIntType returnValue = new MysqlBigIntType(generator, defaultValue, config.getAllowNull(), true);
-            if (config.getLowValue() != null) {
-                returnValue.setLowValue(new BigDecimal(config.getLowValue().toString()));
-            }
-            if (config.getHighValue() != null) {
-                returnValue.setHighValue(new BigDecimal(config.getHighValue().toString()));
-            }
-            return returnValue;
-        }
-    };
+                @Override
+                protected MysqlBigIntType newInstance(DigitDataTypeConfig config, DigitalGeneratorBase generator) {
+                    BigDecimal defaultValue = null;
+                    if (config.getDefaultValue() != null) {
+                        defaultValue = new BigDecimal(config.getDefaultValue().toString());
+                    }
+                    MysqlBigIntType returnValue =
+                            new MysqlBigIntType(generator, defaultValue, config.getAllowNull(), true);
+                    if (config.getLowValue() != null) {
+                        returnValue.setLowValue(new BigDecimal(config.getLowValue().toString()));
+                    }
+                    if (config.getHighValue() != null) {
+                        returnValue.setHighValue(new BigDecimal(config.getHighValue().toString()));
+                    }
+                    return returnValue;
+                }
+            };
 
     /**
      * The int unsigned type in mysql mode
      */
-    private static final DataTypeFactory OB_MYSQL_INT_UNSIGNED
-            = new DataTypeFactory<MysqlIntType, DigitDataTypeConfig, DigitalGeneratorBase>() {
-        @Override
-        public String name() {
-            return "OB_MYSQL_INT_UNSIGNED";
-        }
+    private static final DataTypeFactory OB_MYSQL_INT_UNSIGNED =
+            new DataTypeFactory<MysqlIntType, DigitDataTypeConfig, DigitalGeneratorBase>() {
+                @Override
+                public String name() {
+                    return "OB_MYSQL_INT_UNSIGNED";
+                }
 
-        @Override
-        protected MysqlIntType newInstance(DigitDataTypeConfig config, DigitalGeneratorBase generator) {
-            BigDecimal defaultValue = null;
-            if (config.getDefaultValue() != null) {
-                defaultValue = new BigDecimal(config.getDefaultValue().toString());
-            }
-            MysqlIntType returnValue = new MysqlIntType(generator, defaultValue, config.getAllowNull(), false);
-            if (config.getLowValue() != null) {
-                returnValue.setLowValue(new BigDecimal(config.getLowValue().toString()));
-            }
-            if (config.getHighValue() != null) {
-                returnValue.setHighValue(new BigDecimal(config.getHighValue().toString()));
-            }
-            return returnValue;
-        }
-    };
+                @Override
+                protected MysqlIntType newInstance(DigitDataTypeConfig config, DigitalGeneratorBase generator) {
+                    BigDecimal defaultValue = null;
+                    if (config.getDefaultValue() != null) {
+                        defaultValue = new BigDecimal(config.getDefaultValue().toString());
+                    }
+                    MysqlIntType returnValue = new MysqlIntType(generator, defaultValue, config.getAllowNull(), false);
+                    if (config.getLowValue() != null) {
+                        returnValue.setLowValue(new BigDecimal(config.getLowValue().toString()));
+                    }
+                    if (config.getHighValue() != null) {
+                        returnValue.setHighValue(new BigDecimal(config.getHighValue().toString()));
+                    }
+                    return returnValue;
+                }
+            };
 
     /**
      * The int type in mysql mode
      */
-    private static final DataTypeFactory OB_MYSQL_INT = new DataTypeFactory<MysqlIntType, DigitDataTypeConfig, DigitalGeneratorBase>() {
-        @Override
-        public String name() {
-            return "OB_MYSQL_INT";
-        }
+    private static final DataTypeFactory OB_MYSQL_INT =
+            new DataTypeFactory<MysqlIntType, DigitDataTypeConfig, DigitalGeneratorBase>() {
+                @Override
+                public String name() {
+                    return "OB_MYSQL_INT";
+                }
 
-        @Override
-        protected MysqlIntType newInstance(DigitDataTypeConfig config, DigitalGeneratorBase generator) {
-            BigDecimal defaultValue = null;
-            if (config.getDefaultValue() != null) {
-                defaultValue = new BigDecimal(config.getDefaultValue().toString());
-            }
-            MysqlIntType returnValue = new MysqlIntType(generator, defaultValue, config.getAllowNull(), true);
-            if (config.getLowValue() != null) {
-                returnValue.setLowValue(new BigDecimal(config.getLowValue().toString()));
-            }
-            if (config.getHighValue() != null) {
-                returnValue.setHighValue(new BigDecimal(config.getHighValue().toString()));
-            }
-            return returnValue;
-        }
-    };
+                @Override
+                protected MysqlIntType newInstance(DigitDataTypeConfig config, DigitalGeneratorBase generator) {
+                    BigDecimal defaultValue = null;
+                    if (config.getDefaultValue() != null) {
+                        defaultValue = new BigDecimal(config.getDefaultValue().toString());
+                    }
+                    MysqlIntType returnValue = new MysqlIntType(generator, defaultValue, config.getAllowNull(), true);
+                    if (config.getLowValue() != null) {
+                        returnValue.setLowValue(new BigDecimal(config.getLowValue().toString()));
+                    }
+                    if (config.getHighValue() != null) {
+                        returnValue.setHighValue(new BigDecimal(config.getHighValue().toString()));
+                    }
+                    return returnValue;
+                }
+            };
 
     /**
      * The mediumInt unsigned type in mysql mode
      */
-    private static final DataTypeFactory OB_MYSQL_MEDIUMINT_UNSIGNED
-            = new DataTypeFactory<MysqlMediumIntType, DigitDataTypeConfig, DigitalGeneratorBase>() {
-        @Override
-        public String name() {
-            return "OB_MYSQL_MEDIUMINT_UNSIGNED";
-        }
+    private static final DataTypeFactory OB_MYSQL_MEDIUMINT_UNSIGNED =
+            new DataTypeFactory<MysqlMediumIntType, DigitDataTypeConfig, DigitalGeneratorBase>() {
+                @Override
+                public String name() {
+                    return "OB_MYSQL_MEDIUMINT_UNSIGNED";
+                }
 
-        @Override
-        protected MysqlMediumIntType newInstance(DigitDataTypeConfig config, DigitalGeneratorBase generator) {
-            BigDecimal defaultValue = null;
-            if (config.getDefaultValue() != null) {
-                defaultValue = new BigDecimal(config.getDefaultValue().toString());
-            }
-            MysqlMediumIntType returnValue = new MysqlMediumIntType(generator, defaultValue, config.getAllowNull(), false);
-            if (config.getLowValue() != null) {
-                returnValue.setLowValue(new BigDecimal(config.getLowValue().toString()));
-            }
-            if (config.getHighValue() != null) {
-                returnValue.setHighValue(new BigDecimal(config.getHighValue().toString()));
-            }
-            return returnValue;
-        }
-    };
+                @Override
+                protected MysqlMediumIntType newInstance(DigitDataTypeConfig config, DigitalGeneratorBase generator) {
+                    BigDecimal defaultValue = null;
+                    if (config.getDefaultValue() != null) {
+                        defaultValue = new BigDecimal(config.getDefaultValue().toString());
+                    }
+                    MysqlMediumIntType returnValue =
+                            new MysqlMediumIntType(generator, defaultValue, config.getAllowNull(), false);
+                    if (config.getLowValue() != null) {
+                        returnValue.setLowValue(new BigDecimal(config.getLowValue().toString()));
+                    }
+                    if (config.getHighValue() != null) {
+                        returnValue.setHighValue(new BigDecimal(config.getHighValue().toString()));
+                    }
+                    return returnValue;
+                }
+            };
 
     /**
      * The medium int type in mysql mode
      */
-    private static final DataTypeFactory OB_MYSQL_MEDIUMINT
-            = new DataTypeFactory<MysqlMediumIntType, DigitDataTypeConfig, DigitalGeneratorBase>() {
-        @Override
-        public String name() {
-            return "OB_MYSQL_MEDIUMINT";
-        }
+    private static final DataTypeFactory OB_MYSQL_MEDIUMINT =
+            new DataTypeFactory<MysqlMediumIntType, DigitDataTypeConfig, DigitalGeneratorBase>() {
+                @Override
+                public String name() {
+                    return "OB_MYSQL_MEDIUMINT";
+                }
 
-        @Override
-        protected MysqlMediumIntType newInstance(DigitDataTypeConfig config, DigitalGeneratorBase generator) {
-            BigDecimal defaultValue = null;
-            if (config.getDefaultValue() != null) {
-                defaultValue = new BigDecimal(config.getDefaultValue().toString());
-            }
-            MysqlMediumIntType returnValue = new MysqlMediumIntType(generator, defaultValue, config.getAllowNull(), true);
-            if (config.getLowValue() != null) {
-                returnValue.setLowValue(new BigDecimal(config.getLowValue().toString()));
-            }
-            if (config.getHighValue() != null) {
-                returnValue.setHighValue(new BigDecimal(config.getHighValue().toString()));
-            }
-            return returnValue;
-        }
-    };
+                @Override
+                protected MysqlMediumIntType newInstance(DigitDataTypeConfig config, DigitalGeneratorBase generator) {
+                    BigDecimal defaultValue = null;
+                    if (config.getDefaultValue() != null) {
+                        defaultValue = new BigDecimal(config.getDefaultValue().toString());
+                    }
+                    MysqlMediumIntType returnValue =
+                            new MysqlMediumIntType(generator, defaultValue, config.getAllowNull(), true);
+                    if (config.getLowValue() != null) {
+                        returnValue.setLowValue(new BigDecimal(config.getLowValue().toString()));
+                    }
+                    if (config.getHighValue() != null) {
+                        returnValue.setHighValue(new BigDecimal(config.getHighValue().toString()));
+                    }
+                    return returnValue;
+                }
+            };
 
     /**
      * The smallint unsigned type in mysql mode
      */
-    private static final DataTypeFactory OB_MYSQL_SMALLINT_UNSIGNED
-            = new DataTypeFactory<MysqlSmallIntType, DigitDataTypeConfig, DigitalGeneratorBase>() {
-        @Override
-        public String name() {
-            return "OB_MYSQL_SMALLINT_UNSIGNED";
-        }
+    private static final DataTypeFactory OB_MYSQL_SMALLINT_UNSIGNED =
+            new DataTypeFactory<MysqlSmallIntType, DigitDataTypeConfig, DigitalGeneratorBase>() {
+                @Override
+                public String name() {
+                    return "OB_MYSQL_SMALLINT_UNSIGNED";
+                }
 
-        @Override
-        protected MysqlSmallIntType newInstance(DigitDataTypeConfig config, DigitalGeneratorBase generator) {
-            BigDecimal defaultValue = null;
-            if (config.getDefaultValue() != null) {
-                defaultValue = new BigDecimal(config.getDefaultValue().toString());
-            }
-            MysqlSmallIntType returnValue = new MysqlSmallIntType(generator, defaultValue, config.getAllowNull(), false);
-            if (config.getLowValue() != null) {
-                returnValue.setLowValue(new BigDecimal(config.getLowValue().toString()));
-            }
-            if (config.getHighValue() != null) {
-                returnValue.setHighValue(new BigDecimal(config.getHighValue().toString()));
-            }
-            return returnValue;
-        }
-    };
+                @Override
+                protected MysqlSmallIntType newInstance(DigitDataTypeConfig config, DigitalGeneratorBase generator) {
+                    BigDecimal defaultValue = null;
+                    if (config.getDefaultValue() != null) {
+                        defaultValue = new BigDecimal(config.getDefaultValue().toString());
+                    }
+                    MysqlSmallIntType returnValue =
+                            new MysqlSmallIntType(generator, defaultValue, config.getAllowNull(), false);
+                    if (config.getLowValue() != null) {
+                        returnValue.setLowValue(new BigDecimal(config.getLowValue().toString()));
+                    }
+                    if (config.getHighValue() != null) {
+                        returnValue.setHighValue(new BigDecimal(config.getHighValue().toString()));
+                    }
+                    return returnValue;
+                }
+            };
 
     /**
      * The smallint type in mysql mode
      */
-    private static final DataTypeFactory OB_MYSQL_SMALLINT
-            = new DataTypeFactory<MysqlSmallIntType, DigitDataTypeConfig, DigitalGeneratorBase>() {
-        @Override
-        public String name() {
-            return "OB_MYSQL_SMALLINT";
-        }
+    private static final DataTypeFactory OB_MYSQL_SMALLINT =
+            new DataTypeFactory<MysqlSmallIntType, DigitDataTypeConfig, DigitalGeneratorBase>() {
+                @Override
+                public String name() {
+                    return "OB_MYSQL_SMALLINT";
+                }
 
-        @Override
-        protected MysqlSmallIntType newInstance(DigitDataTypeConfig config, DigitalGeneratorBase generator) {
-            BigDecimal defaultValue = null;
-            if (config.getDefaultValue() != null) {
-                defaultValue = new BigDecimal(config.getDefaultValue().toString());
-            }
-            MysqlSmallIntType returnValue = new MysqlSmallIntType(generator, defaultValue, config.getAllowNull(), true);
-            if (config.getLowValue() != null) {
-                returnValue.setLowValue(new BigDecimal(config.getLowValue().toString()));
-            }
-            if (config.getHighValue() != null) {
-                returnValue.setHighValue(new BigDecimal(config.getHighValue().toString()));
-            }
-            return returnValue;
-        }
-    };
+                @Override
+                protected MysqlSmallIntType newInstance(DigitDataTypeConfig config, DigitalGeneratorBase generator) {
+                    BigDecimal defaultValue = null;
+                    if (config.getDefaultValue() != null) {
+                        defaultValue = new BigDecimal(config.getDefaultValue().toString());
+                    }
+                    MysqlSmallIntType returnValue =
+                            new MysqlSmallIntType(generator, defaultValue, config.getAllowNull(), true);
+                    if (config.getLowValue() != null) {
+                        returnValue.setLowValue(new BigDecimal(config.getLowValue().toString()));
+                    }
+                    if (config.getHighValue() != null) {
+                        returnValue.setHighValue(new BigDecimal(config.getHighValue().toString()));
+                    }
+                    return returnValue;
+                }
+            };
 
     /**
      * The tinyint unsigned type in mysql mode
      */
-    private static final DataTypeFactory OB_MYSQL_TINYINT_UNSIGNED
-            = new DataTypeFactory<MysqlTinyIntType, DigitDataTypeConfig, DigitalGeneratorBase>() {
-        @Override
-        public String name() {
-            return "OB_MYSQL_TINYINT_UNSIGNED";
-        }
+    private static final DataTypeFactory OB_MYSQL_TINYINT_UNSIGNED =
+            new DataTypeFactory<MysqlTinyIntType, DigitDataTypeConfig, DigitalGeneratorBase>() {
+                @Override
+                public String name() {
+                    return "OB_MYSQL_TINYINT_UNSIGNED";
+                }
 
-        @Override
-        protected MysqlTinyIntType newInstance(DigitDataTypeConfig config, DigitalGeneratorBase generator) {
-            BigDecimal defaultValue = null;
-            if (config.getDefaultValue() != null) {
-                defaultValue = new BigDecimal(config.getDefaultValue().toString());
-            }
-            MysqlTinyIntType returnValue = new MysqlTinyIntType(generator, defaultValue, config.getAllowNull(), false);
-            if (config.getLowValue() != null) {
-                returnValue.setLowValue(new BigDecimal(config.getLowValue().toString()));
-            }
-            if (config.getHighValue() != null) {
-                returnValue.setHighValue(new BigDecimal(config.getHighValue().toString()));
-            }
-            return returnValue;
-        }
-    };
+                @Override
+                protected MysqlTinyIntType newInstance(DigitDataTypeConfig config, DigitalGeneratorBase generator) {
+                    BigDecimal defaultValue = null;
+                    if (config.getDefaultValue() != null) {
+                        defaultValue = new BigDecimal(config.getDefaultValue().toString());
+                    }
+                    MysqlTinyIntType returnValue =
+                            new MysqlTinyIntType(generator, defaultValue, config.getAllowNull(), false);
+                    if (config.getLowValue() != null) {
+                        returnValue.setLowValue(new BigDecimal(config.getLowValue().toString()));
+                    }
+                    if (config.getHighValue() != null) {
+                        returnValue.setHighValue(new BigDecimal(config.getHighValue().toString()));
+                    }
+                    return returnValue;
+                }
+            };
 
     /**
      * The tinyint type in mysql mode
      */
-    private static final DataTypeFactory OB_MYSQL_TINYINT
-            = new DataTypeFactory<MysqlTinyIntType, DigitDataTypeConfig, DigitalGeneratorBase>() {
-        @Override
-        public String name() {
-            return "OB_MYSQL_TINYINT";
-        }
+    private static final DataTypeFactory OB_MYSQL_TINYINT =
+            new DataTypeFactory<MysqlTinyIntType, DigitDataTypeConfig, DigitalGeneratorBase>() {
+                @Override
+                public String name() {
+                    return "OB_MYSQL_TINYINT";
+                }
 
-        @Override
-        protected MysqlTinyIntType newInstance(DigitDataTypeConfig config, DigitalGeneratorBase generator) {
-            BigDecimal defaultValue = null;
-            if (config.getDefaultValue() != null) {
-                defaultValue = new BigDecimal(config.getDefaultValue().toString());
-            }
-            MysqlTinyIntType returnValue = new MysqlTinyIntType(generator, defaultValue, config.getAllowNull(), true);
-            if (config.getLowValue() != null) {
-                returnValue.setLowValue(new BigDecimal(config.getLowValue().toString()));
-            }
-            if (config.getHighValue() != null) {
-                returnValue.setHighValue(new BigDecimal(config.getHighValue().toString()));
-            }
-            return returnValue;
-        }
-    };
+                @Override
+                protected MysqlTinyIntType newInstance(DigitDataTypeConfig config, DigitalGeneratorBase generator) {
+                    BigDecimal defaultValue = null;
+                    if (config.getDefaultValue() != null) {
+                        defaultValue = new BigDecimal(config.getDefaultValue().toString());
+                    }
+                    MysqlTinyIntType returnValue =
+                            new MysqlTinyIntType(generator, defaultValue, config.getAllowNull(), true);
+                    if (config.getLowValue() != null) {
+                        returnValue.setLowValue(new BigDecimal(config.getLowValue().toString()));
+                    }
+                    if (config.getHighValue() != null) {
+                        returnValue.setHighValue(new BigDecimal(config.getHighValue().toString()));
+                    }
+                    return returnValue;
+                }
+            };
 
     /**
      * The raw type in oracle mode
      */
-    private static final DataTypeFactory OB_ORACLE_RAW = new DataTypeFactory<OracleRawType, CharDataTypeConfig, ByteGeneratorBase>() {
-        @Override
-        public String name() {
-            return "OB_ORACLE_RAW";
-        }
+    private static final DataTypeFactory OB_ORACLE_RAW =
+            new DataTypeFactory<OracleRawType, CharDataTypeConfig, ByteGeneratorBase>() {
+                @Override
+                public String name() {
+                    return "OB_ORACLE_RAW";
+                }
 
-        @Override
-        protected OracleRawType newInstance(CharDataTypeConfig config, ByteGeneratorBase generator) {
-            OracleRawType returnValue = new OracleRawType(null, config.getAllowNull(), config.getWidth(), generator);
-            if (config.getLowValue() != null) {
-                returnValue.setLowValue((Integer) config.getLowValue());
-            }
-            if (config.getHighValue() != null) {
-                returnValue.setHighValue((Integer) config.getHighValue());
-            }
-            return returnValue;
-        }
-    };
+                @Override
+                protected OracleRawType newInstance(CharDataTypeConfig config, ByteGeneratorBase generator) {
+                    OracleRawType returnValue =
+                            new OracleRawType(null, config.getAllowNull(), config.getWidth(), generator);
+                    if (config.getLowValue() != null) {
+                        returnValue.setLowValue((Integer) config.getLowValue());
+                    }
+                    if (config.getHighValue() != null) {
+                        returnValue.setHighValue((Integer) config.getHighValue());
+                    }
+                    return returnValue;
+                }
+            };
 
     /**
      * The clob type in oracle mode
      */
-    private static final DataTypeFactory OB_ORACLE_CLOB = new DataTypeFactory<OracleBlobType, CharDataTypeConfig, ByteGeneratorBase>() {
-        @Override
-        public String name() {
-            return "OB_ORACLE_CLOB";
-        }
+    private static final DataTypeFactory OB_ORACLE_CLOB =
+            new DataTypeFactory<OracleBlobType, CharDataTypeConfig, ByteGeneratorBase>() {
+                @Override
+                public String name() {
+                    return "OB_ORACLE_CLOB";
+                }
 
-        @Override
-        protected OracleBlobType newInstance(CharDataTypeConfig config, ByteGeneratorBase generator) {
-            OracleBlobType returnValue = new OracleBlobType(null, config.getAllowNull(), generator);
-            if (config.getLowValue() != null) {
-                returnValue.setLowValue((Integer) config.getLowValue());
-            }
-            if (config.getHighValue() != null) {
-                returnValue.setHighValue((Integer) config.getHighValue());
-            }
-            return returnValue;
-        }
-    };
+                @Override
+                protected OracleBlobType newInstance(CharDataTypeConfig config, ByteGeneratorBase generator) {
+                    OracleBlobType returnValue = new OracleBlobType(null, config.getAllowNull(), generator);
+                    if (config.getLowValue() != null) {
+                        returnValue.setLowValue((Integer) config.getLowValue());
+                    }
+                    if (config.getHighValue() != null) {
+                        returnValue.setHighValue((Integer) config.getHighValue());
+                    }
+                    return returnValue;
+                }
+            };
 
     /**
      * The blob type in oracle mode
      */
-    private static final DataTypeFactory OB_ORACLE_BLOB = new DataTypeFactory<OracleBlobType, CharDataTypeConfig, ByteGeneratorBase>() {
-        @Override
-        public String name() {
-            return "OB_ORACLE_BLOB";
-        }
+    private static final DataTypeFactory OB_ORACLE_BLOB =
+            new DataTypeFactory<OracleBlobType, CharDataTypeConfig, ByteGeneratorBase>() {
+                @Override
+                public String name() {
+                    return "OB_ORACLE_BLOB";
+                }
 
-        @Override
-        protected OracleBlobType newInstance(CharDataTypeConfig config, ByteGeneratorBase generator) {
-            OracleBlobType returnValue = new OracleBlobType(null, config.getAllowNull(), generator);
-            if (config.getLowValue() != null) {
-                returnValue.setLowValue((Integer) config.getLowValue());
-            }
-            if (config.getHighValue() != null) {
-                returnValue.setHighValue((Integer) config.getHighValue());
-            }
-            return returnValue;
-        }
-    };
+                @Override
+                protected OracleBlobType newInstance(CharDataTypeConfig config, ByteGeneratorBase generator) {
+                    OracleBlobType returnValue = new OracleBlobType(null, config.getAllowNull(), generator);
+                    if (config.getLowValue() != null) {
+                        returnValue.setLowValue((Integer) config.getLowValue());
+                    }
+                    if (config.getHighValue() != null) {
+                        returnValue.setHighValue((Integer) config.getHighValue());
+                    }
+                    return returnValue;
+                }
+            };
 
     /**
      * timstamp with local time zone type in oracle mode
      */
-    private static final DataTypeFactory OB_ORACLE_TIMESTAMP_WITH_LOCAL_TIME_ZONE
-            = new DataTypeFactory<OracleTimestampType, DateDataTypeConfig, DateGeneratorBase>() {
+    private static final DataTypeFactory OB_ORACLE_TIMESTAMP_WITH_LOCAL_TIME_ZONE =
+            new DataTypeFactory<OracleTimestampType, DateDataTypeConfig, DateGeneratorBase>() {
 
-        @Override
-        public String name() {
-            return "OB_ORACLE_TIMESTAMP_WITH_LOCAL_TIME_ZONE";
-        }
+                @Override
+                public String name() {
+                    return "OB_ORACLE_TIMESTAMP_WITH_LOCAL_TIME_ZONE";
+                }
 
-        @Override
-        protected OracleTimestampType newInstance(DateDataTypeConfig config, DateGeneratorBase generator) {
-            int scale = 3;
-            if (config.getScale() != null) {
-                scale = config.getScale();
-            }
-            Timestamp defaultValue = null;
-            Object val = config.getDefaultValue();
-            if (val != null) {
-                defaultValue = new Timestamp(Long.parseLong(val.toString()));
-            }
-            OracleTimestampType returnValue = new OracleTimestampType(generator, scale, defaultValue, config.getAllowNull());
-            if (config.getTimezone() != null) {
-                returnValue.setTimeZone(TimeZone.getTimeZone(config.getTimezone()));
-            }
-            if (config.getLowValue() != null) {
-                returnValue.setLowValue(new Timestamp(Long.parseLong(config.getLowValue().toString())));
-            }
-            if (config.getHighValue() != null) {
-                returnValue.setHighValue(new Timestamp(Long.parseLong(config.getHighValue().toString())));
-            }
-            return returnValue;
-        }
-    };
+                @Override
+                protected OracleTimestampType newInstance(DateDataTypeConfig config, DateGeneratorBase generator) {
+                    int scale = 3;
+                    if (config.getScale() != null) {
+                        scale = config.getScale();
+                    }
+                    Timestamp defaultValue = null;
+                    Object val = config.getDefaultValue();
+                    if (val != null) {
+                        defaultValue = new Timestamp(Long.parseLong(val.toString()));
+                    }
+                    OracleTimestampType returnValue =
+                            new OracleTimestampType(generator, scale, defaultValue, config.getAllowNull());
+                    if (config.getTimezone() != null) {
+                        returnValue.setTimeZone(TimeZone.getTimeZone(config.getTimezone()));
+                    }
+                    if (config.getLowValue() != null) {
+                        returnValue.setLowValue(new Timestamp(Long.parseLong(config.getLowValue().toString())));
+                    }
+                    if (config.getHighValue() != null) {
+                        returnValue.setHighValue(new Timestamp(Long.parseLong(config.getHighValue().toString())));
+                    }
+                    return returnValue;
+                }
+            };
 
     /**
      * timstamp with time zone type in oracle mode
      */
-    private static final DataTypeFactory OB_ORACLE_TIMESTAMP_WITH_TIME_ZONE
-            = new DataTypeFactory<OracleTimestampType, DateDataTypeConfig, DateGeneratorBase>() {
+    private static final DataTypeFactory OB_ORACLE_TIMESTAMP_WITH_TIME_ZONE =
+            new DataTypeFactory<OracleTimestampType, DateDataTypeConfig, DateGeneratorBase>() {
 
-        @Override
-        public String name() {
-            return "OB_ORACLE_TIMESTAMP_WITH_TIME_ZONE";
-        }
+                @Override
+                public String name() {
+                    return "OB_ORACLE_TIMESTAMP_WITH_TIME_ZONE";
+                }
 
-        @Override
-        protected OracleTimestampType newInstance(DateDataTypeConfig config, DateGeneratorBase generator) {
-            int scale = 3;
-            if (config.getScale() != null) {
-                scale = config.getScale();
-            }
-            Timestamp defaultValue = null;
-            Object val = config.getDefaultValue();
-            if (val != null) {
-                defaultValue = new Timestamp(Long.parseLong(val.toString()));
-            }
-            OracleTimestampType returnValue = new OracleTimestampType(generator, scale, defaultValue, config.getAllowNull());
-            if (config.getTimezone() != null) {
-                returnValue.setTimeZone(TimeZone.getTimeZone(config.getTimezone()));
-            }
-            if (config.getLowValue() != null) {
-                returnValue.setLowValue(new Timestamp(Long.parseLong(config.getLowValue().toString())));
-            }
-            if (config.getHighValue() != null) {
-                returnValue.setHighValue(new Timestamp(Long.parseLong(config.getHighValue().toString())));
-            }
-            return returnValue;
-        }
-    };
+                @Override
+                protected OracleTimestampType newInstance(DateDataTypeConfig config, DateGeneratorBase generator) {
+                    int scale = 3;
+                    if (config.getScale() != null) {
+                        scale = config.getScale();
+                    }
+                    Timestamp defaultValue = null;
+                    Object val = config.getDefaultValue();
+                    if (val != null) {
+                        defaultValue = new Timestamp(Long.parseLong(val.toString()));
+                    }
+                    OracleTimestampType returnValue =
+                            new OracleTimestampType(generator, scale, defaultValue, config.getAllowNull());
+                    if (config.getTimezone() != null) {
+                        returnValue.setTimeZone(TimeZone.getTimeZone(config.getTimezone()));
+                    }
+                    if (config.getLowValue() != null) {
+                        returnValue.setLowValue(new Timestamp(Long.parseLong(config.getLowValue().toString())));
+                    }
+                    if (config.getHighValue() != null) {
+                        returnValue.setHighValue(new Timestamp(Long.parseLong(config.getHighValue().toString())));
+                    }
+                    return returnValue;
+                }
+            };
 
     /**
      * The timestamp type in oracle mode
      */
-    private static final DataTypeFactory OB_ORACLE_TIMESTAMP
-            = new DataTypeFactory<OracleTimestampType, DateDataTypeConfig, DateGeneratorBase>() {
+    private static final DataTypeFactory OB_ORACLE_TIMESTAMP =
+            new DataTypeFactory<OracleTimestampType, DateDataTypeConfig, DateGeneratorBase>() {
 
-        @Override
-        public String name() {
-            return "OB_ORACLE_TIMESTAMP";
-        }
+                @Override
+                public String name() {
+                    return "OB_ORACLE_TIMESTAMP";
+                }
 
-        @Override
-        protected OracleTimestampType newInstance(DateDataTypeConfig config, DateGeneratorBase generator) {
-            int scale = config.getScale() == null ? 3 : config.getScale();
-            Timestamp defaultValue = null;
-            Object val = config.getDefaultValue();
-            if (val != null) {
-                defaultValue = new Timestamp(Long.parseLong(val.toString()));
-            }
-            OracleTimestampType returnValue = new OracleTimestampType(generator, scale, defaultValue, config.getAllowNull());
-            if (config.getTimezone() != null) {
-                returnValue.setTimeZone(TimeZone.getTimeZone(config.getTimezone()));
-            }
-            if (config.getLowValue() != null) {
-                returnValue.setLowValue(new Timestamp(Long.parseLong(config.getLowValue().toString())));
-            }
-            if (config.getHighValue() != null) {
-                returnValue.setHighValue(new Timestamp(Long.parseLong(config.getHighValue().toString())));
-            }
-            return returnValue;
-        }
-    };
+                @Override
+                protected OracleTimestampType newInstance(DateDataTypeConfig config, DateGeneratorBase generator) {
+                    int scale = config.getScale() == null ? 3 : config.getScale();
+                    Timestamp defaultValue = null;
+                    Object val = config.getDefaultValue();
+                    if (val != null) {
+                        defaultValue = new Timestamp(Long.parseLong(val.toString()));
+                    }
+                    OracleTimestampType returnValue =
+                            new OracleTimestampType(generator, scale, defaultValue, config.getAllowNull());
+                    if (config.getTimezone() != null) {
+                        returnValue.setTimeZone(TimeZone.getTimeZone(config.getTimezone()));
+                    }
+                    if (config.getLowValue() != null) {
+                        returnValue.setLowValue(new Timestamp(Long.parseLong(config.getLowValue().toString())));
+                    }
+                    if (config.getHighValue() != null) {
+                        returnValue.setHighValue(new Timestamp(Long.parseLong(config.getHighValue().toString())));
+                    }
+                    return returnValue;
+                }
+            };
 
     /**
      * The date type in oracle mode
      */
-    private static final DataTypeFactory OB_ORACLE_DATE = new DataTypeFactory<OracleDateType, DateDataTypeConfig, DateGeneratorBase>() {
+    private static final DataTypeFactory OB_ORACLE_DATE =
+            new DataTypeFactory<OracleDateType, DateDataTypeConfig, DateGeneratorBase>() {
 
-        @Override
-        public String name() {
-            return "OB_ORACLE_DATE";
-        }
+                @Override
+                public String name() {
+                    return "OB_ORACLE_DATE";
+                }
 
-        @Override
-        protected OracleDateType newInstance(DateDataTypeConfig config, DateGeneratorBase generator) {
-            Date defaultValue = null;
-            Object val = config.getDefaultValue();
-            if (val != null) {
-                defaultValue = new Date(Long.parseLong(val.toString()));
-            }
-            OracleDateType returnValue = new OracleDateType(generator, defaultValue, config.getAllowNull());
-            if (config.getTimezone() != null) {
-                returnValue.setTimeZone(TimeZone.getTimeZone(config.getTimezone()));
-            }
-            if (config.getLowValue() != null) {
-                returnValue.setLowValue(new Date(Long.parseLong(config.getLowValue().toString())));
-            }
-            if (config.getHighValue() != null) {
-                returnValue.setHighValue(new Date(Long.parseLong(config.getHighValue().toString())));
-            }
-            return returnValue;
-        }
-    };
-
-    /**
-     * interval year to month type in oracle mode
-     */
-    private static final DataTypeFactory OB_ORACLE_INTERVAL_YEAR_TO_MONTH
-            = new DataTypeFactory<OracleIntervalYMType, DateDataTypeConfig, BaseGenerator>() {
-
-        @Override
-        public String name() {
-            return "OB_ORACLE_INTERVAL_YEAR_TO_MONTH";
-        }
-
-        @Override
-        protected OracleIntervalYMType newInstance(DateDataTypeConfig config, BaseGenerator generator) {
-            INTERVALYM defaultValue = null;
-            Object val = config.getDefaultValue();
-            if (val != null) {
-                defaultValue = new INTERVALYM(defaultValue.toString());
-            }
-            OracleIntervalYMType returnValue = new OracleIntervalYMType(generator, config.getScale(), defaultValue, config.getAllowNull());
-            if (config.getLowValue() != null) {
-                returnValue.setLowValue(Integer.valueOf(config.getLowValue().toString()));
-            }
-            if (config.getHighValue() != null) {
-                returnValue.setHighValue(Integer.valueOf(config.getHighValue().toString()));
-            }
-            return returnValue;
-        }
-    };
+                @Override
+                protected OracleDateType newInstance(DateDataTypeConfig config, DateGeneratorBase generator) {
+                    Date defaultValue = null;
+                    Object val = config.getDefaultValue();
+                    if (val != null) {
+                        defaultValue = new Date(Long.parseLong(val.toString()));
+                    }
+                    OracleDateType returnValue = new OracleDateType(generator, defaultValue, config.getAllowNull());
+                    if (config.getTimezone() != null) {
+                        returnValue.setTimeZone(TimeZone.getTimeZone(config.getTimezone()));
+                    }
+                    if (config.getLowValue() != null) {
+                        returnValue.setLowValue(new Date(Long.parseLong(config.getLowValue().toString())));
+                    }
+                    if (config.getHighValue() != null) {
+                        returnValue.setHighValue(new Date(Long.parseLong(config.getHighValue().toString())));
+                    }
+                    return returnValue;
+                }
+            };
 
     /**
      * interval year to month type in oracle mode
      */
-    private static final DataTypeFactory OB_ORACLE_INTERVAL_DAY_TO_SECOND
-            = new DataTypeFactory<OracleIntervalYMType, DateDataTypeConfig, BaseGenerator>() {
+    private static final DataTypeFactory OB_ORACLE_INTERVAL_YEAR_TO_MONTH =
+            new DataTypeFactory<OracleIntervalYMType, DateDataTypeConfig, BaseGenerator>() {
 
-        @Override
-        public String name() {
-            return "OB_ORACLE_INTERVAL_DAY_TO_SECOND";
-        }
+                @Override
+                public String name() {
+                    return "OB_ORACLE_INTERVAL_YEAR_TO_MONTH";
+                }
 
-        @Override
-        protected OracleIntervalYMType newInstance(DateDataTypeConfig config, BaseGenerator generator) {
-            INTERVALYM defaultValue = null;
-            Object val = config.getDefaultValue();
-            if (val != null) {
-                defaultValue = new INTERVALYM(defaultValue.toString());
-            }
-            OracleIntervalYMType returnValue = new OracleIntervalYMType(generator, config.getScale(), defaultValue, config.getAllowNull());
-            if (config.getLowValue() != null) {
-                returnValue.setLowValue(Integer.valueOf(config.getLowValue().toString()));
-            }
-            if (config.getHighValue() != null) {
-                returnValue.setHighValue(Integer.valueOf(config.getHighValue().toString()));
-            }
-            return returnValue;
-        }
-    };
+                @Override
+                protected OracleIntervalYMType newInstance(DateDataTypeConfig config, BaseGenerator generator) {
+                    INTERVALYM defaultValue = null;
+                    Object val = config.getDefaultValue();
+                    if (val != null) {
+                        defaultValue = new INTERVALYM(defaultValue.toString());
+                    }
+                    OracleIntervalYMType returnValue =
+                            new OracleIntervalYMType(generator, config.getScale(), defaultValue, config.getAllowNull());
+                    if (config.getLowValue() != null) {
+                        returnValue.setLowValue(Integer.valueOf(config.getLowValue().toString()));
+                    }
+                    if (config.getHighValue() != null) {
+                        returnValue.setHighValue(Integer.valueOf(config.getHighValue().toString()));
+                    }
+                    return returnValue;
+                }
+            };
+
+    /**
+     * interval year to month type in oracle mode
+     */
+    private static final DataTypeFactory OB_ORACLE_INTERVAL_DAY_TO_SECOND =
+            new DataTypeFactory<OracleIntervalYMType, DateDataTypeConfig, BaseGenerator>() {
+
+                @Override
+                public String name() {
+                    return "OB_ORACLE_INTERVAL_DAY_TO_SECOND";
+                }
+
+                @Override
+                protected OracleIntervalYMType newInstance(DateDataTypeConfig config, BaseGenerator generator) {
+                    INTERVALYM defaultValue = null;
+                    Object val = config.getDefaultValue();
+                    if (val != null) {
+                        defaultValue = new INTERVALYM(defaultValue.toString());
+                    }
+                    OracleIntervalYMType returnValue =
+                            new OracleIntervalYMType(generator, config.getScale(), defaultValue, config.getAllowNull());
+                    if (config.getLowValue() != null) {
+                        returnValue.setLowValue(Integer.valueOf(config.getLowValue().toString()));
+                    }
+                    if (config.getHighValue() != null) {
+                        returnValue.setHighValue(Integer.valueOf(config.getHighValue().toString()));
+                    }
+                    return returnValue;
+                }
+            };
 
     /**
      * The nvarchar type in oracle mode
      */
-    private static final DataTypeFactory OB_ORACLE_NVARCHAR
-            = new DataTypeFactory<OracleNvarCharType, CharDataTypeConfig, CharGeneratorBase>() {
+    private static final DataTypeFactory OB_ORACLE_NVARCHAR =
+            new DataTypeFactory<OracleNvarCharType, CharDataTypeConfig, CharGeneratorBase>() {
 
-        @Override
-        public String name() {
-            return "OB_ORACLE_NVARCHAR";
-        }
+                @Override
+                public String name() {
+                    return "OB_ORACLE_NVARCHAR";
+                }
 
-        @Override
-        protected OracleNvarCharType newInstance(CharDataTypeConfig config, CharGeneratorBase generator) {
-            String charset = config.getCharset();
-            Integer length = config.getWidth();
-            if (length == null || charset == null) {
-                throw new MockerException(MockerError.PARAMETER_ERROR, "Error parametes for VARCHAR2");
-            }
-            CharsetType charsetType = CharsetType.valueOf(charset);
-            OracleNvarCharType returnValue = new OracleNvarCharType(generator, length, (String) config.getDefaultValue(),
-                    config.getAllowNull(), charsetType);
-            if (config.getLowValue() != null) {
-                returnValue.setLowValue((Integer) config.getLowValue());
-            }
-            if (config.getHighValue() != null) {
-                returnValue.setHighValue((Integer) config.getHighValue());
-            }
-            return returnValue;
-        }
-    };
+                @Override
+                protected OracleNvarCharType newInstance(CharDataTypeConfig config, CharGeneratorBase generator) {
+                    String charset = config.getCharset();
+                    Integer length = config.getWidth();
+                    if (length == null || charset == null) {
+                        throw new MockerException(MockerError.PARAMETER_ERROR, "Error parametes for VARCHAR2");
+                    }
+                    CharsetType charsetType = CharsetType.valueOf(charset);
+                    OracleNvarCharType returnValue =
+                            new OracleNvarCharType(generator, length, (String) config.getDefaultValue(),
+                                    config.getAllowNull(), charsetType);
+                    if (config.getLowValue() != null) {
+                        returnValue.setLowValue((Integer) config.getLowValue());
+                    }
+                    if (config.getHighValue() != null) {
+                        returnValue.setHighValue((Integer) config.getHighValue());
+                    }
+                    return returnValue;
+                }
+            };
 
     /**
      * The varchar2 type in oracle mode
      */
-    private static final DataTypeFactory OB_ORACLE_VARCHAR2
-            = new DataTypeFactory<OracleVarCharType, CharDataTypeConfig, CharGeneratorBase>() {
-        @Override
-        public String name() {
-            return "OB_ORACLE_VARCHAR2";
-        }
+    private static final DataTypeFactory OB_ORACLE_VARCHAR2 =
+            new DataTypeFactory<OracleVarCharType, CharDataTypeConfig, CharGeneratorBase>() {
+                @Override
+                public String name() {
+                    return "OB_ORACLE_VARCHAR2";
+                }
 
-        @Override
-        protected OracleVarCharType newInstance(CharDataTypeConfig config, CharGeneratorBase generator) {
-            String charset = config.getCharset();
-            Integer length = config.getWidth();
-            if (length == null || charset == null) {
-                throw new MockerException(MockerError.PARAMETER_ERROR, "Error parametes for VARCHAR2");
-            }
-            CharsetType charsetType = CharsetType.valueOf(charset);
-            OracleVarCharType returnValue = new OracleVarCharType(generator, length, (String) config.getDefaultValue(),
-                    config.getAllowNull(), charsetType, config.isUnicode());
-            if (config.getLowValue() != null) {
-                returnValue.setLowValue((Integer) config.getLowValue());
-            }
-            if (config.getHighValue() != null) {
-                returnValue.setHighValue((Integer) config.getHighValue());
-            }
-            return returnValue;
-        }
-    };
+                @Override
+                protected OracleVarCharType newInstance(CharDataTypeConfig config, CharGeneratorBase generator) {
+                    String charset = config.getCharset();
+                    Integer length = config.getWidth();
+                    if (length == null || charset == null) {
+                        throw new MockerException(MockerError.PARAMETER_ERROR, "Error parametes for VARCHAR2");
+                    }
+                    CharsetType charsetType = CharsetType.valueOf(charset);
+                    OracleVarCharType returnValue =
+                            new OracleVarCharType(generator, length, (String) config.getDefaultValue(),
+                                    config.getAllowNull(), charsetType, config.isUnicode());
+                    if (config.getLowValue() != null) {
+                        returnValue.setLowValue((Integer) config.getLowValue());
+                    }
+                    if (config.getHighValue() != null) {
+                        returnValue.setHighValue((Integer) config.getHighValue());
+                    }
+                    return returnValue;
+                }
+            };
 
     /**
      * The varchar type in oracle mode
      */
-    private static final DataTypeFactory OB_ORACLE_VARCHAR
-            = new DataTypeFactory<OracleVarCharType, CharDataTypeConfig, CharGeneratorBase>() {
-        @Override
-        public String name() {
-            return "OB_ORACLE_VARCHAR";
-        }
+    private static final DataTypeFactory OB_ORACLE_VARCHAR =
+            new DataTypeFactory<OracleVarCharType, CharDataTypeConfig, CharGeneratorBase>() {
+                @Override
+                public String name() {
+                    return "OB_ORACLE_VARCHAR";
+                }
 
-        @Override
-        protected OracleVarCharType newInstance(CharDataTypeConfig config, CharGeneratorBase generator) {
-            String charset = config.getCharset();
-            Integer length = config.getWidth();
-            if (length == null || charset == null) {
-                throw new MockerException(MockerError.PARAMETER_ERROR, "Error parametes for VARCHAR");
-            }
-            CharsetType charsetType = CharsetType.valueOf(charset);
-            OracleVarCharType returnValue = new OracleVarCharType(generator, length, (String) config.getDefaultValue(),
-                    config.getAllowNull(), charsetType, config.isUnicode());
-            if (config.getLowValue() != null) {
-                returnValue.setLowValue((Integer) config.getLowValue());
-            }
-            if (config.getHighValue() != null) {
-                returnValue.setHighValue((Integer) config.getHighValue());
-            }
-            return returnValue;
-        }
-    };
+                @Override
+                protected OracleVarCharType newInstance(CharDataTypeConfig config, CharGeneratorBase generator) {
+                    String charset = config.getCharset();
+                    Integer length = config.getWidth();
+                    if (length == null || charset == null) {
+                        throw new MockerException(MockerError.PARAMETER_ERROR, "Error parametes for VARCHAR");
+                    }
+                    CharsetType charsetType = CharsetType.valueOf(charset);
+                    OracleVarCharType returnValue =
+                            new OracleVarCharType(generator, length, (String) config.getDefaultValue(),
+                                    config.getAllowNull(), charsetType, config.isUnicode());
+                    if (config.getLowValue() != null) {
+                        returnValue.setLowValue((Integer) config.getLowValue());
+                    }
+                    if (config.getHighValue() != null) {
+                        returnValue.setHighValue((Integer) config.getHighValue());
+                    }
+                    return returnValue;
+                }
+            };
 
     /**
      * The char type in oracle mode
      */
-    private static final DataTypeFactory OB_ORACLE_CHAR = new DataTypeFactory<OracleCharType, CharDataTypeConfig, CharGeneratorBase>() {
+    private static final DataTypeFactory OB_ORACLE_CHAR =
+            new DataTypeFactory<OracleCharType, CharDataTypeConfig, CharGeneratorBase>() {
 
-        @Override
-        public String name() {
-            return "OB_ORACLE_CHAR";
-        }
+                @Override
+                public String name() {
+                    return "OB_ORACLE_CHAR";
+                }
 
-        @Override
-        protected OracleCharType newInstance(CharDataTypeConfig config, CharGeneratorBase generator) {
-            String charset = config.getCharset();
-            Integer length = config.getWidth();
-            if (length == null || charset == null) {
-                throw new MockerException(MockerError.PARAMETER_ERROR, "Error parametes for CHAR");
-            }
-            CharsetType charsetType = CharsetType.valueOf(charset);
-            OracleCharType returnValue = new OracleCharType(length, (String) config.getDefaultValue(), config.getAllowNull(), charsetType,
-                    generator, config.isUnicode());
-            if (config.getLowValue() != null) {
-                returnValue.setLowValue((Integer) config.getLowValue());
-            }
-            if (config.getHighValue() != null) {
-                returnValue.setHighValue((Integer) config.getHighValue());
-            }
-            return returnValue;
-        }
-    };
+                @Override
+                protected OracleCharType newInstance(CharDataTypeConfig config, CharGeneratorBase generator) {
+                    String charset = config.getCharset();
+                    Integer length = config.getWidth();
+                    if (length == null || charset == null) {
+                        throw new MockerException(MockerError.PARAMETER_ERROR, "Error parametes for CHAR");
+                    }
+                    CharsetType charsetType = CharsetType.valueOf(charset);
+                    OracleCharType returnValue = new OracleCharType(length, (String) config.getDefaultValue(),
+                            config.getAllowNull(), charsetType,
+                            generator, config.isUnicode());
+                    if (config.getLowValue() != null) {
+                        returnValue.setLowValue((Integer) config.getLowValue());
+                    }
+                    if (config.getHighValue() != null) {
+                        returnValue.setHighValue((Integer) config.getHighValue());
+                    }
+                    return returnValue;
+                }
+            };
 
     /**
      * The number type in oracle mode
      */
-    private static final DataTypeFactory OB_ORACLE_NUMBER
-            = new DataTypeFactory<OracleNumberType, DigitDataTypeConfig, DigitalGeneratorBase>() {
-        @Override
-        public String name() {
-            return "OB_ORACLE_NUMBER";
-        }
+    private static final DataTypeFactory OB_ORACLE_NUMBER =
+            new DataTypeFactory<OracleNumberType, DigitDataTypeConfig, DigitalGeneratorBase>() {
+                @Override
+                public String name() {
+                    return "OB_ORACLE_NUMBER";
+                }
 
-        @Override
-        protected OracleNumberType newInstance(DigitDataTypeConfig config, DigitalGeneratorBase generator) {
-            Integer scale = config.getScale() == null ? 0 : config.getScale();
-            Integer precision = config.getPrecision();
-            if (precision == null) {
-                throw new MockerException(MockerError.PARAMETER_ERROR, "Error parametes for NUMBER");
-            }
-            BigDecimal defaultValue = null;
-            if (config.getDefaultValue() != null) {
-                defaultValue = new BigDecimal(config.getDefaultValue().toString());
-            }
-            OracleNumberType returnValue = new OracleNumberType(precision, scale, generator, defaultValue, config.getAllowNull());
-            if (config.getLowValue() != null) {
-                returnValue.setLowValue(new BigDecimal(config.getLowValue().toString()));
-            }
-            if (config.getHighValue() != null) {
-                returnValue.setHighValue(new BigDecimal(config.getHighValue().toString()));
-            }
-            return returnValue;
-        }
-    };
+                @Override
+                protected OracleNumberType newInstance(DigitDataTypeConfig config, DigitalGeneratorBase generator) {
+                    Integer scale = config.getScale() == null ? 0 : config.getScale();
+                    Integer precision = config.getPrecision();
+                    if (precision == null) {
+                        throw new MockerException(MockerError.PARAMETER_ERROR, "Error parametes for NUMBER");
+                    }
+                    BigDecimal defaultValue = null;
+                    if (config.getDefaultValue() != null) {
+                        defaultValue = new BigDecimal(config.getDefaultValue().toString());
+                    }
+                    OracleNumberType returnValue =
+                            new OracleNumberType(precision, scale, generator, defaultValue, config.getAllowNull());
+                    if (config.getLowValue() != null) {
+                        returnValue.setLowValue(new BigDecimal(config.getLowValue().toString()));
+                    }
+                    if (config.getHighValue() != null) {
+                        returnValue.setHighValue(new BigDecimal(config.getHighValue().toString()));
+                    }
+                    return returnValue;
+                }
+            };
 
     /**
      * Instance mapping table
@@ -1475,7 +1542,8 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
     public T make(V config) {
         try {
             if (config == null || config.getGenerator() == null) {
-                throw new MockerException(MockerError.PARAMETER_ERROR, "Generator or generator builder can not be null");
+                throw new MockerException(MockerError.PARAMETER_ERROR,
+                        "Generator or generator builder can not be null");
             }
             GeneratorFactory factory = GeneratorFactory.getInstance(config.getGenerator());
             K generator = (K) factory.make(config.getGenParams());
@@ -1489,10 +1557,10 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
     }
 
     /**
-     * The internal construction object method is used to instantiate a data generator
-     * from the data generator constructor inside the column configuration object
+     * The internal construction object method is used to instantiate a data generator from the data
+     * generator constructor inside the column configuration object
      *
-     * @param config    Column configuration object
+     * @param config Column configuration object
      * @param generator Data generator object passed from upstream
      * @return Return column object
      */

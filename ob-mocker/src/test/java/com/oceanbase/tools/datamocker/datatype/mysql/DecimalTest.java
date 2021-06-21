@@ -20,8 +20,8 @@ import org.junit.Test;
  */
 public class DecimalTest extends MockerTestBase {
     /**
-     * Test the forward logic, test whether the result returned when
-     * the precision and effective digits are given for the decimal object meets expectations
+     * Test the forward logic, test whether the result returned when the precision and effective digits
+     * are given for the decimal object meets expectations
      */
     @Test
     public void testMinAndMaxValueForDecimal() {

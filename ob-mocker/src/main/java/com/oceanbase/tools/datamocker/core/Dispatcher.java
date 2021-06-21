@@ -5,10 +5,11 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.apache.commons.lang.Validate;
 
 /**
- * This object is used to encapsulate the tasks to be executed, and use this object to describe the serial or
- * parallel relationship between tasks. The data encapsulation object is essentially multiple stacks (but different
- * from the normal stack is that the data object is appended at the end rather than operated on the top of the stack when
- * "stacked"), and the stack top pointer is maintained by an array. The tasks in a stack need to be executed serially.
+ * This object is used to encapsulate the tasks to be executed, and use this object to describe the
+ * serial or parallel relationship between tasks. The data encapsulation object is essentially
+ * multiple stacks (but different from the normal stack is that the data object is appended at the
+ * end rather than operated on the top of the stack when "stacked"), and the stack top pointer is
+ * maintained by an array. The tasks in a stack need to be executed serially.
  *
  * @author yh263208
  * @date 2021-01-08 20:33
@@ -21,14 +22,15 @@ public class Dispatcher<T> {
      */
     private final String name;
     /**
-     * The lock object, the data encapsulation object uses an array to maintain the top pointers of multiple stacks.
-     * Since the array cannot be dynamically changed in size, the lock is acquired whenever the program wants to maintain
-     * the array of top pointers to prevent multiple threads from concurrency Modifying the array of pointers at the top
-     * of the stack causes a race condition
+     * The lock object, the data encapsulation object uses an array to maintain the top pointers of
+     * multiple stacks. Since the array cannot be dynamically changed in size, the lock is acquired
+     * whenever the program wants to maintain the array of top pointers to prevent multiple threads from
+     * concurrency Modifying the array of pointers at the top of the stack causes a race condition
      */
     private final ReentrantLock lock = new ReentrantLock();
     /**
-     * The length of the pointer data on the top of the stack can also be used to describe the current number of concurrent tasks
+     * The length of the pointer data on the top of the stack can also be used to describe the current
+     * number of concurrent tasks
      */
     private int concurrent;
     /**
@@ -37,12 +39,12 @@ public class Dispatcher<T> {
     private TopNode[] queuePointers;
 
     /**
-     * The default constructor, at this time, initialize the length of the pointer array at the top of the stack to 0.
-     * It is not recommended to use this constructor. It is best to set the size of the pointer array on the top of
-     * the stack at the beginning of the construction, because adjusting the size of the pointer array is a
-     * resource-consuming behavior
+     * The default constructor, at this time, initialize the length of the pointer array at the top of
+     * the stack to 0. It is not recommended to use this constructor. It is best to set the size of the
+     * pointer array on the top of the stack at the beginning of the construction, because adjusting the
+     * size of the pointer array is a resource-consuming behavior
      *
-     * @param name   dispatcher's name or task name
+     * @param name dispatcher's name or task name
      * @param taskId task id
      */
     public Dispatcher(String name, String taskId) {
@@ -53,8 +55,8 @@ public class Dispatcher<T> {
     }
 
     /**
-     * Constructor, the constructor passes in the default size of the stack top pointer array,
-     * and the program initializes the stack top pointer array according to the incoming size
+     * Constructor, the constructor passes in the default size of the stack top pointer array, and the
+     * program initializes the stack top pointer array according to the incoming size
      *
      * @param concurrent initial size of this dispatcher
      * @param name dispatcher's name or task name
@@ -112,13 +114,13 @@ public class Dispatcher<T> {
     }
 
     /**
-     * This method passes in two parameters, through these two parameters to uniquely locate a task object and scope,
-     * this method will not change the data package object
+     * This method passes in two parameters, through these two parameters to uniquely locate a task
+     * object and scope, this method will not change the data package object
      *
-     * @param index The index number of the stack top pointer array, the method obtains
-     *              the corresponding position of the stack top pointer according to the index
-     * @param columnIndex Stack index, the method finds the corresponding position of the stack
-     *                    index according to this index
+     * @param index The index number of the stack top pointer array, the method obtains the
+     *        corresponding position of the stack top pointer according to the index
+     * @param columnIndex Stack index, the method finds the corresponding position of the stack index
+     *        according to this index
      * @return Return the queried object
      */
     public T getObj(int index, int columnIndex) throws Exception {
@@ -152,18 +154,21 @@ public class Dispatcher<T> {
         if (topNode.length <= 0) {
             return null;
         }
-        // Since the array of pointers on the top of the stack needs to be operated, the lock processing must be performed first
+        // Since the array of pointers on the top of the stack needs to be operated, the lock processing
+        // must be performed first
         T returnObj = null;
         topNode.writeLock.lock();
         try {
-            // Find the first stack whose size is not 0, and pass the top pointer of the stack to the return object to prepare to return
+            // Find the first stack whose size is not 0, and pass the top pointer of the stack to the return
+            // object to prepare to return
             if (topNode.length != 0) {
                 Node destNode = topNode.downNext;
                 if (destNode != null) {
                     returnObj = destNode.getObj();
                 }
             }
-            // The following code performs the actual pop operation, replacing the old stack top pointer with the new stack top pointer
+            // The following code performs the actual pop operation, replacing the old stack top pointer with
+            // the new stack top pointer
             Node next = topNode.downNext;
             if (next != null) {
                 topNode.downNext = next.downNext;
@@ -180,20 +185,21 @@ public class Dispatcher<T> {
     }
 
     /**
-     * Use this method to publish tasks, index indicates which task stack needs to be inserted into,
-     * and appends to the end of the task stack.
+     * Use this method to publish tasks, index indicates which task stack needs to be inserted into, and
+     * appends to the end of the task stack.
      *
-     * @param index The index of the pointer array at the top of the stack indicates which stack
-     *              the current task wants to be inserted into. The value range of the index is
-     *              from 0 to the size of the stack top pointer array. If the maximum value is
-     *              taken, the stack top pointer array performs an expansion operation.
+     * @param index The index of the pointer array at the top of the stack indicates which stack the
+     *        current task wants to be inserted into. The value range of the index is from 0 to the size
+     *        of the stack top pointer array. If the maximum value is taken, the stack top pointer array
+     *        performs an expansion operation.
      * @param obj Task object to be inserted
      */
     public void setObj(int index, T obj) throws Exception {
         if (obj == null) {
             return;
         }
-        // The index of the top pointer of the stack is within the range of the array, and the insertion operation is performed directly
+        // The index of the top pointer of the stack is within the range of the array, and the insertion
+        // operation is performed directly
         if (index < this.concurrent) {
             TopNode topNode = queuePointers[index];
             if (topNode == null) {
@@ -205,7 +211,8 @@ public class Dispatcher<T> {
                 // Find the end of the task stack
                 Node lastNode = topNode.downNext;
                 if (lastNode != null) {
-                    for (; lastNode.downNext != null; lastNode = lastNode.downNext) {}
+                    for (; lastNode.downNext != null; lastNode = lastNode.downNext) {
+                    }
                 }
                 // Construct a new task node and insert the end of the new task node to the end of the task stack
                 Node newNode = new Node(obj);
@@ -244,8 +251,8 @@ public class Dispatcher<T> {
     }
 
     /**
-     * The task node, which is used to encapsulate task objects, has a read lock and a write lock,
-     * and both horizontal and vertical pointers are used to describe the asynchronous and synchronous
+     * The task node, which is used to encapsulate task objects, has a read lock and a write lock, and
+     * both horizontal and vertical pointers are used to describe the asynchronous and synchronous
      * execution relationship with other task objects.
      *
      * @author yh263208
@@ -270,9 +277,10 @@ public class Dispatcher<T> {
     }
 }
 
+
 /**
- * The top node of the task stack is the management node and does
- * not undertake task encapsulation work
+ * The top node of the task stack is the management node and does not undertake task encapsulation
+ * work
  *
  * @author yh263208
  * @date 2021-01-08 20:32

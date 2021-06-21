@@ -9,8 +9,8 @@ import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
 
 /**
- * The configuration object of Mock data,
- * the key parameters of Mock data are configured in the configuration object
+ * The configuration object of Mock data, the key parameters of Mock data are configured in the
+ * configuration object
  *
  * @author yh263208
  * @date 2020-12-22 20:40
@@ -18,17 +18,15 @@ import com.oceanbase.tools.datamocker.model.exception.MockerException;
  */
 public abstract class AbstractTableConfig {
     /**
-     * The maximum number of generations, must be an integer greater than 0,
-     * the maximum limit is 100000
+     * The maximum number of generations, must be an integer greater than 0, the maximum limit is 100000
      *
      * @return 返回数量
      */
     abstract protected Long maxRowCount();
 
     /**
-     * Get the maximum number of data generation tasks.
-     * Here, the maximum number of generations passed in by the user is checked.
-     * Only a value between 0-1000000 is allowed to be passed in.
+     * Get the maximum number of data generation tasks. Here, the maximum number of generations passed
+     * in by the user is checked. Only a value between 0-1000000 is allowed to be passed in.
      *
      * @return Returns the maximum number of generations
      */
@@ -112,8 +110,8 @@ public abstract class AbstractTableConfig {
     abstract public Long timeoutMilliseconds();
 
     /**
-     * Script type enumeration, mock data can be defined to write script type,
-     * multiple scripts can be output
+     * Script type enumeration, mock data can be defined to write script type, multiple scripts can be
+     * output
      *
      * @return Returns the script type array
      */

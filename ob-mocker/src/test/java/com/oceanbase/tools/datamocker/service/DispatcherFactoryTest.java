@@ -47,31 +47,32 @@ public class DispatcherFactoryTest extends MockerTestBase {
     private final String mysqlEnv = "db/mysql-env.properties";
     private final String oracleEnv = "db/oracle-env.properties";
     private final String ddlOracle = "CREATE TABLE \"EMP\" (\n"
-                                     + "  \"COL\" NUMBER(5,2) NOT NULL,\n"
-                                     + "  \"COL2\" NUMBER(5,2) NOT NULL,\n"
-                                     + "  \"COL3\" NUMBER(4,2) NOT NULL,\n"
-                                     + "  CONSTRAINT \"EMP_OBPK_1610357443362979\" PRIMARY KEY (\"COL\"),\n"
-                                     + "  CONSTRAINT \"EMP_OBUNIQUE_1610357443363981\" UNIQUE (\"COL2\", "
-                                     + "\"COL3\")\n"
-                                     + ") ";
+            + "  \"COL\" NUMBER(5,2) NOT NULL,\n"
+            + "  \"COL2\" NUMBER(5,2) NOT NULL,\n"
+            + "  \"COL3\" NUMBER(4,2) NOT NULL,\n"
+            + "  CONSTRAINT \"EMP_OBPK_1610357443362979\" PRIMARY KEY (\"COL\"),\n"
+            + "  CONSTRAINT \"EMP_OBUNIQUE_1610357443363981\" UNIQUE (\"COL2\", "
+            + "\"COL3\")\n"
+            + ") ";
     private final String ddlWithVirtualColumnOracle = "CREATE TABLE \"EMP1\" (\n"
-                                                      + "  \"COL\" NUMBER(5,2) NOT NULL,\n"
-                                                      + "  \"COL2\" NUMBER(5,2) NOT NULL,\n"
-                                                      + "  \"COL3\" NUMBER(4,2) NOT NULL,\n"
-                                                      + "  \"COL4\" NUMBER(5,3) GENERATED ALWAYS AS ((\"COL2\" + \"COL3\")) "
-                                                      + "VIRTUAL,\n"
-                                                      + "  CONSTRAINT \"EMP_OBPK\" PRIMARY KEY (\"COL\"),\n"
-                                                      + "  CONSTRAINT \"EMP_OBUNIQUE_1231\" UNIQUE (\"COL2\", \"COL3\"),\n"
-                                                      + "  CONSTRAINT \"EMP_OBUNIQUE_12343\" UNIQUE (\"COL4\")\n,"
-                                                      + "CONSTRAINT \"EMP1_OBFK_1610454320318209\" FOREIGN KEY (\"COL2\") "
-                                                      + "REFERENCES "
-                                                      + "\"SYS\".\"EMP\"(\"COL\")\n"
-                                                      + ");";
+            + "  \"COL\" NUMBER(5,2) NOT NULL,\n"
+            + "  \"COL2\" NUMBER(5,2) NOT NULL,\n"
+            + "  \"COL3\" NUMBER(4,2) NOT NULL,\n"
+            + "  \"COL4\" NUMBER(5,3) GENERATED ALWAYS AS ((\"COL2\" + \"COL3\")) "
+            + "VIRTUAL,\n"
+            + "  CONSTRAINT \"EMP_OBPK\" PRIMARY KEY (\"COL\"),\n"
+            + "  CONSTRAINT \"EMP_OBUNIQUE_1231\" UNIQUE (\"COL2\", \"COL3\"),\n"
+            + "  CONSTRAINT \"EMP_OBUNIQUE_12343\" UNIQUE (\"COL4\")\n,"
+            + "CONSTRAINT \"EMP1_OBFK_1610454320318209\" FOREIGN KEY (\"COL2\") "
+            + "REFERENCES "
+            + "\"SYS\".\"EMP\"(\"COL\")\n"
+            + ");";
     private DataSource oracleDatasource = null;
     private final Long maxBatchsize = 1024L;
     private final Long maxGenerateCount = 9800L;
 
-    private DataTypeConfig initDigitGen(Map<String, Double> builderParams, String typeName, BigDecimal lowValue, BigDecimal highValue,
+    private DataTypeConfig initDigitGen(Map<String, Double> builderParams, String typeName, BigDecimal lowValue,
+            BigDecimal highValue,
             String genName, Integer precision, Integer scale) {
         DigitDataTypeConfig digit = new DigitDataTypeConfig();
         digit.setColumnType(typeName);

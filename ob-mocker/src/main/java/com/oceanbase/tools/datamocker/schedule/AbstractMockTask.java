@@ -11,7 +11,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 
 /**
- * Abstract operation task, used to perform some cleaning or initialization operations before the start and end of the mock task
+ * Abstract operation task, used to perform some cleaning or initialization operations before the
+ * start and end of the mock task
  *
  * @author yh263208
  * @date 2021-01-13 17:25
@@ -68,7 +69,8 @@ public abstract class AbstractMockTask implements Callable<Void> {
                     context.setStatus(MockTaskStatus.FAILED);
                     log.error(
                             "Some errors happened when onSuccess call back method executed, context has been shutdown. shutdownResult={},"
-                            + "status={}", shutdownResult, "FAILED", e);
+                                    + "status={}",
+                            shutdownResult, "FAILED", e);
                 }
             }
             return null;

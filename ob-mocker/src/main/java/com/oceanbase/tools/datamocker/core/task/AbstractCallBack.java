@@ -41,7 +41,7 @@ public abstract class AbstractCallBack<T> {
      * OnFailure method, which is executed when operation is failed
      *
      * @param param custom parameter
-     * @param e     input exception
+     * @param e input exception
      * @throws Throwable exception is allow to be thrown when onFailure method executed
      */
     public void onFailure(T param, Throwable e) throws Throwable {

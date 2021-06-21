@@ -31,8 +31,8 @@ public class DefaultTaskConfig extends AbstractTaskConfig {
      */
     private DataBaseConfig dbConfig;
     /**
-     * Task name, the default is null, if the user does not pass in a task name,
-     * one will be automatically generated here
+     * Task name, the default is null, if the user does not pass in a task name, one will be
+     * automatically generated here
      */
     private String taskName = null;
     /**

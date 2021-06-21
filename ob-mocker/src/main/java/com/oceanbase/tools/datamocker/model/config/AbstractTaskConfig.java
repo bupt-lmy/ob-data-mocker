@@ -16,8 +16,8 @@ import com.oceanbase.tools.datamocker.model.exception.MockerException;
  */
 public abstract class AbstractTaskConfig {
     /**
-     * Get the mode of OB, here only accept enumeration value return,
-     * respectively ORACLE mode and MYSQL mode
+     * Get the mode of OB, here only accept enumeration value return, respectively ORACLE mode and MYSQL
+     * mode
      *
      * @return Return to OB mode
      */
@@ -38,8 +38,8 @@ public abstract class AbstractTaskConfig {
     abstract public List<? extends AbstractTableConfig> tasks();
 
     /**
-     * Get the task name of the task mock, the configuration can be omitted,
-     * if not, the sdk will specify the task name by itself
+     * Get the task name of the task mock, the configuration can be omitted, if not, the sdk will
+     * specify the task name by itself
      *
      * @return Return task name
      */
@@ -51,7 +51,8 @@ public abstract class AbstractTaskConfig {
                     "Min connection count for connection pool can not be smaller than 3");
         }
         if (connectionInitCount() > connectionMaxCount()) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "Min connection count can not bigger than max connection count");
+            throw new MockerException(MockerError.PARAMETER_ERROR,
+                    "Min connection count can not bigger than max connection count");
         }
         return connectionInitCount();
     }
@@ -62,21 +63,23 @@ public abstract class AbstractTaskConfig {
                     "Max connection count for connection pool can not be smaller than 5");
         }
         if (connectionMaxCount() < connectionInitCount()) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "Max connection count can not smaller than min connection count");
+            throw new MockerException(MockerError.PARAMETER_ERROR,
+                    "Max connection count can not smaller than min connection count");
         }
         return connectionMaxCount();
     }
 
     public int connectionIncreasementStep() {
         if (connectionIncreaseStepCount() < 0) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "Connection pool's increase step can not be smaller than zero");
+            throw new MockerException(MockerError.PARAMETER_ERROR,
+                    "Connection pool's increase step can not be smaller than zero");
         }
         return connectionIncreaseStepCount();
     }
 
     /**
-     * The increase step size of the database connection from the minimum number
-     * of connections to the maximum number of connections
+     * The increase step size of the database connection from the minimum number of connections to the
+     * maximum number of connections
      *
      * @return Return step
      */

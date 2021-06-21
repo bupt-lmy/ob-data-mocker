@@ -31,11 +31,13 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class DataBaseWriter extends AbstractMockWriter {
     /**
-     * Get a database connection pool, use the connection pool to get database connections for data writing
+     * Get a database connection pool, use the connection pool to get database connections for data
+     * writing
      */
     private final DataSource dataSource;
     /**
-     * The written target library, if the target library is specified when the connection is established, this value can also be left blank
+     * The written target library, if the target library is specified when the connection is
+     * established, this value can also be left blank
      */
     private final String database;
     /**
@@ -51,10 +53,10 @@ public class DataBaseWriter extends AbstractMockWriter {
     /**
      * The constructor writes a data source, which is required
      *
-     * @param dataSource  datasource
+     * @param dataSource datasource
      * @param dialectType dialect type
-     * @param database    schema or database name
-     * @param tableName   table name
+     * @param database schema or database name
+     * @param tableName table name
      */
     public DataBaseWriter(DataSource dataSource, ObModeType dialectType, String database, String tableName) {
         validate(dataSource, dialectType, database, tableName);
@@ -123,18 +125,21 @@ public class DataBaseWriter extends AbstractMockWriter {
     }
 
     /**
-     * Pre-check method, mainly used to check whether the target table exists, if it does not exist, throw an exception
+     * Pre-check method, mainly used to check whether the target table exists, if it does not exist,
+     * throw an exception
      *
      * @throws SQLException Throw a table or database does not exist exception
      */
     private void preCheck() throws Throwable {
         String descSql;
         if (ObModeType.OB_ORACLE.equals(this.dialectType)) {
-            descSql = String.format("select count(*) from \"%s\".\"%s\"", DbObjectNameUtil.doubleCharToEscape(database, '"'),
+            descSql = String.format("select count(*) from \"%s\".\"%s\"",
+                    DbObjectNameUtil.doubleCharToEscape(database, '"'),
                     DbObjectNameUtil.doubleCharToEscape(tableName, '"'));
         } else if (ObModeType.OB_MYSQL.equals(this.dialectType)) {
-            descSql = String.format("select count(*) from `%s`.`%s`", DbObjectNameUtil.doubleCharToEscape(database, '`'),
-                    DbObjectNameUtil.doubleCharToEscape(tableName, '`'));
+            descSql =
+                    String.format("select count(*) from `%s`.`%s`", DbObjectNameUtil.doubleCharToEscape(database, '`'),
+                            DbObjectNameUtil.doubleCharToEscape(tableName, '`'));
         } else {
             throw new MockerException(MockerError.INVALID_OB_MODE);
         }
@@ -157,20 +162,24 @@ public class DataBaseWriter extends AbstractMockWriter {
         List<String> columnList = new ArrayList<>(columnSet);
         StringBuffer sqlBuffer = null;
         if (ObModeType.OB_ORACLE.equals(this.dialectType)) {
-            sqlBuffer = new StringBuffer(String.format("insert into \"%s\".\"%s\"(", DbObjectNameUtil.doubleCharToEscape(database, '"'),
-                    DbObjectNameUtil.doubleCharToEscape(tableName, '"')));
+            sqlBuffer = new StringBuffer(
+                    String.format("insert into \"%s\".\"%s\"(", DbObjectNameUtil.doubleCharToEscape(database, '"'),
+                            DbObjectNameUtil.doubleCharToEscape(tableName, '"')));
         } else if (ObModeType.OB_MYSQL.equals(this.dialectType)) {
-            sqlBuffer = new StringBuffer(String.format("insert into `%s`.`%s`(", DbObjectNameUtil.doubleCharToEscape(database, '`'),
-                    DbObjectNameUtil.doubleCharToEscape(tableName, '`')));
+            sqlBuffer = new StringBuffer(
+                    String.format("insert into `%s`.`%s`(", DbObjectNameUtil.doubleCharToEscape(database, '`'),
+                            DbObjectNameUtil.doubleCharToEscape(tableName, '`')));
         }
         int columnLength = columnList.size();
         for (int i = 0; i < columnLength; i++) {
             String columnName = columnList.get(i);
             if (i == columnLength - 1) {
                 if (ObModeType.OB_ORACLE.equals(this.dialectType)) {
-                    sqlBuffer.append(String.format("\"%s\") values (", DbObjectNameUtil.doubleCharToEscape(columnName, '"')));
+                    sqlBuffer.append(
+                            String.format("\"%s\") values (", DbObjectNameUtil.doubleCharToEscape(columnName, '"')));
                 } else if (ObModeType.OB_MYSQL.equals(this.dialectType)) {
-                    sqlBuffer.append(String.format("`%s`) values (", DbObjectNameUtil.doubleCharToEscape(columnName, '`')));
+                    sqlBuffer.append(
+                            String.format("`%s`) values (", DbObjectNameUtil.doubleCharToEscape(columnName, '`')));
                 }
                 for (int j = 0; j < columnLength; j++) {
                     if (j == columnLength - 1) {

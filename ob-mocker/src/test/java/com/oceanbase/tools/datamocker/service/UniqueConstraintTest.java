@@ -48,7 +48,8 @@ public class UniqueConstraintTest extends MockerTestBase {
             BigDecimal value = BigDecimal.valueOf(new Random().nextDouble());
             row.put(column, new Pair<>(new OracleNumberType(10, 5, null, false), value));
         }
-        row.put("column", new Pair<>(new OracleNumberType(10, 5, null, false), BigDecimal.valueOf(new Random().nextDouble())));
+        row.put("column",
+                new Pair<>(new OracleNumberType(10, 5, null, false), BigDecimal.valueOf(new Random().nextDouble())));
         return row;
     }
 

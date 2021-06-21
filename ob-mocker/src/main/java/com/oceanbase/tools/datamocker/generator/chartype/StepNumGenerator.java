@@ -38,7 +38,8 @@ public class StepNumGenerator extends CharGeneratorBase {
                     "Start or end or step or cycle for step number generator can not be null");
         }
         if (start.compareTo(end) >= 0) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "Start for step number generator can not be bigger than end");
+            throw new MockerException(MockerError.PARAMETER_ERROR,
+                    "Start for step number generator can not be bigger than end");
         }
         this.start = start;
         this.end = end;

@@ -21,9 +21,9 @@ public class MysqlBlobType extends AbstractByteDataType {
     /**
      * Constructor
      *
-     * @param generator    Character type binding data generator
-     * @param length       Data type length
-     * @param allowNull    Whether to allow null values
+     * @param generator Character type binding data generator
+     * @param length Data type length
+     * @param allowNull Whether to allow null values
      * @param defaultValue default value for byte type
      */
     public MysqlBlobType(Integer length, byte[] defaultValue, Boolean allowNull, ByteGeneratorBase generator) {

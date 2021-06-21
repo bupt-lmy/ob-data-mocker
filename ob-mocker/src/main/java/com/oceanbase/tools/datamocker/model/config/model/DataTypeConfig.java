@@ -42,8 +42,8 @@ public class DataTypeConfig {
      */
     private Map<String, ?> genParams;
     /**
-     * The data generator builder object is used to generate a specific data generator
-     * for the column object to use based on the above params object
+     * The data generator builder object is used to generate a specific data generator for the column
+     * object to use based on the above params object
      */
     private String generator;
 

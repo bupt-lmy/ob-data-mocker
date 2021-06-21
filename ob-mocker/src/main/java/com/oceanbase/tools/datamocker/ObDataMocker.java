@@ -8,8 +8,7 @@ import com.oceanbase.tools.datamocker.schedule.AbstractScheduler;
 import com.oceanbase.tools.datamocker.schedule.MockContext;
 
 /**
- * Simulate the data object,
- * use the object for actual data generation
+ * Simulate the data object, use the object for actual data generation
  *
  * @author yh263208
  * @date 2021-02-03 21:02
@@ -26,10 +25,11 @@ public class ObDataMocker {
     private final AbstractScheduler scheduler;
 
     /**
-     * The constructor of the protected type cannot be manually created by the user through the new method
+     * The constructor of the protected type cannot be manually created by the user through the new
+     * method
      *
      * @param dispatcher Dispatcher object that encapsulates the topological relationship of tasks
-     * @param scheduler  Scheduler object for scheduling tasks
+     * @param scheduler Scheduler object for scheduling tasks
      */
     public ObDataMocker(Dispatcher<TableTaskInfo> dispatcher, AbstractScheduler scheduler) {
         this.dispatcher = dispatcher;

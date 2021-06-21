@@ -50,7 +50,8 @@ public class SqlScriptPrimitiveTest extends MockerTestBase {
             Map<String, Pair<AbstractDataType, Object>> row = new HashMap<>();
             for (String column : columnList) {
                 row.put(column,
-                        new Pair<>(new OracleNumberType(8, 5, null, false), new BigDecimal(String.valueOf(new Random().nextInt(1000)))));
+                        new Pair<>(new OracleNumberType(8, 5, null, false),
+                                new BigDecimal(String.valueOf(new Random().nextInt(1000)))));
             }
             list.add(row);
         }

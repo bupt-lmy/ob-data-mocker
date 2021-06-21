@@ -16,8 +16,8 @@ import org.junit.Test;
  */
 public class CharTest extends MockerTestBase {
     /**
-     * Test the forward logic, test whether the returned result meets expectations
-     * when the precision and effective digits are given for the char object
+     * Test the forward logic, test whether the returned result meets expectations when the precision
+     * and effective digits are given for the char object
      */
     @Test
     public void testMinAndMaxValueForChar() {
@@ -35,8 +35,9 @@ public class CharTest extends MockerTestBase {
     @Test
     public void testRandomGeneratorForChar() {
         RandomGenerator generator = new RandomGenerator(CharCaseOption.DEFAULT);
-        OracleCharType charType = new OracleCharType(128, null, false, CharsetType.UTF_8, new RandomGenerator(CharCaseOption.DEFAULT),
-                false);
+        OracleCharType charType =
+                new OracleCharType(128, null, false, CharsetType.UTF_8, new RandomGenerator(CharCaseOption.DEFAULT),
+                        false);
         charType.bind(generator);
         Integer minValue = 32;
         Integer maxValue = 64;

@@ -27,9 +27,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 
 /**
- * A data connection pool dedicated to mock data is used to encapsulate database connections.
- * Unlike ordinary database connection pools, the maximum number of database connections
- * that can be established with DB at a certain time is strictly limited here
+ * A data connection pool dedicated to mock data is used to encapsulate database connections. Unlike
+ * ordinary database connection pools, the maximum number of database connections that can be
+ * established with DB at a certain time is strictly limited here
  *
  * @author yh263208
  * @date 2021-01-04 16:04
@@ -56,7 +56,8 @@ public class MockerDataSource implements DataSource {
      */
     private int maxPoolSize = 20;
     /**
-     * The gain step size when the number of database connections increases from minPoolSize to maxPoolSize
+     * The gain step size when the number of database connections increases from minPoolSize to
+     * maxPoolSize
      */
     private int increaseStep = 5;
     /**
@@ -80,7 +81,7 @@ public class MockerDataSource implements DataSource {
     /**
      * Construct a connection pool according to the database connection configuration information
      *
-     * @param config       Database connection information
+     * @param config Database connection information
      * @param connectParam map between parameter name and parameter value
      */
     public MockerDataSource(DataBaseConfig config, Map<String, String> connectParam) throws SQLException {
@@ -108,7 +109,8 @@ public class MockerDataSource implements DataSource {
                     "Min pool size, max pool size or increase step can not be equal to or less than zero");
         }
         if (minPoolSize > maxPoolSize) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "Min pool size can not be bigger than max pool size");
+            throw new MockerException(MockerError.PARAMETER_ERROR,
+                    "Min pool size can not be bigger than max pool size");
         }
         this.minPoolSize = minPoolSize;
         this.increaseStep = increaseStep;
@@ -139,8 +141,9 @@ public class MockerDataSource implements DataSource {
      * @throws MockerException If the verification fails, an exception is thrown
      */
     private void validate(DataBaseConfig config) {
-        if (StringUtils.isBlank(config.getHost()) || StringUtils.isBlank(config.getUser()) || StringUtils.isBlank(config.getPassword())
-            || StringUtils.isBlank(config.getDefaultSchame()) || config.getPort() == null) {
+        if (StringUtils.isBlank(config.getHost()) || StringUtils.isBlank(config.getUser())
+                || StringUtils.isBlank(config.getPassword())
+                || StringUtils.isBlank(config.getDefaultSchame()) || config.getPort() == null) {
             throw new MockerException(MockerError.PARAMETER_ERROR, "Database's config is illegal");
         }
     }
@@ -154,7 +157,8 @@ public class MockerDataSource implements DataSource {
                 .append(this.config.getDefaultSchame());
         if (this.connectParams != null) {
             Set<Entry<String, String>> entrySet = this.connectParams.entrySet();
-            String paramStr = entrySet.stream().map(stringStringEntry -> stringStringEntry.getKey() + "=" + stringStringEntry.getValue())
+            String paramStr = entrySet.stream()
+                    .map(stringStringEntry -> stringStringEntry.getKey() + "=" + stringStringEntry.getValue())
                     .collect(Collectors.joining("&"));
             buffer.append("?").append(paramStr);
         }
@@ -171,8 +175,8 @@ public class MockerDataSource implements DataSource {
     }
 
     /**
-     * Refresh the connection pool and call this method when no connection is available.
-     * This method will clean up the connections that have been used
+     * Refresh the connection pool and call this method when no connection is available. This method
+     * will clean up the connections that have been used
      */
     private void refresh() {
         lock.lock();
@@ -203,7 +207,7 @@ public class MockerDataSource implements DataSource {
                 int interval = minPoolSize - liveConnectionCount;
                 log.info(
                         "The number of surviving connections is less than the minimum number of connections, start adding connections, "
-                        + "liveConnectionsCount={}, minPoolSize={}, triggeredThreadName={}",
+                                + "liveConnectionsCount={}, minPoolSize={}, triggeredThreadName={}",
                         liveConnectionCount, liveConnectionCount + interval, Thread.currentThread().getName());
                 for (int i = 0; i < interval; i++) {
                     this.connectionPool.push(getConnection(username.toString(), this.config.getPassword()));
@@ -212,7 +216,7 @@ public class MockerDataSource implements DataSource {
                 int count = Math.min(liveConnectionCount - maxPoolSize, connectionPool.size());
                 log.info(
                         "The number of surviving connections is greater than the maximum number of connections, start to reduce the "
-                        + "number of connections, liveConnectionsCount={}, maxPoolSize={}, triggeredThreadName={}",
+                                + "number of connections, liveConnectionsCount={}, maxPoolSize={}, triggeredThreadName={}",
                         liveConnectionCount, liveConnectionCount - count, Thread.currentThread().getName());
                 for (int i = 0; i < count; i++) {
                     try {
@@ -245,11 +249,13 @@ public class MockerDataSource implements DataSource {
         lock.lock();
         try {
             if (this.connectionPool.size() == 0) {
-                log.warn("There are no more connections available in the connection pool, start refreshing, triggeredThreadName={}",
+                log.warn(
+                        "There are no more connections available in the connection pool, start refreshing, triggeredThreadName={}",
                         Thread.currentThread().getName());
                 refresh();
                 if (this.connectionPool.size() == 0) {
-                    log.warn("No connection is released from the connection pool, the thread starts to wait, threadName={}",
+                    log.warn(
+                            "No connection is released from the connection pool, the thread starts to wait, threadName={}",
                             Thread.currentThread().getName());
                     noMoreConnection.await(3, TimeUnit.SECONDS);
                     return getConnection();
@@ -262,11 +268,12 @@ public class MockerDataSource implements DataSource {
             this.connectionInUse.add(connection);
             log.debug(
                     "The thread gets the database connection from the connection pool successfully, threadName={}, currentPoolSize={}, "
-                    + "connectionInUseSize={}",
+                            + "connectionInUseSize={}",
                     Thread.currentThread().getName(), this.connectionPool.size(), this.connectionInUse.size());
             return connection;
         } catch (InterruptedException e) {
-            log.error("Thread waiting for connection pool read lock failed, threadName={}", Thread.currentThread().getName(), e);
+            log.error("Thread waiting for connection pool read lock failed, threadName={}",
+                    Thread.currentThread().getName(), e);
             throw new SQLException(e.getMessage());
         } finally {
             lock.unlock();
@@ -280,7 +287,8 @@ public class MockerDataSource implements DataSource {
         if (lock.tryLock()) {
             try {
                 int count = connectionPool.size();
-                log.info("The database connection pool will be closed, the free database connection needs to be closed, currentPoolSize={}",
+                log.info(
+                        "The database connection pool will be closed, the free database connection needs to be closed, currentPoolSize={}",
                         count);
                 int clearSize = 0;
                 for (int i = 0; i < count; i++) {
@@ -291,7 +299,9 @@ public class MockerDataSource implements DataSource {
                         log.error("Fail to close the connection", e);
                     }
                 }
-                log.info("Free database connection closed completely, clearConnectionCount={}, failedConnectionCount={}", clearSize,
+                log.info(
+                        "Free database connection closed completely, clearConnectionCount={}, failedConnectionCount={}",
+                        clearSize,
                         count - clearSize);
                 count = this.connectionInUse.size();
                 log.info("The database connection in use will be closed, connectionInUseCount={}", count);

@@ -26,7 +26,8 @@ public class MysqlDecimalType extends AbstractDigitDataType<BigDecimal> {
      */
     private final int scale;
 
-    public MysqlDecimalType(int precision, int scale, DigitalGeneratorBase<BigDecimal> generator, BigDecimal defaultValue,
+    public MysqlDecimalType(int precision, int scale, DigitalGeneratorBase<BigDecimal> generator,
+            BigDecimal defaultValue,
             Boolean allowNull, Boolean signed) {
         super(generator, ObModeType.OB_MYSQL, defaultValue, allowNull, signed);
         validate(precision, scale);
@@ -34,7 +35,8 @@ public class MysqlDecimalType extends AbstractDigitDataType<BigDecimal> {
         this.scale = scale;
     }
 
-    public MysqlDecimalType(DigitalGeneratorBase<BigDecimal> generator, BigDecimal defaultValue, Boolean allowNull, Boolean signed) {
+    public MysqlDecimalType(DigitalGeneratorBase<BigDecimal> generator, BigDecimal defaultValue, Boolean allowNull,
+            Boolean signed) {
         super(generator, ObModeType.OB_MYSQL, defaultValue, allowNull, signed);
         this.precision = 10;
         this.scale = 0;
@@ -44,14 +46,16 @@ public class MysqlDecimalType extends AbstractDigitDataType<BigDecimal> {
      * Verify that the effective digits and precision of the decimal type are legal
      *
      * @param precision Effective digits
-     * @param scale     Floating point precision
+     * @param scale Floating point precision
      * @throws MockerException Validation fails and throws an exception
      */
     private void validate(int precision, int scale) {
         if (precision <= 0 || precision > 65) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "Precision for decaimal can not larger than 65 or smaller than 0");
+            throw new MockerException(MockerError.PARAMETER_ERROR,
+                    "Precision for decaimal can not larger than 65 or smaller than 0");
         } else if (scale < 0 || scale > 30) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "Scale for decimal can not larger than 30 or smaller than 0");
+            throw new MockerException(MockerError.PARAMETER_ERROR,
+                    "Scale for decimal can not larger than 30 or smaller than 0");
         } else if (precision < scale) {
             throw new MockerException(MockerError.PARAMETER_ERROR, "Scale can not be bigger than precision");
         }
@@ -100,15 +104,14 @@ public class MysqlDecimalType extends AbstractDigitDataType<BigDecimal> {
     }
 
     /**
-     * The decimal data type in mysql mode has significant digits and precision requirements,
-     * so you need to know the maximum and minimum values of the data type under the constraints
-     * of the specified precision and significant digits
+     * The decimal data type in mysql mode has significant digits and precision requirements, so you
+     * need to know the maximum and minimum values of the data type under the constraints of the
+     * specified precision and significant digits
      *
-     * @return Return the absolute value of the maximum and minimum values,
-     * if it is the maximum value, just use the return value directly,
-     * if it is the minimum value, take a negative value
-     * @throws MockerException The number of significant digits and precision are required for the size range, and an error may be thrown
-     * if it exceeds the range
+     * @return Return the absolute value of the maximum and minimum values, if it is the maximum value,
+     *         just use the return value directly, if it is the minimum value, take a negative value
+     * @throws MockerException The number of significant digits and precision are required for the size
+     *         range, and an error may be thrown if it exceeds the range
      */
     private BigDecimal maxOrMinForNumber() {
         validate(precision, scale);

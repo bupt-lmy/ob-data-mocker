@@ -18,12 +18,13 @@ public class MysqlSmallIntType extends AbstractDigitDataType<BigDecimal> {
     /**
      * Constructor of smallIntType type
      *
-     * @param generator    Data generator
+     * @param generator Data generator
      * @param defaultValue default value for int type
-     * @param allowNull    Whether it is allowed to be empty
-     * @param signed       Is it a signed number
+     * @param allowNull Whether it is allowed to be empty
+     * @param signed Is it a signed number
      */
-    public MysqlSmallIntType(DigitalGeneratorBase<BigDecimal> generator, BigDecimal defaultValue, Boolean allowNull, Boolean signed) {
+    public MysqlSmallIntType(DigitalGeneratorBase<BigDecimal> generator, BigDecimal defaultValue, Boolean allowNull,
+            Boolean signed) {
         super(generator, ObModeType.OB_MYSQL, defaultValue, allowNull, signed);
     }
 
@@ -34,8 +35,8 @@ public class MysqlSmallIntType extends AbstractDigitDataType<BigDecimal> {
     }
 
     /**
-     * Conversion method, because mysql reuses the data generator in oracle mode,
-     * the data must be calculated using BigDecimal for data type conversion.
+     * Conversion method, because mysql reuses the data generator in oracle mode, the data must be
+     * calculated using BigDecimal for data type conversion.
      *
      * @param value original value
      * @return converted value

@@ -19,14 +19,16 @@ public class MockDataPipe extends AbstractDataPipe<Map<String, Pair<AbstractData
     /**
      * Use blocking queues as the underlying implementation of data pipelines
      */
-    private final LinkedBlockingQueue<List<Map<String, Pair<AbstractDataType, Object>>>> queue = new LinkedBlockingQueue<>();
+    private final LinkedBlockingQueue<List<Map<String, Pair<AbstractDataType, Object>>>> queue =
+            new LinkedBlockingQueue<>();
 
     public MockDataPipe(int maxRetained) {
         super(maxRetained);
     }
 
     @Override
-    public void doWrite(List<Map<String, Pair<AbstractDataType, Object>>> row, long timout, TimeUnit timeUnit) throws Exception {
+    public void doWrite(List<Map<String, Pair<AbstractDataType, Object>>> row, long timout, TimeUnit timeUnit)
+            throws Exception {
         queue.put(row);
     }
 

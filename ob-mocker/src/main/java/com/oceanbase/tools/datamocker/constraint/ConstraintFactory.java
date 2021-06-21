@@ -32,8 +32,8 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 
 /**
- * Factory class for AbstractConstraint, used to generate the
- * factory object to make constraint object
+ * Factory class for AbstractConstraint, used to generate the factory object to make constraint
+ * object
  *
  * @author yh263208
  * @date 2021-01-11 17:18
@@ -43,57 +43,51 @@ public abstract class ConstraintFactory {
     /**
      * Sql to query unique constraint for oracle mode
      */
-    private static final String ORACLE_UNIQUE_CONSTRAINT_SQL
-            = "select o.* from (select * from all_constraints where "
-              + "constraint_type='U') s left join all_cons_columns o on s"
-              + ".OWNER=o.OWNER and s.CONSTRAINT_NAME=o.CONSTRAINT_NAME and "
-              + "s.TABLE_NAME=o.TABLE_NAME where s.OWNER=? and s"
-              + ".TABLE_NAME=?;";
+    private static final String ORACLE_UNIQUE_CONSTRAINT_SQL = "select o.* from (select * from all_constraints where "
+            + "constraint_type='U') s left join all_cons_columns o on s"
+            + ".OWNER=o.OWNER and s.CONSTRAINT_NAME=o.CONSTRAINT_NAME and "
+            + "s.TABLE_NAME=o.TABLE_NAME where s.OWNER=? and s"
+            + ".TABLE_NAME=?;";
     /**
      * Sql to query unqique constraint for mysql mode
      */
-    private static final String MYSQL_UNIQUE_CONSTRAINT_SQL
-            = "select CONSTRAINT_SCHEMA as OWNER, CONSTRAINT_NAME,"
-              + "TABLE_NAME,COLUMN_NAME,ORDINAL_POSITION as POSITION from "
-              + "information_schema.key_column_usage where "
-              + "CONSTRAINT_NAME<>'PRIMARY' and CONSTRAINT_SCHEMA=? and "
-              + "TABLE_NAME=?; ";
+    private static final String MYSQL_UNIQUE_CONSTRAINT_SQL = "select CONSTRAINT_SCHEMA as OWNER, CONSTRAINT_NAME,"
+            + "TABLE_NAME,COLUMN_NAME,ORDINAL_POSITION as POSITION from "
+            + "information_schema.key_column_usage where "
+            + "CONSTRAINT_NAME<>'PRIMARY' and CONSTRAINT_SCHEMA=? and "
+            + "TABLE_NAME=?; ";
     /**
      * Sql to query primary constraint for oracle mode
      */
-    private static final String ORACLE_PRIMARY_CONSTRAINT_SQL
-            = "select o.* from (select * from all_constraints where "
-              + "constraint_type='P') s left join all_cons_columns o on s"
-              + ".OWNER=o.OWNER and s.CONSTRAINT_NAME=o.CONSTRAINT_NAME and "
-              + "s.TABLE_NAME=o.TABLE_NAME where s.OWNER=? and s"
-              + ".TABLE_NAME=?;";
+    private static final String ORACLE_PRIMARY_CONSTRAINT_SQL = "select o.* from (select * from all_constraints where "
+            + "constraint_type='P') s left join all_cons_columns o on s"
+            + ".OWNER=o.OWNER and s.CONSTRAINT_NAME=o.CONSTRAINT_NAME and "
+            + "s.TABLE_NAME=o.TABLE_NAME where s.OWNER=? and s"
+            + ".TABLE_NAME=?;";
     /**
      * Sql to query primary constraint for mysql mode
      */
-    private static final String MYSQL_PRIMARY_CONSTRAINT_SQL
-            = "select CONSTRAINT_SCHEMA as OWNER, CONSTRAINT_NAME,"
-              + "TABLE_NAME,COLUMN_NAME,ORDINAL_POSITION as POSITION from "
-              + "information_schema.key_column_usage where "
-              + "CONSTRAINT_NAME='PRIMARY' and CONSTRAINT_SCHEMA=? and "
-              + "TABLE_NAME=?; ";
+    private static final String MYSQL_PRIMARY_CONSTRAINT_SQL = "select CONSTRAINT_SCHEMA as OWNER, CONSTRAINT_NAME,"
+            + "TABLE_NAME,COLUMN_NAME,ORDINAL_POSITION as POSITION from "
+            + "information_schema.key_column_usage where "
+            + "CONSTRAINT_NAME='PRIMARY' and CONSTRAINT_SCHEMA=? and "
+            + "TABLE_NAME=?; ";
     /**
      * Sql to query check constraint for oracle mode
      */
-    private static final String ORACLE_CHECK_CONSTRAINT_SQL
-            = "select o.* from (select * from all_constraints where "
-              + "constraint_type='C') s left join all_cons_columns o on s"
-              + ".OWNER=o.OWNER and s.CONSTRAINT_NAME=o.CONSTRAINT_NAME and "
-              + "s.TABLE_NAME=o.TABLE_NAME where s.OWNER=? and s"
-              + ".TABLE_NAME=?;";
+    private static final String ORACLE_CHECK_CONSTRAINT_SQL = "select o.* from (select * from all_constraints where "
+            + "constraint_type='C') s left join all_cons_columns o on s"
+            + ".OWNER=o.OWNER and s.CONSTRAINT_NAME=o.CONSTRAINT_NAME and "
+            + "s.TABLE_NAME=o.TABLE_NAME where s.OWNER=? and s"
+            + ".TABLE_NAME=?;";
     /**
      * Sql to query foreign constraint for mysql mode
      */
-    private static final String ORACLE_FOREIGN_CONSTRAINT_SQL
-            = "select o.* from (select * from all_constraints where "
-              + "constraint_type='R') s left join all_cons_columns o on s"
-              + ".OWNER=o.OWNER and s.CONSTRAINT_NAME=o.CONSTRAINT_NAME and "
-              + "s.TABLE_NAME=o.TABLE_NAME where s.OWNER=? and s"
-              + ".TABLE_NAME=?;";
+    private static final String ORACLE_FOREIGN_CONSTRAINT_SQL = "select o.* from (select * from all_constraints where "
+            + "constraint_type='R') s left join all_cons_columns o on s"
+            + ".OWNER=o.OWNER and s.CONSTRAINT_NAME=o.CONSTRAINT_NAME and "
+            + "s.TABLE_NAME=o.TABLE_NAME where s.OWNER=? and s"
+            + ".TABLE_NAME=?;";
     /**
      * Map between constraint factory name and constraint factory object
      */
@@ -104,20 +98,24 @@ public abstract class ConstraintFactory {
      */
     private static final ConstraintFactory UNIQUE_CONSTRAINT = new ConstraintFactory() {
         @Override
-        public List<AbstractConstraint> make(DataSource dataSource, ObModeType dialectType, String database, String tableName,
+        public List<AbstractConstraint> make(DataSource dataSource, ObModeType dialectType, String database,
+                String tableName,
                 Map<String, AbstractDataType> columnName2DataType, int totalCount) throws Throwable {
             List<AbstractConstraint> constraints;
             if (ObModeType.OB_ORACLE.equals(dialectType)) {
-                constraints = getConstraints(dataSource, ORACLE_UNIQUE_CONSTRAINT_SQL, database, tableName, columnName2DataType, totalCount,
+                constraints = getConstraints(dataSource, ORACLE_UNIQUE_CONSTRAINT_SQL, database, tableName,
+                        columnName2DataType, totalCount,
                         ObModeType.OB_ORACLE,
                         new OracleValidation());
             } else if (ObModeType.OB_MYSQL.equals(dialectType)) {
-                constraints = getConstraints(dataSource, MYSQL_UNIQUE_CONSTRAINT_SQL, database, tableName, columnName2DataType, totalCount,
+                constraints = getConstraints(dataSource, MYSQL_UNIQUE_CONSTRAINT_SQL, database, tableName,
+                        columnName2DataType, totalCount,
                         ObModeType.OB_MYSQL,
                         new MysqlValidation());
             } else {
                 throw new MockerException(MockerError.NOT_SUPPORT_FEATURE,
-                        String.format("\"%s\" mode is not support yet", dialectType == null ? "null" : dialectType.name()));
+                        String.format("\"%s\" mode is not support yet",
+                                dialectType == null ? "null" : dialectType.name()));
             }
             validateConstraints(constraints, tableName, columnName2DataType, totalCount);
             return constraints;
@@ -128,87 +126,99 @@ public abstract class ConstraintFactory {
      */
     private static final ConstraintFactory PRIMARY_CONSTRAINT = new ConstraintFactory() {
         @Override
-        public List<AbstractConstraint> make(DataSource dataSource, ObModeType dialectType, String database, String tableName,
+        public List<AbstractConstraint> make(DataSource dataSource, ObModeType dialectType, String database,
+                String tableName,
                 Map<String, AbstractDataType> columnName2DataType, int totalCount) throws Throwable {
             List<AbstractConstraint> constraints;
             if (ObModeType.OB_ORACLE.equals(dialectType)) {
-                constraints = getConstraints(dataSource, ORACLE_PRIMARY_CONSTRAINT_SQL, database, tableName, columnName2DataType,
+                constraints = getConstraints(dataSource, ORACLE_PRIMARY_CONSTRAINT_SQL, database, tableName,
+                        columnName2DataType,
                         totalCount, ObModeType.OB_ORACLE, null);
             } else if (ObModeType.OB_MYSQL.equals(dialectType)) {
-                constraints = getConstraints(dataSource, MYSQL_PRIMARY_CONSTRAINT_SQL, database, tableName, columnName2DataType,
+                constraints = getConstraints(dataSource, MYSQL_PRIMARY_CONSTRAINT_SQL, database, tableName,
+                        columnName2DataType,
                         totalCount, ObModeType.OB_MYSQL, null);
             } else {
                 throw new MockerException(MockerError.NOT_SUPPORT_FEATURE,
-                        String.format("\"%s\" mode is not support yet", dialectType == null ? "null" : dialectType.name()));
+                        String.format("\"%s\" mode is not support yet",
+                                dialectType == null ? "null" : dialectType.name()));
             }
             validateConstraints(constraints, tableName, columnName2DataType, totalCount);
             return constraints;
         }
     };
     /**
-     * Check constraint factory, but this kind of constraint is not supported yet.
-     * If this kind of constraint exist, exception will be thrown
+     * Check constraint factory, but this kind of constraint is not supported yet. If this kind of
+     * constraint exist, exception will be thrown
      */
     private static final ConstraintFactory CHECK_CONSTRAINT = new ConstraintFactory() {
         @Override
-        public List<AbstractConstraint> make(DataSource dataSource, ObModeType dialectType, String database, String tableName,
+        public List<AbstractConstraint> make(DataSource dataSource, ObModeType dialectType, String database,
+                String tableName,
                 Map<String, AbstractDataType> columnName2DataType, int totalCount) throws Throwable {
             String[] params = new String[] {database, tableName};
             if (ObModeType.OB_ORACLE.equals(dialectType)) {
-                SqlUtil.executeQuery(dataSource, ORACLE_CHECK_CONSTRAINT_SQL, params, new AbstractCallBack<ResultSet>() {
-                    @Override
-                    public void doOnSuccess(ResultSet result) throws Throwable {
-                        List<ConstraintColumn> cols = SerializeUtil.getList(result, ConstraintColumn.class);
-                        if (cols.size() != 0) {
-                            throw new MockerException(MockerError.NOT_SUPPORT_FEATURE, "Check constraint is not support yet");
-                        }
-                    }
+                SqlUtil.executeQuery(dataSource, ORACLE_CHECK_CONSTRAINT_SQL, params,
+                        new AbstractCallBack<ResultSet>() {
+                            @Override
+                            public void doOnSuccess(ResultSet result) throws Throwable {
+                                List<ConstraintColumn> cols = SerializeUtil.getList(result, ConstraintColumn.class);
+                                if (cols.size() != 0) {
+                                    throw new MockerException(MockerError.NOT_SUPPORT_FEATURE,
+                                            "Check constraint is not support yet");
+                                }
+                            }
 
-                    @Override
-                    public void doOnFailure(ResultSet result, Throwable e) {
-                        throw new MockerException(e);
-                    }
-                });
+                            @Override
+                            public void doOnFailure(ResultSet result, Throwable e) {
+                                throw new MockerException(e);
+                            }
+                        });
             } else if (ObModeType.OB_MYSQL.equals(dialectType)) {
                 // OB-Mysql does not support query check constraint
                 return null;
             } else {
                 throw new MockerException(MockerError.NOT_SUPPORT_FEATURE,
-                        String.format("\"%s\" mode is not support yet", dialectType == null ? "null" : dialectType.name()));
+                        String.format("\"%s\" mode is not support yet",
+                                dialectType == null ? "null" : dialectType.name()));
             }
             return null;
         }
     };
     /**
-     * Foreign constraint factory, but this kind of constraint is not supported yet.
-     * If this kind of constraint exist, exception will be thrown
+     * Foreign constraint factory, but this kind of constraint is not supported yet. If this kind of
+     * constraint exist, exception will be thrown
      */
     private static final ConstraintFactory FOREIGN_CONSTRAINT = new ConstraintFactory() {
         @Override
-        public List<AbstractConstraint> make(DataSource dataSource, ObModeType dialectType, String database, String tableName,
+        public List<AbstractConstraint> make(DataSource dataSource, ObModeType dialectType, String database,
+                String tableName,
                 Map<String, AbstractDataType> columnName2DataType, int totalCount) throws Throwable {
             if (ObModeType.OB_ORACLE.equals(dialectType)) {
                 String[] params = new String[] {database, tableName};
-                SqlUtil.executeQuery(dataSource, ORACLE_FOREIGN_CONSTRAINT_SQL, params, new AbstractCallBack<ResultSet>() {
-                    @Override
-                    public void doOnSuccess(ResultSet result) throws Throwable {
-                        List<ConstraintColumn> cols = SerializeUtil.getList(result, ConstraintColumn.class);
-                        if (cols.size() != 0) {
-                            throw new MockerException(MockerError.NOT_SUPPORT_FEATURE, "Foreign constraint is not support yet");
-                        }
-                    }
+                SqlUtil.executeQuery(dataSource, ORACLE_FOREIGN_CONSTRAINT_SQL, params,
+                        new AbstractCallBack<ResultSet>() {
+                            @Override
+                            public void doOnSuccess(ResultSet result) throws Throwable {
+                                List<ConstraintColumn> cols = SerializeUtil.getList(result, ConstraintColumn.class);
+                                if (cols.size() != 0) {
+                                    throw new MockerException(MockerError.NOT_SUPPORT_FEATURE,
+                                            "Foreign constraint is not support yet");
+                                }
+                            }
 
-                    @Override
-                    public void doOnFailure(ResultSet result, Throwable e) {
-                        throw new MockerException(e);
-                    }
-                });
+                            @Override
+                            public void doOnFailure(ResultSet result, Throwable e) {
+                                throw new MockerException(e);
+                            }
+                        });
             } else if (ObModeType.OB_MYSQL.equals(dialectType)) {
                 // OB-Mysql does not support query foreign constraint
                 return null;
             } else {
                 throw new MockerException(MockerError.NOT_SUPPORT_FEATURE,
-                        String.format("\"%s\" mode is not support yet", dialectType == null ? "null" : dialectType.name()));
+                        String.format("\"%s\" mode is not support yet",
+                                dialectType == null ? "null" : dialectType.name()));
             }
             return null;
         }
@@ -231,20 +241,21 @@ public abstract class ConstraintFactory {
     /**
      * New Instance of a Constraint Factory
      *
-     * @param dataSource          datasource for constraint factory
-     * @param dialectType         ob mode enum(oracle, mysql)
-     * @param database            schema name for constraint
-     * @param tableName           table name for constraint
+     * @param dataSource datasource for constraint factory
+     * @param dialectType ob mode enum(oracle, mysql)
+     * @param database schema name for constraint
+     * @param tableName table name for constraint
      * @param columnName2DataType table schema(map between column name column type)
-     * @param totalCount          data count
+     * @param totalCount data count
      */
-    abstract public List<AbstractConstraint> make(DataSource dataSource, ObModeType dialectType, String database, String tableName,
+    abstract public List<AbstractConstraint> make(DataSource dataSource, ObModeType dialectType, String database,
+            String tableName,
             Map<String, AbstractDataType> columnName2DataType, int totalCount) throws Throwable;
 
     /**
-     * Verify method for constraint object
-     * eg. If a unique constraint restricts at most n different pieces of data can be generated,
-     *     but the input requires more than n pieces of data to be generated, an error will be reported
+     * Verify method for constraint object eg. If a unique constraint restricts at most n different
+     * pieces of data can be generated, but the input requires more than n pieces of data to be
+     * generated, an error will be reported
      *
      * @param constraints list of constraint
      * @param tableName table name which is associated with constraint
@@ -273,7 +284,8 @@ public abstract class ConstraintFactory {
             }
             if (limitCount < totalCount) {
                 throw new MockerException(MockerError.PARAMETER_ERROR,
-                        String.format("The given data generator can only generate %d unique data for cols {%s}, but the goal is %d",
+                        String.format(
+                                "The given data generator can only generate %d unique data for cols {%s}, but the goal is %d",
                                 limitCount.intValue(), String.join(", ", colSet), totalCount));
             }
         }
@@ -306,7 +318,8 @@ public abstract class ConstraintFactory {
                             Long position = (Long) item.getPosition();
                             map.putIfAbsent(item.getColumnName(), position.intValue());
                         } else {
-                            throw new MockerException(MockerError.ILLEGAL_RETURN_VALUE, "Position's type is not support");
+                            throw new MockerException(MockerError.ILLEGAL_RETURN_VALUE,
+                                    "Position's type is not support");
                         }
                         columnMap.put(item.getTableName(), map);
                     }
@@ -365,7 +378,8 @@ public abstract class ConstraintFactory {
      * @param columnName2DataType table schema
      */
     private static void initConstraint(DataSource dataSource, List<ConstraintColumn> colsList, String table,
-            Map<String, AbstractDataType> columnName2DataType, AbstractConstraint constraint, ObModeType obModeType) throws Throwable {
+            Map<String, AbstractDataType> columnName2DataType, AbstractConstraint constraint, ObModeType obModeType)
+            throws Throwable {
         Validate.notNull(obModeType, "OBModeType can not be null for ConstraintFactory#initConstraint");
         String columnStr = colsList.stream().map(column -> {
             if (ObModeType.OB_ORACLE.equals(obModeType)) {
@@ -373,9 +387,11 @@ public abstract class ConstraintFactory {
             }
             return "`" + DbObjectNameUtil.doubleCharToEscape(column.getColumnName(), '`') + "`";
         }).collect(Collectors.joining(","));
-        String querySql = String.format("select %s from \"%s\"; ", columnStr, DbObjectNameUtil.doubleCharToEscape(table, '"'));
+        String querySql =
+                String.format("select %s from \"%s\"; ", columnStr, DbObjectNameUtil.doubleCharToEscape(table, '"'));
         if (ObModeType.OB_MYSQL.equals(obModeType)) {
-            querySql = String.format("select %s from `%s`; ", columnStr, DbObjectNameUtil.doubleCharToEscape(table, '`'));
+            querySql =
+                    String.format("select %s from `%s`; ", columnStr, DbObjectNameUtil.doubleCharToEscape(table, '`'));
         }
         SqlUtil.executeQuery(dataSource, querySql, null, new AbstractCallBack<ResultSet>() {
             @Override
@@ -451,6 +467,7 @@ public abstract class ConstraintFactory {
     }
 }
 
+
 /**
  * Verify interface, used to verify if the constraint is associated with virtual column
  *
@@ -460,16 +477,17 @@ public abstract class ConstraintFactory {
  */
 interface Validation {
     /**
-     * The verification method is used to determine whether the constraint is a type that the mock can handle.
-     * Currently, it only targets primary key constraints and unique constraints. Unique constraints can be
-     * defined on virtual columns, so this check is mainly used on virtual columns to check whether the
-     * constraints include virtual columns
+     * The verification method is used to determine whether the constraint is a type that the mock can
+     * handle. Currently, it only targets primary key constraints and unique constraints. Unique
+     * constraints can be defined on virtual columns, so this check is mainly used on virtual columns to
+     * check whether the constraints include virtual columns
      *
      * @param dataSource datasource
      * @param column column which is associated this constraint
      */
     void validate(DataSource dataSource, ConstraintColumn column) throws Throwable;
 }
+
 
 /**
  * Interface implementation for mysql mode
@@ -482,9 +500,9 @@ class MysqlValidation implements Validation {
     /**
      * Query sql for verifing if there exists a virtual column
      */
-    private static final String MYSQL_VALIDATE_SQL
-            = "select TABLE_SCHEMA as OWNER,TABLE_NAME,COLUMN_NAME,DATA_TYPE,NUMERIC_PRECISION as DATA_PRECISION,NUMERIC_SCALE as "
-              + "DATA_SCALE,GENERATION_EXPRESSION from information_schema.columns where TABLE_SCHEMA=? and TABLE_NAME=? and COLUMN_NAME=?";
+    private static final String MYSQL_VALIDATE_SQL =
+            "select TABLE_SCHEMA as OWNER,TABLE_NAME,COLUMN_NAME,DATA_TYPE,NUMERIC_PRECISION as DATA_PRECISION,NUMERIC_SCALE as "
+                    + "DATA_SCALE,GENERATION_EXPRESSION from information_schema.columns where TABLE_SCHEMA=? and TABLE_NAME=? and COLUMN_NAME=?";
 
     @Override
     public void validate(DataSource dataSource, ConstraintColumn cols) throws Throwable {
@@ -495,7 +513,8 @@ class MysqlValidation implements Validation {
                 TableColumn tableCol = SerializeUtil.getObject(result, TableColumn.class);
                 if (StringUtils.isNotBlank(tableCol.getExpression())) {
                     throw new MockerException(MockerError.NOT_SUPPORT_FEATURE,
-                            String.format("Virtual column \"%s.%s\" for constraint is not support yet", tableCol.getTableName(),
+                            String.format("Virtual column \"%s.%s\" for constraint is not support yet",
+                                    tableCol.getTableName(),
                                     tableCol.getColumnName()));
                 }
             }
@@ -508,6 +527,7 @@ class MysqlValidation implements Validation {
     }
 }
 
+
 /**
  * Interface implementation for oracle mode
  *
@@ -519,7 +539,8 @@ class OracleValidation implements Validation {
     /**
      * Query sql for verifing if there exists a virtual column
      */
-    private static final String ORACLE_VALIDATE_SQL = "select * from all_tab_cols where owner=? and table_name=? and column_name=?";
+    private static final String ORACLE_VALIDATE_SQL =
+            "select * from all_tab_cols where owner=? and table_name=? and column_name=?";
 
     @Override
     public void validate(DataSource dataSource, ConstraintColumn cols) throws Throwable {
@@ -530,7 +551,8 @@ class OracleValidation implements Validation {
                 TableColumn tableCol = SerializeUtil.getObject(result, TableColumn.class);
                 if ("YES".equals(tableCol.getVirtualColumn())) {
                     throw new MockerException(MockerError.NOT_SUPPORT_FEATURE,
-                            String.format("Virtual column \"%s.%s\" for constraint is not support yet", tableCol.getTableName(),
+                            String.format("Virtual column \"%s.%s\" for constraint is not support yet",
+                                    tableCol.getTableName(),
                                     tableCol.getColumnName()));
                 }
             }

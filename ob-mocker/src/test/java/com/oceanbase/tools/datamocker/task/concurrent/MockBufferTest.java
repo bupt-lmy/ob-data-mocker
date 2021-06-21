@@ -52,10 +52,10 @@ public class MockBufferTest extends MockerTestBase {
     private final static String mysqlEnv = "db/mysql-env.properties";
     private final static String oracleEnv = "db/oracle-env.properties";
     private final String ddl = "CREATE TABLE \"EMP\" (\n"
-                               + "  \"COL1\" NUMBER(5,2) NOT NULL,\n"
-                               + "  \"COL2\" NUMBER(5,2) NOT NULL,\n"
-                               + "  \"COL3\" NUMBER(5,3) NOT NULL\n"
-                               + "); ";
+            + "  \"COL1\" NUMBER(5,2) NOT NULL,\n"
+            + "  \"COL2\" NUMBER(5,2) NOT NULL,\n"
+            + "  \"COL3\" NUMBER(5,3) NOT NULL\n"
+            + "); ";
     private DataSource dataSource;
     private MockerFile manager;
 

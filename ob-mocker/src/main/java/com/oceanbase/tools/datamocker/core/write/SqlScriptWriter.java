@@ -27,7 +27,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class SqlScriptWriter extends AbstractMockWriter {
     /**
-     * The written target library, if the target library is specified when the connection is established, this value can also be left blank
+     * The written target library, if the target library is specified when the connection is
+     * established, this value can also be left blank
      */
     private final String database;
     /**
@@ -44,10 +45,10 @@ public class SqlScriptWriter extends AbstractMockWriter {
     /**
      * The constructor writes a mock file, which is required
      *
-     * @param manager     mock file object
+     * @param manager mock file object
      * @param dialectType dialect type
-     * @param database    schema or database name
-     * @param tableName   table name
+     * @param database schema or database name
+     * @param tableName table name
      */
     public SqlScriptWriter(MockerFile manager, ObModeType dialectType, String database,
             String tableName) {
@@ -124,20 +125,24 @@ public class SqlScriptWriter extends AbstractMockWriter {
         List<String> columnList = new ArrayList<>(columnSet);
         StringBuffer sqlBuffer = null;
         if (ObModeType.OB_ORACLE.equals(this.dialectType)) {
-            sqlBuffer = new StringBuffer(String.format("insert into \"%s\".\"%s\"(", DbObjectNameUtil.doubleCharToEscape(database, '"'),
-                    DbObjectNameUtil.doubleCharToEscape(tableName, '"')));
+            sqlBuffer = new StringBuffer(
+                    String.format("insert into \"%s\".\"%s\"(", DbObjectNameUtil.doubleCharToEscape(database, '"'),
+                            DbObjectNameUtil.doubleCharToEscape(tableName, '"')));
         } else if (ObModeType.OB_MYSQL.equals(this.dialectType)) {
-            sqlBuffer = new StringBuffer(String.format("insert into `%s`.`%s`(", DbObjectNameUtil.doubleCharToEscape(database, '`'),
-                    DbObjectNameUtil.doubleCharToEscape(tableName, '`')));
+            sqlBuffer = new StringBuffer(
+                    String.format("insert into `%s`.`%s`(", DbObjectNameUtil.doubleCharToEscape(database, '`'),
+                            DbObjectNameUtil.doubleCharToEscape(tableName, '`')));
         }
         int columnLength = columnList.size();
         for (int i = 0; i < columnLength; i++) {
             String columnName = columnList.get(i);
             if (i == columnLength - 1) {
                 if (ObModeType.OB_ORACLE.equals(this.dialectType)) {
-                    sqlBuffer.append(String.format("\"%s\") values (", DbObjectNameUtil.doubleCharToEscape(columnName, '"')));
+                    sqlBuffer.append(
+                            String.format("\"%s\") values (", DbObjectNameUtil.doubleCharToEscape(columnName, '"')));
                 } else if (ObModeType.OB_MYSQL.equals(this.dialectType)) {
-                    sqlBuffer.append(String.format("`%s`) values (", DbObjectNameUtil.doubleCharToEscape(columnName, '`')));
+                    sqlBuffer.append(
+                            String.format("`%s`) values (", DbObjectNameUtil.doubleCharToEscape(columnName, '`')));
                 }
             } else {
                 if (ObModeType.OB_ORACLE.equals(this.dialectType)) {

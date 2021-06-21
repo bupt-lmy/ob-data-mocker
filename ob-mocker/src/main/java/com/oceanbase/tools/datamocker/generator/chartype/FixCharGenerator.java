@@ -24,7 +24,7 @@ public class FixCharGenerator extends CharGeneratorBase {
      * Constructor
      *
      * @param caseType Character case control configuration
-     * @param fixText  Fixed value text
+     * @param fixText Fixed value text
      */
     public FixCharGenerator(CharCaseOption caseType, String fixText) {
         super(caseType);

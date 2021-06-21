@@ -19,14 +19,15 @@ public class MysqlCharType extends AbstractCharDataType {
     /**
      * Constructor
      *
-     * @param length       Length of character type
-     * @param charsetType  Character type encoding format
-     * @param generator    Character type binding data generator
-     * @param allowNull    Whether to allow null values
+     * @param length Length of character type
+     * @param charsetType Character type encoding format
+     * @param generator Character type binding data generator
+     * @param allowNull Whether to allow null values
      * @param defaultValue defaultvalue for data type
-     * @param isUnicode    Whether it is a unicode character
+     * @param isUnicode Whether it is a unicode character
      */
-    public MysqlCharType(Integer length, String defaultValue, Boolean allowNull, CharsetType charsetType, CharGeneratorBase generator,
+    public MysqlCharType(Integer length, String defaultValue, Boolean allowNull, CharsetType charsetType,
+            CharGeneratorBase generator,
             Boolean isUnicode) {
         super(generator, ObModeType.OB_MYSQL, charsetType, length, defaultValue, allowNull, isUnicode);
         if (length > 256 || length <= 0) {
@@ -44,7 +45,8 @@ public class MysqlCharType extends AbstractCharDataType {
      * @param defaultValue defaultvalue for data type
      * @param isUnicode Whether it is a unicode character
      */
-    public MysqlCharType(Integer length, String defaultValue, Boolean allowNull, CharsetType charsetType, Boolean isUnicode) {
+    public MysqlCharType(Integer length, String defaultValue, Boolean allowNull, CharsetType charsetType,
+            Boolean isUnicode) {
         super(ObModeType.OB_MYSQL, charsetType, length, defaultValue, allowNull, isUnicode);
         if (length > 256 || length <= 0) {
             throw new MockerException(MockerError.PARAMETER_ERROR,

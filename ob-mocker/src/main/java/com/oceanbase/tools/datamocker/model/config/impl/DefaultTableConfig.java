@@ -10,7 +10,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * Table task configuration object, used to encapsulate configuration parameters related to table generation tasks
+ * Table task configuration object, used to encapsulate configuration parameters related to table
+ * generation tasks
  *
  * @author yh263208
  * @date 2020-12-27 20:58
@@ -48,8 +49,8 @@ public class DefaultTableConfig extends AbstractTableConfig {
      */
     private String schemaName;
     /**
-     * The timeout period of the table generation task, in milliseconds,
-     * the default timeout period is 1 hour, which is 3600000
+     * The timeout period of the table generation task, in milliseconds, the default timeout period is 1
+     * hour, which is 3600000
      */
     private Long timeout = 3600000L;
     /**

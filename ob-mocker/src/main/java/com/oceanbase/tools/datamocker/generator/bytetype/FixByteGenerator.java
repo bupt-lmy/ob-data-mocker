@@ -18,7 +18,7 @@ public class FixByteGenerator extends ByteGeneratorBase {
      * 构造方法
      *
      * @param caseType 字符大小写控制配置
-     * @param fixText  定值文本
+     * @param fixText 定值文本
      */
     public FixByteGenerator(CharCaseOption caseType, String fixText) {
         customGen = new FixCharGenerator(caseType, fixText);

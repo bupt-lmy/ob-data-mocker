@@ -31,7 +31,8 @@ public class RandomDateCharGenerator extends CharGeneratorBase {
     public RandomDateCharGenerator(CharCaseOption caseOption, long startTime, long endTime, String timezone) {
         super(caseOption);
         if (startTime >= endTime) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "Start time stamp can not be later than end time stamp");
+            throw new MockerException(MockerError.PARAMETER_ERROR,
+                    "Start time stamp can not be later than end time stamp");
         }
         if (startTime < 0) {
             throw new MockerException(MockerError.PARAMETER_ERROR, "Time stamp can not be smaller than zero");

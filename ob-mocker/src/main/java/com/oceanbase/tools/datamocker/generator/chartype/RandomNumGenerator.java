@@ -25,10 +25,12 @@ public class RandomNumGenerator extends CharGeneratorBase {
     public RandomNumGenerator(CharCaseOption caseOption, Long start, Long end) {
         super(caseOption);
         if (start == null || end == null) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "Start or end for random number generator can not be null");
+            throw new MockerException(MockerError.PARAMETER_ERROR,
+                    "Start or end for random number generator can not be null");
         }
         if (start.compareTo(end) >= 0) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "Start for random number generator can not be bigger than end");
+            throw new MockerException(MockerError.PARAMETER_ERROR,
+                    "Start for random number generator can not be bigger than end");
         }
         this.start = start;
         this.end = end;

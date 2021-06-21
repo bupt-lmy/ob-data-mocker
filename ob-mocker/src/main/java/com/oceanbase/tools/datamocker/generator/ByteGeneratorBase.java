@@ -9,7 +9,8 @@ package com.oceanbase.tools.datamocker.generator;
  */
 public abstract class ByteGeneratorBase extends BaseGenerator<Integer, byte[]> {
     /**
-     * Pre-checking step, used to check whether the generator can work normally according to the boundary value
+     * Pre-checking step, used to check whether the generator can work normally according to the
+     * boundary value
      *
      * @param minLength Minimum
      * @param maxLength Max length for string value
@@ -21,8 +22,10 @@ public abstract class ByteGeneratorBase extends BaseGenerator<Integer, byte[]> {
     /**
      * Data generation method interface
      *
-     * @param minLength The minimum value, the character generation task reflects the minimum byte value of the character
-     * @param maxLength The maximum value, the character generation task reflects the minimum byte value of the character
+     * @param minLength The minimum value, the character generation task reflects the minimum byte value
+     *        of the character
+     * @param maxLength The maximum value, the character generation task reflects the minimum byte value
+     *        of the character
      * @return Returns a generated specific value
      */
     @Override
@@ -31,7 +34,8 @@ public abstract class ByteGeneratorBase extends BaseGenerator<Integer, byte[]> {
     /**
      * Return the total number of unique data that the data generator can generate
      *
-     * @return Return a specific value, or null if the data generator can generate data without limitation
+     * @return Return a specific value, or null if the data generator can generate data without
+     *         limitation
      */
     @Override
     abstract public Long count(Integer minLength, Integer maxLength);

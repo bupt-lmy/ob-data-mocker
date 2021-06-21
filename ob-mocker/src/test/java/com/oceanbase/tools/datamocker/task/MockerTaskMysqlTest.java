@@ -54,40 +54,40 @@ public class MockerTaskMysqlTest extends MockerTestBase {
     private final String oracleEnv = "db/oracle-env.properties";
     private final String[] ddls = new String[] {
             " CREATE TABLE `emp` (\n"
-            + "  `col` tinyint(4) DEFAULT NULL,\n"
-            + "  `col2` tinyint(3) unsigned DEFAULT NULL,\n"
-            + "  `col3` smallint(6) NOT NULL,\n"
-            + "  `col4` smallint(5) unsigned DEFAULT NULL,\n"
-            + "  `col5` mediumint(9) DEFAULT NULL,\n"
-            + "  `col6` mediumint(8) unsigned DEFAULT NULL,\n"
-            + "  `col7` int(11) DEFAULT NULL,\n"
-            + "  `col8` int(10) unsigned DEFAULT NULL,\n"
-            + "  `col9` bigint(20) DEFAULT NULL,\n"
-            + "  `col10` bigint(20) unsigned DEFAULT NULL,\n"
-            + "  `col11` decimal(10,0) DEFAULT NULL,\n"
-            + "  `col12` decimal(12,5) unsigned DEFAULT NULL,\n"
-            + "  `col13` float unsigned DEFAULT NULL,\n"
-            + "  `col14` float DEFAULT NULL,\n"
-            + "  `col15` float(5,3) DEFAULT NULL,\n"
-            + "  `col16` char(256),\n"
-            + "  `col17` varchar(512) DEFAULT NULL,\n"
-            + "  `col18` tinytext DEFAULT NULL,\n"
-            + "  `col19` text DEFAULT NULL,\n"
-            + "  `col20` mediumtext DEFAULT NULL,\n"
-            + "  `col21` longtext DEFAULT NULL,\n"
-            + "  `col22` tinyblob DEFAULT NULL,\n"
-            + "  `col23` blob DEFAULT NULL,\n"
-            + "  `col24` mediumblob DEFAULT NULL,\n"
-            + "  `col25` longblob DEFAULT NULL,\n"
-            + "  `col26` binary(128) DEFAULT NULL,\n"
-            + "  `col27` varbinary(256) DEFAULT NULL,\n"
-            + "  `col28` date DEFAULT NULL,\n"
-            + "  `col29` timestamp(5) DEFAULT NULL,\n"
-            + "  `col30` time(2) DEFAULT NULL,\n"
-            + "  `col31` datetime DEFAULT NULL,\n"
-            + "  `col32` year(4) DEFAULT NULL,\n"
-            + "  `col33` bit(16) DEFAULT NULL\n"
-            + ") ;"
+                    + "  `col` tinyint(4) DEFAULT NULL,\n"
+                    + "  `col2` tinyint(3) unsigned DEFAULT NULL,\n"
+                    + "  `col3` smallint(6) NOT NULL,\n"
+                    + "  `col4` smallint(5) unsigned DEFAULT NULL,\n"
+                    + "  `col5` mediumint(9) DEFAULT NULL,\n"
+                    + "  `col6` mediumint(8) unsigned DEFAULT NULL,\n"
+                    + "  `col7` int(11) DEFAULT NULL,\n"
+                    + "  `col8` int(10) unsigned DEFAULT NULL,\n"
+                    + "  `col9` bigint(20) DEFAULT NULL,\n"
+                    + "  `col10` bigint(20) unsigned DEFAULT NULL,\n"
+                    + "  `col11` decimal(10,0) DEFAULT NULL,\n"
+                    + "  `col12` decimal(12,5) unsigned DEFAULT NULL,\n"
+                    + "  `col13` float unsigned DEFAULT NULL,\n"
+                    + "  `col14` float DEFAULT NULL,\n"
+                    + "  `col15` float(5,3) DEFAULT NULL,\n"
+                    + "  `col16` char(256),\n"
+                    + "  `col17` varchar(512) DEFAULT NULL,\n"
+                    + "  `col18` tinytext DEFAULT NULL,\n"
+                    + "  `col19` text DEFAULT NULL,\n"
+                    + "  `col20` mediumtext DEFAULT NULL,\n"
+                    + "  `col21` longtext DEFAULT NULL,\n"
+                    + "  `col22` tinyblob DEFAULT NULL,\n"
+                    + "  `col23` blob DEFAULT NULL,\n"
+                    + "  `col24` mediumblob DEFAULT NULL,\n"
+                    + "  `col25` longblob DEFAULT NULL,\n"
+                    + "  `col26` binary(128) DEFAULT NULL,\n"
+                    + "  `col27` varbinary(256) DEFAULT NULL,\n"
+                    + "  `col28` date DEFAULT NULL,\n"
+                    + "  `col29` timestamp(5) DEFAULT NULL,\n"
+                    + "  `col30` time(2) DEFAULT NULL,\n"
+                    + "  `col31` datetime DEFAULT NULL,\n"
+                    + "  `col32` year(4) DEFAULT NULL,\n"
+                    + "  `col33` bit(16) DEFAULT NULL\n"
+                    + ") ;"
     };
     private DataSource mysqlDatasource = null;
 
@@ -160,9 +160,11 @@ public class MockerTaskMysqlTest extends MockerTestBase {
                 }
                 for (TableTaskContext item : contexts) {
                     String interval = (System.currentTimeMillis() - start) / 1000 + "s";
-                    System.out.printf("[\"%s\" - \"%s\"] : %s - %s - %f%n", item.getTaskName(), item.getTableTaskId(), item.getStatus(),
+                    System.out.printf("[\"%s\" - \"%s\"] : %s - %s - %f%n", item.getTaskName(), item.getTableTaskId(),
+                            item.getStatus(),
                             interval, context.getProgress());
-                    if (MockTaskStatus.CANCELED.equals(item.getStatus()) || MockTaskStatus.FAILED.equals(item.getStatus())) {
+                    if (MockTaskStatus.CANCELED.equals(item.getStatus())
+                            || MockTaskStatus.FAILED.equals(item.getStatus())) {
                         return false;
                     }
                     flag &= MockTaskStatus.SUCCESS.equals(item.getStatus());

@@ -29,11 +29,12 @@ public class SqlUtil {
      * Execute sql query
      *
      * @param connection Database Connectivity
-     * @param sql        sql text
-     * @param params     parameter
-     * @param callBack   Callback method
+     * @param sql sql text
+     * @param params parameter
+     * @param callBack Callback method
      */
-    public static void executeQuery(Connection connection, String sql, Object[] params, AbstractCallBack<ResultSet> callBack)
+    public static void executeQuery(Connection connection, String sql, Object[] params,
+            AbstractCallBack<ResultSet> callBack)
             throws Throwable {
         if (connection == null || sql == null) {
             MockerException e = new MockerException(MockerError.PARAMETER_ERROR, "Connection or SQL can not be null");
@@ -94,7 +95,8 @@ public class SqlUtil {
      * @param params parameter
      * @param callBack callback method
      */
-    public static void executeQuery(DataSource dataSource, String sql, Object[] params, AbstractCallBack<ResultSet> callBack)
+    public static void executeQuery(DataSource dataSource, String sql, Object[] params,
+            AbstractCallBack<ResultSet> callBack)
             throws Throwable {
         if (dataSource == null) {
             MockerException e = new MockerException(MockerError.PARAMETER_ERROR, "Datasource can not be null");
@@ -120,7 +122,8 @@ public class SqlUtil {
      * @param params parameter
      * @param callBack callback method
      */
-    public static void executeUpdate(Connection connection, String sql, Object[] params, AbstractCallBack<Integer> callBack)
+    public static void executeUpdate(Connection connection, String sql, Object[] params,
+            AbstractCallBack<Integer> callBack)
             throws Throwable {
         if (connection == null || sql == null) {
             MockerException e = new MockerException(MockerError.PARAMETER_ERROR, "Connection or SQL can not be null");
@@ -179,7 +182,8 @@ public class SqlUtil {
      * @param params parameter
      * @param callBack callback method
      */
-    public static void executeUpdate(DataSource dataSource, String sql, Object[] params, AbstractCallBack<Integer> callBack)
+    public static void executeUpdate(DataSource dataSource, String sql, Object[] params,
+            AbstractCallBack<Integer> callBack)
             throws Throwable {
         if (dataSource == null) {
             MockerException e = new MockerException(MockerError.PARAMETER_ERROR, "Datasource can not be null");
@@ -205,7 +209,8 @@ public class SqlUtil {
      * @param params parameter
      * @param callBack callback method
      */
-    public static void executeBatch(Connection connection, String sql, Object[][] params, AbstractCallBack<int[]> callBack)
+    public static void executeBatch(Connection connection, String sql, Object[][] params,
+            AbstractCallBack<int[]> callBack)
             throws Throwable {
         if (connection == null || sql == null) {
             MockerException e = new MockerException(MockerError.PARAMETER_ERROR, "Connection or sql can not be null");
@@ -230,7 +235,8 @@ public class SqlUtil {
             for (int i = 0; i < length; i++) {
                 Object[] innerParams = params[i];
                 if (innerParams == null) {
-                    throw new MockerException(MockerError.FAIL_TO_EXECUTE_SQL, "Param can not be null for batch update");
+                    throw new MockerException(MockerError.FAIL_TO_EXECUTE_SQL,
+                            "Param can not be null for batch update");
                 }
                 int innerLength = innerParams.length;
                 for (int j = 0; j < innerLength; j++) {
@@ -277,7 +283,8 @@ public class SqlUtil {
      * @param params parameter
      * @param callBack callback method
      */
-    public static void executeBatch(DataSource dataSource, String sql, Object[][] params, AbstractCallBack<int[]> callBack)
+    public static void executeBatch(DataSource dataSource, String sql, Object[][] params,
+            AbstractCallBack<int[]> callBack)
             throws Throwable {
         if (dataSource == null) {
             MockerException e = new MockerException(MockerError.PARAMETER_ERROR, "Datasource can not be null");

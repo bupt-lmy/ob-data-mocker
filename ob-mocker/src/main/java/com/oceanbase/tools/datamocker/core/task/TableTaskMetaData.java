@@ -18,15 +18,14 @@ import lombok.Getter;
 public class TableTaskMetaData {
     private final String tableTaskId;
     /**
-     * The maximum number of table generation tasks, when a table is generated,
-     * totalCount represents the maximum number of entries of data to be generated
+     * The maximum number of table generation tasks, when a table is generated, totalCount represents
+     * the maximum number of entries of data to be generated
      */
     private final Long totalCount;
     /**
-     * Table structure definition, used to describe the structure of the table,
-     * including the mapping relationship between field names and types
-     * key：Column name
-     * value：Data type corresponding to column name
+     * Table structure definition, used to describe the structure of the table, including the mapping
+     * relationship between field names and types key：Column name value：Data type corresponding to
+     * column name
      */
     private final Map<String, AbstractDataType> tableSchema;
     private final String tableName;
@@ -37,7 +36,8 @@ public class TableTaskMetaData {
     private final ObModeType dialectType;
     private final String taskId;
 
-    public TableTaskMetaData(Map<String, AbstractDataType> tableSchema, AbstractTableConfig tableConfig, ObModeType dialectType,
+    public TableTaskMetaData(Map<String, AbstractDataType> tableSchema, AbstractTableConfig tableConfig,
+            ObModeType dialectType,
             String taskId, int columnIndex, int rowIndex) {
         this.tableSchema = tableSchema;
         this.tableName = tableConfig.tableName();

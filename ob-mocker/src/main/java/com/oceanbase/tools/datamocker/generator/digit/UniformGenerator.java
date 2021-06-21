@@ -29,9 +29,9 @@ public class UniformGenerator extends DigitalGeneratorBase<BigDecimal> {
     }
 
     /**
-     * Get the multiplier factor. In design, the multiplier factor is a fixed value in a generated object.
-     * Therefore, this acquisition method is designed to improve the acquisition efficiency.
-     * In an instance, the multiplier factor is a fixed value.
+     * Get the multiplier factor. In design, the multiplier factor is a fixed value in a generated
+     * object. Therefore, this acquisition method is designed to improve the acquisition efficiency. In
+     * an instance, the multiplier factor is a fixed value.
      *
      * @param maxValue Generate the maximum value of a random number
      * @param minValue Generate the minimum value of a random number

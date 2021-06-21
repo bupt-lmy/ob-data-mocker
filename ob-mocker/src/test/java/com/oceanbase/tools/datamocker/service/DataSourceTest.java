@@ -134,8 +134,9 @@ public class DataSourceTest extends MockerTestBase {
     }
 
     @Test
-    public void testDataSourceWithMultiThread() throws IOException, SQLException, InterruptedException, TimeoutException,
-                                                       ExecutionException {
+    public void testDataSourceWithMultiThread()
+            throws IOException, SQLException, InterruptedException, TimeoutException,
+            ExecutionException {
         DataBaseConfig config = getDBConfig(ObModeType.OB_ORACLE);
         DataSource dataSource = new MockerDataSource(config, 3, 5, 2, params);
         dataSource.setLoginTimeout(5);
@@ -179,7 +180,8 @@ public class DataSourceTest extends MockerTestBase {
     public void testDataSourceWithDirectConnection() throws IOException, SQLException {
         DataBaseConfig config = getDBConfig(ObModeType.OB_ORACLE);
         DataSource dataSource = new MockerDataSource(config, 3, 5, 2, params);
-        Connection connection = dataSource.getConnection(config.getUser() + "@" + config.getTenant(), config.getPassword());
+        Connection connection =
+                dataSource.getConnection(config.getUser() + "@" + config.getTenant(), config.getPassword());
         Assert.assertNotNull(connection);
         connection.close();
     }

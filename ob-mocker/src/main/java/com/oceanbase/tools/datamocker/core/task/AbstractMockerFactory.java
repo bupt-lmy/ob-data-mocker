@@ -63,8 +63,8 @@ public abstract class AbstractMockerFactory {
      */
     private AbstractTaskConfig taskConfig;
     /**
-     * The internal data source of the factory type, which is used to verify the existence of tables, check constraints and other
-     * information
+     * The internal data source of the factory type, which is used to verify the existence of tables,
+     * check constraints and other information
      */
     private MockerDataSource innerDatasource = null;
     /**
@@ -95,8 +95,9 @@ public abstract class AbstractMockerFactory {
         if (dbConfig == null) {
             return false;
         }
-        return !StringUtils.isBlank(dbConfig.getUser()) && !StringUtils.isBlank(dbConfig.getTenant()) && !StringUtils.isBlank(
-                dbConfig.getHost());
+        return !StringUtils.isBlank(dbConfig.getUser()) && !StringUtils.isBlank(dbConfig.getTenant())
+                && !StringUtils.isBlank(
+                        dbConfig.getHost());
     }
 
     /**
@@ -198,7 +199,8 @@ public abstract class AbstractMockerFactory {
      * @param tableConfig table configuration
      * @return list of constraint
      */
-    protected List<AbstractConstraint> getConstraints(AbstractTableConfig tableConfig, ObModeType dialectType) throws Throwable {
+    protected List<AbstractConstraint> getConstraints(AbstractTableConfig tableConfig, ObModeType dialectType)
+            throws Throwable {
         if (tableConfig.constraints() != null) {
             return tableConfig.constraints();
         } else if (this.innerDatasource == null) {
@@ -208,8 +210,9 @@ public abstract class AbstractMockerFactory {
         List<ConstraintFactory> factories = ConstraintFactory.listInstances();
         List<AbstractConstraint> returnVal = new ArrayList<>();
         for (ConstraintFactory factory : factories) {
-            List<AbstractConstraint> customConstraint = factory.make(this.innerDatasource, dialectType, tableConfig.schemaName(),
-                    tableConfig.tableName(), columnName2DataType, tableConfig.maxCount().intValue());
+            List<AbstractConstraint> customConstraint =
+                    factory.make(this.innerDatasource, dialectType, tableConfig.schemaName(),
+                            tableConfig.tableName(), columnName2DataType, tableConfig.maxCount().intValue());
             if (customConstraint != null) {
                 returnVal.addAll(customConstraint);
             }
@@ -239,7 +242,7 @@ public abstract class AbstractMockerFactory {
         realParam.put("autoReconnect", "true");
         realParam.put("rewriteBatchedStatements", "true");
         realParam.put("emulateUnsupportedPstmts", "false");
-        //realParam.put("useServerPrepStmts", "true");
+        // realParam.put("useServerPrepStmts", "true");
         Map<String, String> param = this.taskConfig.dbConfig().getConnectParam();
         if (param != null) {
             Set<Entry<String, String>> entries = param.entrySet();
@@ -247,8 +250,9 @@ public abstract class AbstractMockerFactory {
                 realParam.putIfAbsent(entry.getKey(), entry.getValue());
             }
         }
-        dataSource = new MockerDataSource(this.taskConfig.dbConfig(), taskConfig.minConnection(), taskConfig.maxConnection(),
-                taskConfig.connectionIncreasementStep(), realParam);
+        dataSource =
+                new MockerDataSource(this.taskConfig.dbConfig(), taskConfig.minConnection(), taskConfig.maxConnection(),
+                        taskConfig.connectionIncreasementStep(), realParam);
         this.taskId2DataSource.putIfAbsent(tableTaskId, dataSource);
         return dataSource;
     }
@@ -261,7 +265,8 @@ public abstract class AbstractMockerFactory {
      * @return list of file manager
      * @exception IOException Throw an exception when the file operation fails
      */
-    protected synchronized List<MockerFile> getFileManager(String tableTaskId, AbstractTableConfig tableConfig) throws IOException {
+    protected synchronized List<MockerFile> getFileManager(String tableTaskId, AbstractTableConfig tableConfig)
+            throws IOException {
         Validate.notEmpty(tableTaskId, "Table task id can not be null");
         Validate.notNull(tableConfig, "Table config can not be null");
         List<MockerFile> returnVal = taskId2MockerFiles.get(tableTaskId);
@@ -286,13 +291,15 @@ public abstract class AbstractMockerFactory {
      * @param ds datasource
      * @return list of mock writer
      */
-    protected List<AbstractMockWriter> getDataWriter(AbstractTableConfig tableConfig, MockerBuffer buffer, List<MockerFile> managers,
+    protected List<AbstractMockWriter> getDataWriter(AbstractTableConfig tableConfig, MockerBuffer buffer,
+            List<MockerFile> managers,
             DataSource ds) {
         Validate.notNull(managers, "Mocker file manager list can not be null");
         List<AbstractMockWriter> dataWriters = new ArrayList<>();
         for (MockerFile manager : managers) {
-            SqlScriptWriter writer = new SqlScriptWriter(manager, this.taskConfig.obDialectType(), tableConfig.schemaName(),
-                    tableConfig.tableName());
+            SqlScriptWriter writer =
+                    new SqlScriptWriter(manager, this.taskConfig.obDialectType(), tableConfig.schemaName(),
+                            tableConfig.tableName());
             dataWriters.add(writer);
         }
         if (ds == null) {
@@ -303,7 +310,8 @@ public abstract class AbstractMockerFactory {
         dataWriters.add(writer);
         Map<String, AbstractDataPipe> map = new HashMap<>();
         for (AbstractMockWriter item : dataWriters) {
-            AbstractDataPipe dataPipe = map.getOrDefault(item.groupId(), new MockDataPipe(tableConfig.maxRetainedCount()));
+            AbstractDataPipe dataPipe =
+                    map.getOrDefault(item.groupId(), new MockDataPipe(tableConfig.maxRetainedCount()));
             item.register(dataPipe);
             buffer.register(dataPipe);
         }
@@ -317,7 +325,8 @@ public abstract class AbstractMockerFactory {
      * @param constraints constraint list
      * @return list of column reader
      */
-    protected List<ColumnReader> getColumnReader(AbstractTableConfig tableConfig, List<AbstractConstraint> constraints) {
+    protected List<ColumnReader> getColumnReader(AbstractTableConfig tableConfig,
+            List<AbstractConstraint> constraints) {
         List<? extends AbstractColumnConfig> columnConfigs = tableConfig.columns();
         List<Set<String>> colGroupList = new ArrayList<>();
         for (AbstractConstraint constraint : constraints) {

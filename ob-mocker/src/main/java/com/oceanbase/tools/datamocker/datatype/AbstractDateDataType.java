@@ -21,21 +21,24 @@ public abstract class AbstractDateDataType<T extends Comparable> extends Abstrac
     private TimeZone timeZone = TimeZone.getDefault();
 
     /**
-     * The constructor of the abstract base class, where you need to pass in the random data generator bound to this data type,
-     * and specify the OB mode corresponding to the data type and the database type in this mode
+     * The constructor of the abstract base class, where you need to pass in the random data generator
+     * bound to this data type, and specify the OB mode corresponding to the data type and the database
+     * type in this mode
      *
-     * @param generator    data generator
-     * @param dialectType  dialect type
+     * @param generator data generator
+     * @param dialectType dialect type
      * @param defaultValue default value for type
-     * @param allowNull    Whether it is allowed to be empty
+     * @param allowNull Whether it is allowed to be empty
      */
-    public AbstractDateDataType(DateGeneratorBase<T> generator, ObModeType dialectType, T defaultValue, Boolean allowNull) {
+    public AbstractDateDataType(DateGeneratorBase<T> generator, ObModeType dialectType, T defaultValue,
+            Boolean allowNull) {
         super(generator, dialectType, defaultValue, allowNull);
     }
 
     /**
-     * The constructor of the abstract base class, where you need to pass in the random data generator bound to this data type,
-     * and specify the OB mode corresponding to the data type and the database type in this mode
+     * The constructor of the abstract base class, where you need to pass in the random data generator
+     * bound to this data type, and specify the OB mode corresponding to the data type and the database
+     * type in this mode
      *
      * @param dialectType dialect type
      * @param defaultValue default value for type
@@ -46,8 +49,9 @@ public abstract class AbstractDateDataType<T extends Comparable> extends Abstrac
     }
 
     /**
-     * The constructor of the abstract base class, where you need to pass in the random data generator bound to this data type,
-     * and specify the OB mode corresponding to the data type and the database type in this mode
+     * The constructor of the abstract base class, where you need to pass in the random data generator
+     * bound to this data type, and specify the OB mode corresponding to the data type and the database
+     * type in this mode
      *
      * @param dialectType dialect type
      * @param timeZone time zone
@@ -68,8 +72,8 @@ public abstract class AbstractDateDataType<T extends Comparable> extends Abstrac
     }
 
     /**
-     * The maximum number of unique digits that can be generated under the constraints of
-     * the type itself (such as precision, number of significant digits)
+     * The maximum number of unique digits that can be generated under the constraints of the type
+     * itself (such as precision, number of significant digits)
      *
      * @param minDate left limit date
      * @param maxDate eight limit date
@@ -78,11 +82,11 @@ public abstract class AbstractDateDataType<T extends Comparable> extends Abstrac
     abstract protected Long limitForType(T minDate, T maxDate);
 
     /**
-     * The maximum amount of unique data that this type can generate under the constraints of the specified
-     * data generator. This value is determined by two indicators. The first indicator is the amount of
-     * unique data that the data generator itself can generate. The other indicator is that the data type is
-     * in The maximum amount of non-repetitive data that can be generated under precision constraints,
-     * whichever is smaller
+     * The maximum amount of unique data that this type can generate under the constraints of the
+     * specified data generator. This value is determined by two indicators. The first indicator is the
+     * amount of unique data that the data generator itself can generate. The other indicator is that
+     * the data type is in The maximum amount of non-repetitive data that can be generated under
+     * precision constraints, whichever is smaller
      *
      * @return Return specific value
      */
@@ -91,8 +95,9 @@ public abstract class AbstractDateDataType<T extends Comparable> extends Abstrac
         if (generator == null || generator.count(lowValue(), highValue()) == null) {
             return limitForType(lowValue(), highValue());
         }
-        return limitForType(lowValue(), highValue()) < generator.count(lowValue(), highValue()) ?
-                limitForType(lowValue(), highValue()) : generator.count(lowValue(), highValue());
+        return limitForType(lowValue(), highValue()) < generator.count(lowValue(), highValue())
+                ? limitForType(lowValue(), highValue())
+                : generator.count(lowValue(), highValue());
     }
 
     @Override

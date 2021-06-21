@@ -20,13 +20,14 @@ public class StepDateByteGenerator extends ByteGeneratorBase {
      * 构造方法
      *
      * @param caseOption 字符大小写配置，该配置在日期范围内无效
-     * @param startTime  开始时间戳
-     * @param endTime    结束时间戳
-     * @param timeUnit   时间单位
-     * @param cycle      是否轮转
-     * @param step       时间步长
+     * @param startTime 开始时间戳
+     * @param endTime 结束时间戳
+     * @param timeUnit 时间单位
+     * @param cycle 是否轮转
+     * @param step 时间步长
      */
-    public StepDateByteGenerator(CharCaseOption caseOption, long startTime, long endTime, long step, TimeUnit timeUnit, Boolean cycle,
+    public StepDateByteGenerator(CharCaseOption caseOption, long startTime, long endTime, long step, TimeUnit timeUnit,
+            Boolean cycle,
             String timezone) {
         this.customGen = new StepDateCharGenerator(caseOption, startTime, endTime, step, timeUnit, cycle, timezone);
     }

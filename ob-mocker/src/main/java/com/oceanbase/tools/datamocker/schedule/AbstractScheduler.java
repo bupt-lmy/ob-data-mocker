@@ -58,24 +58,27 @@ public abstract class AbstractScheduler {
             executor = new ThreadPoolExecutor(CORE_POOL_SIZE, MAX_POOL_SIZE, 0, TimeUnit.MILLISECONDS,
                     new LinkedBlockingQueue<>(), new ThreadPoolExecutor.CallerRunsPolicy());
         }
-        Validate.isTrue(executor.getCorePoolSize() == executor.getMaximumPoolSize(), "core pool size has to be equal to max pool size");
+        Validate.isTrue(executor.getCorePoolSize() == executor.getMaximumPoolSize(),
+                "core pool size has to be equal to max pool size");
         Validate.isTrue(executor.getCorePoolSize() >= 5, "core pool size of thread pool can not be smaller than 5");
         service = new MockExecutorService(executor);
         startTimestamp = System.currentTimeMillis();
     }
 
     /**
-     * Task execution method, the abstract scheduler uses this method for the actual execution of the task
+     * Task execution method, the abstract scheduler uses this method for the actual execution of the
+     * task
      *
      * @param dispatcher Dispatcher object
      * @return Total number of tasks performed
      */
     public MockContext execute(Dispatcher<TableTaskInfo> dispatcher) {
         log.info("Thread pool's initialization has been done. coreSize={},maxSize={}", CORE_POOL_SIZE, MAX_POOL_SIZE);
-        MockContext context = new MockContext(this.service, dispatcher.taskId(), dispatcher.name(), dispatcher.totalCount());
+        MockContext context =
+                new MockContext(this.service, dispatcher.taskId(), dispatcher.name(), dispatcher.totalCount());
         AbstractScheduler thisScheduler = this;
         int concurrentCount = dispatcher.count();
-        //标识数组，数组长度和tasks的任务队列数量相同，每一位分别用于标示对应任务队列中是否还有任务等待执行
+        // 标识数组，数组长度和tasks的任务队列数量相同，每一位分别用于标示对应任务队列中是否还有任务等待执行
         boolean[] flags = new boolean[concurrentCount];
         for (int i = 0; i < concurrentCount; i++) {
             flags[i] = true;
@@ -103,14 +106,16 @@ public abstract class AbstractScheduler {
                     if (flags[i]) {
                         TableTaskInfo task = dispatcher.getObj(i, 0);
                         if (task != null) {
-                            Map<Set<String>, Integer> dataGroups = scheduleDataTask(task.dataWriteGroups(), service.getActiveCount(),
-                                    service.getCorePoolSize(), service.getMaximumPoolSize());
+                            Map<Set<String>, Integer> dataGroups =
+                                    scheduleDataTask(task.dataWriteGroups(), service.getActiveCount(),
+                                            service.getCorePoolSize(), service.getMaximumPoolSize());
                             if (dataGroups == null) {
                                 Thread.sleep(5000);
                                 log.warn("Insufficient thread resources, will retry, schema={}, tableName={}",
                                         task.getMetaData().getTableSchema(), task.getMetaData().getTableName());
                                 if ((failCount++) > maxFailCount) {
-                                    log.warn("Task scheduling operation timed out, the scheduling thread will exit, timeout={} min",
+                                    log.warn(
+                                            "Task scheduling operation timed out, the scheduling thread will exit, timeout={} min",
                                             maxTimeout / 60000 + 3);
                                     clearResource(dispatcher);
                                     return totalCount;
@@ -122,13 +127,15 @@ public abstract class AbstractScheduler {
                                 currentActive += entry.getValue();
                             }
                             Set<Set<String>> columnGroups = scheduleColumnTask(task.columnGroups(),
-                                    service.getActiveCount() + currentActive, service.getCorePoolSize(), service.getMaximumPoolSize());
+                                    service.getActiveCount() + currentActive, service.getCorePoolSize(),
+                                    service.getMaximumPoolSize());
                             if (columnGroups == null) {
                                 Thread.sleep(5000);
                                 log.warn("Insufficient thread resources, will retry, schema={}, tableName={}",
                                         task.getMetaData().getTableSchema(), task.getMetaData().getTableName());
                                 if ((failCount++) > maxFailCount) {
-                                    log.warn("Task scheduling operation timed out, the scheduling thread will exit, timeout={} min",
+                                    log.warn(
+                                            "Task scheduling operation timed out, the scheduling thread will exit, timeout={} min",
                                             maxTimeout / 60000 + 3);
                                     clearResource(dispatcher);
                                     return totalCount;
@@ -137,7 +144,8 @@ public abstract class AbstractScheduler {
                             }
                             validateSet(columnGroups);
                             failCount = 0;
-                            if (!validateThreadResource(columnGroups, dataGroups, service.getActiveCount(), service.getMaximumPoolSize())) {
+                            if (!validateThreadResource(columnGroups, dataGroups, service.getActiveCount(),
+                                    service.getMaximumPoolSize())) {
                                 int required = columnGroups.size();
                                 Set<Map.Entry<Set<String>, Integer>> entrySet = dataGroups.entrySet();
                                 for (Map.Entry<Set<String>, Integer> entry : entrySet) {
@@ -145,15 +153,16 @@ public abstract class AbstractScheduler {
                                 }
                                 log.warn(
                                         "The thread resource requirements given by the custom scheduling algorithm exceed the currently "
-                                        + "available thread resources, requiredThreadCount={}, availableThreadCount={}",
+                                                + "available thread resources, requiredThreadCount={}, availableThreadCount={}",
                                         required, this.service.getMaximumPoolSize() - service.getActiveCount());
                                 clearResource(dispatcher);
                                 return totalCount;
                             }
                             dispatcher.pop(i);
                             flags[i] = false;
-                            //初始化TaskBean，主要是定义TaskBean的回调函数
-                            TableTask mockTaskBean = new TableTask(task, columnGroups, dataGroups, dispatcher.name(), i);
+                            // 初始化TaskBean，主要是定义TaskBean的回调函数
+                            TableTask mockTaskBean =
+                                    new TableTask(task, columnGroups, dataGroups, dispatcher.name(), i);
                             mockTaskBean.getContext().setStatus(MockTaskStatus.PENDING);
                             mockTaskBean.init(service, new AbstractCallBack<TableTaskContext>() {
                                 @Override
@@ -207,7 +216,8 @@ public abstract class AbstractScheduler {
                 }
             }
             clearResource(dispatcher);
-            log.info("Scheduled task execution completed, totalTaskExecuted={}, duration={}", totalCount, getDuration());
+            log.info("Scheduled task execution completed, totalTaskExecuted={}, duration={}", totalCount,
+                    getDuration());
             MDC.clear();
             return totalCount;
         };
@@ -216,8 +226,8 @@ public abstract class AbstractScheduler {
     }
 
     /**
-     * Before the scheduler thread exits,
-     * it is necessary to clean up the resources of the unfinished tasks inside the dispatcher object
+     * Before the scheduler thread exits, it is necessary to clean up the resources of the unfinished
+     * tasks inside the dispatcher object
      *
      * @param dispatcher Dispatcher object
      * @throws Exception The release of resources may be abnormal
@@ -235,16 +245,17 @@ public abstract class AbstractScheduler {
     }
 
     /**
-     * Verify that the thread resources are sufficient.
-     * This method does not throw an exception. If the verification fails, an exception will be thrown directly
+     * Verify that the thread resources are sufficient. This method does not throw an exception. If the
+     * verification fails, an exception will be thrown directly
      *
      * @param columnGroups Column primitive grouping ID collection
-     * @param dataGroups   Data generation primitive group ID collection
-     * @param active       Tasks currently active in the thread pool
-     * @param max          The maximum number of threads in the thread pool
+     * @param dataGroups Data generation primitive group ID collection
+     * @param active Tasks currently active in the thread pool
+     * @param max The maximum number of threads in the thread pool
      * @return Return verification result
      */
-    private boolean validateThreadResource(Set<Set<String>> columnGroups, Map<Set<String>, Integer> dataGroups, int active, int max) {
+    private boolean validateThreadResource(Set<Set<String>> columnGroups, Map<Set<String>, Integer> dataGroups,
+            int active, int max) {
         int freeResource = max - active;
         if (freeResource < 0) {
             throw new MockerException(MockerError.UNKNOWN_ERROR, "Free resource thread pool size is smaller than zero");
@@ -261,8 +272,9 @@ public abstract class AbstractScheduler {
     }
 
     /**
-     * Verify that the user implements the interface to return the column primitive grouping set is legal,
-     * the verification standard is that there can be no intersection between the grouping ID sets
+     * Verify that the user implements the interface to return the column primitive grouping set is
+     * legal, the verification standard is that there can be no intersection between the grouping ID
+     * sets
      *
      * @param input Input group set
      * @throws MockerException If the verification fails, an exception is thrown
@@ -288,11 +300,12 @@ public abstract class AbstractScheduler {
     private long interval() {
         return System.currentTimeMillis() - startTimestamp;
     }
+
     /**
      * Get duration string value
      *
      * @return duration string value
-     * */
+     */
     private String getDuration() {
         long minMillis = 60 * 1000L;
         long hourMills = minMillis * 60;
@@ -307,8 +320,8 @@ public abstract class AbstractScheduler {
     }
 
     /**
-     * The thread scheduling abstract method of column generation primitives,
-     * through which the scheduling of column primitives is realized
+     * The thread scheduling abstract method of column generation primitives, through which the
+     * scheduling of column primitives is realized
      *
      * @param groups Set of grouping IDs of column primitives
      * @param active The number of active tasks in the current thread pool
@@ -319,7 +332,8 @@ public abstract class AbstractScheduler {
     abstract protected Set<Set<String>> scheduleColumnTask(Set<String> groups, int active, int core, int max);
 
     /**
-     * An abstract scheduling method for data writing primitives, through which data primitives are dispatched
+     * An abstract scheduling method for data writing primitives, through which data primitives are
+     * dispatched
      *
      * @param groups Group ID of the data primitive
      * @param active Number of active tasks in the thread pool

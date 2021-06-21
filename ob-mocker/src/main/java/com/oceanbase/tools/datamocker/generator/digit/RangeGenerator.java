@@ -24,8 +24,8 @@ public class RangeGenerator extends DigitalGeneratorBase<BigDecimal> {
     private final Map<Range<BigDecimal>, Double> weightMap;
 
     /**
-     * Constructor, pass in a weight mapping set, note that the weights in the
-     * weight mapping set must add up to one, otherwise an error will be reported
+     * Constructor, pass in a weight mapping set, note that the weights in the weight mapping set must
+     * add up to one, otherwise an error will be reported
      *
      * @param weightMap Weight mapping table
      */

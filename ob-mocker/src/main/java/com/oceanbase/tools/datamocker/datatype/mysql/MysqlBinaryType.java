@@ -22,7 +22,7 @@ public class MysqlBinaryType extends AbstractByteDataType {
      * Constructor
      *
      * @param generator Character type binding data generator
-     * @param width     width of data type
+     * @param width width of data type
      * @param allowNull Whether to allow null values
      */
     public MysqlBinaryType(byte[] defaultValue, Boolean allowNull, Integer width, ByteGeneratorBase generator) {

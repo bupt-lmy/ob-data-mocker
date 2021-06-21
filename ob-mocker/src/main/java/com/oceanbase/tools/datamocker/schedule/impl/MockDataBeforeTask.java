@@ -18,8 +18,8 @@ import com.oceanbase.tools.datamocker.util.SqlUtil;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * The preparation logic before the start of the mock data business logic,
- * here is mainly the emptying of the table and the reloading logic of the constraints
+ * The preparation logic before the start of the mock data business logic, here is mainly the
+ * emptying of the table and the reloading logic of the constraints
  *
  * @author yh263208
  * @date 20210-01-13 22:37
@@ -34,7 +34,8 @@ public class MockDataBeforeTask extends AbstractMockTask {
         super(metaData, context);
         if (dataSource == null) {
             MockerException e = new MockerException(MockerError.PARAMETER_ERROR, "Datasource can not be null");
-            log.error("The mock data preparation task failed to initialize because the data source could not be found", e);
+            log.error("The mock data preparation task failed to initialize because the data source could not be found",
+                    e);
             throw e;
         }
         this.dataSource = dataSource;
@@ -43,14 +44,16 @@ public class MockDataBeforeTask extends AbstractMockTask {
     @Override
     public Void execute(TableTaskMetaData metaData, TableTaskContext context) throws Throwable {
         log.info("Start the mock data preparation task");
-        //如果设置了清空表则需要重新加载约束
+        // 如果设置了清空表则需要重新加载约束
         if (Boolean.TRUE.equals(metaData.getShouldTruncate())) {
             String sql;
             if (ObModeType.OB_MYSQL.equals(metaData.getDialectType())) {
-                sql = String.format("delete from `%s`.`%s` where 1=1; ", DbObjectNameUtil.doubleCharToEscape(metaData.getSchema(), '`'),
+                sql = String.format("delete from `%s`.`%s` where 1=1; ",
+                        DbObjectNameUtil.doubleCharToEscape(metaData.getSchema(), '`'),
                         DbObjectNameUtil.doubleCharToEscape(metaData.getTableName(), '`'));
             } else if (ObModeType.OB_ORACLE.equals(metaData.getDialectType())) {
-                sql = String.format("delete from \"%s\".\"%s\" where 1=1; ", DbObjectNameUtil.doubleCharToEscape(metaData.getSchema(), '"'),
+                sql = String.format("delete from \"%s\".\"%s\" where 1=1; ",
+                        DbObjectNameUtil.doubleCharToEscape(metaData.getSchema(), '"'),
                         DbObjectNameUtil.doubleCharToEscape(metaData.getTableName(), '"'));
             } else {
                 MockerException e = new MockerException(MockerError.INVALID_OB_MODE);
@@ -66,9 +69,10 @@ public class MockDataBeforeTask extends AbstractMockTask {
                     if (effectRow > 0) {
                         List<ConstraintFactory> factories = ConstraintFactory.listInstances();
                         for (ConstraintFactory factory : factories) {
-                            List<AbstractConstraint> customConstraint = factory.make(dataSource, metaData.getDialectType(),
-                                    metaData.getSchema(), metaData.getTableName(), metaData.getTableSchema(),
-                                    metaData.getTotalCount().intValue());
+                            List<AbstractConstraint> customConstraint =
+                                    factory.make(dataSource, metaData.getDialectType(),
+                                            metaData.getSchema(), metaData.getTableName(), metaData.getTableSchema(),
+                                            metaData.getTotalCount().intValue());
                             context.setConstraints(customConstraint);
                         }
                         log.info("Reload constraint succeeded");

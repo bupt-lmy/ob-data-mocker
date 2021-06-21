@@ -5,8 +5,8 @@ import com.oceanbase.tools.datamocker.generator.chartype.RegExpGenerator;
 import com.oceanbase.tools.datamocker.model.enums.CharCaseOption;
 
 /**
- * Regular expression string generator,
- * used to generate regular expressions that meet the requirements
+ * Regular expression string generator, used to generate regular expressions that meet the
+ * requirements
  *
  * @author yh263208
  * @date 2021-01-16 20:06

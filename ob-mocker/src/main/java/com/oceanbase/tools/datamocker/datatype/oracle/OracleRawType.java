@@ -22,9 +22,9 @@ public class OracleRawType extends AbstractByteDataType {
      * Constructor
      *
      * @param defaultValue default value for raw
-     * @param generator    Character type binding data generator
-     * @param width        width of data type
-     * @param allowNull    Whether to allow null values
+     * @param generator Character type binding data generator
+     * @param width width of data type
+     * @param allowNull Whether to allow null values
      */
     public OracleRawType(byte[] defaultValue, Boolean allowNull, Integer width, ByteGeneratorBase generator) {
         super(generator, ObModeType.OB_ORACLE, defaultValue, allowNull);

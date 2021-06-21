@@ -54,18 +54,18 @@ public class MockerTaskOracleTest extends MockerTestBase {
     private final String oracleEnv = "db/oracle-env.properties";
     private final String[] ddls = new String[] {
             "CREATE TABLE \"EMP\" (\n"
-            + "  \"COL\" NUMBER(5,2) NOT NULL,\n"
-            + "  \"COL2\" VARCHAR(64) NOT NULL,\n"
-            + "  \"COL3\" VARCHAR2(128) NOT NULL,\n"
-            + "  \"COL4\" CHAR(128) NOT NULL,\n"
-            + "  \"COL5\" NVARCHAR2(128) NOT NULL,\n"
-            + "  \"COL6\" date,\n"
-            + "  \"COL7\" interval year(5) to month,\n"
-            + "  \"COL8\" interval day(2) to second(6),\n"
-            + "  PRIMARY KEY (\"COL\", \"COL4\"),\n"
-            + "  UNIQUE (\"COL2\", \"COL3\"),\n"
-            + "  UNIQUE (\"COL5\")\n"
-            + ");"
+                    + "  \"COL\" NUMBER(5,2) NOT NULL,\n"
+                    + "  \"COL2\" VARCHAR(64) NOT NULL,\n"
+                    + "  \"COL3\" VARCHAR2(128) NOT NULL,\n"
+                    + "  \"COL4\" CHAR(128) NOT NULL,\n"
+                    + "  \"COL5\" NVARCHAR2(128) NOT NULL,\n"
+                    + "  \"COL6\" date,\n"
+                    + "  \"COL7\" interval year(5) to month,\n"
+                    + "  \"COL8\" interval day(2) to second(6),\n"
+                    + "  PRIMARY KEY (\"COL\", \"COL4\"),\n"
+                    + "  UNIQUE (\"COL2\", \"COL3\"),\n"
+                    + "  UNIQUE (\"COL5\")\n"
+                    + ");"
     };
     private DataSource oracleDatasource = null;
 
@@ -118,7 +118,8 @@ public class MockerTaskOracleTest extends MockerTestBase {
                 for (String ddl : ddls) {
                     statement.execute(ddl);
                 }
-                statement.execute("insert into emp(col,col2,col3,col4,col5) values(12.1,'12.44','11.67','23.44', 'hello,world');");
+                statement.execute(
+                        "insert into emp(col,col2,col3,col4,col5) values(12.1,'12.44','11.67','23.44', 'hello,world');");
             }
         }
     }
@@ -139,9 +140,11 @@ public class MockerTaskOracleTest extends MockerTestBase {
                 }
                 for (TableTaskContext item : contexts) {
                     String interval = (System.currentTimeMillis() - start) / 1000 + "s";
-                    System.out.printf("[\"%s\" - \"%s\"] : %s - %s%n", item.getTaskName(), item.getTableTaskId(), item.getStatus(),
+                    System.out.printf("[\"%s\" - \"%s\"] : %s - %s%n", item.getTaskName(), item.getTableTaskId(),
+                            item.getStatus(),
                             interval);
-                    if (MockTaskStatus.CANCELED.equals(item.getStatus()) || MockTaskStatus.FAILED.equals(item.getStatus())) {
+                    if (MockTaskStatus.CANCELED.equals(item.getStatus())
+                            || MockTaskStatus.FAILED.equals(item.getStatus())) {
                         return false;
                     }
                     flag &= MockTaskStatus.SUCCESS.equals(item.getStatus());

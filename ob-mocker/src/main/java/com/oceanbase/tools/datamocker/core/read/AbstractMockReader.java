@@ -20,8 +20,8 @@ public abstract class AbstractMockReader<T> {
     abstract public Pair<String, Pair<AbstractDataType, T>> read() throws Exception;
 
     /**
-     * Get the groupId of the primitive. The primitive is an atomic part of an overall operation,
-     * so a groupId is needed to identify which primitives belong to the same overall operation
+     * Get the groupId of the primitive. The primitive is an atomic part of an overall operation, so a
+     * groupId is needed to identify which primitives belong to the same overall operation
      *
      * @return group id string value
      */

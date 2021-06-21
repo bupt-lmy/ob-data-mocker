@@ -3,8 +3,7 @@ package com.oceanbase.tools.datamocker.util;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
 
 /**
- * Represents a numeric interval,
- * which is a left-closed right-closed interval
+ * Represents a numeric interval, which is a left-closed right-closed interval
  *
  * @author yh263208
  * @date 2020-12-11 20：55
@@ -29,8 +28,7 @@ public class Range<T extends Comparable> {
     }
 
     /**
-     * Used to judge whether a value is in the interval,
-     * this is a left-closed right-closed interval
+     * Used to judge whether a value is in the interval, this is a left-closed right-closed interval
      *
      * @param value Value used for judgment
      * @return Return boolean result

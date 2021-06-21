@@ -62,13 +62,15 @@ public abstract class AbstractMockWriter {
     abstract protected Long doWrite(List<Map<String, Pair<AbstractDataType, Object>>> rows) throws Throwable;
 
     /**
-     * Mockwriter is used to output data to a database or script file. There are currently two output sources,
-     * one is the database and the other is the script file. Reader and writer constitute a producer and consumer model,
-     * that is, a reader produces data, and multiple writers output data, but the writer output to the database and the
-     * writer output to the file cannot share the same data communication "pipe", otherwise to the database The writer
-     * written out and the writer written to the text file will compete for the data, resulting in only part of the
-     * data being written to the database and the text file. The solution is to bind different data pipelines to
-     * the writers of different output sources. The groupId here is used to distinguish Different types of writers
+     * Mockwriter is used to output data to a database or script file. There are currently two output
+     * sources, one is the database and the other is the script file. Reader and writer constitute a
+     * producer and consumer model, that is, a reader produces data, and multiple writers output data,
+     * but the writer output to the database and the writer output to the file cannot share the same
+     * data communication "pipe", otherwise to the database The writer written out and the writer
+     * written to the text file will compete for the data, resulting in only part of the data being
+     * written to the database and the text file. The solution is to bind different data pipelines to
+     * the writers of different output sources. The groupId here is used to distinguish Different types
+     * of writers
      */
     abstract public String groupId();
 }

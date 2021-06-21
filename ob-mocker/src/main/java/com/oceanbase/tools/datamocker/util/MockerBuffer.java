@@ -54,7 +54,8 @@ public class MockerBuffer {
      */
     private final List<AbstractDataPipe> dataPipes;
     /**
-     * The data flushing threshold, the data in the buffer reaches this value and the value pipeline will be forced to refresh
+     * The data flushing threshold, the data in the buffer reaches this value and the value pipeline
+     * will be forced to refresh
      */
     private final Long flushThreshold;
     /**
@@ -91,8 +92,8 @@ public class MockerBuffer {
     }
 
     /**
-     * Set the concurrency number of the buffer object. Note: Once the write method is called to write data,
-     * it cannot be set, otherwise an error will be reported
+     * Set the concurrency number of the buffer object. Note: Once the write method is called to write
+     * data, it cannot be set, otherwise an error will be reported
      *
      * @param count Concurrency
      * @throws MockerException Setting a negative value or repeating the setting will cause errors
@@ -102,7 +103,8 @@ public class MockerBuffer {
             throw new MockerException(MockerError.OPERATION_FAILURE, "Concurrent count can not be set repeatedly");
         }
         if (count < 0) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "Concurrent for mock buffer can not be smaller than zero");
+            throw new MockerException(MockerError.PARAMETER_ERROR,
+                    "Concurrent for mock buffer can not be smaller than zero");
         }
         this.synchronizer = new CyclicBarrier(count, null);
     }
@@ -117,7 +119,8 @@ public class MockerBuffer {
     }
 
     /**
-     * Register a data pipeline, this method can be called multiple times to register multiple data pipelines in the buffer
+     * Register a data pipeline, this method can be called multiple times to register multiple data
+     * pipelines in the buffer
      *
      * @param dataPipe Data pipeline
      */
@@ -133,12 +136,13 @@ public class MockerBuffer {
     /**
      * Write a collection of column data to the buffer
      *
-     * @param data     Column data collection
-     * @param timeout  Write timeout
+     * @param data Column data collection
+     * @param timeout Write timeout
      * @param timeUnit time unit
      * @throws InterruptedException May be interrupted
      */
-    public void write(Map<String, Pair<AbstractDataType, Object>> data, long timeout, TimeUnit timeUnit) throws Exception {
+    public void write(Map<String, Pair<AbstractDataType, Object>> data, long timeout, TimeUnit timeUnit)
+            throws Exception {
         Validate.notNull(timeUnit, "time unit for buffer write timeout can not be null");
         Validate.isTrue(timeout > 0, "timeout for buffer write can not be negative");
         if (isClosed()) {
@@ -169,16 +173,17 @@ public class MockerBuffer {
      * @param timeUnit time unit
      * @throws InterruptedException May be interrupted
      */
-    public void write(Pair<String, Pair<AbstractDataType, Object>> column, long timeout, TimeUnit timeUnit) throws Exception {
+    public void write(Pair<String, Pair<AbstractDataType, Object>> column, long timeout, TimeUnit timeUnit)
+            throws Exception {
         Map<String, Pair<AbstractDataType, Object>> inputRow = new HashMap<>();
         inputRow.putIfAbsent(column.getKey(), column.getValue());
         write(inputRow, timeout, timeUnit);
     }
 
     /**
-     * To write a column of data to the current cursor row,
-     * the column name of the column data must be in the column set defined by the table schema,
-     * otherwise an error is reported, and the column data is not written in the current cursor row
+     * To write a column of data to the current cursor row, the column name of the column data must be
+     * in the column set defined by the table schema, otherwise an error is reported, and the column
+     * data is not written in the current cursor row
      *
      * @param column Column data
      */
@@ -191,8 +196,9 @@ public class MockerBuffer {
             throw e;
         }
         if (this.currentRow.get(column.getKey()) != null) {
-            MockerException e = new MockerException(MockerError.PARAMETER_ERROR, String.format("Custom column \"%s\" is duplicate",
-                    column.getKey()));
+            MockerException e =
+                    new MockerException(MockerError.PARAMETER_ERROR, String.format("Custom column \"%s\" is duplicate",
+                            column.getKey()));
             log.error("Column error", e);
             throw e;
         }
@@ -204,7 +210,8 @@ public class MockerBuffer {
      *
      * @param timeout Write timeout
      * @param timeUnit time unit
-     * @throws InterruptedException Writing data to the pipeline is a blocking operation and may be interrupted
+     * @throws InterruptedException Writing data to the pipeline is a blocking operation and may be
+     *         interrupted
      */
     private void reload(long timeout, TimeUnit timeUnit) throws Exception {
         if (this.currentRow.size() > this.columnSet.size()) {
@@ -223,9 +230,8 @@ public class MockerBuffer {
     }
 
     /**
-     * Close the buffer object, this method is a blocking method.
-     * If multiple threads are referencing the buffer,
-     * you need to block until the last thread call to properly close the buffer
+     * Close the buffer object, this method is a blocking method. If multiple threads are referencing
+     * the buffer, you need to block until the last thread call to properly close the buffer
      *
      * @throws BrokenBarrierException The barrier may be broken
      * @throws InterruptedException Blocking methods may be interrupted
@@ -258,8 +264,7 @@ public class MockerBuffer {
     }
 
     /**
-     * Forcibly refresh the cache,
-     * flush all the data in the row cache to the pipeline
+     * Forcibly refresh the cache, flush all the data in the row cache to the pipeline
      *
      * @param timeout Write timeout
      * @param timeUnit time unit

@@ -10,8 +10,8 @@ import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
 
 /**
- * INTERVAL YEAR TO MONTH data type in oracle mode, this data type only provides
- * the most basic compatibility, so use String as the basic Java type
+ * INTERVAL YEAR TO MONTH data type in oracle mode, this data type only provides the most basic
+ * compatibility, so use String as the basic Java type
  *
  * @author yh263208
  * @date 2021-02-04 12:01
@@ -26,10 +26,10 @@ public class OracleIntervalYMType extends AbstractDataType<INTERVALYM, Integer> 
     /**
      * The interval year to month data type is compatible with the java type constructor
      *
-     * @param generator    Data generator
+     * @param generator Data generator
      * @param defaultValue default value for interval type
-     * @param allowNull    Whether it is allowed to be empty
-     * @param scale        scale for type
+     * @param allowNull Whether it is allowed to be empty
+     * @param scale scale for type
      * @throws MockerException If the precision value is illegal, an exception will be thrown
      */
     public OracleIntervalYMType(BaseGenerator<Integer, INTERVALYM> generator, Integer scale, INTERVALYM defaultValue,
@@ -77,7 +77,8 @@ public class OracleIntervalYMType extends AbstractDataType<INTERVALYM, Integer> 
         byte yearLen = value.getBytes()[value.getBytes().length - 1];
         if (yearLen > this.scale) {
             throw new MockerException(MockerError.VALUE_OUT_OFRANGE,
-                    String.format("Scale for interval year(%d) to month is out of bound, [%d>%d]", this.scale, yearLen, this.scale));
+                    String.format("Scale for interval year(%d) to month is out of bound, [%d>%d]", this.scale, yearLen,
+                            this.scale));
         }
         return value;
     }

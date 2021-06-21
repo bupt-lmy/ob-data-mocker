@@ -30,7 +30,7 @@ public class MockerException extends RuntimeException {
      * Exception constructor
      *
      * @param errorEnum Error type enumeration
-     * @param errorMsg  Error message
+     * @param errorMsg Error message
      */
     public MockerException(MockerError errorEnum, String errorMsg) {
         super(errorMsg);

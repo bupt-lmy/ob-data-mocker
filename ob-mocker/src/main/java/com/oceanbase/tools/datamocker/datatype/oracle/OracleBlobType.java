@@ -17,8 +17,8 @@ public class OracleBlobType extends AbstractByteDataType {
      * Constructor
      *
      * @param defaultValue default value for data type
-     * @param generator    Character type binding data generator
-     * @param allowNull    Whether to allow null values
+     * @param generator Character type binding data generator
+     * @param allowNull Whether to allow null values
      */
     public OracleBlobType(byte[] defaultValue, Boolean allowNull, ByteGeneratorBase generator) {
         super(generator, ObModeType.OB_ORACLE, defaultValue, allowNull);

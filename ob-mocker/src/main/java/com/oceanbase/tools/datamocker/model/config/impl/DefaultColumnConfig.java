@@ -8,7 +8,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * Column task configuration object, used to indicate the configuration information of the column generation task
+ * Column task configuration object, used to indicate the configuration information of the column
+ * generation task
  *
  * @author yh263208
  * @date 2020-12-27 20:57

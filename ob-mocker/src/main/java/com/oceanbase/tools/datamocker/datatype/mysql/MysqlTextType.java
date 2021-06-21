@@ -17,14 +17,15 @@ public class MysqlTextType extends AbstractCharDataType {
     /**
      * Constructor
      *
-     * @param length       data length for text type
+     * @param length data length for text type
      * @param defaultValue default value for data type
-     * @param isUnicode    Whether it is a unicode character
-     * @param charsetType  Character type encoding format
-     * @param generator    Character type binding data generator
-     * @param allowNull    Whether to allow null values
+     * @param isUnicode Whether it is a unicode character
+     * @param charsetType Character type encoding format
+     * @param generator Character type binding data generator
+     * @param allowNull Whether to allow null values
      */
-    public MysqlTextType(Integer length, String defaultValue, Boolean allowNull, CharsetType charsetType, CharGeneratorBase generator,
+    public MysqlTextType(Integer length, String defaultValue, Boolean allowNull, CharsetType charsetType,
+            CharGeneratorBase generator,
             Boolean isUnicode) {
         super(generator, ObModeType.OB_MYSQL, charsetType, length, defaultValue, allowNull, isUnicode);
     }
@@ -38,7 +39,8 @@ public class MysqlTextType extends AbstractCharDataType {
      * @param charsetType Character type encoding format
      * @param allowNull Whether to allow null values
      */
-    public MysqlTextType(Integer length, String defaultValue, Boolean allowNull, CharsetType charsetType, Boolean isUnicode) {
+    public MysqlTextType(Integer length, String defaultValue, Boolean allowNull, CharsetType charsetType,
+            Boolean isUnicode) {
         super(ObModeType.OB_MYSQL, charsetType, length, defaultValue, allowNull, isUnicode);
     }
 

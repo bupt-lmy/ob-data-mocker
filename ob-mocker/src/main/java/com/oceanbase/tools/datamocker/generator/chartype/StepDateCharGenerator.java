@@ -45,17 +45,19 @@ public class StepDateCharGenerator extends CharGeneratorBase {
      * Constructor
      *
      * @param caseOption Character case configuration, the configuration is invalid in the date range
-     * @param startTime  Start timestamp
-     * @param endTime    End timestamp
-     * @param timeUnit   Time unit
-     * @param cycle      Whether to rotate
-     * @param step       Time Step
+     * @param startTime Start timestamp
+     * @param endTime End timestamp
+     * @param timeUnit Time unit
+     * @param cycle Whether to rotate
+     * @param step Time Step
      */
-    public StepDateCharGenerator(CharCaseOption caseOption, long startTime, long endTime, long step, TimeUnit timeUnit, Boolean cycle,
+    public StepDateCharGenerator(CharCaseOption caseOption, long startTime, long endTime, long step, TimeUnit timeUnit,
+            Boolean cycle,
             String timezone) {
         super(caseOption);
         if (startTime >= endTime) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "Start time stamp can not be later than end time stamp");
+            throw new MockerException(MockerError.PARAMETER_ERROR,
+                    "Start time stamp can not be later than end time stamp");
         }
         if (startTime < 0) {
             throw new MockerException(MockerError.PARAMETER_ERROR, "Time stamp can not be smaller than zero");

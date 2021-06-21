@@ -17,7 +17,8 @@ import com.oceanbase.tools.datamocker.util.SqlUtil;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * The finishing task after the execution of mock data business logic is mainly to count the data volume of the current table
+ * The finishing task after the execution of mock data business logic is mainly to count the data
+ * volume of the current table
  *
  * @author yh263208
  * @date 2021-01-14 10:54
@@ -34,7 +35,9 @@ public class MockDataAfterTask extends AbstractMockTask {
         super(metaData, context);
         if (dataSource == null) {
             MockerException e = new MockerException(MockerError.PARAMETER_ERROR, "Datasource can not be null");
-            log.error("The initialization of the mock data destruction task failed because the data source could not be found", e);
+            log.error(
+                    "The initialization of the mock data destruction task failed because the data source could not be found",
+                    e);
             throw e;
         }
         this.dataSource = dataSource;
@@ -45,10 +48,12 @@ public class MockDataAfterTask extends AbstractMockTask {
         log.info("Start the mock data destruction task");
         String sql;
         if (ObModeType.OB_ORACLE.equals(metaData.getDialectType())) {
-            sql = String.format("select count(*) from \"%s\".\"%s\"; ", DbObjectNameUtil.doubleCharToEscape(metaData.getSchema(), '"'),
+            sql = String.format("select count(*) from \"%s\".\"%s\"; ",
+                    DbObjectNameUtil.doubleCharToEscape(metaData.getSchema(), '"'),
                     DbObjectNameUtil.doubleCharToEscape(metaData.getTableName(), '"'));
         } else if (ObModeType.OB_MYSQL.equals(metaData.getDialectType())) {
-            sql = String.format("select count(*) from `%s`.`%s`; ", DbObjectNameUtil.doubleCharToEscape(metaData.getSchema(), '`'),
+            sql = String.format("select count(*) from `%s`.`%s`; ",
+                    DbObjectNameUtil.doubleCharToEscape(metaData.getSchema(), '`'),
                     DbObjectNameUtil.doubleCharToEscape(metaData.getTableName(), '`'));
         } else {
             MockerException e = new MockerException(MockerError.INVALID_OB_MODE);
@@ -62,7 +67,8 @@ public class MockDataAfterTask extends AbstractMockTask {
                 ResultSetMetaData md = resultSet.getMetaData();
                 if (md.getColumnCount() != 1) {
                     throw new MockerException(MockerError.ILLEGAL_RETURN_VALUE,
-                            String.format("Column count for \"select count(*) from \"%s\".\"%s\" is not equal to one, [%d!=1]",
+                            String.format(
+                                    "Column count for \"select count(*) from \"%s\".\"%s\" is not equal to one, [%d!=1]",
                                     metaData.getSchema(), metaData.getTableName(), md.getColumnCount()));
                 }
                 if (resultSet.next()) {

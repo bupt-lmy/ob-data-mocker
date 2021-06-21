@@ -5,7 +5,8 @@ import com.oceanbase.tools.datamocker.model.enums.CharCaseOption;
 import com.oceanbase.tools.datamocker.util.RegExpTextBuilder;
 
 /**
- * Regular expression string generator, used to generate regular expressions that meet the requirements
+ * Regular expression string generator, used to generate regular expressions that meet the
+ * requirements
  *
  * @author yh263208
  * @date 2021-01-16 20:06
@@ -20,7 +21,7 @@ public class RegExpGenerator extends CharGeneratorBase {
     /**
      * Constructor
      *
-     * @param regExp     Regular expression
+     * @param regExp Regular expression
      * @param caseOption Capitalization
      */
     public RegExpGenerator(CharCaseOption caseOption, String regExp) {

@@ -20,13 +20,15 @@ public abstract class AbstractDataType<T, V extends Comparable> {
      */
     private Boolean preCheck = null;
     /**
-     * The minimum value that the corresponding type of the data type can reach in the database.
-     * The value can be specified manually. If not specified, it is the minimum value that the data type can represent.
+     * The minimum value that the corresponding type of the data type can reach in the database. The
+     * value can be specified manually. If not specified, it is the minimum value that the data type can
+     * represent.
      */
     protected V lowValue = null;
     /**
-     * The maximum value that the corresponding type of the data type can reach in the database.
-     * The value can be specified manually. If not specified, it is the maximum value that the data type can represent.
+     * The maximum value that the corresponding type of the data type can reach in the database. The
+     * value can be specified manually. If not specified, it is the maximum value that the data type can
+     * represent.
      */
     protected V highValue = null;
     /**
@@ -39,12 +41,13 @@ public abstract class AbstractDataType<T, V extends Comparable> {
     private final ObModeType dialectType;
 
     /**
-     * The constructor of the abstract base class, where you need to pass in the random data generator bound to this data type,
-     * and specify the OB mode corresponding to the data type and the database type in this mode
+     * The constructor of the abstract base class, where you need to pass in the random data generator
+     * bound to this data type, and specify the OB mode corresponding to the data type and the database
+     * type in this mode
      *
-     * @param dialectType  dialect type
+     * @param dialectType dialect type
      * @param defaultValue default value for type
-     * @param allowNull    Whether it is allowed to be empty
+     * @param allowNull Whether it is allowed to be empty
      */
     protected AbstractDataType(ObModeType dialectType, T defaultValue, Boolean allowNull) {
         this.dialectType = dialectType;
@@ -53,15 +56,17 @@ public abstract class AbstractDataType<T, V extends Comparable> {
     }
 
     /**
-     * The constructor of the abstract base class, where you need to pass in the random data generator bound to this data type,
-     * and specify the OB mode corresponding to the data type and the database type in this mode
+     * The constructor of the abstract base class, where you need to pass in the random data generator
+     * bound to this data type, and specify the OB mode corresponding to the data type and the database
+     * type in this mode
      *
      * @param generator data generator
      * @param dialectType dialect type
      * @param defaultValue default value for type
      * @param allowNull Whether it is allowed to be empty
      */
-    protected AbstractDataType(BaseGenerator<V, T> generator, ObModeType dialectType, T defaultValue, Boolean allowNull) {
+    protected AbstractDataType(BaseGenerator<V, T> generator, ObModeType dialectType, T defaultValue,
+            Boolean allowNull) {
         this.dialectType = dialectType;
         this.allowNull = allowNull;
         this.defaultValue = defaultValue;
@@ -90,11 +95,11 @@ public abstract class AbstractDataType<T, V extends Comparable> {
     abstract protected V maxValueForType();
 
     /**
-     * The maximum amount of unique data that this type can generate under the constraints
-     * of the specified data generator. This value is determined by two indicators.
-     * The first indicator is the amount of unique data that the data generator itself can generate.
-     * The other indicator is that the data type is in The maximum amount of non-repetitive
-     * data that can be generated under precision constraints, whichever is smaller
+     * The maximum amount of unique data that this type can generate under the constraints of the
+     * specified data generator. This value is determined by two indicators. The first indicator is the
+     * amount of unique data that the data generator itself can generate. The other indicator is that
+     * the data type is in The maximum amount of non-repetitive data that can be generated under
+     * precision constraints, whichever is smaller
      *
      * @return Return specific value
      */
@@ -117,7 +122,8 @@ public abstract class AbstractDataType<T, V extends Comparable> {
     abstract public String toString(T value);
 
     /**
-     * Generate data summary, used to convert a large data into a data summary to reduce data storage costs
+     * Generate data summary, used to convert a large data into a data summary to reduce data storage
+     * costs
      *
      * @param value The content of the data
      * @return Back to summary
@@ -125,8 +131,8 @@ public abstract class AbstractDataType<T, V extends Comparable> {
     abstract public T toDigest(T value);
 
     /**
-     * Type conversion method, used for data compatibility,
-     * converts a type of data into the default corresponding type of the data type
+     * Type conversion method, used for data compatibility, converts a type of data into the default
+     * corresponding type of the data type
      *
      * @param value original value
      * @return converted value
@@ -136,8 +142,8 @@ public abstract class AbstractDataType<T, V extends Comparable> {
     }
 
     /**
-     * The data generator object binding method, the reason why it is a
-     * public type method is because the data generator can bind a new
+     * The data generator object binding method, the reason why it is a public type method is because
+     * the data generator can bind a new
      *
      * @param generator data generator
      */
@@ -191,7 +197,8 @@ public abstract class AbstractDataType<T, V extends Comparable> {
         validateValue(value);
         if (value.compareTo(highValue()) > 0) {
             throw new MockerException(MockerError.VALUE_OUT_OFRANGE,
-                    String.format("Min value can not be bigger than max value \"%s\" for data type %s", highValue().toString(),
+                    String.format("Min value can not be bigger than max value \"%s\" for data type %s",
+                            highValue().toString(),
                             toString()));
         }
         this.lowValue = value;
@@ -206,7 +213,8 @@ public abstract class AbstractDataType<T, V extends Comparable> {
         validateValue(value);
         if (value.compareTo(lowValue()) < 0) {
             throw new MockerException(MockerError.VALUE_OUT_OFRANGE,
-                    String.format("Max value can not be smaller than min value \"%s\" for data type %s", lowValue().toString(),
+                    String.format("Max value can not be smaller than min value \"%s\" for data type %s",
+                            lowValue().toString(),
                             toString()));
         }
         this.highValue = value;

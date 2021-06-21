@@ -17,14 +17,15 @@ public class OracleVarCharType extends AbstractCharDataType {
     /**
      * Constructor
      *
-     * @param length       Length of character type
-     * @param charsetType  Character type encoding format
-     * @param generator    Character type binding data generator
-     * @param allowNull    Whether to allow null values
-     * @param isUnicode    Is it a unicode string
+     * @param length Length of character type
+     * @param charsetType Character type encoding format
+     * @param generator Character type binding data generator
+     * @param allowNull Whether to allow null values
+     * @param isUnicode Is it a unicode string
      * @param defaultValue default value for string type
      */
-    public OracleVarCharType(CharGeneratorBase generator, Integer length, String defaultValue, Boolean allowNull, CharsetType charsetType,
+    public OracleVarCharType(CharGeneratorBase generator, Integer length, String defaultValue, Boolean allowNull,
+            CharsetType charsetType,
             Boolean isUnicode) {
         super(generator, ObModeType.OB_ORACLE, charsetType, length, defaultValue, allowNull, isUnicode);
     }
@@ -38,7 +39,8 @@ public class OracleVarCharType extends AbstractCharDataType {
      * @param isUnicode Is it a unicode string
      * @param defaultValue default value for string type
      */
-    public OracleVarCharType(Integer length, String defaultValue, Boolean allowNull, CharsetType charsetType, Boolean isUnicode) {
+    public OracleVarCharType(Integer length, String defaultValue, Boolean allowNull, CharsetType charsetType,
+            Boolean isUnicode) {
         super(ObModeType.OB_ORACLE, charsetType, length, defaultValue, allowNull, isUnicode);
     }
 

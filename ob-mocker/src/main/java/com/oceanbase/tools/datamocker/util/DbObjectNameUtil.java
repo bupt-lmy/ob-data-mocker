@@ -11,12 +11,13 @@ import org.apache.commons.lang.StringUtils;
  */
 public class DbObjectNameUtil {
     /**
-     * To convert the name, you can use single quotation marks or backslashes as naming, but single quotation marks and backslashes in the
-     * oracle mode and mysql mode appear as escape symbols in the string. If you want to make the single quotation mark also appear in the
-     * string If it appears normally, a single quotation mark must be added before the single quotation mark as an escape. This method is
-     * to play its role.
+     * To convert the name, you can use single quotation marks or backslashes as naming, but single
+     * quotation marks and backslashes in the oracle mode and mysql mode appear as escape symbols in the
+     * string. If you want to make the single quotation mark also appear in the string If it appears
+     * normally, a single quotation mark must be added before the single quotation mark as an escape.
+     * This method is to play its role.
      *
-     * @param objectName  object name for db object
+     * @param objectName object name for db object
      * @param escapeChars escape char list
      * @return converted object name
      */

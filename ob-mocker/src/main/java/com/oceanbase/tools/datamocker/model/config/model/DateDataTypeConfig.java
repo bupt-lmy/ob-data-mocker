@@ -15,8 +15,7 @@ import lombok.Setter;
 public class DateDataTypeConfig extends DataTypeConfig {
     private String timezone;
     /**
-     * Time precision, mainly for the timestamp type,
-     * indicating the length of the time in nanoseconds
+     * Time precision, mainly for the timestamp type, indicating the length of the time in nanoseconds
      */
     private Integer scale;
 }

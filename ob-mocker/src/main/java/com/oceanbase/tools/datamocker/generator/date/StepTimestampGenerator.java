@@ -32,8 +32,8 @@ public class StepTimestampGenerator extends DateGeneratorBase<Timestamp> {
      * Constructor
      *
      * @param timeUnit time unit
-     * @param cycle    Whether to rotate
-     * @param step     Time Step
+     * @param cycle Whether to rotate
+     * @param step Time Step
      */
     public StepTimestampGenerator(long step, TimeUnit timeUnit, Boolean cycle) {
         this.cycle = cycle;

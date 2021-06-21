@@ -33,10 +33,12 @@ public class OracleTimestampType extends AbstractDateDataType<Timestamp> {
      */
     private final int scale;
 
-    public OracleTimestampType(DateGeneratorBase<Timestamp> generator, int scale, Timestamp defaultValue, Boolean allowNull) {
+    public OracleTimestampType(DateGeneratorBase<Timestamp> generator, int scale, Timestamp defaultValue,
+            Boolean allowNull) {
         super(generator, ObModeType.OB_ORACLE, defaultValue, allowNull);
         if (scale < 0 || scale > 9) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "Scale for timestamp can not smaller than zero or bigger than nine");
+            throw new MockerException(MockerError.PARAMETER_ERROR,
+                    "Scale for timestamp can not smaller than zero or bigger than nine");
         }
         this.scale = scale;
         generator.setScale(scale);
@@ -114,6 +116,7 @@ public class OracleTimestampType extends AbstractDateDataType<Timestamp> {
         }
         SimpleDateFormat dateFormat = new SimpleDateFormat(JAVA_DATE_FORMAT);
         dateFormat.setTimeZone(timeZone());
-        return String.format("to_timestamp('%s.%d', '%s')", dateFormat.format(value), value.getNanos(), oracleDateFormate);
+        return String.format("to_timestamp('%s.%d', '%s')", dateFormat.format(value), value.getNanos(),
+                oracleDateFormate);
     }
 }

@@ -55,8 +55,8 @@ public class TableTaskContext {
     @Getter
     private final Long totalCount;
     /**
-     * Table structure definition, used to describe the structure of the table, including the mapping relationship between field names and
-     * types
+     * Table structure definition, used to describe the structure of the table, including the mapping
+     * relationship between field names and types
      */
     @Getter
     private final Map<String, AbstractDataType> tableSchema;
@@ -85,9 +85,9 @@ public class TableTaskContext {
      */
     private List<Future> handlers;
     /**
-     * Data write statistics. The Key here represents the names of different output sources:
-     * for example, the name of the output source for writing DB and the name of the output
-     * source for writing files. Value here represents the amount of data written by the output source.
+     * Data write statistics. The Key here represents the names of different output sources: for
+     * example, the name of the output source for writing DB and the name of the output source for
+     * writing files. Value here represents the amount of data written by the output source.
      */
     @Getter
     private Map<String, Long> writerName2writeCount;
@@ -190,7 +190,8 @@ public class TableTaskContext {
      * Append a piece of statistical information for data generation primitives
      *
      * @param result statistical results
-     * @throws MockerException All data generation primitives must generate the same amount of data. If violated, an error will be reported
+     * @throws MockerException All data generation primitives must generate the same amount of data. If
+     *         violated, an error will be reported
      */
     public synchronized void appendDataGenInfo(Long result) {
         if (result == null) {
@@ -200,7 +201,8 @@ public class TableTaskContext {
             this.totalDataGenerateCount = result;
         } else {
             if (!this.totalDataGenerateCount.equals(result)) {
-                throw new MockerException(MockerError.OPERATION_FAILURE, "All column readers have to generate same number of data");
+                throw new MockerException(MockerError.OPERATION_FAILURE,
+                        "All column readers have to generate same number of data");
             }
         }
     }

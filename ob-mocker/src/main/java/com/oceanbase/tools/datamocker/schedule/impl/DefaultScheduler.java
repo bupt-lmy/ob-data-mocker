@@ -13,8 +13,9 @@ import com.oceanbase.tools.datamocker.schedule.AbstractScheduler;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * The default scheduler, the scheduling logic is that different groups of column primitives allocate a thread resource.
- * Different groups of data write primitives are combined with each other, and each combination is allocated two thread resources
+ * The default scheduler, the scheduling logic is that different groups of column primitives
+ * allocate a thread resource. Different groups of data write primitives are combined with each
+ * other, and each combination is allocated two thread resources
  *
  * @author yh263208
  * @date 2021-01-18 22:14
@@ -30,13 +31,15 @@ public class DefaultScheduler extends AbstractScheduler {
     }
 
     /**
-     * Thread resources are allocated equally, and the same number of thread resources are allocated to each column grouping
+     * Thread resources are allocated equally, and the same number of thread resources are allocated to
+     * each column grouping
      */
     @Override
     protected Set<Set<String>> scheduleColumnTask(Set<String> groups, int active, int core, int max) {
         int allocate = (int) ((max - active) * 0.7) - 1;
         if (allocate <= 0) {
-            log.error("The scheduling task failed because the idle thread resources are less than or equal to zero, freeThreadCount={}",
+            log.error(
+                    "The scheduling task failed because the idle thread resources are less than or equal to zero, freeThreadCount={}",
                     allocate);
             return null;
         }
@@ -74,7 +77,8 @@ public class DefaultScheduler extends AbstractScheduler {
     protected Map<Set<String>, Integer> scheduleDataTask(Set<String> groups, int active, int core, int max) {
         int allocate = (int) ((max - active) * 0.7) - 1;
         if (allocate <= 0) {
-            log.error("The scheduling task failed because the idle thread resources are less than or equal to zero, freeThreadCount={}",
+            log.error(
+                    "The scheduling task failed because the idle thread resources are less than or equal to zero, freeThreadCount={}",
                     allocate);
             return null;
         }

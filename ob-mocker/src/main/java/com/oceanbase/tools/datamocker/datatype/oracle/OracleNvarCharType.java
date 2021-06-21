@@ -17,10 +17,10 @@ public class OracleNvarCharType extends AbstractCharDataType {
     /**
      * Constructor
      *
-     * @param length       Length of character type
-     * @param charsetType  Character type encoding format
-     * @param generator    Character type binding data generator
-     * @param allowNull    Whether to allow null values
+     * @param length Length of character type
+     * @param charsetType Character type encoding format
+     * @param generator Character type binding data generator
+     * @param allowNull Whether to allow null values
      * @param defaultValue default value for data type
      */
     public OracleNvarCharType(CharGeneratorBase generator, Integer length, String defaultValue, Boolean allowNull,

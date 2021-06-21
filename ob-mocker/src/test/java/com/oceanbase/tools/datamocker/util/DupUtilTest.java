@@ -10,8 +10,8 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 /**
- * The test class of the tool class, which is used to test the test class
- * of the repeated value detection tool class
+ * The test class of the tool class, which is used to test the test class of the repeated value
+ * detection tool class
  *
  * @author yh263208
  * @date 2021-01-10 23:13
@@ -56,7 +56,8 @@ public class DupUtilTest extends MockerTestBase {
         DuplicatedJudger dupUtil = new DuplicatedJudger(count);
         for (int i = 0; i < count + 1; i++) {
             if (i == count) {
-                thrown.expectMessage(String.format("The max count for DuplicatedJudger is %d, can not add more", count));
+                thrown.expectMessage(
+                        String.format("The max count for DuplicatedJudger is %d, can not add more", count));
                 thrown.expect(MockerException.class);
             }
             dupUtil.add(UUID.randomUUID().toString());

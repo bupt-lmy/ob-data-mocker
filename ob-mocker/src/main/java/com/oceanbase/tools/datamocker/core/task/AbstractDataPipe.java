@@ -13,8 +13,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.Validate;
 
 /**
- * Abstract data pipeline, used for data transfer between two threads.
- * Paradigm T represents the type of object passed in the data pipeline
+ * Abstract data pipeline, used for data transfer between two threads. Paradigm T represents the
+ * type of object passed in the data pipeline
  *
  * @author yh263208
  * @date 2021-01-14 15:32
@@ -23,7 +23,8 @@ import org.apache.commons.lang.Validate;
 @Slf4j
 public abstract class AbstractDataPipe<T> {
     /**
-     * Pipeline state, used to describe the current state of the pipeline. There are two states of on and off, the default is on
+     * Pipeline state, used to describe the current state of the pipeline. There are two states of on
+     * and off, the default is on
      */
     private Boolean closed = Boolean.FALSE;
     /**
@@ -59,9 +60,9 @@ public abstract class AbstractDataPipe<T> {
     /**
      * The write method of the pipeline, by which a record is written to the pipeline
      *
-     * @param timeout  timeout for write operation
+     * @param timeout timeout for write operation
      * @param timeUnit unit for timeout
-     * @param row      row of data
+     * @param row row of data
      * @throws Exception exception will be thrown when fail to write data
      */
     public void write(List<T> row, long timeout, TimeUnit timeUnit) throws Exception {
@@ -80,7 +81,9 @@ public abstract class AbstractDataPipe<T> {
                 notFullCondition.await(CONDITION_WAIT_TIMEOUTSEC, TimeUnit.SECONDS);
             }
             if (maxLoopCount == -1) {
-                log.warn("Data pipeline write operation timed out and will return, currentSize={}, maxRetained={}, threadName={}", size(),
+                log.warn(
+                        "Data pipeline write operation timed out and will return, currentSize={}, maxRetained={}, threadName={}",
+                        size(),
                         maxRetained,
                         Thread.currentThread().getName());
                 return;
@@ -112,9 +115,9 @@ public abstract class AbstractDataPipe<T> {
     /**
      * The write method of the pipeline, by which a record is written to the pipeline
      *
-     * @param timeout  timeout for write operation
+     * @param timeout timeout for write operation
      * @param timeUnit unit for timeout
-     * @param row      row of data
+     * @param row row of data
      * @throws Exception exception will be thrown when fail to write data
      */
     abstract public void doWrite(List<T> row, long timeout, TimeUnit timeUnit) throws Exception;
@@ -149,7 +152,9 @@ public abstract class AbstractDataPipe<T> {
                 notEmptyCondition.await(CONDITION_WAIT_TIMEOUTSEC, TimeUnit.SECONDS);
             }
             if (maxLoopCount == -1) {
-                log.warn("Data pipeline read operation timed out and will return, currentSize={}, maxRetained={}, threadName={}", size(),
+                log.warn(
+                        "Data pipeline read operation timed out and will return, currentSize={}, maxRetained={}, threadName={}",
+                        size(),
                         maxRetained,
                         Thread.currentThread().getName());
                 return Collections.emptyList();

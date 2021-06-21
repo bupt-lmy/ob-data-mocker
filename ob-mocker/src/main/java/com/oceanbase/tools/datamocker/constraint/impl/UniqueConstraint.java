@@ -15,8 +15,8 @@ import com.oceanbase.tools.datamocker.util.Pair;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * Packaged Object for Unique Constraint, used to verify whether
- * the unique constraint of the database is violated
+ * Packaged Object for Unique Constraint, used to verify whether the unique constraint of the
+ * database is violated
  *
  * @author yh263208
  * @date 2020-12-31 20:47
@@ -37,10 +37,10 @@ public class UniqueConstraint extends AbstractConstraint {
      * Constructor for UniqueConstraint
      *
      * @param constraintName name for unique constraint
-     * @param database       schema for this unique constraint
-     * @param tableName      table name which is related to this unique constraint
-     * @param consColumns    the name of the column to which the constraint is associated
-     * @param count          the row count which is needed to be verified
+     * @param database schema for this unique constraint
+     * @param tableName table name which is related to this unique constraint
+     * @param consColumns the name of the column to which the constraint is associated
+     * @param count the row count which is needed to be verified
      */
     public UniqueConstraint(String constraintName, String database, String tableName,
             Map<String, Map<String, Integer>> consColumns, int count) {
@@ -59,11 +59,13 @@ public class UniqueConstraint extends AbstractConstraint {
      * @param database schema for this unique constraint
      * @param tableName table name which is related to this unique constraint
      * @param consColumns the name of the column to which the constraint is associated
-     * @param rows initialize the column data, define some initial values of the unique constraint through the input of the column data
+     * @param rows initialize the column data, define some initial values of the unique constraint
+     *        through the input of the column data
      * @param count the row count which is needed to be verified
      */
     public UniqueConstraint(String constraintName, String database, String tableName,
-            Map<String, Map<String, Integer>> consColumns, List<Map<String, Pair<AbstractDataType, Object>>> rows, int count) {
+            Map<String, Map<String, Integer>> consColumns, List<Map<String, Pair<AbstractDataType, Object>>> rows,
+            int count) {
         super(constraintName, database, tableName, consColumns, rows);
         if (count <= 0) {
             throw new MockerException(MockerError.PARAMETER_ERROR,
@@ -86,11 +88,13 @@ public class UniqueConstraint extends AbstractConstraint {
     }
 
     @Override
-    protected boolean doCheck(Map<String, Integer> columns, Map<String, Pair<AbstractDataType, Object>> value, Boolean markable) {
+    protected boolean doCheck(Map<String, Integer> columns, Map<String, Pair<AbstractDataType, Object>> value,
+            Boolean markable) {
         String checkValue = convert(value);
         if (judger.contains(checkValue)) {
-            //log.warn(String.format("value \"%s\" for columns \"%s\" can not pass the unique constraint, will be droped", checkValue,
-            //        columns.keySet().stream().collect(Collectors.joining(","))));
+            // log.warn(String.format("value \"%s\" for columns \"%s\" can not pass the unique constraint, will
+            // be droped", checkValue,
+            // columns.keySet().stream().collect(Collectors.joining(","))));
             return false;
         }
         if (markable) {

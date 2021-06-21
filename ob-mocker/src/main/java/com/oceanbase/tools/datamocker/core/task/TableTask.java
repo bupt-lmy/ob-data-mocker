@@ -31,12 +31,14 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class TableTask {
     /**
-     * Tasks that need to be executed before all tasks are executed, usually used to initialize the test environment
+     * Tasks that need to be executed before all tasks are executed, usually used to initialize the test
+     * environment
      */
     @Getter
     private AbstractMockTask beforeTask;
     /**
-     * Tasks that need to be executed after all tasks are executed, usually used to clean up the environment
+     * Tasks that need to be executed after all tasks are executed, usually used to clean up the
+     * environment
      */
     private AbstractMockTask afterTask;
     /**
@@ -58,12 +60,14 @@ public class TableTask {
     /**
      * Constructor for TableTask
      *
-     * @param taskBean     Bean package object of table generation task
+     * @param taskBean Bean package object of table generation task
      * @param columnGroups Column generation primitive grouping information
-     * @param dataGroups   Data write out primitive grouping information
-     * @param index        Used to indicate which task queue of the TaskBean data, the queue index of the task queue in the Dispatcher
+     * @param dataGroups Data write out primitive grouping information
+     * @param index Used to indicate which task queue of the TaskBean data, the queue index of the task
+     *        queue in the Dispatcher
      */
-    public TableTask(TableTaskInfo taskBean, Set<Set<String>> columnGroups, Map<Set<String>, Integer> dataGroups, String taskName,
+    public TableTask(TableTaskInfo taskBean, Set<Set<String>> columnGroups, Map<Set<String>, Integer> dataGroups,
+            String taskName,
             int index) {
         this.tableTaskId = taskBean.getMetaData().getTableTaskId();
         this.context = new TableTaskContext(taskBean, taskName, index);
@@ -77,8 +81,9 @@ public class TableTask {
                     }
                 }
             }
-            MockDataGenTask genTask = new MockDataGenTask(taskBean.getMetaData(), this.context, taskBean.getBuffer(), tmpList,
-                    taskBean.getConstraints());
+            MockDataGenTask genTask =
+                    new MockDataGenTask(taskBean.getMetaData(), this.context, taskBean.getBuffer(), tmpList,
+                            taskBean.getConstraints());
             businessTasks.add(genTask);
         }
         taskBean.getBuffer().setConcurrent(businessTasks.size());
@@ -94,7 +99,8 @@ public class TableTask {
                 }
             }
             if (entry.getValue() <= 0) {
-                throw new MockerException(MockerError.PARAMETER_ERROR, "Task size can not be equal to or smaller than zero");
+                throw new MockerException(MockerError.PARAMETER_ERROR,
+                        "Task size can not be equal to or smaller than zero");
             }
             for (int i = 0; i < entry.getValue(); i++) {
                 MockDataOutputTask outputTask = new MockDataOutputTask(taskBean.getMetaData(), this.context, writers);
@@ -122,7 +128,8 @@ public class TableTask {
         beforeTask.bind(new AbstractCallBack<TableTaskContext>() {
             @Override
             public void doOnSuccess(TableTaskContext param) throws Throwable {
-                log.info("The Mock data preparation task has been completed, and the business task has begun to run, taskStatus={}",
+                log.info(
+                        "The Mock data preparation task has been completed, and the business task has begun to run, taskStatus={}",
                         MockTaskStatus.RUNNING);
                 for (AbstractMockTask task : thisTaskBean.businessTasks) {
                     if (task instanceof MockDataGenTask) {
@@ -139,7 +146,8 @@ public class TableTask {
 
             @Override
             public void doOnFailure(TableTaskContext param, Throwable e) throws Throwable {
-                log.error("The mock data preparation task fails to execute, and the business task will not be executed, taskStatus={}",
+                log.error(
+                        "The mock data preparation task fails to execute, and the business task will not be executed, taskStatus={}",
                         param.getStatus(), e);
                 callBack.onFailure(param, e);
             }
@@ -169,7 +177,8 @@ public class TableTask {
                         for (Map.Entry<String, Long> item : param.getWriterName2writeCount().entrySet()) {
                             builder.append("{\"" + item.getKey() + "\" : " + item.getValue() + "} ");
                         }
-                        log.info("Data writing task is completed, taskStatus={}, writingInfo={}", param.getStatus(), builder.toString());
+                        log.info("Data writing task is completed, taskStatus={}, writingInfo={}", param.getStatus(),
+                                builder.toString());
                         startAfterTask(service, callBack);
                     }
 

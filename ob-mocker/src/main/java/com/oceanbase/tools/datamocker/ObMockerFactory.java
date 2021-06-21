@@ -24,11 +24,11 @@ import com.oceanbase.tools.datamocker.util.MockerBuffer;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * The implementation class of the simple dispatcher factory,
- * used to generate a simple table generation task dispatcher.
- * This is a simple dispatcher factory class for the first phase of mock data.
- * It can only be used to process table generation tasks that do not contain foreign key constraints,
- * do not contain check constraints, and unique constraints do not contain virtual columns.
+ * The implementation class of the simple dispatcher factory, used to generate a simple table
+ * generation task dispatcher. This is a simple dispatcher factory class for the first phase of mock
+ * data. It can only be used to process table generation tasks that do not contain foreign key
+ * constraints, do not contain check constraints, and unique constraints do not contain virtual
+ * columns.
  *
  * @author yh263208
  * @date 2021-01-11 21:41
@@ -59,7 +59,8 @@ public class ObMockerFactory extends AbstractMockerFactory {
             DataSource dataSource = getDataSource(metaData.getTableTaskId());
             List<MockerFile> managers = getFileManager(metaData.getTableTaskId(), tableConfig);
             List<AbstractMockWriter> dataWriter = this.getDataWriter(tableConfig, buffer, managers, dataSource);
-            TableTaskInfo bean = new TableTaskInfo(columnReaders, dataWriter, constraints, buffer, dataSource, managers, metaData);
+            TableTaskInfo bean =
+                    new TableTaskInfo(columnReaders, dataWriter, constraints, buffer, dataSource, managers, metaData);
             dispatcher.setObj(i, bean);
         }
         return dispatcher;

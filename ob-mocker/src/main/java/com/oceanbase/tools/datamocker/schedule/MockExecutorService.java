@@ -14,8 +14,8 @@ import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
 
 /**
- * The mock data thread pool executes the serivce object,
- * used to encapsulate the call and execution of the thread pool
+ * The mock data thread pool executes the serivce object, used to encapsulate the call and execution
+ * of the thread pool
  *
  * @author yh263208
  * @date 2021-01-18 11:24
@@ -29,7 +29,8 @@ public class MockExecutorService {
 
     public MockExecutorService(ThreadPoolExecutor executor) {
         if (executor == null) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "Executor for mock executor service can not be null");
+            throw new MockerException(MockerError.PARAMETER_ERROR,
+                    "Executor for mock executor service can not be null");
         }
         this.executor = executor;
     }
@@ -65,12 +66,13 @@ public class MockExecutorService {
     /**
      * Submit a specific callable task for execution, this method is not needed in normal calls
      *
-     * @param task    Task to be performed
+     * @param task Task to be performed
      * @param context Context object for mock data subtask
      */
     public synchronized <V> void submitCallable(Callable<V> task, TableTaskContext context) {
         if (task == null || context == null) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "Callable or context for executor service can not be null");
+            throw new MockerException(MockerError.PARAMETER_ERROR,
+                    "Callable or context for executor service can not be null");
         }
         if (!context.isShutdown() && !isShutdown()) {
             Future future = executor.submit(newTaskFor(task));
@@ -85,7 +87,8 @@ public class MockExecutorService {
      */
     public synchronized <V> void submitCallable(Callable<V> task) {
         if (task == null) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "Callable or context for executor service can not be null");
+            throw new MockerException(MockerError.PARAMETER_ERROR,
+                    "Callable or context for executor service can not be null");
         }
         executor.submit(newTaskFor(task));
     }

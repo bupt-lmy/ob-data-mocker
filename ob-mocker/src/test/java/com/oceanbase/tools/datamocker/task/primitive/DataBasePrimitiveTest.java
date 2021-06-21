@@ -79,7 +79,9 @@ public class DataBasePrimitiveTest extends MockerTestBase {
     }
 
     private static void initEnv(Connection connection) throws SQLException {
-        String sql = String.format("create table %s (%s varchar(20) not null, %s varchar(20) not null, %s varchar(20) not null)", tableName,
+        String sql = String.format(
+                "create table %s (%s varchar(20) not null, %s varchar(20) not null, %s varchar(20) not null)",
+                tableName,
                 columnList.get(0), columnList.get(1), columnList.get(2));
         PreparedStatement statement = null;
         ResultSet resultSet = null;
@@ -98,7 +100,8 @@ public class DataBasePrimitiveTest extends MockerTestBase {
         for (int i = 0; i < size; i++) {
             Map<String, Pair<AbstractDataType, Object>> row = new HashMap<>();
             for (String column : columnList) {
-                row.put(column, new Pair<>(new OracleNumberType(8, 5, null, false), String.valueOf(new Random().nextInt(1000))));
+                row.put(column, new Pair<>(new OracleNumberType(8, 5, null, false),
+                        String.valueOf(new Random().nextInt(1000))));
             }
             list.add(row);
         }
@@ -159,7 +162,8 @@ public class DataBasePrimitiveTest extends MockerTestBase {
         expect.expect(MockerException.class);
         ObModeType dialectType = ObModeType.OB_ORACLE;
         DataBaseConfig config = getDBConfig(dialectType);
-        AbstractMockWriter primitive = new DataBaseWriter(oracleDataSource, dialectType, config.getDefaultSchame(), null);
+        AbstractMockWriter primitive =
+                new DataBaseWriter(oracleDataSource, dialectType, config.getDefaultSchame(), null);
     }
 
     @Test
@@ -167,7 +171,8 @@ public class DataBasePrimitiveTest extends MockerTestBase {
         List<Map<String, Pair<AbstractDataType, Object>>> rows = getRows(24);
         ObModeType dialectType = ObModeType.OB_MYSQL;
         DataBaseConfig config = getDBConfig(dialectType);
-        DataBaseWriter primitive = new DataBaseWriter(mysqlDataSource, dialectType, config.getDefaultSchame(), tableName);
+        DataBaseWriter primitive =
+                new DataBaseWriter(mysqlDataSource, dialectType, config.getDefaultSchame(), tableName);
         AbstractDataPipe pipe = new MockDataPipe(1);
         primitive.register(pipe);
         pipe.write(rows);
@@ -180,7 +185,8 @@ public class DataBasePrimitiveTest extends MockerTestBase {
         List<Map<String, Pair<AbstractDataType, Object>>> rows = getRows(24);
         ObModeType dialectType = ObModeType.OB_ORACLE;
         DataBaseConfig config = getDBConfig(dialectType);
-        DataBaseWriter primitive = new DataBaseWriter(oracleDataSource, dialectType, config.getDefaultSchame(), tableName);
+        DataBaseWriter primitive =
+                new DataBaseWriter(oracleDataSource, dialectType, config.getDefaultSchame(), tableName);
         AbstractDataPipe pipe = new MockDataPipe(1);
         primitive.register(pipe);
         pipe.write(rows);

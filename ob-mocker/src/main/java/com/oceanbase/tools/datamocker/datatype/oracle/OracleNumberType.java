@@ -25,14 +25,16 @@ public class OracleNumberType extends AbstractDigitDataType<BigDecimal> {
      */
     private final int scale;
 
-    public OracleNumberType(int precision, int scale, DigitalGeneratorBase<BigDecimal> generator, BigDecimal defaultValue,
+    public OracleNumberType(int precision, int scale, DigitalGeneratorBase<BigDecimal> generator,
+            BigDecimal defaultValue,
             Boolean allowNull) {
         super(generator, ObModeType.OB_ORACLE, defaultValue, allowNull);
         this.precision = precision;
         this.scale = scale;
     }
 
-    public OracleNumberType(int precision, DigitalGeneratorBase<BigDecimal> generator, BigDecimal defaultValue, Boolean allowNull) {
+    public OracleNumberType(int precision, DigitalGeneratorBase<BigDecimal> generator, BigDecimal defaultValue,
+            Boolean allowNull) {
         super(generator, ObModeType.OB_ORACLE, defaultValue, allowNull);
         this.precision = precision;
         this.scale = 0;
@@ -89,14 +91,14 @@ public class OracleNumberType extends AbstractDigitDataType<BigDecimal> {
     }
 
     /**
-     * The number data type in oracle mode has significant digits and precision requirements,
-     * so it is necessary to know the maximum and minimum values of the data type under the
-     * constraints of the specified precision and significant digits
+     * The number data type in oracle mode has significant digits and precision requirements, so it is
+     * necessary to know the maximum and minimum values of the data type under the constraints of the
+     * specified precision and significant digits
      *
      * @return Return the absolute value of the maximum and minimum values, if it is the maximum value,
-     * just use the return value directly, if it is the minimum value, take a negative value
+     *         just use the return value directly, if it is the minimum value, take a negative value
      * @throws MockerException The number of significant digits and precision are required for the size
-     * range, and an error may be thrown if it exceeds the range
+     *         range, and an error may be thrown if it exceeds the range
      */
     private BigDecimal maxOrMinForNumber() {
         if (precision > 38 || precision < 0 || scale < -84 || scale > 127) {

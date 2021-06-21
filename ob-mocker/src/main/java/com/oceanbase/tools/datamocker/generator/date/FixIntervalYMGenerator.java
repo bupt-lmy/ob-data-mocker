@@ -25,7 +25,8 @@ public class FixIntervalYMGenerator extends BaseGenerator<Integer, INTERVALYM> {
      * Regular expression, used to verify whether the interval is written correctly
      */
     private static final Pattern PATTERN = Pattern.compile(
-            "interval '(\\d{1,9}(\\-\\d{1,2})?)' (year|month)(\\(\\d{1}\\))? (to (year|month))?", Pattern.CASE_INSENSITIVE);
+            "interval '(\\d{1,9}(\\-\\d{1,2})?)' (year|month)(\\(\\d{1}\\))? (to (year|month))?",
+            Pattern.CASE_INSENSITIVE);
     /**
      * The string used to insert the interval
      */
@@ -49,12 +50,14 @@ public class FixIntervalYMGenerator extends BaseGenerator<Integer, INTERVALYM> {
             int yearLen = intervalVal.split("\\-")[0].length();
             if (yearLen < leftLimit || yearLen > rightLimit) {
                 throw new MockerException(MockerError.PARAMETER_ERROR,
-                        String.format("Interval value \"%s\" is out of bound for limit [%d,%d]", intervalVal, leftLimit, rightLimit));
+                        String.format("Interval value \"%s\" is out of bound for limit [%d,%d]", intervalVal, leftLimit,
+                                rightLimit));
             }
             this.value = intervalVal;
         } else {
             throw new MockerException(MockerError.PARAMETER_ERROR,
-                    String.format("Fix text \"%s\" for INTERVAL YEAR TO MONTH is illegal, value pattern is \"%s\"", this.fixText,
+                    String.format("Fix text \"%s\" for INTERVAL YEAR TO MONTH is illegal, value pattern is \"%s\"",
+                            this.fixText,
                             "INTERVAL 'integer [- integer]' {YEAR | MONTH} [(precision)][TO {YEAR | MONTH}]"));
         }
         return true;

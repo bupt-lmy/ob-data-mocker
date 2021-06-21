@@ -23,8 +23,7 @@ import org.apache.commons.lang.StringUtils;
  */
 public class RegExpTextBuilder {
     /**
-     * Match a special regular expression,
-     * this regular expression needs to be rewritten
+     * Match a special regular expression, this regular expression needs to be rewritten
      */
     private static final Pattern PATTERN_REQUOTED = Pattern.compile("\\\\Q(.*?)\\\\E");
     /**
@@ -36,15 +35,15 @@ public class RegExpTextBuilder {
      */
     private final Automaton automaton;
     /**
-     * Traversing automata may encounter multiple paths,
-     * and use a random object to increase the diversity of generated data
+     * Traversing automata may encounter multiple paths, and use a random object to increase the
+     * diversity of generated data
      */
     private Random random;
 
     /**
      * Constructor, used to construct a regular expression tool class
      *
-     * @param regex  Regular expression
+     * @param regex Regular expression
      * @param random Random object
      */
     public RegExpTextBuilder(String regex, Random random) {
@@ -96,7 +95,8 @@ public class RegExpTextBuilder {
                     return builder.toString();
                 } else {
                     throw new MockerException(
-                            String.format("Reached accept state before min length (current = %d < min = %d)", walkLength, minLength));
+                            String.format("Reached accept state before min length (current = %d < min = %d)",
+                                    walkLength, minLength));
                 }
             }
             List<Transition> nonFinalTransitions = transitions.stream()
@@ -126,7 +126,8 @@ public class RegExpTextBuilder {
             return builder.toString();
         } else {
             throw new MockerException(String.format(
-                    "Exceeded max walk length (%d) before reaching an accept state: target length was %d (min length = %d)", maxLength,
+                    "Exceeded max walk length (%d) before reaching an accept state: target length was %d (min length = %d)",
+                    maxLength,
                     targetLength, minLength));
         }
     }
@@ -158,8 +159,7 @@ public class RegExpTextBuilder {
     }
 
     /**
-     * Need to rewrite the regular expression,
-     * remove the special part
+     * Need to rewrite the regular expression, remove the special part
      *
      * @param regex Regular expression string
      * @return Return regular expression

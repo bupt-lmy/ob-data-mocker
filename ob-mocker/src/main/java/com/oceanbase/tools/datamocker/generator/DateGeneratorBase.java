@@ -41,10 +41,11 @@ public abstract class DateGeneratorBase<T extends Comparable> extends BaseGenera
     }
 
     /**
-     * Pre-checking step, used to check whether the generator can work normally according to the boundary value
+     * Pre-checking step, used to check whether the generator can work normally according to the
+     * boundary value
      *
      * @param startTime min timestamp for a date type
-     * @param endTime   max timestamp for a date type
+     * @param endTime max timestamp for a date type
      * @return Return the verification result
      */
     @Override
@@ -53,10 +54,10 @@ public abstract class DateGeneratorBase<T extends Comparable> extends BaseGenera
     /**
      * Get generated data
      *
-     * @param startTime The left boundary value has slightly different meanings for different types of data generators.
-     *                  For date-type data generation tasks, it indicates the start time
-     * @param endTime The right boundary value has slightly different meanings for different types of data generators.
-     *                For date-type data generation tasks, it indicates the end time
+     * @param startTime The left boundary value has slightly different meanings for different types of
+     *        data generators. For date-type data generation tasks, it indicates the start time
+     * @param endTime The right boundary value has slightly different meanings for different types of
+     *        data generators. For date-type data generation tasks, it indicates the end time
      * @return Returns a generated specific value
      */
     @Override
@@ -65,7 +66,8 @@ public abstract class DateGeneratorBase<T extends Comparable> extends BaseGenera
     /**
      * Return the total number of unique data that the data generator can generate
      *
-     * @return Return a specific value, or null if the data generator can generate data without limitation
+     * @return Return a specific value, or null if the data generator can generate data without
+     *         limitation
      */
     @Override
     abstract public Long count(T startTime, T endTime);

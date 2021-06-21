@@ -14,8 +14,7 @@ import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
 
 /**
- * ODC object deserialization tool class,
- * used to read objects from the DB in the form of objects
+ * ODC object deserialization tool class, used to read objects from the DB in the form of objects
  *
  * @author yh263208
  * @date 2020-12-02 17:24
@@ -26,13 +25,13 @@ public class SerializeUtil {
      * Deserialize a collection of objects from the database
      *
      * @param result Query result
-     * @param clazz  目标对象的类型
+     * @param clazz 目标对象的类型
      * @return Return the deserialized collection of objects
-     * @throws Exception An exception will be thrown when the length of the reflection generated
-     * object and the column collection is inconsistent with the result set
+     * @throws Exception An exception will be thrown when the length of the reflection generated object
+     *         and the column collection is inconsistent with the result set
      */
     public static <T> List<T> getList(ResultSet result, Class<T> clazz) throws SQLException, InstantiationException,
-                                                                               IllegalAccessException {
+            IllegalAccessException {
         if (result == null) {
             return Collections.emptyList();
         }
@@ -77,10 +76,11 @@ public class SerializeUtil {
      * @param result Query Result
      * @param clazz Target type
      * @return Return the deserialized object
-     * @throws Exception An exception will be thrown when the length of the reflection
-     * generated object and the column collection is inconsistent with the result set
+     * @throws Exception An exception will be thrown when the length of the reflection generated object
+     *         and the column collection is inconsistent with the result set
      */
-    public static <T> T getObject(ResultSet result, Class<T> clazz) throws SQLException, InstantiationException, IllegalAccessException {
+    public static <T> T getObject(ResultSet result, Class<T> clazz)
+            throws SQLException, InstantiationException, IllegalAccessException {
         if (result == null) {
             return null;
         }
@@ -100,7 +100,8 @@ public class SerializeUtil {
         }
         if (resultList.size() != columnList.size()) {
             throw new MockerException(MockerError.OPERATION_FAILURE,
-                    String.format("Result set's length \"%d\" is not equal to the length of the column names \"%d\"", resultList.size(),
+                    String.format("Result set's length \"%d\" is not equal to the length of the column names \"%d\"",
+                            resultList.size(),
                             columnList.size()));
         }
         int columnLength = columnList.size();
@@ -117,8 +118,8 @@ public class SerializeUtil {
      * @param columnMap The mapping relationship between column names and indexes
      * @param clazz Target type
      * @return Return the deserialized object
-     * @throws Exception An exception will be thrown when the length of the reflection generated
-     * object and the column collection is inconsistent with the result set
+     * @throws Exception An exception will be thrown when the length of the reflection generated object
+     *         and the column collection is inconsistent with the result set
      */
     private static <T> T parseObject(List<Object> input, Map<String, Integer> columnMap, Class<T> clazz)
             throws IllegalAccessException, InstantiationException {

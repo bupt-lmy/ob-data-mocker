@@ -31,9 +31,10 @@ public abstract class BaseGenerator<T extends Comparable, V> {
     }
 
     /**
-     * Pre-checking step, used to check whether the generator can work normally according to the boundary value
+     * Pre-checking step, used to check whether the generator can work normally according to the
+     * boundary value
      *
-     * @param leftLimit  Left boundary value
+     * @param leftLimit Left boundary value
      * @param rightLimit Right boundary value
      * @return Return the verification result
      */
@@ -42,12 +43,14 @@ public abstract class BaseGenerator<T extends Comparable, V> {
     /**
      * Get generated data
      *
-     * @param leftLimit The left boundary value has slightly different meanings for different types of data generators.
-     *                  For digital generation tasks, it reflects the minimum value of the generated numbers.
-     *                  If it is a character generation task, it reflects the minimum value of characters.
-     * @param rightLimit The right boundary value has slightly different meanings for different types of data generators.
-     *                   For digital generation tasks, it reflects the minimum value of the generated numbers.
-     *                   If it is a character generation task, it reflects the minimum value of characters.
+     * @param leftLimit The left boundary value has slightly different meanings for different types of
+     *        data generators. For digital generation tasks, it reflects the minimum value of the
+     *        generated numbers. If it is a character generation task, it reflects the minimum value of
+     *        characters.
+     * @param rightLimit The right boundary value has slightly different meanings for different types of
+     *        data generators. For digital generation tasks, it reflects the minimum value of the
+     *        generated numbers. If it is a character generation task, it reflects the minimum value of
+     *        characters.
      * @return Returns a generated specific value
      */
     abstract protected V generate(T leftLimit, T rightLimit);
@@ -55,12 +58,14 @@ public abstract class BaseGenerator<T extends Comparable, V> {
     /**
      * Obtain the generated data method
      *
-     * @param leftLimit The left boundary value has slightly different meanings for different types of data generators.
-     *                  For digital generation tasks, it reflects the minimum value of the generated numbers.
-     *                  If it is a character generation task, it reflects the minimum value of characters.
-     * @param rightLimit The right boundary value has slightly different meanings for different types of data generators.
-     *                   For digital generation tasks, it reflects the minimum value of the generated numbers.
-     *                   If it is a character generation task, it reflects the minimum value of characters.
+     * @param leftLimit The left boundary value has slightly different meanings for different types of
+     *        data generators. For digital generation tasks, it reflects the minimum value of the
+     *        generated numbers. If it is a character generation task, it reflects the minimum value of
+     *        characters.
+     * @param rightLimit The right boundary value has slightly different meanings for different types of
+     *        data generators. For digital generation tasks, it reflects the minimum value of the
+     *        generated numbers. If it is a character generation task, it reflects the minimum value of
+     *        characters.
      * @return Returns a generated specific value
      */
     public V next(T leftLimit, T rightLimit) {
@@ -87,7 +92,8 @@ public abstract class BaseGenerator<T extends Comparable, V> {
      *
      * @param leftLimit Left boundary value
      * @param rightLimit Right boundary value
-     * @return Return a specific value, or null if the data generator can generate data without limitation
+     * @return Return a specific value, or null if the data generator can generate data without
+     *         limitation
      */
     abstract public Long count(T leftLimit, T rightLimit);
 }
