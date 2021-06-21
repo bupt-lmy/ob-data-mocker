@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * 数据库约束关联列数据封装对象
+ * Database Constraint Associated Column Data Package Object
  *
  * @author yh263208
  * @date 2021-01-11 20:19

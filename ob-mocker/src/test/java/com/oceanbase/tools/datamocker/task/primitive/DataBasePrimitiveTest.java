@@ -39,7 +39,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 /**
- * JDBC操作原语测试类
+ * JDBC operation primitive test class
  *
  * @author yh263208
  * @date 2021-01-04
@@ -47,30 +47,15 @@ import org.junit.rules.ExpectedException;
  */
 @Slf4j
 public class DataBasePrimitiveTest extends MockerTestBase {
-    /**
-     * mysql数据库连接配置文件所在地
-     */
     private final static String mysqlEnv = "db/mysql-env.properties";
-    /**
-     * oracle数据库连接配置文件所在地
-     */
     private final static String oracleEnv = "db/oracle-env.properties";
     @Rule
     public ExpectedException expect = ExpectedException.none();
     private final static String tableName = "TEST_EMP";
-    /**
-     * 列信息
-     */
     private final static List<String> columnList = Arrays.asList("COL1", "COL2", "COL3");
     private static DataSource oracleDataSource;
     private static DataSource mysqlDataSource;
 
-    /**
-     * 获取测试数据库连接配置信息
-     *
-     * @param dialectType 方言类型
-     * @throws IOException 文件读取操作可能会抛出异常
-     */
     private static DataBaseConfig getDBConfig(ObModeType dialectType) throws IOException {
         DataBaseConfig config = new DataBaseConfig();
         Properties properties = new Properties();
@@ -93,11 +78,6 @@ public class DataBasePrimitiveTest extends MockerTestBase {
         return config;
     }
 
-    /**
-     * 初始化环境，创建一个目标表
-     *
-     * @param connection 一个数据连接
-     */
     private static void initEnv(Connection connection) throws SQLException {
         String sql = String.format("create table %s (%s varchar(20) not null, %s varchar(20) not null, %s varchar(20) not null)", tableName,
                 columnList.get(0), columnList.get(1), columnList.get(2));
@@ -113,12 +93,6 @@ public class DataBasePrimitiveTest extends MockerTestBase {
         }
     }
 
-    /**
-     * 获取一个测试用的随机数据块
-     *
-     * @param size 数据行数
-     * @return 返回数据
-     */
     private List<Map<String, Pair<AbstractDataType, Object>>> getRows(int size) {
         List<Map<String, Pair<AbstractDataType, Object>>> list = new ArrayList<>();
         for (int i = 0; i < size; i++) {
@@ -131,13 +105,6 @@ public class DataBasePrimitiveTest extends MockerTestBase {
         return list;
     }
 
-    /**
-     * 关闭数据库资源
-     *
-     * @param connection 数据库连接
-     * @param statement  数据库操作句柄
-     * @param resultSet  结果集
-     */
     private static void close(Connection connection, Statement statement, ResultSet resultSet) {
         if (resultSet != null) {
             try {
@@ -221,11 +188,6 @@ public class DataBasePrimitiveTest extends MockerTestBase {
         Assert.assertEquals(rows.size(), count.intValue());
     }
 
-    /**
-     * 关闭环境，创建一个目标表
-     *
-     * @param connection 一个数据连接
-     */
     private static void closeEnv(Connection connection) throws SQLException {
         String sql = String.format("drop table %s", tableName);
         PreparedStatement statement = null;

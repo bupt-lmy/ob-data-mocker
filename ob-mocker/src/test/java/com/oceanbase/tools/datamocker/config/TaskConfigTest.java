@@ -21,7 +21,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * 总的生成任务配置
+ * Overall build task configuration
  *
  * @author yh263208
  * @date 2020-12-27 20:45
@@ -29,7 +29,7 @@ import org.junit.Test;
  */
 public class TaskConfigTest extends MockerTestBase {
     /**
-     * 列任务有关的参数
+     * List task-related parameters
      */
     private final Integer precision = 5;
     private final Integer scale = 2;
@@ -42,7 +42,7 @@ public class TaskConfigTest extends MockerTestBase {
     private final BigDecimal highValue = BigDecimal.TEN.multiply(BigDecimal.TEN);
     private final Map<String, Double> builderParams = new HashMap<>();
     /**
-     * 表任务有关的参数
+     * Table task-related parameters
      */
     private final int configListSize = 3;
     private final Long maxBatchsize = 1024L;
@@ -50,7 +50,7 @@ public class TaskConfigTest extends MockerTestBase {
     private final String tableName = "test_table";
     private final String schemaName = "schema_name";
     /**
-     * 总体任务有关的参数
+     * Parameters related to the overall task
      */
     private final Integer port = 3306;
     private final String host = "xxx.xxx.xxx.xxx";
@@ -63,7 +63,7 @@ public class TaskConfigTest extends MockerTestBase {
     private DataBaseConfig dbConfig = null;
 
     /**
-     * 初始化一个数字类型的数据生成器配置
+     * Initialize a numeric data generator configuration
      */
     private DataTypeConfig initDigitGen() {
         DigitDataTypeConfig digit = new DigitDataTypeConfig();
@@ -78,10 +78,10 @@ public class TaskConfigTest extends MockerTestBase {
     }
 
     /**
-     * 初始化列任务配置对象
+     * Initialize the column task configuration object
      *
-     * @param size 列任务大小
-     * @return 返回列任务集合
+     * @param size Column task size
+     * @return Return to the list of tasks
      */
     private List<DefaultColumnConfig> initColumnConfig(int size) {
         builderParams.put("average", 50.21);
@@ -98,12 +98,6 @@ public class TaskConfigTest extends MockerTestBase {
         return configList;
     }
 
-    /**
-     * 初始化表任务配置对象
-     *
-     * @param size 表任务大小
-     * @return 返回表任务集合
-     */
     private List<DefaultTableConfig> initTableConfig(int size) {
         List<DefaultTableConfig> list = new ArrayList<>();
         for (int i = 0; i < size; i++) {
@@ -120,9 +114,6 @@ public class TaskConfigTest extends MockerTestBase {
         return list;
     }
 
-    /**
-     * 初始化环境，包括数据库配置
-     */
     @Before
     public void initEnv() {
         dbConfig = new DataBaseConfig();

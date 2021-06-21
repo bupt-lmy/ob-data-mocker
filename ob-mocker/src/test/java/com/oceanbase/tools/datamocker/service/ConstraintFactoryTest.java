@@ -28,7 +28,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * 约束工厂类的测试类，用于测试工厂类的逻辑
+ * The test class of the constraint factory class is used to test the logic of the factory class
  *
  * @author yh263208
  * @date 2021-01-11 17:11
@@ -36,11 +36,11 @@ import org.junit.Test;
  */
 public class ConstraintFactoryTest extends MockerTestBase {
     /**
-     * mysql数据库连接配置文件所在地
+     * The location of the mysql database connection configuration file
      */
     private final String mysqlEnv = "db/mysql-env.properties";
     /**
-     * oracle数据库连接配置文件所在地
+     * The location of the oracle database connection configuration file
      */
     private final String oracleEnv = "db/oracle-env.properties";
     private final String ddlMysql = "CREATE TABLE `emp` (\n"
@@ -108,12 +108,6 @@ public class ConstraintFactoryTest extends MockerTestBase {
         }
     }
 
-    /**
-     * 获取测试数据库连接配置信息
-     *
-     * @param dialectType 方言类型
-     * @throws IOException 文件读取操作可能会抛出异常
-     */
     private DataBaseConfig getDBConfig(ObModeType dialectType) throws IOException {
         DataBaseConfig config = new DataBaseConfig();
         Properties properties = new Properties();

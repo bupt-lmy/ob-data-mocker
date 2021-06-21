@@ -5,7 +5,7 @@ import com.oceanbase.tools.datamocker.generator.chartype.BoolCharGenerator;
 import com.oceanbase.tools.datamocker.model.enums.CharCaseOption;
 
 /**
- * 布尔类型字节数组的数据生成器
+ * Data generator for boolean byte array
  *
  * @author yh263208
  * @date 2020-12-16 23:01

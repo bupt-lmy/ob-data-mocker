@@ -1,7 +1,7 @@
 package com.oceanbase.tools.datamocker.generator;
 
 /**
- * 字节数组对象类型数据生成器
+ * Byte array object type data generator
  *
  * @author yh263208
  * @date 2020-12-16 22:39
@@ -9,31 +9,29 @@ package com.oceanbase.tools.datamocker.generator;
  */
 public abstract class ByteGeneratorBase extends BaseGenerator<Integer, byte[]> {
     /**
-     * 预检查步骤，用于根据边界值校验该生成器是否可以正常工作
+     * Pre-checking step, used to check whether the generator can work normally according to the boundary value
      *
-     * @param minLength 最小值，
-     * @param maxLength 最大值
-     * @return 返回校验结果
+     * @param minLength Minimum
+     * @param maxLength Max length for string value
+     * @return Return the verification result
      */
     @Override
     abstract public Boolean preCheck(Integer minLength, Integer maxLength);
 
     /**
-     * 数据生成方法接口
+     * Data generation method interface
      *
-     * @param minLength 最小值，对于不同类型的数据生成器含义略有不同，对于数字型的生成任务反映的是生成数字的最小值，
-     *                  如果是字符型的生成任务反映的是字符的字节最小值
-     * @param maxLength 最大值，对于不同类型的数据生成器含义略有不同，对于数字型的生成任务反映的是生成数字的最小值，
-     *                  如果是字符型的生成任务反映的是字符的字节最小值
-     * @return 返回一个生成的具体值
+     * @param minLength The minimum value, the character generation task reflects the minimum byte value of the character
+     * @param maxLength The maximum value, the character generation task reflects the minimum byte value of the character
+     * @return Returns a generated specific value
      */
     @Override
     abstract public byte[] generate(Integer minLength, Integer maxLength);
 
     /**
-     * 返回数据生成器一共能够生成的不重复的数据个数
+     * Return the total number of unique data that the data generator can generate
      *
-     * @return 返回具体的数值，如果数据生成器可以无限制生成数据则返回null
+     * @return Return a specific value, or null if the data generator can generate data without limitation
      */
     @Override
     abstract public Long count(Integer minLength, Integer maxLength);

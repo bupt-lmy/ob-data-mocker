@@ -5,7 +5,7 @@ import java.sql.Date;
 import com.oceanbase.tools.datamocker.generator.DateGeneratorBase;
 
 /**
- * 固定日期数据生成器
+ * Fixed date data generator
  *
  * @author yh263208
  * @date 2020-12-16 15:24
@@ -13,7 +13,7 @@ import com.oceanbase.tools.datamocker.generator.DateGeneratorBase;
  */
 public class FixDateGenerator extends DateGeneratorBase<Date> {
     /**
-     * 固定日期时间戳
+     * Fixed date and time stamp
      */
     private final long timestamp;
 

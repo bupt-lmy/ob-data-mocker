@@ -11,7 +11,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 /**
- * 分发器测试类
+ * Distributor test class
  *
  * @author yh263208
  * @date 2021-01-08 17:44
@@ -21,9 +21,6 @@ public class DispatcherTest extends MockerTestBase {
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 
-    /**
-     * 获取一个队列
-     */
     private List<List<String>> getQueue() {
         List<String> queue1 = Arrays.asList("1", "4", "7", "12");
         List<String> queue2 = Arrays.asList("2", "5", "8", "13", "17");
@@ -31,9 +28,6 @@ public class DispatcherTest extends MockerTestBase {
         return Arrays.asList(queue1, queue2, queue3);
     }
 
-    /**
-     * 测试指定capacity的分发器逻辑
-     */
     @Test
     public void testDispatcher() throws Exception {
         List<List<String>> queue = getQueue();
@@ -55,9 +49,6 @@ public class DispatcherTest extends MockerTestBase {
         }
     }
 
-    /**
-     * 测试默认大小的分发器对象
-     */
     @Test
     public void testDefaultDispatcher() throws Exception {
         List<List<String>> queue = getQueue();

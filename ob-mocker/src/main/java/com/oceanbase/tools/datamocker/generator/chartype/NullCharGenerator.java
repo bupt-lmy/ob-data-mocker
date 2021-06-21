@@ -4,7 +4,7 @@ import com.oceanbase.tools.datamocker.generator.CharGeneratorBase;
 import com.oceanbase.tools.datamocker.model.enums.CharCaseOption;
 
 /**
- * char类型的空数据生成器
+ * Null data generator of char type
  *
  * @author yh263208
  * @date 2021-01-26 14:41

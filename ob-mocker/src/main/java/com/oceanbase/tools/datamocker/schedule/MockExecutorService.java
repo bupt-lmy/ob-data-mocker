@@ -14,7 +14,8 @@ import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
 
 /**
- * mock数据线程池执行serivce对象，用于封装线程池的调用和执行
+ * The mock data thread pool executes the serivce object,
+ * used to encapsulate the call and execution of the thread pool
  *
  * @author yh263208
  * @date 2021-01-18 11:24
@@ -22,7 +23,7 @@ import com.oceanbase.tools.datamocker.model.exception.MockerException;
  */
 public class MockExecutorService {
     /**
-     * 线程池，该类需要接受一个外界传入的线程池
+     * Thread pool, this class needs to accept an incoming thread pool
      */
     private final ThreadPoolExecutor executor;
 
@@ -34,10 +35,10 @@ public class MockExecutorService {
     }
 
     /**
-     * 返回新的FutureTask
+     * Return a new FutureTask
      *
-     * @param task 需要执行的任务
-     * @return FustureTask对象
+     * @param task Tasks to be performed
+     * @return FustureTask object
      */
     private <V> RunnableFuture<V> newTaskFor(Callable<V> task) {
         return new FutureTask<>(task);
@@ -48,9 +49,9 @@ public class MockExecutorService {
     }
 
     /**
-     * 提交一个TaskBean执行
+     * Submit a TaskBean for execution
      *
-     * @param taskBean 提交的TaskBean
+     * @param taskBean Submitted TaskBean
      */
     public synchronized TableTaskContext submit(TableTask taskBean) {
         if (taskBean == null) {
@@ -62,10 +63,10 @@ public class MockExecutorService {
     }
 
     /**
-     * 提交一个具体的callable任务进行执行，正常的调用中不需要这个方法
+     * Submit a specific callable task for execution, this method is not needed in normal calls
      *
-     * @param task    任务
-     * @param context mock数据子任务的上下文对象
+     * @param task    Task to be performed
+     * @param context Context object for mock data subtask
      */
     public synchronized <V> void submitCallable(Callable<V> task, TableTaskContext context) {
         if (task == null || context == null) {
@@ -78,9 +79,9 @@ public class MockExecutorService {
     }
 
     /**
-     * 提交一个具体的callable任务进行执行，正常的调用中不需要这个方法
+     * Submit a specific callable task for execution, this method is not needed in normal calls
      *
-     * @param task 任务
+     * @param task Task to be performed
      */
     public synchronized <V> void submitCallable(Callable<V> task) {
         if (task == null) {

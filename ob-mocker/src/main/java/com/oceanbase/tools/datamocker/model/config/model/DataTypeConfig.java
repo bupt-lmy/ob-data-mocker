@@ -10,7 +10,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * 类型配置，用于表示数据库的类型配置信息
+ * Type configuration, used to represent the type configuration information of the database
  *
  * @author yh263208
  * @date 2020-12-24 20:26
@@ -25,32 +25,25 @@ import lombok.Setter;
         @JsonSubTypes.Type(value = CharDataTypeConfig.class, name = "CHAR")
 })
 public class DataTypeConfig {
-    /**
-     * 默认值
-     */
     private Object defaultValue;
-    /**
-     * 列是否可以为空
-     */
     private Boolean allowNull;
-    /**
-     * 列的类型枚举
-     */
     private String columnType;
     /**
-     * 低值
+     * Data type low value, meaning the same as low value in oracle
      */
     private Object lowValue;
     /**
-     * 高值
+     * Data type high value, meaning the same as high value in oracle
      */
     private Object highValue;
     /**
-     * 和列绑定的数据生成器初始化参数，可能有多个值因此用List对象封装
+     * The initialization parameter of the data generator bound to the column may have multiple values,
+     * so it is encapsulated with a List object
      */
     private Map<String, ?> genParams;
     /**
-     * 数据生成器builder对象，用于根据上述params对象生成一个具体的数据生成器供列对象来使用
+     * The data generator builder object is used to generate a specific data generator
+     * for the column object to use based on the above params object
      */
     private String generator;
 

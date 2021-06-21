@@ -5,39 +5,45 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.apache.commons.lang.Validate;
 
 /**
- * 这个对象用来封装待执行的任务，使用该对象可以描述任务之间的串行或并行关系。该数据封装对象本质上是多个栈（但是和普通栈不同的是
- * 该数据对象在"入栈"的时候是在末尾追加而不是在栈顶进行操作），栈顶指针使用一个数组来维护。一个栈中的任务都是需要串行执行的。
+ * This object is used to encapsulate the tasks to be executed, and use this object to describe the serial or
+ * parallel relationship between tasks. The data encapsulation object is essentially multiple stacks (but different
+ * from the normal stack is that the data object is appended at the end rather than operated on the top of the stack when
+ * "stacked"), and the stack top pointer is maintained by an array. The tasks in a stack need to be executed serially.
  *
  * @author yh263208
  * @date 2021-01-08 20:33
  * @since OBMOCKER_0.1.0_snapshot
  */
 public class Dispatcher<T> {
-    /**
-     * 任务Id
-     */
     private final String taskId;
     /**
-     * 名称，可以代指分发器的名称也可以代指整个任务的名称
+     * The name can refer to the name of the distributor or the name of the entire task
      */
     private final String name;
     /**
-     * 锁对象，该数据封装对象使用数组来维护多个栈的栈顶指针，由于数组不能动态地改变大小，因此每当程序要对栈顶指针
-     * 数组进行维护时就获取该锁，防止多个线程并发地修改栈顶指针数组造成竞争条件
+     * The lock object, the data encapsulation object uses an array to maintain the top pointers of multiple stacks.
+     * Since the array cannot be dynamically changed in size, the lock is acquired whenever the program wants to maintain
+     * the array of top pointers to prevent multiple threads from concurrency Modifying the array of pointers at the top
+     * of the stack causes a race condition
      */
     private final ReentrantLock lock = new ReentrantLock();
     /**
-     * 栈顶指针数据的长度，同时也可以用来描述当前并发任务的多少
+     * The length of the pointer data on the top of the stack can also be used to describe the current number of concurrent tasks
      */
     private int concurrent;
     /**
-     * 栈顶指针数组
+     * Stack top pointer array
      */
     private TopNode[] queuePointers;
 
     /**
-     * 默认构造函数，此时初始化栈顶指针数组的长度为0。不推荐使用该构造函数，最好在构造之初就设定栈顶指针数组的大小，因为调整该指针数组大小
-     * 是一个耗资源的行为
+     * The default constructor, at this time, initialize the length of the pointer array at the top of the stack to 0.
+     * It is not recommended to use this constructor. It is best to set the size of the pointer array on the top of
+     * the stack at the beginning of the construction, because adjusting the size of the pointer array is a
+     * resource-consuming behavior
+     *
+     * @param name   dispatcher's name or task name
+     * @param taskId task id
      */
     public Dispatcher(String name, String taskId) {
         Validate.notEmpty(taskId, "task id can not be null");
@@ -47,7 +53,12 @@ public class Dispatcher<T> {
     }
 
     /**
-     * 构造函数，该构造函数传入栈顶指针数组的默认大小，程序根据传入的大小初始化栈顶指针数组
+     * Constructor, the constructor passes in the default size of the stack top pointer array,
+     * and the program initializes the stack top pointer array according to the incoming size
+     *
+     * @param concurrent initial size of this dispatcher
+     * @param name dispatcher's name or task name
+     * @param taskId task id
      */
     public Dispatcher(int concurrent, String name, String taskId) {
         Validate.notEmpty(taskId, "task id can not be null");
@@ -60,33 +71,22 @@ public class Dispatcher<T> {
         }
     }
 
-    /**
-     * 返回分发器名称，其实也是mock数据任务的名称
-     */
     public String name() {
         return this.name;
     }
 
-    /**
-     * 返回任务id
-     */
     public String taskId() {
         return this.taskId;
     }
 
-    /**
-     * 获取topNodes数组的长度
-     *
-     * @return 返回长度
-     */
     public int count() {
         return this.concurrent;
     }
 
     /**
-     * 返回分发器内全部对象的数量
+     * Returns the number of all objects in the distributor
      *
-     * @return 返回具体的数量
+     * @return Return specific quantity
      */
     public int totalCount() {
         int queueSize = count();
@@ -98,10 +98,10 @@ public class Dispatcher<T> {
     }
 
     /**
-     * 获取某个具体的任务队列的长度
+     * Get the length of a specific task queue
      *
-     * @param index 目标任务队列的索引
-     * @return 返回目标任务队列的长度
+     * @param index Index of the target task queue
+     * @return Returns the length of the target task queue
      */
     public int getTaskSize(int index) {
         if (index >= this.concurrent || index < 0) {
@@ -112,11 +112,14 @@ public class Dispatcher<T> {
     }
 
     /**
-     * 此方法传入两个参数，通过这两个参数唯一定位到某个任务对象并范围，该方法不会对数据封装对象进行改动
+     * This method passes in two parameters, through these two parameters to uniquely locate a task object and scope,
+     * this method will not change the data package object
      *
-     * @param index       栈顶指针数组的索引号，方法根据该索引获取到对应位置的栈顶指针
-     * @param columnIndex 栈索引，方法根据此索引找到栈的索引对应位置
-     * @return 返回查询到的对象
+     * @param index The index number of the stack top pointer array, the method obtains
+     *              the corresponding position of the stack top pointer according to the index
+     * @param columnIndex Stack index, the method finds the corresponding position of the stack
+     *                    index according to this index
+     * @return Return the queried object
      */
     public T getObj(int index, int columnIndex) throws Exception {
         if (index >= this.concurrent || index < 0) {
@@ -136,10 +139,10 @@ public class Dispatcher<T> {
     }
 
     /**
-     * 进行一次出栈操作
+     * Perform a pop operation
      *
-     * @param index 对哪个任务队列进行"出栈"
-     * @return 返回具体的任务对象
+     * @param index Which task queue to "pop"
+     * @return Return the specific task object
      */
     public T pop(int index) throws Exception {
         if (index >= this.concurrent || index < 0) {
@@ -149,25 +152,25 @@ public class Dispatcher<T> {
         if (topNode.length <= 0) {
             return null;
         }
-        //由于需要对栈顶指针数组进行操作，因此首先要进行加锁处理
+        // Since the array of pointers on the top of the stack needs to be operated, the lock processing must be performed first
         T returnObj = null;
         topNode.writeLock.lock();
         try {
-            //找到第一个栈大小不为0的栈，将栈顶指针传入到返回对象中准备返回
+            // Find the first stack whose size is not 0, and pass the top pointer of the stack to the return object to prepare to return
             if (topNode.length != 0) {
                 Node destNode = topNode.downNext;
                 if (destNode != null) {
                     returnObj = destNode.getObj();
                 }
             }
-            //以下代码进行实际的出栈操作，将旧的栈顶指针用新的栈顶指针替代
+            // The following code performs the actual pop operation, replacing the old stack top pointer with the new stack top pointer
             Node next = topNode.downNext;
             if (next != null) {
                 topNode.downNext = next.downNext;
                 next.downNext = null;
             }
             if (topNode.length > 0) {
-                //栈大小减一
+                // Stack size minus one
                 topNode.length--;
             }
         } finally {
@@ -177,31 +180,34 @@ public class Dispatcher<T> {
     }
 
     /**
-     * 使用该方法进行任务的发布，index表明需要插入到哪一个任务栈中，并且追加到该任务栈的末尾。
+     * Use this method to publish tasks, index indicates which task stack needs to be inserted into,
+     * and appends to the end of the task stack.
      *
-     * @param index 栈顶指针数组索引，表明当前任务想要插入到哪一个栈中。该索引的取值范围是0至栈顶指针数组的大小，若取最大值则栈顶
-     *              指针数组进行扩容操作。
-     * @param obj   待插入的任务对象
+     * @param index The index of the pointer array at the top of the stack indicates which stack
+     *              the current task wants to be inserted into. The value range of the index is
+     *              from 0 to the size of the stack top pointer array. If the maximum value is
+     *              taken, the stack top pointer array performs an expansion operation.
+     * @param obj Task object to be inserted
      */
     public void setObj(int index, T obj) throws Exception {
         if (obj == null) {
             return;
         }
-        //栈顶指针索引在数组的范围内，直接进行插入操作
+        // The index of the top pointer of the stack is within the range of the array, and the insertion operation is performed directly
         if (index < this.concurrent) {
             TopNode topNode = queuePointers[index];
             if (topNode == null) {
                 throw new Exception(String.format("index %d is invaild", index));
             }
-            //对当前栈顶指针进行加锁
+            // Lock the current stack pointer
             topNode.writeLock.lock();
             try {
-                //找到该任务栈的栈尾
+                // Find the end of the task stack
                 Node lastNode = topNode.downNext;
                 if (lastNode != null) {
                     for (; lastNode.downNext != null; lastNode = lastNode.downNext) {}
                 }
-                //构造出新的任务节点并且将新的任务节点尾插到任务栈的末尾
+                // Construct a new task node and insert the end of the new task node to the end of the task stack
                 Node newNode = new Node(obj);
                 if (lastNode == null) {
                     topNode.downNext = newNode;
@@ -215,7 +221,7 @@ public class Dispatcher<T> {
                 topNode.writeLock.unlock();
             }
         } else if (index == this.concurrent) {
-            //此处要进行栈顶指针数组扩容，新的大小为原来大小加一
+            // Here to expand the stack top pointer array, the new size is the original size plus one
             lock.lock();
             try {
                 if (index == this.concurrent) {
@@ -232,13 +238,15 @@ public class Dispatcher<T> {
             }
             this.setObj(index, obj);
         } else {
-            //非法的索引
+            // Illegal index
             throw new Exception(String.format("index %d out of bound", index));
         }
     }
 
     /**
-     * 任务节点，该节点用于封装任务对象，拥有读锁和写锁同时拥有横向和纵向两个指针分别用来描述与其他任务对象之间的异步和同步执行关系
+     * The task node, which is used to encapsulate task objects, has a read lock and a write lock,
+     * and both horizontal and vertical pointers are used to describe the asynchronous and synchronous
+     * execution relationship with other task objects.
      *
      * @author yh263208
      * @date 2021-01-08 20:32
@@ -263,7 +271,8 @@ public class Dispatcher<T> {
 }
 
 /**
- * 任务栈的栈顶节点，为管理节点，不承担任务的封装工作
+ * The top node of the task stack is the management node and does
+ * not undertake task encapsulation work
  *
  * @author yh263208
  * @date 2021-01-08 20:32

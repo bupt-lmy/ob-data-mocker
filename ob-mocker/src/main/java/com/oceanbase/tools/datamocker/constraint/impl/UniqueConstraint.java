@@ -15,7 +15,8 @@ import com.oceanbase.tools.datamocker.util.Pair;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * 唯一约束校验类
+ * Packaged Object for Unique Constraint, used to verify whether
+ * the unique constraint of the database is violated
  *
  * @author yh263208
  * @date 2020-12-31 20:47
@@ -24,18 +25,22 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class UniqueConstraint extends AbstractConstraint {
     /**
-     * 重复定义工具类
+     * Judger used to verify whether a piece of data appears multiple times
      */
     private final DuplicatedJudger judger;
     /**
-     * 唯一约束关联列排序后的列集合
+     * Sorted column list which is associated with unique constraint
      */
     private List<String> sortedList;
 
     /**
-     * 唯一约束的构造方法
+     * Constructor for UniqueConstraint
      *
-     * @param count 需要进行唯一约束的条目数量
+     * @param constraintName name for unique constraint
+     * @param database       schema for this unique constraint
+     * @param tableName      table name which is related to this unique constraint
+     * @param consColumns    the name of the column to which the constraint is associated
+     * @param count          the row count which is needed to be verified
      */
     public UniqueConstraint(String constraintName, String database, String tableName,
             Map<String, Map<String, Integer>> consColumns, int count) {
@@ -48,10 +53,14 @@ public class UniqueConstraint extends AbstractConstraint {
     }
 
     /**
-     * 唯一约束的构造函数，通过该构造函数构造一个唯一约束对象
+     * Constructor for unique constraint
      *
-     * @param rows  初始化列数据，通过该列数据的传入定义唯一约束的一些初始值
-     * @param count 需要进行唯一约束的记录条目数
+     * @param constraintName name for unique constraint
+     * @param database schema for this unique constraint
+     * @param tableName table name which is related to this unique constraint
+     * @param consColumns the name of the column to which the constraint is associated
+     * @param rows initialize the column data, define some initial values of the unique constraint through the input of the column data
+     * @param count the row count which is needed to be verified
      */
     public UniqueConstraint(String constraintName, String database, String tableName,
             Map<String, Map<String, Integer>> consColumns, List<Map<String, Pair<AbstractDataType, Object>>> rows, int count) {
@@ -93,10 +102,10 @@ public class UniqueConstraint extends AbstractConstraint {
     }
 
     /**
-     * 转化方法，在这里需要将一行数据转化为一个字符串用于接下来的唯一性检测
+     * Convert method, which is to convert a data to string value, used to verify
      *
-     * @param row 一行数据
-     * @return 返回一行数据的字符串
+     * @param row row of data
+     * @return string value for this row of data
      */
     private String convert(Map<String, Pair<AbstractDataType, Object>> row) {
         List<String> list = new ArrayList<>();
@@ -115,12 +124,12 @@ public class UniqueConstraint extends AbstractConstraint {
     }
 
     /**
-     * 对列映射表进行排序，按照列的position进行排序
+     * Sort method, which is used to sort the map by every row's position stored in input map
      *
-     * @param map 映射表
-     * @return 返回排序好的集合
+     * @param map intput map
+     * @return sorted list of column name
      */
-    public static List<String> sortMapByValue(Map<String, Integer> map) {
+    private static List<String> sortMapByValue(Map<String, Integer> map) {
         if (map == null || map.isEmpty()) {
             return null;
         }
@@ -132,4 +141,5 @@ public class UniqueConstraint extends AbstractConstraint {
         }
         return sortedList;
     }
+
 }

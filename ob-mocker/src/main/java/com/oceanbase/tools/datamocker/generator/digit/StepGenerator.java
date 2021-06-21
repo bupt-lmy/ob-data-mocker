@@ -6,23 +6,20 @@ import com.oceanbase.tools.datamocker.generator.DigitalGeneratorBase;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
 
 /**
- * 步长数据生成器，用于生成指定步长的随机数据
+ * Step data generator, used to generate random data with specified step length
  *
  * @author yh263208
  * @date 2020-12-11 17:16
  * @since OBMOCKER_snapshot_0.1.0
  */
 public class StepGenerator extends DigitalGeneratorBase<BigDecimal> {
-    /**
-     * 步长
-     */
     private final double step;
     /**
-     * 当前生成的数
+     * Number currently generated
      */
     private BigDecimal currentDigit = null;
     /**
-     * s是否循环生成
+     * Whether to generate in a loop
      */
     private final boolean round;
 
@@ -51,11 +48,11 @@ public class StepGenerator extends DigitalGeneratorBase<BigDecimal> {
     }
 
     /**
-     * 步长为负数时的随机数生成逻辑
+     * Random number generation logic when the step size is negative
      *
-     * @param minValue 生成的最小值
-     * @param maxValue 生成的最大值
-     * @return 返回生成的随机数值
+     * @param minValue Minimum value generated
+     * @param maxValue Maximum value generated
+     * @return Returns the generated random value
      */
     private BigDecimal minusStep(BigDecimal minValue, BigDecimal maxValue) {
         if (currentDigit == null) {
@@ -74,11 +71,11 @@ public class StepGenerator extends DigitalGeneratorBase<BigDecimal> {
     }
 
     /**
-     * 步长为正数时的随机数生成逻辑
+     * Random number generation logic when the step size is positive
      *
-     * @param minValue 生成的最小值
-     * @param maxValue 生成的最大值
-     * @return 返回生成的随机数值
+     * @param minValue Minimum value generated
+     * @param maxValue Maximum value generated
+     * @return Returns the generated random value
      */
     private BigDecimal positive(BigDecimal minValue, BigDecimal maxValue) {
         if (currentDigit == null) {

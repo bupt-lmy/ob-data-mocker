@@ -5,7 +5,7 @@ import java.sql.Date;
 import com.oceanbase.tools.datamocker.generator.DateGeneratorBase;
 
 /**
- * date类型的空数据生成器
+ * Null data generator of date type
  *
  * @author yh263208
  * @date 2021-01-26 14:42

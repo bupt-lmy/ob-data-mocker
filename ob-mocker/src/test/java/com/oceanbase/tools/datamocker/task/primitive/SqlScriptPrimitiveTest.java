@@ -27,7 +27,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 /**
- * sql脚本生成原语测试类
+ * sql script generates primitive test class
  *
  * @author yh263208
  * @date 2021-01-05 21:10
@@ -36,13 +36,7 @@ import org.junit.rules.ExpectedException;
 public class SqlScriptPrimitiveTest extends MockerTestBase {
     @Rule
     public ExpectedException expect = ExpectedException.none();
-    /**
-     * 列信息
-     */
     private final static List<String> columnList = Arrays.asList("COL1", "COL2", "COL3");
-    /**
-     * mock数据文件管理器
-     */
     private MockerFile manager = null;
 
     @Before
@@ -50,12 +44,6 @@ public class SqlScriptPrimitiveTest extends MockerTestBase {
         manager = new MockerFile("test/mock/mock.sql", ScriptType.SQL);
     }
 
-    /**
-     * 获取一个测试用的随机数据块
-     *
-     * @param size 数据行数
-     * @return 返回数据
-     */
     private List<Map<String, Pair<AbstractDataType, Object>>> getRows(int size) {
         List<Map<String, Pair<AbstractDataType, Object>>> list = new ArrayList<>();
         for (int i = 0; i < size; i++) {

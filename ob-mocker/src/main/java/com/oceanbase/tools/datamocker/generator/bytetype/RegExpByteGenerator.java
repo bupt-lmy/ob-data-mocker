@@ -5,7 +5,8 @@ import com.oceanbase.tools.datamocker.generator.chartype.RegExpGenerator;
 import com.oceanbase.tools.datamocker.model.enums.CharCaseOption;
 
 /**
- * 正则表达式字符串生成器，用于生成符合要求的正则表达式
+ * Regular expression string generator,
+ * used to generate regular expressions that meet the requirements
  *
  * @author yh263208
  * @date 2021-01-16 20:06

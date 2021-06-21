@@ -11,7 +11,7 @@ import com.oceanbase.tools.datamocker.model.exception.MockerException;
 import com.oceanbase.tools.datamocker.util.Range;
 
 /**
- * 范围数据生成器，用于在特定范围内生成数据
+ * Range data generator, used to generate data within a specific range
  *
  * @author yh263208
  * @date 2020-12-11 21:20
@@ -19,14 +19,15 @@ import com.oceanbase.tools.datamocker.util.Range;
  */
 public class RangeGenerator extends DigitalGeneratorBase<BigDecimal> {
     /**
-     * 权重映射表
+     * Weight mapping table
      */
     private final Map<Range<BigDecimal>, Double> weightMap;
 
     /**
-     * 构造函数，传入一个权重映射集合，需要注意的是该权重映射集合中的权重相加必须等于一，否则报错
+     * Constructor, pass in a weight mapping set, note that the weights in the
+     * weight mapping set must add up to one, otherwise an error will be reported
      *
-     * @param weightMap 权重映射表
+     * @param weightMap Weight mapping table
      */
     public RangeGenerator(Map<Range<BigDecimal>, Double> weightMap) {
         this.weightMap = weightMap;
@@ -79,9 +80,9 @@ public class RangeGenerator extends DigitalGeneratorBase<BigDecimal> {
     }
 
     /**
-     * 获取一个随机数生成范围
+     * Get a random number generation range
      *
-     * @return 返回范围
+     * @return Return range
      */
     private Range getRange() {
         double random = Math.random();
@@ -101,9 +102,9 @@ public class RangeGenerator extends DigitalGeneratorBase<BigDecimal> {
     }
 
     /**
-     * 这种生成方法可以生成无限的不重复数据，因此返回null
+     * This generation method can generate unlimited unique data, so it returns null
      *
-     * @return 返回null代表可以生成无限量的不重复数据
+     * @return Returning null means that an unlimited amount of unique data can be generated
      */
     @Override
     public Long count(BigDecimal minValue, BigDecimal maxValue) {

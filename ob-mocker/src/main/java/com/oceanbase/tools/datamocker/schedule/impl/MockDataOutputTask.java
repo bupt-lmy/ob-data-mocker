@@ -14,7 +14,7 @@ import com.oceanbase.tools.datamocker.util.Pair;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * mock数据输出任务，用于将数据写出到定义的输出源中
+ * Mock data output task, used to write data to the defined output source
  *
  * @author yh263208
  * @date 2021-01-17 15:32
@@ -23,11 +23,11 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class MockDataOutputTask extends AbstractMockTask {
     /**
-     * 输出原语
+     * Output primitive
      */
     private final List<AbstractMockWriter> writers;
     /**
-     * 标记数据写出原语是否可写的标志位
+     * Mark the data to write out the flag bit whether the primitive is writable
      */
     private final List<Boolean> writerSymbols;
 

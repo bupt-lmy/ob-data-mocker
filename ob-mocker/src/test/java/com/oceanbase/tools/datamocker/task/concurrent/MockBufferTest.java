@@ -41,7 +41,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * mock数据缓冲对象测试类
+ * mock data buffer object test class
  *
  * @author yh263208
  * @date 2021-01-16 17:28
@@ -49,34 +49,16 @@ import org.junit.Test;
  */
 @Slf4j
 public class MockBufferTest extends MockerTestBase {
-    /**
-     * mysql数据库连接配置文件所在地
-     */
     private final static String mysqlEnv = "db/mysql-env.properties";
-    /**
-     * oracle数据库连接配置文件所在地
-     */
     private final static String oracleEnv = "db/oracle-env.properties";
-    /**
-     * 列信息
-     */
     private final String ddl = "CREATE TABLE \"EMP\" (\n"
                                + "  \"COL1\" NUMBER(5,2) NOT NULL,\n"
                                + "  \"COL2\" NUMBER(5,2) NOT NULL,\n"
                                + "  \"COL3\" NUMBER(5,3) NOT NULL\n"
                                + "); ";
     private DataSource dataSource;
-    /**
-     * mock数据文件管理器
-     */
     private MockerFile manager;
 
-    /**
-     * 获取测试数据库连接配置信息
-     *
-     * @param dialectType 方言类型
-     * @throws IOException 文件读取操作可能会抛出异常
-     */
     private DataBaseConfig getDBConfig(ObModeType dialectType) throws IOException {
         DataBaseConfig config = new DataBaseConfig();
         Properties properties = new Properties();
@@ -99,11 +81,6 @@ public class MockBufferTest extends MockerTestBase {
         return config;
     }
 
-    /**
-     * 初始化环境，创建一个目标表
-     *
-     * @param dataSource 数据库连接池
-     */
     private void initEnv(DataSource dataSource) throws SQLException {
         try (Connection connection = dataSource.getConnection()) {
             try (PreparedStatement statement = connection.prepareStatement(this.ddl)) {
@@ -120,11 +97,6 @@ public class MockBufferTest extends MockerTestBase {
         manager = new MockerFile("test/mock/mock.sql", ScriptType.SQL);
     }
 
-    /**
-     * 获取生成表的结构映射表
-     *
-     * @return 返回映射表集合
-     */
     private Map<String, AbstractDataType> getTableSchma() {
         List<String> columns = Arrays.asList("COL1", "COL2", "COL3");
         Map<String, AbstractDataType> map = new HashMap<>();
@@ -134,12 +106,6 @@ public class MockBufferTest extends MockerTestBase {
         return map;
     }
 
-    /**
-     * 获取列生成原语
-     *
-     * @param columnName 列原语的列名
-     * @return 返回列原语集合
-     */
     private ColumnReader<BigDecimal> getPrimitive(String columnName) {
         OracleNumberType number = new OracleNumberType(5, 2, null, false);
         BigDecimal expectAvg = new BigDecimal("12");
@@ -148,11 +114,6 @@ public class MockBufferTest extends MockerTestBase {
         return new ColumnReader<>(number, columnName, null);
     }
 
-    /**
-     * 开始数据生成任务
-     *
-     * @param dataPipe 数据通信管道
-     */
     private void startDataGenerateTask(AbstractDataPipe dataPipe, int batchSize, int maxCount) {
         Map<String, AbstractDataType> map = getTableSchma();
         MockerBuffer buffer = new MockerBuffer(map, (long) batchSize);
@@ -268,11 +229,6 @@ public class MockBufferTest extends MockerTestBase {
         }
     }
 
-    /**
-     * 关闭环境，创建一个目标表
-     *
-     * @param dataSource 一个数据连接
-     */
     private void closeEnv(DataSource dataSource) throws SQLException {
         String sql = "drop table emp";
         try (Connection connection = dataSource.getConnection()) {
@@ -283,7 +239,7 @@ public class MockBufferTest extends MockerTestBase {
     }
 
     @After
-    public void clear() throws IOException, SQLException {
+    public void clear() throws SQLException {
         try {
             manager.clear();
         } catch (Exception e) {

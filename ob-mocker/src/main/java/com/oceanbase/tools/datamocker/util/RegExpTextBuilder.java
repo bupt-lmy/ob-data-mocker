@@ -15,7 +15,7 @@ import dk.brics.automaton.Transition;
 import org.apache.commons.lang.StringUtils;
 
 /**
- * 正则表达式生成工具类
+ * Regular expression generation tool class
  *
  * @author yh263208
  * @date 2021-01-16 19:48
@@ -23,27 +23,29 @@ import org.apache.commons.lang.StringUtils;
  */
 public class RegExpTextBuilder {
     /**
-     * 匹配特殊的正则表达式，这种正则表达式需要被进行改写
+     * Match a special regular expression,
+     * this regular expression needs to be rewritten
      */
     private static final Pattern PATTERN_REQUOTED = Pattern.compile("\\\\Q(.*?)\\\\E");
     /**
-     * 需要对PATTERN_REQUOTED中匹配到的正则表达式进行替换
+     * Need to replace the regular expression matched in PATTERN_REQUOTED
      */
     private static final Pattern PATTERN_SPECIAL = Pattern.compile("[.^$*+?(){|\\[\\\\@]");
     /**
-     * 正则表达式代表的自动机实例
+     * Examples of automata represented by regular expressions
      */
     private final Automaton automaton;
     /**
-     * 遍历自动机可能遇到多个路径，利用一个随机对象来增加生成数据的多样性
+     * Traversing automata may encounter multiple paths,
+     * and use a random object to increase the diversity of generated data
      */
     private Random random;
 
     /**
-     * 构造函数，用于构造一个正则表达式工具类
+     * Constructor, used to construct a regular expression tool class
      *
-     * @param regex  正则表达式
-     * @param random 随机对象
+     * @param regex  Regular expression
+     * @param random Random object
      */
     public RegExpTextBuilder(String regex, Random random) {
         if (StringUtils.isBlank(regex) || random == null) {
@@ -54,18 +56,18 @@ public class RegExpTextBuilder {
     }
 
     /**
-     * 标准构造函数
+     * Standard constructor
      *
-     * @param regex 正则表达式
+     * @param regex Regular expression
      */
     public RegExpTextBuilder(String regex) {
         this(regex, new Random());
     }
 
     /**
-     * 获取一个符合正则表达式的字符串
+     * Get a string that conforms to a regular expression
      *
-     * @return 返回字符串
+     * @return Return string
      */
     public String generate() {
         StringBuilder builder = new StringBuilder();
@@ -74,11 +76,11 @@ public class RegExpTextBuilder {
     }
 
     /**
-     * 生成宇哥符合长度规范的正则表达式字符串
+     * Generate a regular expression string that meets the length specification
      *
-     * @param minLength 字符串的最小长度
-     * @param maxLength 字符串的最大长度
-     * @return 返回字符串
+     * @param minLength Minimum length of string
+     * @param maxLength The maximum length of the string
+     * @return Return string
      */
     public String generate(int minLength, int maxLength) {
         final StringBuilder builder = new StringBuilder();
@@ -156,10 +158,11 @@ public class RegExpTextBuilder {
     }
 
     /**
-     * 需要对正则表达式进行改写，去掉其中的特殊部分
+     * Need to rewrite the regular expression,
+     * remove the special part
      *
-     * @param regex 正则表达式字符串
-     * @return 返回正则表达式
+     * @param regex Regular expression string
+     * @return Return regular expression
      */
     private static String requote(String regex) {
         StringBuilder sb = new StringBuilder(regex);

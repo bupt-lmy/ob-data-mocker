@@ -7,7 +7,7 @@ import com.oceanbase.tools.datamocker.model.enums.CharsetType;
 import com.oceanbase.tools.datamocker.model.enums.ObModeType;
 
 /**
- * mysq模式下的text类型
+ * Text type in mysql mode
  *
  * @author yh263208
  * @date 2021-01-13 12:29
@@ -15,11 +15,14 @@ import com.oceanbase.tools.datamocker.model.enums.ObModeType;
  */
 public class MysqlTextType extends AbstractCharDataType {
     /**
-     * 构造函数
+     * Constructor
      *
-     * @param charsetType 字符类型的编码格式
-     * @param generator   字符类型绑定的数据生成器
-     * @param allowNull   是否允许空值
+     * @param length       data length for text type
+     * @param defaultValue default value for data type
+     * @param isUnicode    Whether it is a unicode character
+     * @param charsetType  Character type encoding format
+     * @param generator    Character type binding data generator
+     * @param allowNull    Whether to allow null values
      */
     public MysqlTextType(Integer length, String defaultValue, Boolean allowNull, CharsetType charsetType, CharGeneratorBase generator,
             Boolean isUnicode) {
@@ -27,10 +30,13 @@ public class MysqlTextType extends AbstractCharDataType {
     }
 
     /**
-     * 构造函数
+     * Constructor
      *
-     * @param charsetType 字符类型的编码格式
-     * @param allowNull   是否允许空值
+     * @param length data length for text type
+     * @param defaultValue default value for data type
+     * @param isUnicode Whether it is a unicode character
+     * @param charsetType Character type encoding format
+     * @param allowNull Whether to allow null values
      */
     public MysqlTextType(Integer length, String defaultValue, Boolean allowNull, CharsetType charsetType, Boolean isUnicode) {
         super(ObModeType.OB_MYSQL, charsetType, length, defaultValue, allowNull, isUnicode);

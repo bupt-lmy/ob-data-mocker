@@ -10,7 +10,8 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 /**
- * 工具类的测试类，用于测试重复值检测工具类的测试类
+ * The test class of the tool class, which is used to test the test class
+ * of the repeated value detection tool class
  *
  * @author yh263208
  * @date 2021-01-10 23:13

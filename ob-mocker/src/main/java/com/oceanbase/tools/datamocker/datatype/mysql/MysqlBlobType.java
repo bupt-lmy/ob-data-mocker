@@ -6,7 +6,7 @@ import com.oceanbase.tools.datamocker.generator.ByteGeneratorBase;
 import com.oceanbase.tools.datamocker.model.enums.ObModeType;
 
 /**
- * mysql模式下的blob类型
+ * Blob type in mysql mode
  *
  * @author yh263208
  * @date 2020-12-16 10:23
@@ -14,16 +14,17 @@ import com.oceanbase.tools.datamocker.model.enums.ObModeType;
  */
 public class MysqlBlobType extends AbstractByteDataType {
     /**
-     * 数据类型的长度
+     * The length of the data type
      */
     private final Integer length;
 
     /**
-     * 构造函数
+     * Constructor
      *
-     * @param generator 字符类型绑定的数据生成器
-     * @param length    数据类型长度
-     * @param allowNull 是否允许空值
+     * @param generator    Character type binding data generator
+     * @param length       Data type length
+     * @param allowNull    Whether to allow null values
+     * @param defaultValue default value for byte type
      */
     public MysqlBlobType(Integer length, byte[] defaultValue, Boolean allowNull, ByteGeneratorBase generator) {
         super(generator, ObModeType.OB_MYSQL, defaultValue, allowNull);
@@ -31,11 +32,11 @@ public class MysqlBlobType extends AbstractByteDataType {
     }
 
     /**
-     * 构造函数
+     * Constructor
      *
-     * @param allowNull    是否允许空值
-     * @param length       最大允许长度
-     * @param defaultValue 默认值
+     * @param length Data type length
+     * @param allowNull Whether to allow null values
+     * @param defaultValue default value for byte type
      */
     public MysqlBlobType(Integer length, byte[] defaultValue, Boolean allowNull) {
         super(ObModeType.OB_MYSQL, defaultValue, allowNull);

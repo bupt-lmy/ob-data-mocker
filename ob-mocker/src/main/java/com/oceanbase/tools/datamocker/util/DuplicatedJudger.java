@@ -7,7 +7,7 @@ import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
 
 /**
- * 工具类，用于判断某个值是否重复出现过
+ * Tool class, used to determine whether a value has repeatedly appeared
  *
  * @author yh263208
  * @date 2021-01-10 22:56
@@ -15,19 +15,19 @@ import com.oceanbase.tools.datamocker.model.exception.MockerException;
  */
 public class DuplicatedJudger {
     /**
-     * 集合，用于较少数据量时是否重复的判断
+     * Set, used for judging whether it is repeated when the amount of data is small
      */
     private Set set;
     /**
-     * 位图，用于较多数据量时数据是否重复的判断
+     * Bitmap, used to judge whether the data is duplicated when there is a large amount of data
      */
     private BitMap bitMap;
     /**
-     * 能够承载的最大数量
+     * The maximum number that can be carried
      */
     private final int maxCount;
     /**
-     * 当前的游标
+     * Current cursor
      */
     private int cursor;
 

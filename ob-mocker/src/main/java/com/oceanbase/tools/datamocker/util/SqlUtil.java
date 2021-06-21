@@ -17,7 +17,7 @@ import com.oceanbase.tools.datamocker.model.exception.MockerException;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * sql执行工具类，用于执行sql
+ * sql execution tool class, used to execute sql
  *
  * @author yh263208
  * @date 2021-01-26 21:59
@@ -26,12 +26,12 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class SqlUtil {
     /**
-     * 执行sql查询
+     * Execute sql query
      *
-     * @param connection 数据库连接
-     * @param sql        sql文本
-     * @param params     参数
-     * @param callBack   回调函数
+     * @param connection Database Connectivity
+     * @param sql        sql text
+     * @param params     parameter
+     * @param callBack   Callback method
      */
     public static void executeQuery(Connection connection, String sql, Object[] params, AbstractCallBack<ResultSet> callBack)
             throws Throwable {
@@ -87,12 +87,12 @@ public class SqlUtil {
     }
 
     /**
-     * 执行sql查询
+     * Execute sql query
      *
-     * @param dataSource 数据库连接池
-     * @param sql        sql文本
-     * @param params     参数
-     * @param callBack   回调函数
+     * @param dataSource Database connection pool
+     * @param sql sql text
+     * @param params parameter
+     * @param callBack callback method
      */
     public static void executeQuery(DataSource dataSource, String sql, Object[] params, AbstractCallBack<ResultSet> callBack)
             throws Throwable {
@@ -113,12 +113,12 @@ public class SqlUtil {
     }
 
     /**
-     * 执行sql查询
+     * Execute sql query
      *
-     * @param connection 数据库连接
-     * @param sql        sql文本
-     * @param params     参数
-     * @param callBack   回调函数
+     * @param connection Database connection
+     * @param sql sql text
+     * @param params parameter
+     * @param callBack callback method
      */
     public static void executeUpdate(Connection connection, String sql, Object[] params, AbstractCallBack<Integer> callBack)
             throws Throwable {
@@ -172,12 +172,12 @@ public class SqlUtil {
     }
 
     /**
-     * 执行sql查询
+     * Execute sql query
      *
-     * @param dataSource 数据库连接池
-     * @param sql        sql文本
-     * @param params     参数
-     * @param callBack   回调函数
+     * @param dataSource Database connection pool
+     * @param sql sql text
+     * @param params parameter
+     * @param callBack callback method
      */
     public static void executeUpdate(DataSource dataSource, String sql, Object[] params, AbstractCallBack<Integer> callBack)
             throws Throwable {
@@ -198,12 +198,12 @@ public class SqlUtil {
     }
 
     /**
-     * 执行sql批处理更新操作
+     * Execute sql query
      *
-     * @param connection 数据库连接
-     * @param sql        sql文本
-     * @param params     参数
-     * @param callBack   回调函数
+     * @param connection Database connection
+     * @param sql sql text
+     * @param params parameter
+     * @param callBack callback method
      */
     public static void executeBatch(Connection connection, String sql, Object[][] params, AbstractCallBack<int[]> callBack)
             throws Throwable {
@@ -270,12 +270,12 @@ public class SqlUtil {
     }
 
     /**
-     * 执行sql批处理更新操作
+     * Perform batch operations
      *
-     * @param dataSource 数据库连接池
-     * @param sql        sql文本
-     * @param params     参数
-     * @param callBack   回调函数
+     * @param dataSource Database connection pool
+     * @param sql sql text
+     * @param params parameter
+     * @param callBack callback method
      */
     public static void executeBatch(DataSource dataSource, String sql, Object[][] params, AbstractCallBack<int[]> callBack)
             throws Throwable {

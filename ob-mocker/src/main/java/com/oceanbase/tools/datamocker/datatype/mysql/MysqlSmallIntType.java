@@ -8,7 +8,7 @@ import com.oceanbase.tools.datamocker.generator.DigitalGeneratorBase;
 import com.oceanbase.tools.datamocker.model.enums.ObModeType;
 
 /**
- * mysql模式下的smallInt数据类型
+ * smallInt data type in mysql mode
  *
  * @author yh263208
  * @date 2021-01-28 20:09
@@ -16,12 +16,12 @@ import com.oceanbase.tools.datamocker.model.enums.ObModeType;
  */
 public class MysqlSmallIntType extends AbstractDigitDataType<BigDecimal> {
     /**
-     * smallInt类型的构造函数
+     * Constructor of smallIntType type
      *
-     * @param generator    数据生成器
-     * @param defaultValue 默认值
-     * @param allowNull    是否允许为空
-     * @param signed       是否为有符号数
+     * @param generator    Data generator
+     * @param defaultValue default value for int type
+     * @param allowNull    Whether it is allowed to be empty
+     * @param signed       Is it a signed number
      */
     public MysqlSmallIntType(DigitalGeneratorBase<BigDecimal> generator, BigDecimal defaultValue, Boolean allowNull, Boolean signed) {
         super(generator, ObModeType.OB_MYSQL, defaultValue, allowNull, signed);
@@ -34,10 +34,11 @@ public class MysqlSmallIntType extends AbstractDigitDataType<BigDecimal> {
     }
 
     /**
-     * 转换方法，由于mysql复用了oracle模式的数据生成器，数据使用BigDecimal进行计算必须使用转化方法进行数据类型转换
+     * Conversion method, because mysql reuses the data generator in oracle mode,
+     * the data must be calculated using BigDecimal for data type conversion.
      *
-     * @param value 原值
-     * @return 转换值
+     * @param value original value
+     * @return converted value
      */
     @Override
     public BigDecimal convert(Object value) {

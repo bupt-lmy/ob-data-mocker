@@ -4,7 +4,7 @@ import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 /**
- * 日期类型的数据生成器
+ * Date type data generator
  *
  * @author yh263208
  * @date 2020-12-16 16:27
@@ -12,85 +12,60 @@ import java.util.concurrent.TimeUnit;
  */
 public abstract class DateGeneratorBase<T extends Comparable> extends BaseGenerator<T, T> {
     /**
-     * 数据生成器的最小精度单位，默认使用date类型的秒
+     * The smallest precision unit of the data generator, the second of the date type is used by default
      */
     private TimeUnit timeUnit = TimeUnit.SECONDS;
     /**
-     * 日期精度，主要针对于时间戳类型
+     * Date precision, mainly for the timestamp type
      */
     private int scale;
 
-    /**
-     * 设置精度
-     *
-     * @param scale 精度
-     */
     public void setScale(int scale) {
         this.scale = scale;
     }
 
-    /**
-     * 获取精度
-     *
-     * @return 返回精度
-     */
     protected int scale() {
         return this.scale;
     }
 
-    /**
-     * 设置日期精度
-     *
-     * @param timeUnit 精度单位
-     */
     public void setTimeUnit(TimeUnit timeUnit) {
         this.timeUnit = timeUnit;
     }
 
-    /**
-     * 获取纳秒值
-     *
-     * @return 返回纳秒值
-     */
     protected int getnano() {
         return new Random().nextInt(new Double(Math.pow(10, scale)).intValue());
     }
 
-    /**
-     * 获取日期精度
-     *
-     * @return 返回日期精度
-     */
     public TimeUnit timeUnit() {
         return this.timeUnit;
     }
 
     /**
-     * 预检查步骤，用于根据边界值校验该生成器是否可以正常工作
+     * Pre-checking step, used to check whether the generator can work normally according to the boundary value
      *
-     * @param startTime\ 最小值，
-     * @param endTime    最大值
-     * @return 返回校验结果
+     * @param startTime min timestamp for a date type
+     * @param endTime   max timestamp for a date type
+     * @return Return the verification result
      */
     @Override
     abstract public Boolean preCheck(T startTime, T endTime);
 
     /**
-     * 数据生成方法接口
+     * Get generated data
      *
-     * @param startTime 最小值，对于不同类型的数据生成器含义略有不同，对于数字型的生成任务反映的是生成数字的最小值，
-     *                  如果是字符型的生成任务反映的是字符的字节最小值
-     * @param endTime   最大值，对于不同类型的数据生成器含义略有不同，对于数字型的生成任务反映的是生成数字的最小值，
-     *                  如果是字符型的生成任务反映的是字符的字节最小值
-     * @return 返回一个生成的具体值
+     * @param startTime The left boundary value has slightly different meanings for different types of data generators.
+     *                  For date-type data generation tasks, it indicates the start time
+     * @param endTime The right boundary value has slightly different meanings for different types of data generators.
+     *                For date-type data generation tasks, it indicates the end time
+     * @return Returns a generated specific value
      */
     @Override
     abstract public T generate(T startTime, T endTime);
 
     /**
-     * 返回数据生成器一共能够生成的不重复的数据个数
+     * Return the total number of unique data that the data generator can generate
      *
-     * @return 返回具体的数值，如果数据生成器可以无限制生成数据则返回null
+     * @return Return a specific value, or null if the data generator can generate data without limitation
      */
     @Override
     abstract public Long count(T startTime, T endTime);

@@ -21,7 +21,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * 列生成任务的配置对象的测试类
+ * The test class of the configuration object of the column generation task
  *
  * @author yh263208
  * @date 2020-12-25 17:36
@@ -41,9 +41,6 @@ public class ColumnConfigTest extends MockerTestBase {
     private DefaultColumnConfig config = null;
     private int length = 128;
 
-    /**
-     * 初始化一个数字类型的数据生成器配置
-     */
     private DigitDataTypeConfig initDigitConfig() {
         DigitDataTypeConfig digit = new DigitDataTypeConfig();
         digit.setColumnType(typeName);
@@ -56,9 +53,6 @@ public class ColumnConfigTest extends MockerTestBase {
         return digit;
     }
 
-    /**
-     * 初始化一个字符类型的数据生成器配置
-     */
     private CharDataTypeConfig initCharConfig() {
         CharDataTypeConfig charConfig = new CharDataTypeConfig();
         charConfig.setColumnType("OB_ORACLE_CHAR");

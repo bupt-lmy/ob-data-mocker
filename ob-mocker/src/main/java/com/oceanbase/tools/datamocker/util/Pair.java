@@ -3,7 +3,9 @@ package com.oceanbase.tools.datamocker.util;
 import java.util.UUID;
 
 /**
- * 自定义一个Java对象用于表示Java配对，jfxrt.jar提供的Pair在很多版本的jdk上都不存在，造成很大的编译困难
+ * A custom Java object is used to represent the Java pairing.
+ * The Pair provided by jfxrt.jar does not exist on many versions of jdk,
+ * causing great compilation difficulties
  *
  * @author yh263208
  * @date 2020-12-31 17:50

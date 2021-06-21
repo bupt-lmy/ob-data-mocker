@@ -8,7 +8,7 @@ import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
 
 /**
- * 生成正态分布随机数的数据生成器
+ * A data generator that generates normally distributed random numbers
  *
  * @author yh263208
  * @date 2020-12-11 16:50
@@ -16,11 +16,11 @@ import com.oceanbase.tools.datamocker.model.exception.MockerException;
  */
 public class NormalGenerator extends DigitalGeneratorBase<BigDecimal> {
     /**
-     * 正态分布的标准差
+     * Standard deviation of normal distribution
      */
     private final double variance;
     /**
-     * 正态分布的平均值
+     * The mean of the normal distribution
      */
     private final double average;
 

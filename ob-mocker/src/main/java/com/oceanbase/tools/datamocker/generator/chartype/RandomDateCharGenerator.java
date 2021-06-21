@@ -11,27 +11,20 @@ import com.oceanbase.tools.datamocker.model.exception.MockerException;
 import org.apache.commons.lang.StringUtils;
 
 /**
- * 随机日期数据生成器
+ * Random date data generator
  *
  * @author yh263208
  * @date 2020-12-16 00:08
  * @since OBMOCKER_snapshot_0.1.0
  */
 public class RandomDateCharGenerator extends CharGeneratorBase {
-    /**
-     * 日期格式
-     */
     private static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
     /**
-     * 日期格式化
-     */
-    private final SimpleDateFormat formater = new SimpleDateFormat(DATE_FORMAT);
-    /**
-     * 开始的时间戳
+     * Start timestamp
      */
     private final long startTime;
     /**
-     * 结束的时间戳
+     * End timestamp
      */
     private final long endTime;
 
@@ -47,6 +40,7 @@ public class RandomDateCharGenerator extends CharGeneratorBase {
         this.endTime = endTime;
         if (StringUtils.isNotBlank(timezone)) {
             TimeZone zone = TimeZone.getTimeZone(timezone);
+            SimpleDateFormat formater = new SimpleDateFormat(DATE_FORMAT);
             formater.setTimeZone(zone);
         }
     }
@@ -65,6 +59,7 @@ public class RandomDateCharGenerator extends CharGeneratorBase {
     @Override
     public String generate(Integer minLength, Integer maxLength) {
         long timstamp = (long) (Math.random() * (endTime - startTime) + startTime);
+        SimpleDateFormat formater = new SimpleDateFormat(DATE_FORMAT);
         return formater.format(new Date(timstamp));
     }
 

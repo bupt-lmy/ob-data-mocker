@@ -5,7 +5,7 @@ import com.oceanbase.tools.datamocker.generator.chartype.RandomNumGenerator;
 import com.oceanbase.tools.datamocker.model.enums.CharCaseOption;
 
 /**
- * 随机数字生成器
+ * Random number generator
  *
  * @author yh263208
  * @date 2020-12-16 23:38

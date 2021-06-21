@@ -8,7 +8,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 /**
- * oracle模式下char类型的测试类
+ * Char type test class in oracle mode
  *
  * @author yh263208
  * @date 2020-12-16 16:06
@@ -16,7 +16,8 @@ import org.junit.Test;
  */
 public class CharTest extends MockerTestBase {
     /**
-     * 测试正向逻辑，测试针对char对象给定精度以及有效位数时返回的结果是否符合预期
+     * Test the forward logic, test whether the returned result meets expectations
+     * when the precision and effective digits are given for the char object
      */
     @Test
     public void testMinAndMaxValueForChar() {
@@ -31,9 +32,6 @@ public class CharTest extends MockerTestBase {
         Assert.assertEquals(maxValue, charType.highValue());
     }
 
-    /**
-     * 测试正向逻辑，测试针对char对象给定精度以及有效位数在数据生成器生成数据的情况下是否生成的数据符合范围
-     */
     @Test
     public void testRandomGeneratorForChar() {
         RandomGenerator generator = new RandomGenerator(CharCaseOption.DEFAULT);

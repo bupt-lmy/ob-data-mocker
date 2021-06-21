@@ -25,7 +25,7 @@ import org.apache.commons.lang.Validate;
 import org.slf4j.MDC;
 
 /**
- * 抽象调度器，通过实现该调度器实现任务的线程调度
+ * Abstract scheduler, through the realization of the scheduler to achieve task thread scheduling
  *
  * @author yh263208
  * @date 2021-01-18 00:37
@@ -34,15 +34,15 @@ import org.slf4j.MDC;
 @Slf4j
 public abstract class AbstractScheduler {
     /**
-     * 线程池的初始大小
+     * The initial size of the thread pool
      */
     private static final int CORE_POOL_SIZE;
     /**
-     * 线程池的最大大小
+     * The maximum size of the thread pool
      */
     private static final int MAX_POOL_SIZE;
     /**
-     * 线程池的对象封装
+     * Object encapsulation of thread pool
      */
     private MockExecutorService service;
     private final long startTimestamp;
@@ -65,10 +65,10 @@ public abstract class AbstractScheduler {
     }
 
     /**
-     * 任务执行方法，抽象调度器使用该方法进行任务的实际执行
+     * Task execution method, the abstract scheduler uses this method for the actual execution of the task
      *
-     * @param dispatcher 分发器对象
-     * @return 一共执行的任务数量
+     * @param dispatcher Dispatcher object
+     * @return Total number of tasks performed
      */
     public MockContext execute(Dispatcher<TableTaskInfo> dispatcher) {
         log.info("Thread pool's initialization has been done. coreSize={},maxSize={}", CORE_POOL_SIZE, MAX_POOL_SIZE);
@@ -216,10 +216,11 @@ public abstract class AbstractScheduler {
     }
 
     /**
-     * 调度器线程退出前需要清理分发器对象内部没有执行完的任务的资源
+     * Before the scheduler thread exits,
+     * it is necessary to clean up the resources of the unfinished tasks inside the dispatcher object
      *
-     * @param dispatcher 分发器对象
-     * @throws Exception 释放资源可能发生异常
+     * @param dispatcher Dispatcher object
+     * @throws Exception The release of resources may be abnormal
      */
     private void clearResource(Dispatcher<TableTaskInfo> dispatcher) throws Exception {
         for (int i = 0; i < dispatcher.count(); i++) {
@@ -234,13 +235,14 @@ public abstract class AbstractScheduler {
     }
 
     /**
-     * 验证线程资源是否足够，该方法不抛出异常，如果验证不通过则直接抛出异常
+     * Verify that the thread resources are sufficient.
+     * This method does not throw an exception. If the verification fails, an exception will be thrown directly
      *
-     * @param columnGroups 列原语分组ID集合
-     * @param dataGroups   数据生成原语分组ID集合
-     * @param active       目前线程池中活跃的任务
-     * @param max          线程池的最大线程数
-     * @return 返回验证结果
+     * @param columnGroups Column primitive grouping ID collection
+     * @param dataGroups   Data generation primitive group ID collection
+     * @param active       Tasks currently active in the thread pool
+     * @param max          The maximum number of threads in the thread pool
+     * @return Return verification result
      */
     private boolean validateThreadResource(Set<Set<String>> columnGroups, Map<Set<String>, Integer> dataGroups, int active, int max) {
         int freeResource = max - active;
@@ -259,10 +261,11 @@ public abstract class AbstractScheduler {
     }
 
     /**
-     * 验证用户实现接口返回列原语分组集合是否合法，验证标准是各个分组ID集合之间不能有交集
+     * Verify that the user implements the interface to return the column primitive grouping set is legal,
+     * the verification standard is that there can be no intersection between the grouping ID sets
      *
-     * @param input 输入分组集合
-     * @throws MockerException 若验证失败则抛出异常
+     * @param input Input group set
+     * @throws MockerException If the verification fails, an exception is thrown
      */
     private void validateSet(Set<Set<String>> input) {
         List<Set<String>> middle = new ArrayList<>(input);
@@ -278,14 +281,13 @@ public abstract class AbstractScheduler {
     }
 
     /**
-     * 返回调度任务的历时
+     * Return the duration of the scheduled task
      *
-     * @return 返回调度任务执行的时间
+     * @return Return the execution time of the scheduled task
      */
     private long interval() {
         return System.currentTimeMillis() - startTimestamp;
     }
-
     /**
      * Get duration string value
      *
@@ -305,45 +307,46 @@ public abstract class AbstractScheduler {
     }
 
     /**
-     * 列生成原语的线程调度抽象方法，通过该方法实现列原语的调度
+     * The thread scheduling abstract method of column generation primitives,
+     * through which the scheduling of column primitives is realized
      *
-     * @param groups 列原语的分组ID集合
-     * @param active 当前线程池的活跃任务数量
-     * @param core   当前线程池的core size
-     * @param max    当前线程池的最大大小
-     * @return 返回group分组，每个分组分配一个线程资源
+     * @param groups Set of grouping IDs of column primitives
+     * @param active The number of active tasks in the current thread pool
+     * @param core The core size of the current thread pool
+     * @param max The maximum size of the current thread pool
+     * @return Return to the group group, each group is allocated a thread resource
      */
     abstract protected Set<Set<String>> scheduleColumnTask(Set<String> groups, int active, int core, int max);
 
     /**
-     * 数据写入原语的抽象调度方法，通过该方法调度数据原语
+     * An abstract scheduling method for data writing primitives, through which data primitives are dispatched
      *
-     * @param groups 数据原语的分组ID
-     * @param active 线程池的活跃任务数量
-     * @param core   线程池的core size
-     * @param max    线程池的最大容量
-     * @return 返回每个分组集合所分配的线程数量
+     * @param groups Group ID of the data primitive
+     * @param active Number of active tasks in the thread pool
+     * @param core The core size of the thread pool
+     * @param max Maximum capacity of thread pool
+     * @return Returns the number of threads allocated for each grouping set
      */
     abstract protected Map<Set<String>, Integer> scheduleDataTask(Set<String> groups, int active, int core, int max);
 
     /**
-     * 任务执行完成后调用的回调方法
+     * Callback method called after task execution is complete
      *
-     * @param context mock任务的执行上下文
+     * @param context Execution context of mock task
      */
     protected abstract void onSuccess(TableTaskContext context);
 
     /**
-     * 任务执行完成后调用的回调方法，任务失败时
+     * Callback method to be called after the task execution is completed, when the task fails
      *
-     * @param context mock任务的执行上下文
+     * @param context Execution context of mock task
      */
     protected abstract void onFailure(TableTaskContext context, Throwable e);
 
     /**
-     * 获取线程池对象，如果想使用默认的就可以直接返回null
+     * Get the thread pool object, if you want to use the default, you can directly return null
      *
-     * @return 返回线程池对象
+     * @return Return thread pool object
      */
     public abstract ThreadPoolExecutor pool();
 }

@@ -22,7 +22,7 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * mock数据的任务封装对象
+ * Task encapsulation object of mock data
  *
  * @author yh263208
  * @date 2021-01-17 22:52
@@ -31,37 +31,37 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class TableTask {
     /**
-     * 在一切任务执行前需要执行的任务，通常用来初始化测试环境
+     * Tasks that need to be executed before all tasks are executed, usually used to initialize the test environment
      */
     @Getter
     private AbstractMockTask beforeTask;
     /**
-     * 在一切任务执行后需要执行的任务，通常用于清理环境
+     * Tasks that need to be executed after all tasks are executed, usually used to clean up the environment
      */
     private AbstractMockTask afterTask;
     /**
-     * 实际的任务
+     * List of Business Tasks
      */
     private List<AbstractMockTask> businessTasks;
     /**
-     * 唯一的任务Id
+     * table task id
      */
     @Getter
     private final String tableTaskId;
     @Getter
     private final TableTaskContext context;
     /**
-     * 计数器，用于标定当前执行完成的任务数量
+     * Counter, used to calibrate the number of tasks currently executed
      */
     private final AtomicInteger counter = new AtomicInteger(0);
 
     /**
-     * taskbean的构造方法
+     * Constructor for TableTask
      *
-     * @param taskBean     表生成任务的bean封装对象
-     * @param columnGroups 列生成原语分组信息
-     * @param dataGroups   数据写出原语分组信息
-     * @param index        用于表明该TaskBean数据哪一个任务队列，任务队列在Dispatcher中的队列索引
+     * @param taskBean     Bean package object of table generation task
+     * @param columnGroups Column generation primitive grouping information
+     * @param dataGroups   Data write out primitive grouping information
+     * @param index        Used to indicate which task queue of the TaskBean data, the queue index of the task queue in the Dispatcher
      */
     public TableTask(TableTaskInfo taskBean, Set<Set<String>> columnGroups, Map<Set<String>, Integer> dataGroups, String taskName,
             int index) {
@@ -107,11 +107,11 @@ public class TableTask {
     }
 
     /**
-     * 初始化TaskBean
+     * Initialize TableTask
      *
-     * @param service  传入线程池封装对象
-     * @param callBack 回掉函数，TaskBean执行完毕后调用
-     * @throws MockerException 参数校验不通过抛出异常
+     * @param service Incoming thread pool package object
+     * @param callBack Callback function, called after TaskBean is executed
+     * @throws MockerException Parameter verification fails and throws an exception
      */
     public void init(MockExecutorService service, AbstractCallBack<TableTaskContext> callBack) {
         if (callBack == null || service == null) {
@@ -203,12 +203,6 @@ public class TableTask {
         });
     }
 
-    /**
-     * 启动after任务
-     *
-     * @param service  线程service对象
-     * @param callBack 回调方法
-     */
     private void startAfterTask(MockExecutorService service, AbstractCallBack callBack) throws Throwable {
         if (counter.incrementAndGet() == this.businessTasks.size()) {
             log.info("All mock data business tasks are completed, and the destructuring task is started");

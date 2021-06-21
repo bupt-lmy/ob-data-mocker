@@ -8,7 +8,8 @@ import com.oceanbase.tools.datamocker.schedule.AbstractScheduler;
 import com.oceanbase.tools.datamocker.schedule.MockContext;
 
 /**
- * 模拟数据对象，使用该对象进行进行实际的数据生成
+ * Simulate the data object,
+ * use the object for actual data generation
  *
  * @author yh263208
  * @date 2021-02-03 21:02
@@ -16,19 +17,19 @@ import com.oceanbase.tools.datamocker.schedule.MockContext;
  */
 public class ObDataMocker {
     /**
-     * mock数据任务对象，用于封装多表任务之间的拓扑关系
+     * Mock data task object, used to encapsulate the topological relationship between multi-table tasks
      */
     private final Dispatcher<TableTaskInfo> dispatcher;
     /**
-     * 调度器，用于向各个表生成任务调度线程资源
+     * Scheduler, used to generate task scheduling thread resources for each table
      */
     private final AbstractScheduler scheduler;
 
     /**
-     * 保护类型的构造函数，不能让用户通过new的方式手动创建
+     * The constructor of the protected type cannot be manually created by the user through the new method
      *
-     * @param dispatcher 封装任务拓扑关系的分发器对象
-     * @param scheduler  用于调度任务的调度器对象
+     * @param dispatcher Dispatcher object that encapsulates the topological relationship of tasks
+     * @param scheduler  Scheduler object for scheduling tasks
      */
     public ObDataMocker(Dispatcher<TableTaskInfo> dispatcher, AbstractScheduler scheduler) {
         this.dispatcher = dispatcher;
@@ -36,9 +37,9 @@ public class ObDataMocker {
     }
 
     /**
-     * 开启一个模拟数据任务
+     * Start a simulated data task
      *
-     * @return 返回模拟数据上下文
+     * @return Return to the simulation data context
      */
     public MockContext start() {
         if (this.scheduler == null) {
@@ -51,9 +52,9 @@ public class ObDataMocker {
     }
 
     /**
-     * 获取模拟数据多表任务的并发数
+     * Get the concurrency number of the simulation data multi-table task
      *
-     * @return 返回并发数
+     * @return Return the number of concurrent
      */
     public int size() {
         if (this.dispatcher == null) {
@@ -63,11 +64,11 @@ public class ObDataMocker {
     }
 
     /**
-     * 获取某个任务队列上任务的长度
+     * Get the length of a task on a task queue
      *
-     * @param index 索引
-     * @return 返回长度
-     * @throws Exception 可能是一个非法的索引值
+     * @param index index
+     * @return Return length
+     * @throws Exception May be an illegal index value
      */
     public int size(int index) throws Exception {
         if (index < 0 || this.dispatcher == null) {

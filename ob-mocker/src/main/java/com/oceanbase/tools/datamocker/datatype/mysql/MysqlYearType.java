@@ -11,7 +11,7 @@ import com.oceanbase.tools.datamocker.generator.DateGeneratorBase;
 import com.oceanbase.tools.datamocker.model.enums.ObModeType;
 
 /**
- * mysql模式下的year类型
+ * The year type in mysql mode
  *
  * @author yh263208
  * @date 2021-01-21 14:04
@@ -19,17 +19,13 @@ import com.oceanbase.tools.datamocker.model.enums.ObModeType;
  */
 public class MysqlYearType extends AbstractDateDataType {
     /**
-     * 时间戳类型的精度，该精度范围在0-6范围内
+     * The precision of the timestamp type, the precision range is in the range of 0-6
      */
     private final int scale;
     /**
-     * java应用程序中的日期格式化字符串
+     * Date format string in java application
      */
     private static final String JAVA_DATE_FORMAT = "yyyy";
-    /**
-     * 日期格式化器
-     */
-    private final SimpleDateFormat dateFormat = new SimpleDateFormat(JAVA_DATE_FORMAT);
 
     public MysqlYearType(DateGeneratorBase generator, int scale, Date defaultValue, Boolean allowNull) {
         super(generator, ObModeType.OB_MYSQL, defaultValue, allowNull);
@@ -38,11 +34,6 @@ public class MysqlYearType extends AbstractDateDataType {
         this.scale = scale;
     }
 
-    /**
-     * 绑定数据生成器方法
-     *
-     * @param generator 数据生成器
-     */
     @Override
     public void bind(BaseGenerator generator) {
         super.bind(generator);
@@ -76,6 +67,7 @@ public class MysqlYearType extends AbstractDateDataType {
         if (value == null) {
             return null;
         }
+        SimpleDateFormat dateFormat = new SimpleDateFormat(JAVA_DATE_FORMAT);
         return dateFormat.format((Date) value);
     }
 

@@ -1,7 +1,7 @@
 package com.oceanbase.tools.datamocker.model.enums;
 
 /**
- * 字符串类型的字符集枚举
+ * Character set enumeration of string type
  *
  * @author yh263208
  * @date 2020-12-06 21:39
@@ -9,7 +9,7 @@ package com.oceanbase.tools.datamocker.model.enums;
  */
 public enum CharsetType {
     /**
-     * utf-8字符编码格式
+     * utf-8 character encoding format
      */
     UTF_8 {
         @Override
@@ -18,7 +18,7 @@ public enum CharsetType {
         }
     },
     /**
-     * utf-8字符编码格式
+     * utf-8 character encoding format
      */
     AL32UTF8 {
         @Override
@@ -27,7 +27,7 @@ public enum CharsetType {
         }
     },
     /**
-     * utf-8字符编码格式
+     * utf-8 character encoding format
      */
     UTF8MB4 {
         @Override
@@ -36,7 +36,7 @@ public enum CharsetType {
         }
     },
     /**
-     * GBK编码格式
+     * gbk character encoding format
      */
     GBK {
         @Override
@@ -46,9 +46,9 @@ public enum CharsetType {
     };
 
     /**
-     * 获取编码格式的字符串名称
+     * Get the string name of the encoding format
      *
-     * @return 返回名称
+     * @return Return name
      */
     abstract public String getCharSet();
 }

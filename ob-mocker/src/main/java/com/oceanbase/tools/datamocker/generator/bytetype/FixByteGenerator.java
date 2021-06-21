@@ -5,7 +5,7 @@ import com.oceanbase.tools.datamocker.generator.chartype.FixCharGenerator;
 import com.oceanbase.tools.datamocker.model.enums.CharCaseOption;
 
 /**
- * 定值字节数据生成器
+ * Constant value byte data generator
  *
  * @author yh263208
  * @date 2020-12-16 23:09

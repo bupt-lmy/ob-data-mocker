@@ -17,7 +17,7 @@ import com.oceanbase.tools.datamocker.util.SqlUtil;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * mock数据业务逻辑执行完毕后的收尾任务，主要是统计当前表的数据量
+ * The finishing task after the execution of mock data business logic is mainly to count the data volume of the current table
  *
  * @author yh263208
  * @date 2021-01-14 10:54

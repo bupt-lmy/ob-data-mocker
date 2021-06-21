@@ -24,8 +24,11 @@ import com.oceanbase.tools.datamocker.util.MockerBuffer;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * 简单分发器工厂的实现类，用于生成简单的表生成任务分发器。这是针对mock数据第一期的简单分发器工厂类，只能用于处理不含外键约束，不含检查约束，唯一约束
- * 不包含虚拟列的表生成任务
+ * The implementation class of the simple dispatcher factory,
+ * used to generate a simple table generation task dispatcher.
+ * This is a simple dispatcher factory class for the first phase of mock data.
+ * It can only be used to process table generation tasks that do not contain foreign key constraints,
+ * do not contain check constraints, and unique constraints do not contain virtual columns.
  *
  * @author yh263208
  * @date 2021-01-11 21:41

@@ -7,7 +7,7 @@ import com.oceanbase.tools.datamocker.util.Pair;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * 列数据读取器
+ * Column reader, which is used to get a column data from data generator
  *
  * @author yh263208
  * @date 2020-12-31 17:41
@@ -16,15 +16,15 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ColumnReader<T> extends AbstractMockReader<T> {
     /**
-     * 抽象数据类型
+     * Data type for a column
      */
     private AbstractDataType<T, ?> dataType;
     /**
-     * 列名
+     * Dolumn name
      */
     private String columnName;
     /**
-     * 分组ID
+     * Group ID
      */
     private String groupId;
 

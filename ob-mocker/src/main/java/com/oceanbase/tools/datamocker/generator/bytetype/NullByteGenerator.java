@@ -3,7 +3,7 @@ package com.oceanbase.tools.datamocker.generator.bytetype;
 import com.oceanbase.tools.datamocker.generator.ByteGeneratorBase;
 
 /**
- * 空数据生成器
+ * Null data generator
  *
  * @author yh263208
  * @date 2021-01-26 14:40

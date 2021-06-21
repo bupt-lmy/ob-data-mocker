@@ -13,7 +13,7 @@ import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
 
 /**
- * mysql模式下的time类型
+ * The time type in mysql mode
  *
  * @author yh263208
  * @date 2021-01-17 11:50
@@ -21,15 +21,11 @@ import com.oceanbase.tools.datamocker.model.exception.MockerException;
  */
 public class MysqlTimeType extends AbstractDateDataType<Timestamp> {
     /**
-     * java应用程序中的日期格式化字符串
+     * Date format string in java application
      */
     private static final String JAVA_DATE_FORMAT = "HH:mm:ss";
     /**
-     * 日期格式化器
-     */
-    private final SimpleDateFormat dateFormat = new SimpleDateFormat(JAVA_DATE_FORMAT);
-    /**
-     * 时间戳类型的精度，该精度范围在0-6范围内
+     * The precision of the timestamp type, the precision range is in the range of 0-6
      */
     private final int scale;
 
@@ -54,11 +50,6 @@ public class MysqlTimeType extends AbstractDateDataType<Timestamp> {
         generator.setTimeUnit(TimeUnit.SECONDS);
     }
 
-    /**
-     * 绑定数据生成器方法
-     *
-     * @param generator 数据生成器
-     */
     @Override
     public void bind(BaseGenerator<Timestamp, Timestamp> generator) {
         super.bind(generator);
@@ -100,6 +91,7 @@ public class MysqlTimeType extends AbstractDateDataType<Timestamp> {
         if (value == null) {
             return "NULL";
         }
+        SimpleDateFormat dateFormat = new SimpleDateFormat(JAVA_DATE_FORMAT);
         dateFormat.setTimeZone(timeZone());
         if (this.scale != 0) {
             return String.format("'%s.%d'", dateFormat.format(value), value.getNanos());

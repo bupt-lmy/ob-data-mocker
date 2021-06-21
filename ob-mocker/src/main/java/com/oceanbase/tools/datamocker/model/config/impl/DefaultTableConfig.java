@@ -10,7 +10,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * 表任务配置对象，用于封装和表生成任务相关的配置参数
+ * Table task configuration object, used to encapsulate configuration parameters related to table generation tasks
  *
  * @author yh263208
  * @date 2020-12-27 20:58
@@ -20,43 +20,44 @@ import lombok.Setter;
 @Setter
 public class DefaultTableConfig extends AbstractTableConfig {
     /**
-     * 列配置集合
+     * Column configuration collection
      */
     private List<DefaultColumnConfig> columns;
     /**
-     * 最大生成数量
+     * Maximum number of generations
      */
     private Long totalCount;
     /**
-     * 出现冲突时的处理策略
+     * Handling strategy in case of conflict (abandoned)
      */
     private DuplicateStrategy strategy;
     /**
-     * 批处理大小
+     * Batch size
      */
     private Long batchSize;
     /**
-     * 是否清空表
+     * Whether to empty the table
      */
     private Boolean whetherTruncate;
     /**
-     * 要插入的表名
+     * The name of the table to be inserted
      */
     private String tableName;
     /**
-     * 数据库的模式名
+     * The schema name of the database
      */
     private String schemaName;
     /**
-     * 表生成任务的超时时间，单位为毫秒，默认超时时间为1小时，即3600000
+     * The timeout period of the table generation task, in milliseconds,
+     * the default timeout period is 1 hour, which is 3600000
      */
     private Long timeout = 3600000L;
     /**
-     * 数据写出地址
+     * Data write address
      */
     private String location;
     /**
-     * 最大留存数量，设置内存中最大的批处理数据滞留数量
+     * Maximum number of retention, set the maximum number of batch data retention in the memory
      */
     private int maxRetainedCount = -1;
 

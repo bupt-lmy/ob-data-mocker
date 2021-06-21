@@ -6,7 +6,7 @@ import com.oceanbase.tools.datamocker.generator.CharGeneratorBase;
 import com.oceanbase.tools.datamocker.model.enums.CharCaseOption;
 
 /**
- * 随机文本数据生成器
+ * Random text data generator
  *
  * @author yh263208
  * @date 2020-12-16 16:14
@@ -14,7 +14,7 @@ import com.oceanbase.tools.datamocker.model.enums.CharCaseOption;
  */
 public class RandomGenerator extends CharGeneratorBase {
     /**
-     * 可打印字符数组
+     * Printable character array
      */
     private final static char[] PRINT_CHAR = new char[] {
             '!', '"', '#', '$', '%', '&', '(', ')', '*', '+', ',', '-', '.', '/', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', ':',
@@ -28,11 +28,11 @@ public class RandomGenerator extends CharGeneratorBase {
     }
 
     /**
-     * 随机文本数据生成器没有参数，预检查模块默认返回真
+     * The random text data generator has no parameters, and the pre-check module returns true by default
      *
-     * @param minLength 字符串的最小长度
-     * @param maxLength 字符串的最大长度
-     * @return 返回检查结果
+     * @param minLength Minimum length of string
+     * @param maxLength The maximum length of the string
+     * @return Return check result
      */
     @Override
     public Boolean preCheck(Integer minLength, Integer maxLength) {

@@ -36,7 +36,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 /**
- * 数据库连接池的测试对象
+ * Test object for database connection pool
  *
  * @author yh263208
  * @date 2021-01-04 20:55
@@ -44,13 +44,7 @@ import org.junit.rules.ExpectedException;
  */
 @Slf4j
 public class DataSourceTest extends MockerTestBase {
-    /**
-     * mysql数据库连接配置文件所在地
-     */
     private final String mysqlEnv = "db/mysql-env.properties";
-    /**
-     * oracle数据库连接配置文件所在地
-     */
     private final String oracleEnv = "db/oracle-env.properties";
     @Rule
     public ExpectedException expect = ExpectedException.none();
@@ -61,12 +55,6 @@ public class DataSourceTest extends MockerTestBase {
         params.put("socketTimeout", "8000");
     }
 
-    /**
-     * 获取测试数据库连接配置信息
-     *
-     * @param dialectType 方言类型
-     * @throws IOException 文件读取操作可能会抛出异常
-     */
     private DataBaseConfig getDBConfig(ObModeType dialectType) throws IOException {
         DataBaseConfig config = new DataBaseConfig();
         Properties properties = new Properties();
@@ -89,12 +77,6 @@ public class DataSourceTest extends MockerTestBase {
         return config;
     }
 
-    /**
-     * 测试数据源
-     *
-     * @param dataSource 数据源
-     * @param sql        测试sql
-     */
     private void testDataSource(DataSource dataSource, String sql) throws SQLException {
         Connection connection = null;
         PreparedStatement statement = null;
@@ -202,13 +184,6 @@ public class DataSourceTest extends MockerTestBase {
         connection.close();
     }
 
-    /**
-     * 关闭数据库资源
-     *
-     * @param connection 数据库连接
-     * @param statement  数据库操作句柄
-     * @param resultSet  结果集
-     */
     private void close(Connection connection, Statement statement, ResultSet resultSet) {
         if (resultSet != null) {
             try {

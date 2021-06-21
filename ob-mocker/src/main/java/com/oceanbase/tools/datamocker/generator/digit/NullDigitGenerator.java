@@ -5,7 +5,7 @@ import java.math.BigDecimal;
 import com.oceanbase.tools.datamocker.generator.DigitalGeneratorBase;
 
 /**
- * 数字类型的空数据生成器
+ * Numerical null data generator
  *
  * @author yh263208
  * @date 2021-01-26 14:43

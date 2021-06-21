@@ -13,7 +13,8 @@ import com.oceanbase.tools.datamocker.schedule.AbstractScheduler;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * 默认调度器，调度逻辑是不同组的列原语分配一个线程资源。数据写入原语不同组相互组合，每个组合分配两个线程资源
+ * The default scheduler, the scheduling logic is that different groups of column primitives allocate a thread resource.
+ * Different groups of data write primitives are combined with each other, and each combination is allocated two thread resources
  *
  * @author yh263208
  * @date 2021-01-18 22:14
@@ -29,7 +30,7 @@ public class DefaultScheduler extends AbstractScheduler {
     }
 
     /**
-     * 平均分配线程资源，各个列分组分配相同数量的线程资源
+     * Thread resources are allocated equally, and the same number of thread resources are allocated to each column grouping
      */
     @Override
     protected Set<Set<String>> scheduleColumnTask(Set<String> groups, int active, int core, int max) {
@@ -67,7 +68,7 @@ public class DefaultScheduler extends AbstractScheduler {
     }
 
     /**
-     * 平均分配线程资源到各个数据写出原语
+     * Equally allocate thread resources to each data to write primitives
      */
     @Override
     protected Map<Set<String>, Integer> scheduleDataTask(Set<String> groups, int active, int core, int max) {

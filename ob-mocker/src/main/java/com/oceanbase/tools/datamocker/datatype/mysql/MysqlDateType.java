@@ -14,7 +14,7 @@ import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
 
 /**
- * mysql模式下的date类型，精确到天
+ * Date type in mysql mode, accurate to the day
  *
  * @author yh263208
  * @date 2020-12-16 11:17
@@ -22,13 +22,9 @@ import com.oceanbase.tools.datamocker.model.exception.MockerException;
  */
 public class MysqlDateType extends AbstractDateDataType<Date> {
     /**
-     * java应用程序中的日期格式化字符串
+     * Date format string in java application
      */
     private static final String JAVA_DATE_FORMAT = "yyyy-MM-dd";
-    /**
-     * 日期格式化器
-     */
-    private final SimpleDateFormat dateFormat = new SimpleDateFormat(JAVA_DATE_FORMAT);
 
     public MysqlDateType(DateGeneratorBase<Date> generator, Date defaultValue, Boolean allowNull) {
         super(generator, ObModeType.OB_MYSQL, defaultValue, allowNull);
@@ -43,11 +39,6 @@ public class MysqlDateType extends AbstractDateDataType<Date> {
         super(ObModeType.OB_MYSQL, defaultValue, allowNull);
     }
 
-    /**
-     * 绑定数据生成器方法
-     *
-     * @param generator 数据生成器
-     */
     @Override
     public void bind(BaseGenerator<Date, Date> generator) {
         super.bind(generator);
@@ -83,6 +74,7 @@ public class MysqlDateType extends AbstractDateDataType<Date> {
         if (value == null) {
             return "NULL";
         }
+        SimpleDateFormat dateFormat = new SimpleDateFormat(JAVA_DATE_FORMAT);
         dateFormat.setTimeZone(timeZone());
         return String.format("'%s'", dateFormat.format(value));
     }

@@ -20,7 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.Validate;
 
 /**
- * mock数据的缓冲区，用于缓冲产生出的临时数据
+ * Buffer of mock data, used to buffer temporary data generated
  *
  * @author yh263208
  * @date 2021-01-14 20:48
@@ -28,40 +28,37 @@ import org.apache.commons.lang.Validate;
  */
 @Slf4j
 public class MockerBuffer {
-    /**
-     * s是否关闭
-     */
     private Boolean isClose = Boolean.FALSE;
     /**
-     * 线程同步器
+     * Thread synchronizer
      */
     private CyclicBarrier synchronizer;
     /**
-     * 表示是否已经设定过线程同步器
+     * Indicates whether the thread synchronizer has been set
      */
     private Boolean hasSet = Boolean.FALSE;
     /**
-     * 数据缓冲区，缓冲一个batch的数据
+     * Data buffer, buffer a batch of data
      */
     private List<Map<String, Pair<AbstractDataType, Object>>> rows;
     /**
-     * mock的表的列名集合
+     * Collection of column names of mock table
      */
     private Set<String> columnSet;
     /**
-     * 缓冲中的当前行
+     * The current line in the buffer
      */
     private Map<String, Pair<AbstractDataType, Object>> currentRow;
     /**
-     * 数据管道集合，通过该管道集合向外发送数据
+     * Data pipeline collection through which data is sent out
      */
     private final List<AbstractDataPipe> dataPipes;
     /**
-     * 数据刷写阀值，缓冲中的数据达到该值则会强制刷新值管道
+     * The data flushing threshold, the data in the buffer reaches this value and the value pipeline will be forced to refresh
      */
     private final Long flushThreshold;
     /**
-     * 锁对象，用于保护currentRow对象
+     * Lock object, used to protect the currentRow object
      */
     private Lock lock = new ReentrantLock();
 
@@ -94,10 +91,11 @@ public class MockerBuffer {
     }
 
     /**
-     * 设定缓冲对象的并发数，注意：一旦调用过write方法写数据之后就不能在进行设定，否则会报错
+     * Set the concurrency number of the buffer object. Note: Once the write method is called to write data,
+     * it cannot be set, otherwise an error will be reported
      *
-     * @param count 并发数
-     * @throws MockerException 设定一个负值或者重复设定都会出错
+     * @param count Concurrency
+     * @throws MockerException Setting a negative value or repeating the setting will cause errors
      */
     public synchronized void setConcurrent(int count) {
         if (this.hasSet) {
@@ -110,18 +108,18 @@ public class MockerBuffer {
     }
 
     /**
-     * 获取缓冲的并发数目
+     * Get the number of concurrent buffers
      *
-     * @return 返回并发数
+     * @return Return the number of concurrent
      */
     public int getParties() {
         return this.synchronizer.getParties();
     }
 
     /**
-     * 注册一个数据管道，该方法可以调用多次向缓冲中注册多个数据管道
+     * Register a data pipeline, this method can be called multiple times to register multiple data pipelines in the buffer
      *
-     * @param dataPipe 数据管道
+     * @param dataPipe Data pipeline
      */
     public void register(AbstractDataPipe dataPipe) {
         if (dataPipe == null) {
@@ -133,12 +131,12 @@ public class MockerBuffer {
     }
 
     /**
-     * 向缓冲中写入列数据集合
+     * Write a collection of column data to the buffer
      *
-     * @param data     列数据集合
-     * @param timeout  写入超时时间
-     * @param timeUnit 时间单位
-     * @throws InterruptedException 可能会被中断
+     * @param data     Column data collection
+     * @param timeout  Write timeout
+     * @param timeUnit time unit
+     * @throws InterruptedException May be interrupted
      */
     public void write(Map<String, Pair<AbstractDataType, Object>> data, long timeout, TimeUnit timeUnit) throws Exception {
         Validate.notNull(timeUnit, "time unit for buffer write timeout can not be null");
@@ -164,12 +162,12 @@ public class MockerBuffer {
     }
 
     /**
-     * 向缓冲中写入一条列数据
+     * Write a column of data to the buffer
      *
-     * @param column   列数据
-     * @param timeout  写入超时时间
-     * @param timeUnit 时间单位
-     * @throws InterruptedException 可能会被中断
+     * @param column Column data
+     * @param timeout Write timeout
+     * @param timeUnit time unit
+     * @throws InterruptedException May be interrupted
      */
     public void write(Pair<String, Pair<AbstractDataType, Object>> column, long timeout, TimeUnit timeUnit) throws Exception {
         Map<String, Pair<AbstractDataType, Object>> inputRow = new HashMap<>();
@@ -178,9 +176,11 @@ public class MockerBuffer {
     }
 
     /**
-     * 向当前游标行中写入一列数据，要求该列数据的列名必须在表schema定义的列集合中，否则报错，且当前游标行中未写入该列数据
+     * To write a column of data to the current cursor row,
+     * the column name of the column data must be in the column set defined by the table schema,
+     * otherwise an error is reported, and the column data is not written in the current cursor row
      *
-     * @param column 列数据
+     * @param column Column data
      */
     private void writeToCurrentRow(Pair<String, Pair<AbstractDataType, Object>> column) {
         if (!this.columnSet.contains(column.getKey())) {
@@ -200,11 +200,11 @@ public class MockerBuffer {
     }
 
     /**
-     * 重加载游标行和行数据集合
+     * Reload the cursor row and row data collection
      *
-     * @param timeout  写入超时时间
-     * @param timeUnit 时间单位
-     * @throws InterruptedException 管道写入数据是一个阻塞操作，可能被中断
+     * @param timeout Write timeout
+     * @param timeUnit time unit
+     * @throws InterruptedException Writing data to the pipeline is a blocking operation and may be interrupted
      */
     private void reload(long timeout, TimeUnit timeUnit) throws Exception {
         if (this.currentRow.size() > this.columnSet.size()) {
@@ -223,10 +223,12 @@ public class MockerBuffer {
     }
 
     /**
-     * 关闭缓冲对象，该方法是一个阻塞方法如果有多个线程都在引用该缓冲则需要阻塞到最后一个线程调用才能正确关闭缓冲
+     * Close the buffer object, this method is a blocking method.
+     * If multiple threads are referencing the buffer,
+     * you need to block until the last thread call to properly close the buffer
      *
-     * @throws BrokenBarrierException 篱笆可能会被冲破
-     * @throws InterruptedException 阻塞方法可能会被中断
+     * @throws BrokenBarrierException The barrier may be broken
+     * @throws InterruptedException Blocking methods may be interrupted
      */
     public void close(long timeout, TimeUnit timeUnit) throws Exception {
         if (isClosed()) {
@@ -247,20 +249,21 @@ public class MockerBuffer {
     }
 
     /**
-     * 缓冲区是否关闭
+     * Whether the buffer is closed
      *
-     * @return 返回是否关闭
+     * @return Return whether to close
      */
     public Boolean isClosed() {
         return this.isClose;
     }
 
     /**
-     * 强制刷新缓存，将行缓存中的数据全部刷新至管道中
+     * Forcibly refresh the cache,
+     * flush all the data in the row cache to the pipeline
      *
-     * @param timeout  写入超时时间
-     * @param timeUnit 时间单位
-     * @throws InterruptedException 管道写入操作是一个阻塞操作，可能被中断
+     * @param timeout Write timeout
+     * @param timeUnit time unit
+     * @throws InterruptedException Pipe write operation is a blocking operation and may be interrupted
      */
     public synchronized void flush(long timeout, TimeUnit timeUnit) throws Exception {
         if (dataPipes != null) {

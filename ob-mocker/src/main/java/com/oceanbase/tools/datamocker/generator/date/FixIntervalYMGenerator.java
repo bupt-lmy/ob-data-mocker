@@ -10,7 +10,7 @@ import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
 
 /**
- * 固定interval year to month数据生成器
+ * Fixed interval year to month data generator
  *
  * @author yh263208
  * @date 2021-02-05 16:12
@@ -18,16 +18,16 @@ import com.oceanbase.tools.datamocker.model.exception.MockerException;
  */
 public class FixIntervalYMGenerator extends BaseGenerator<Integer, INTERVALYM> {
     /**
-     * 固定的interval字符串
+     * Fixed interval string
      */
     private final String fixText;
     /**
-     * 正则表达式，用于校验interval的写法是否正确
+     * Regular expression, used to verify whether the interval is written correctly
      */
     private static final Pattern PATTERN = Pattern.compile(
             "interval '(\\d{1,9}(\\-\\d{1,2})?)' (year|month)(\\(\\d{1}\\))? (to (year|month))?", Pattern.CASE_INSENSITIVE);
     /**
-     * 用于插入的interval的字符串
+     * The string used to insert the interval
      */
     private String value;
 

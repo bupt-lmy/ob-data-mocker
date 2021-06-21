@@ -5,7 +5,7 @@ import com.oceanbase.tools.datamocker.model.enums.CharCaseOption;
 import com.oceanbase.tools.datamocker.util.RegExpTextBuilder;
 
 /**
- * 正则表达式字符串生成器，用于生成符合要求的正则表达式
+ * Regular expression string generator, used to generate regular expressions that meet the requirements
  *
  * @author yh263208
  * @date 2021-01-16 20:06
@@ -13,15 +13,15 @@ import com.oceanbase.tools.datamocker.util.RegExpTextBuilder;
  */
 public class RegExpGenerator extends CharGeneratorBase {
     /**
-     * 正则表达式字符串生成工具类，用于生成符合正则表达式的字符串
+     * Regular expression string generation tool class, used to generate regular expression strings
      */
     private final RegExpTextBuilder builder;
 
     /**
-     * 构造函数
+     * Constructor
      *
-     * @param regExp     正则表达式
-     * @param caseOption 大小写规定
+     * @param regExp     Regular expression
+     * @param caseOption Capitalization
      */
     public RegExpGenerator(CharCaseOption caseOption, String regExp) {
         super(caseOption);

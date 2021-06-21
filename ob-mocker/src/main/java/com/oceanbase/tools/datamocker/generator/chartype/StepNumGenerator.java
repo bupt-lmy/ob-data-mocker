@@ -6,7 +6,7 @@ import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
 
 /**
- * 步长数字数据生成器
+ * Step size digital data generator
  *
  * @author yh263208
  * @date 2020-12-16 13:08
@@ -14,23 +14,20 @@ import com.oceanbase.tools.datamocker.model.exception.MockerException;
  */
 public class StepNumGenerator extends CharGeneratorBase {
     /**
-     * 随机数据开始值
+     * Random data start value
      */
     private Long start;
     /**
-     * 随机数据结束值
+     * Random data end value
      */
     private Long end;
-    /**
-     * 步长
-     */
     private final Long step;
     /**
-     * 是否循环
+     * Whether to loop
      */
     private final Boolean cycle;
     /**
-     * 当前数值
+     * Current value
      */
     private Long current = null;
 
@@ -77,9 +74,9 @@ public class StepNumGenerator extends CharGeneratorBase {
     }
 
     /**
-     * 步长为负数时的随机数生成逻辑
+     * Random number generation logic when the step size is negative
      *
-     * @return 返回生成的随机日期
+     * @return Returns the generated random date
      */
     private long minus() {
         if (current == null) {
@@ -98,9 +95,9 @@ public class StepNumGenerator extends CharGeneratorBase {
     }
 
     /**
-     * 步长为正数时的随机数生成逻辑
+     * Random number generation logic when the step size is positive
      *
-     * @return 返回生成的随机日期
+     * @return Returns the generated random date
      */
     private long positive() {
         if (current == null) {

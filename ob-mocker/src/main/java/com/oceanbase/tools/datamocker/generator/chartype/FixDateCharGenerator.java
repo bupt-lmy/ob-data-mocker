@@ -11,7 +11,7 @@ import com.oceanbase.tools.datamocker.model.exception.MockerException;
 import org.apache.commons.lang.StringUtils;
 
 /**
- * 定值日期数据生成器
+ * Fixed value date data generator
  *
  * @author yh263208
  * @date 2020-12-16 00:30
@@ -19,15 +19,11 @@ import org.apache.commons.lang.StringUtils;
  */
 public class FixDateCharGenerator extends CharGeneratorBase {
     /**
-     * 日期格式
+     * Date format
      */
     private static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
     /**
-     * 日期格式化
-     */
-    private final SimpleDateFormat formater = new SimpleDateFormat(DATE_FORMAT);
-    /**
-     * 定值时间戳
+     * Fixed time stamp
      */
     private final long timestamp;
 
@@ -39,6 +35,7 @@ public class FixDateCharGenerator extends CharGeneratorBase {
         this.timestamp = timestamp;
         if (StringUtils.isNotBlank(timezone)) {
             TimeZone zone = TimeZone.getTimeZone(timezone);
+            SimpleDateFormat formater = new SimpleDateFormat(DATE_FORMAT);
             formater.setTimeZone(zone);
         }
     }
@@ -56,6 +53,7 @@ public class FixDateCharGenerator extends CharGeneratorBase {
 
     @Override
     public String generate(Integer minLength, Integer maxLength) {
+        SimpleDateFormat formater = new SimpleDateFormat(DATE_FORMAT);
         return formater.format(new Date(this.timestamp));
     }
 

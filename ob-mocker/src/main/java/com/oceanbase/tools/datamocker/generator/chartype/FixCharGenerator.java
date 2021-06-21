@@ -8,7 +8,7 @@ import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
 
 /**
- * 定值文本数据生成器
+ * Fixed value text data generator
  *
  * @author yh263208
  * @date 2020-12-16 23:13
@@ -16,15 +16,15 @@ import com.oceanbase.tools.datamocker.model.exception.MockerException;
  */
 public class FixCharGenerator extends CharGeneratorBase {
     /**
-     * 定值文本
+     * Fixed value text
      */
     private final String fixText;
 
     /**
-     * 构造方法
+     * Constructor
      *
-     * @param caseType 字符大小写控制配置
-     * @param fixText  定值文本
+     * @param caseType Character case control configuration
+     * @param fixText  Fixed value text
      */
     public FixCharGenerator(CharCaseOption caseType, String fixText) {
         super(caseType);

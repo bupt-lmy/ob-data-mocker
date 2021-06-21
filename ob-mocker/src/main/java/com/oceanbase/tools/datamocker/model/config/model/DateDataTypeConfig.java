@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * 日期类型配置对象
+ * Date type configuration object
  *
  * @author yh263208
  * @date 2020-12-24 20:59
@@ -13,12 +13,10 @@ import lombok.Setter;
 @Getter
 @Setter
 public class DateDataTypeConfig extends DataTypeConfig {
-    /**
-     * 时区
-     */
     private String timezone;
     /**
-     * 精度
+     * Time precision, mainly for the timestamp type,
+     * indicating the length of the time in nanoseconds
      */
     private Integer scale;
 }

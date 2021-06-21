@@ -22,7 +22,7 @@ import com.oceanbase.tools.datamocker.util.SqlUtil;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * 数据库写出writer，用于将数据直接写出到数据库中
+ * The database write writer is used to write data directly to the database
  *
  * @author yh263208
  * @date 2021-01-04 11:04
@@ -31,33 +31,30 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class DataBaseWriter extends AbstractMockWriter {
     /**
-     * 获取一个数据库连接池，使用该连接池获取数据库连接进行数据写入
+     * Get a database connection pool, use the connection pool to get database connections for data writing
      */
     private final DataSource dataSource;
     /**
-     * 写入的目标库，如果建连接的时候指定了目标库该值也可以不填写
+     * The written target library, if the target library is specified when the connection is established, this value can also be left blank
      */
     private final String database;
     /**
-     * 写入的目标表，该参数必传，指定传入的目标表
+     * The target table to be written, this parameter must be passed, specify the incoming target table
      */
     private final String tableName;
     /**
-     * OB的方言模式，默认为oracle模式
+     * The dialect mode of OB, the default is oracle mode
      */
     private ObModeType dialectType = ObModeType.OB_ORACLE;
-    /**
-     * 分组ID
-     */
     private final String groupId;
 
     /**
-     * 构造函数写入一个数据源，该数据源是必须的
+     * The constructor writes a data source, which is required
      *
-     * @param dataSource  数据源
-     * @param dialectType 方言类型
-     * @param database    数据库名
-     * @param tableName   表名
+     * @param dataSource  datasource
+     * @param dialectType dialect type
+     * @param database    schema or database name
+     * @param tableName   table name
      */
     public DataBaseWriter(DataSource dataSource, ObModeType dialectType, String database, String tableName) {
         validate(dataSource, dialectType, database, tableName);
@@ -72,13 +69,13 @@ public class DataBaseWriter extends AbstractMockWriter {
     }
 
     /**
-     * 构造函数写入一个数据源，该数据源是必须的
+     * The constructor writes a data source, which is required
      *
-     * @param dataSource  数据源
-     * @param dialectType 方言类型
-     * @param database    数据库名
-     * @param tableName   表名
-     * @param groupId     分组信息
+     * @param dataSource datasource
+     * @param dialectType dialect type
+     * @param database schema or database name
+     * @param tableName table name
+     * @param groupId group Id for Database writer
      */
     public DataBaseWriter(DataSource dataSource, ObModeType dialectType, String database,
             String tableName, String groupId) {
@@ -93,13 +90,13 @@ public class DataBaseWriter extends AbstractMockWriter {
     }
 
     /**
-     * 验证构造函数的输入是否合法
+     * Verify that the input to the constructor is legal
      *
-     * @param dataSource  数据源
-     * @param database    目标写入的数据库
-     * @param tableName   表名
-     * @param dialectType 方言类型
-     * @throws MockerException 验证失败则抛出异常
+     * @param dataSource datasource, can not be null
+     * @param database database name or schema name
+     * @param tableName table name
+     * @param dialectType dialect type
+     * @throws MockerException An exception is thrown if verification fails
      */
     private void validate(DataSource dataSource, ObModeType dialectType, String database, String tableName) {
         if (dataSource == null) {
@@ -126,9 +123,9 @@ public class DataBaseWriter extends AbstractMockWriter {
     }
 
     /**
-     * 预检查方法，主要用于检查目标表是否存在，如果不存在则抛出异常
+     * Pre-check method, mainly used to check whether the target table exists, if it does not exist, throw an exception
      *
-     * @throws SQLException 抛出表或数据库不存在异常
+     * @throws SQLException Throw a table or database does not exist exception
      */
     private void preCheck() throws Throwable {
         String descSql;

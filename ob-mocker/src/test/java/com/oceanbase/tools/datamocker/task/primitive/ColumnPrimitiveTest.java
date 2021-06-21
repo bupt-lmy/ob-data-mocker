@@ -13,16 +13,14 @@ import org.junit.Assert;
 import org.junit.Test;
 
 /**
- * 列生成原语测试
+ * Column generation primitive test
  *
  * @author yh263208
  * @date 2020-12-31 20:11
  * @since OBMOCKER_snaoshot_0.1.0
  */
 public class ColumnPrimitiveTest extends MockerTestBase {
-    /**
-     * 正向逻辑，使用列生成原语生成制定数量的正态分布随机数
-     */
+
     @Test
     public void testColumnPrimitive() throws Exception {
         OracleNumberType number = new OracleNumberType(5, 2, null, false);
@@ -43,9 +41,6 @@ public class ColumnPrimitiveTest extends MockerTestBase {
         Assert.assertTrue(avg.subtract(expectAvg).abs().doubleValue() < 0.5);
     }
 
-    /**
-     * 构造函数参数任意为null时应该抛出异常
-     */
     @Test(expected = MockerException.class)
     public void testColumnPrimitiveWithoutType() {
         ColumnReader primitive = new ColumnReader(null, null, null);

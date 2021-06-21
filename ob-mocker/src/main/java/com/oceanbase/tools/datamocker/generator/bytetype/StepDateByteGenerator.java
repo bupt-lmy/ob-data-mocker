@@ -7,7 +7,7 @@ import com.oceanbase.tools.datamocker.generator.chartype.StepDateCharGenerator;
 import com.oceanbase.tools.datamocker.model.enums.CharCaseOption;
 
 /**
- * 步长日期字节数组数据生成器
+ * Step Date Byte Array Data Generator
  *
  * @author yh263208
  * @date 2020-12-16 23:44

@@ -19,7 +19,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * 表生成任务的配置对象类测试
+ * Configuration object class test of table generation task
  *
  * @author yh263208
  * @date 2020-12-27 20:28
@@ -27,7 +27,7 @@ import org.junit.Test;
  */
 public class TableConfigTest extends MockerTestBase {
     /**
-     * 列任务有关的参数
+     * List task-related parameters
      */
     private Integer precision = 5;
     private Integer scale = 2;
@@ -40,7 +40,7 @@ public class TableConfigTest extends MockerTestBase {
     private BigDecimal highValue = BigDecimal.TEN.multiply(BigDecimal.TEN);
     private Map<String, Double> builderParams = new HashMap<>();
     /**
-     * 表任务有关的初始化参数
+     * Table task-related initialization parameters
      */
     private int configListSize = 3;
     private Long batchSize = 1024L;
@@ -49,9 +49,6 @@ public class TableConfigTest extends MockerTestBase {
     private String schemaName = "schema_name";
     private DefaultTableConfig tableConfig = null;
 
-    /**
-     * 初始化一个数字类型的数据生成器配置
-     */
     private DataTypeConfig initDigitGen() {
         DigitDataTypeConfig digit = new DigitDataTypeConfig();
         digit.setColumnType(typeName);
@@ -65,10 +62,10 @@ public class TableConfigTest extends MockerTestBase {
     }
 
     /**
-     * 初始化列任务配置对象
+     * Initialize the column task configuration object
      *
-     * @param size 列任务大小
-     * @return 返回列任务集合
+     * @param size Column task size
+     * @return Return to the list of tasks
      */
     private List<DefaultColumnConfig> initColumnConfig(int size) {
         builderParams.put("average", 50.21);

@@ -4,7 +4,7 @@ import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
 
 /**
- * 位图对象，用于用较小的内存开销来计算一个值是否出现过
+ * Bitmap object, used to calculate whether a value has appeared or not with a small memory overhead
  *
  * @author yh263208
  * @date 2021-01-09 20:47
@@ -13,22 +13,22 @@ import com.oceanbase.tools.datamocker.model.exception.MockerException;
 public class BitMap {
     private final int capacity;
     /**
-     * 位图的内置字节数组
+     * Built-in byte array of bitmap
      */
     private final byte[] bytes;
     /**
-     * 放大因子，用于增大位图数组的容量，降低hash碰撞的概率
+     * Amplification factor, used to increase the capacity of the bitmap array and reduce the probability of hash collision
      */
     private static final int INCREASE_FACTOR = 4;
     /**
-     * 字节数组的容量二进制宽度
+     * Binary width of the capacity of the byte array
      */
     private final int capacityWidth;
 
     /**
-     * 构造方法，用于初始化一个特定大小的位图对象
+     * Constructor, used to initialize a bitmap object of a specific size
      *
-     * @param count 容量，该容量不能小于等于零
+     * @param count Capacity, the capacity cannot be less than or equal to zero
      */
     public BitMap(int count) {
         if (count <= 0) {
@@ -43,28 +43,28 @@ public class BitMap {
     }
 
     /**
-     * 获取位图对象的大小
+     * Get the size of the bitmap object
      *
-     * @return 返回字节大小
+     * @return Return size in bytes
      */
     public int size() {
         return this.bytes.length;
     }
 
     /**
-     * 获取位图的容量
+     * Get the capacity of the bitmap
      *
-     * @return 返回容量
+     * @return Return capacity
      */
     public int capacity() {
         return this.capacity;
     }
 
     /**
-     * 用于向位图对象中增加一个对象
+     * Used to add an object to the bitmap object
      *
-     * @param obj 增加的对象
-     * @return 返回是否添加成功
+     * @param obj object
+     * @return Return whether the addition is successful
      */
     public synchronized boolean add(Object obj) {
         if (obj == null) {
@@ -76,10 +76,10 @@ public class BitMap {
     }
 
     /**
-     * 判断一个对象是否已经存在
+     * Determine whether an object already exists
      *
-     * @param obj 对象
-     * @return 返回判断结果
+     * @param obj object
+     * @return Return the judgment result
      */
     public boolean contains(Object obj) {
         if (obj == null) {
@@ -90,10 +90,10 @@ public class BitMap {
     }
 
     /**
-     * 重制某一个对象对应的位图位为0
+     * Reproduce the bitmap bit corresponding to an object to 0
      *
-     * @param obj 对象
-     * @return 返回重置结果
+     * @param obj object
+     * @return Return reset result
      */
     public synchronized boolean clear(Object obj) {
         if (obj == null) {
@@ -105,9 +105,9 @@ public class BitMap {
     }
 
     /**
-     * 重制整个位图
+     * Remake the entire bitmap
      *
-     * @return 返回重置结果
+     * @return Return reset result
      */
     public synchronized void clear() {
         int length = this.bytes.length;
@@ -117,10 +117,10 @@ public class BitMap {
     }
 
     /**
-     * 计算一个hash值在位图中的下标索引
+     * Calculate the subscript index of a hash value in the bitmap
      *
-     * @param key hash值
-     * @return 返回位图索引
+     * @param key hash value
+     * @return Return position information
      */
     private int getIndex(int key) {
         int hashKey = key ^ (key >>> capacityWidth);
@@ -128,10 +128,10 @@ public class BitMap {
     }
 
     /**
-     * 获取在位图数组中某一个字节上的具体位置
+     * Get the specific position on a byte in the bitmap array
      *
-     * @param key hash值
-     * @return 返回position信息
+     * @param key hash value
+     * @return Return position information
      */
     private int getPosition(int key) {
         return key & 0x07;

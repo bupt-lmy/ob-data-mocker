@@ -20,16 +20,13 @@ import org.junit.Assert;
 import org.junit.Test;
 
 /**
- * 唯一约束的测试类
+ * Uniquely constrained test class
  *
  * @author yh263208
  * @date 2021-01-11 15:57
  * @since OBMOCKER_0.1.0_snapshot
  */
 public class UniqueConstraintTest extends MockerTestBase {
-    /**
-     * 列名
-     */
     private final List<String> columnNames = Arrays.asList("COL1", "COL2", "COL3");
     private final String tableName = "EMP";
     private final String database = "SYS";

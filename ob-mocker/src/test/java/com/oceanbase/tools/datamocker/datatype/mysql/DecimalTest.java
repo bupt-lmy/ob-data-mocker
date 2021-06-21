@@ -12,7 +12,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 /**
- * mysql模式下decimal类型的测试类
+ * Decimal type test class in mysql mode
  *
  * @author yh263208
  * @date 2020-12-16 15:19
@@ -20,7 +20,8 @@ import org.junit.Test;
  */
 public class DecimalTest extends MockerTestBase {
     /**
-     * 测试正向逻辑，测试针对decimal对象给定精度以及有效位数时返回的结果是否符合预期
+     * Test the forward logic, test whether the result returned when
+     * the precision and effective digits are given for the decimal object meets expectations
      */
     @Test
     public void testMinAndMaxValueForDecimal() {
@@ -35,9 +36,6 @@ public class DecimalTest extends MockerTestBase {
         Assert.assertEquals(new BigDecimal(maxValue), decimal.highValue());
     }
 
-    /**
-     * 测试正向逻辑，测试针对decimal对象给定精度以及有效位数在数据生成器生成数据的情况下是否生成的数据符合范围
-     */
     @Test
     public void testNormalGeneratorForDecimal() {
         MysqlDecimalType number = new MysqlDecimalType(5, 3, new NormalGenerator(), null, false, true);
@@ -55,9 +53,6 @@ public class DecimalTest extends MockerTestBase {
         }
     }
 
-    /**
-     * 测试正向逻辑，测试针对decimal对象给定精度以及有效位数在数据生成器生成数据的情况下是否生成的数据符合范围
-     */
     @Test
     public void testNormalPoissonForDecimal() {
         MysqlDecimalType number = new MysqlDecimalType(5, 3, new PoissonGenerator(15), null, false, true);
@@ -75,9 +70,6 @@ public class DecimalTest extends MockerTestBase {
         }
     }
 
-    /**
-     * 测试正向逻辑，测试针对decimal对象给定精度以及有效位数在数据生成器生成数据的情况下是否生成的数据符合范围
-     */
     @Test
     public void testNormalStepForDecimal() {
         MysqlDecimalType number = new MysqlDecimalType(5, 3, new StepGenerator(1.3, true), null, false, true);

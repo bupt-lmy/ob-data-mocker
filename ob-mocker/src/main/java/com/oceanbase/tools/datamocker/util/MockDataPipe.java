@@ -9,7 +9,7 @@ import com.oceanbase.tools.datamocker.core.task.AbstractDataPipe;
 import com.oceanbase.tools.datamocker.datatype.AbstractDataType;
 
 /**
- * 数据管道的具体实现类
+ * The concrete realization class of the data pipeline
  *
  * @author yh263208
  * @date 2021-01-14 19:38
@@ -17,7 +17,7 @@ import com.oceanbase.tools.datamocker.datatype.AbstractDataType;
  */
 public class MockDataPipe extends AbstractDataPipe<Map<String, Pair<AbstractDataType, Object>>> {
     /**
-     * 使用阻塞队列作为数据管道的底层实现方式
+     * Use blocking queues as the underlying implementation of data pipelines
      */
     private final LinkedBlockingQueue<List<Map<String, Pair<AbstractDataType, Object>>>> queue = new LinkedBlockingQueue<>();
 

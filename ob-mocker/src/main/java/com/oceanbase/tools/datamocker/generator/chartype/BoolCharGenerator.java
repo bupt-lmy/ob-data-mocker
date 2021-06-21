@@ -4,7 +4,7 @@ import com.oceanbase.tools.datamocker.generator.CharGeneratorBase;
 import com.oceanbase.tools.datamocker.model.enums.CharCaseOption;
 
 /**
- * 布尔类型数据生成器
+ * Boolean data generator
  *
  * @author yh263208
  * @date 2020-12-16 23:38
@@ -12,7 +12,7 @@ import com.oceanbase.tools.datamocker.model.enums.CharCaseOption;
  */
 public class BoolCharGenerator extends CharGeneratorBase {
     /**
-     * 定值布尔类型，若不传则为null，代表随机布尔类型
+     * Fixed boolean type, null if not passed, representing random boolean type
      */
     private final Boolean fixBool;
 

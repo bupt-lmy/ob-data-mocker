@@ -9,6 +9,13 @@ import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
 import lombok.Getter;
 
+/**
+ * Context object for mock task
+ *
+ * @author yh263208
+ * @date 2021-06-21 13:39
+ * @since OB_MOCKER_snapshot_0.1.0
+ */
 public class MockContext {
     private final Integer totalTableTaskCount;
     @Getter
@@ -16,7 +23,7 @@ public class MockContext {
     @Getter
     private final String taskId;
     @Getter
-    private List<TableTaskContext> tables;
+    private final List<TableTaskContext> tables;
     private final MockExecutorService service;
 
     public MockContext(MockExecutorService service, String taskId, String taskName, Integer totalTableTaskCount) {
@@ -31,9 +38,9 @@ public class MockContext {
     }
 
     /**
-     * 追加一个mock数据上下文对象
+     * Append a mock data context object
      *
-     * @param context 上下文对象
+     * @param context Context object
      */
     protected void appendContext(TableTaskContext context) {
         if (context == null) {
@@ -45,9 +52,9 @@ public class MockContext {
     }
 
     /**
-     * 删除一个上下文对象
+     * Delete a context object
      *
-     * @param taskId 传入一个子任务id
+     * @param taskId Pass in a subtask id
      */
     protected void removeContext(String taskId) {
         if (taskId == null) {
@@ -65,9 +72,9 @@ public class MockContext {
     }
 
     /**
-     * 关闭mock数据调度器对象
+     * Close the mock data scheduler object
      *
-     * @return 返回关闭结果
+     * @return Return close result
      */
     public Boolean shutdown() {
         this.service.shutdown();

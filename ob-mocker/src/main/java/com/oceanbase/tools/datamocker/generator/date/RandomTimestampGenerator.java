@@ -6,7 +6,7 @@ import java.util.concurrent.TimeUnit;
 import com.oceanbase.tools.datamocker.generator.DateGeneratorBase;
 
 /**
- * 随机时间戳数据生成器
+ * Random timestamp data generator
  *
  * @author yh263208
  * @date 2020-12-16 19:55

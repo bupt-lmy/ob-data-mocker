@@ -8,7 +8,7 @@ import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
 
 /**
- * 顺序日期数据生成器
+ * Sequential date data generator
  *
  * @author yh263208
  * @date 2020-12-16 16:44
@@ -16,24 +16,24 @@ import com.oceanbase.tools.datamocker.model.exception.MockerException;
  */
 public class StepDateGenerator extends DateGeneratorBase<Date> {
     /**
-     * 日期步长
+     * Date step
      */
     private final long step;
     /**
-     * 是否循环
+     * Whether to loop
      */
     private final Boolean cycle;
     /**
-     * 当前生成的数
+     * Number currently generated
      */
     private Long timestamp = null;
 
     /**
-     * 构造方法
+     * Constructor
      *
-     * @param timeUnit 时间单位
-     * @param cycle    是否轮转
-     * @param step     时间步长
+     * @param timeUnit time unit
+     * @param cycle    Whether to rotate
+     * @param step     Time Step
      */
     public StepDateGenerator(long step, TimeUnit timeUnit, Boolean cycle) {
         this.cycle = cycle;
@@ -58,9 +58,9 @@ public class StepDateGenerator extends DateGeneratorBase<Date> {
     }
 
     /**
-     * 步长为负数时的随机数生成逻辑
+     * Random number generation logic when the step size is negative
      *
-     * @return 返回生成的随机日期
+     * @return Returns the generated random date
      */
     private long minus(long startTime, long endTime) {
         if (timestamp == null) {
@@ -79,9 +79,9 @@ public class StepDateGenerator extends DateGeneratorBase<Date> {
     }
 
     /**
-     * 步长为正数时的随机数生成逻辑
+     * Random number generation logic when the step size is positive
      *
-     * @return 返回生成的随机日期
+     * @return Returns the generated random date
      */
     private long positive(long startTime, long endTime) {
         if (timestamp == null) {

@@ -51,7 +51,8 @@ import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
 
 /**
- * 数据生成器builder，使用该枚举作为各种数据生成器的Builder用于根据配置具体生成数据生成器对象
+ * Data generator builder, use this enumeration as a builder of various data generators to
+ * generate data generator objects according to the configuration
  *
  * @author yh263208
  * @date 2020-12-24 21:47
@@ -59,7 +60,7 @@ import com.oceanbase.tools.datamocker.model.exception.MockerException;
  */
 public abstract class GeneratorFactory<T extends BaseGenerator, V extends Object> {
     /**
-     * null数据生成器
+     * null data generator
      */
     private static final GeneratorFactory NULL_DIGIT_GENERATOR = new GeneratorFactory<NullDigitGenerator, Object>() {
 
@@ -69,7 +70,7 @@ public abstract class GeneratorFactory<T extends BaseGenerator, V extends Object
         }
     };
     /**
-     * null数据生成器
+     * null data generator
      */
     private static final GeneratorFactory NULL_BYTE_GENERATOR = new GeneratorFactory<NullByteGenerator, Object>() {
 
@@ -79,7 +80,7 @@ public abstract class GeneratorFactory<T extends BaseGenerator, V extends Object
         }
     };
     /**
-     * null数据生成器
+     * null data generator
      */
     private static final GeneratorFactory NULL_CHAR_GENERATOR = new GeneratorFactory<NullCharGenerator, Object>() {
 
@@ -89,7 +90,7 @@ public abstract class GeneratorFactory<T extends BaseGenerator, V extends Object
         }
     };
     /**
-     * null数据生成器
+     * null data generator
      */
     private static final GeneratorFactory NULL_DATE_GENERATOR = new GeneratorFactory<NullDateGenerator, Object>() {
 
@@ -99,7 +100,7 @@ public abstract class GeneratorFactory<T extends BaseGenerator, V extends Object
         }
     };
     /**
-     * null数据生成器
+     * null data generator
      */
     private static final GeneratorFactory NULL_TIMESTAMP_GENERATOR = new GeneratorFactory<NullTimestampGenerator, Object>() {
 
@@ -109,7 +110,7 @@ public abstract class GeneratorFactory<T extends BaseGenerator, V extends Object
         }
     };
     /**
-     * null数据生成器
+     * null data generator
      */
     private static final GeneratorFactory NULL_INTERVALYM_GENERATOR = new GeneratorFactory<NullIntervalYMGenerator, Object>() {
 
@@ -119,7 +120,7 @@ public abstract class GeneratorFactory<T extends BaseGenerator, V extends Object
         }
     };
     /**
-     * 步长数据生成器
+     * Step data generator
      */
     private static final GeneratorFactory STEP_NUMBER_BYTE_GENERATOR = new GeneratorFactory<StepNumByteGenerator, Object>() {
 
@@ -139,7 +140,7 @@ public abstract class GeneratorFactory<T extends BaseGenerator, V extends Object
         }
     };
     /**
-     * 随机数字生成器
+     * Random number generator
      */
     private static final GeneratorFactory RANDOM_NUMBER_BYTE_GENERATOR = new GeneratorFactory<RandomNumByteGenerator, Object>() {
 
@@ -170,7 +171,7 @@ public abstract class GeneratorFactory<T extends BaseGenerator, V extends Object
         }
     };
     /**
-     * 步长日期数据生成器
+     * Step Date Data Generator
      */
     private static final GeneratorFactory STEP_DATE_BYTE_GENERATOR = new GeneratorFactory<StepDateByteGenerator, Object>() {
 
@@ -194,7 +195,7 @@ public abstract class GeneratorFactory<T extends BaseGenerator, V extends Object
         }
     };
     /**
-     * 定值日期数据生成器
+     * Fixed value date data generator
      */
     private static final GeneratorFactory FIX_DATE_BYTE_GENERATOR = new GeneratorFactory<FixDateByteGenerator, Object>() {
 
@@ -212,7 +213,7 @@ public abstract class GeneratorFactory<T extends BaseGenerator, V extends Object
         }
     };
     /**
-     * 随机日期生成器
+     * Random date generator
      */
     private static final GeneratorFactory RANDOM_DATE_BYTE_GENERATOR = new GeneratorFactory<RandomDateByteGenerator, Object>() {
 
@@ -232,7 +233,7 @@ public abstract class GeneratorFactory<T extends BaseGenerator, V extends Object
         }
     };
     /**
-     * 布尔文本数据生成器
+     * Boolean text data generator
      */
     private static final GeneratorFactory BOOL_BYTE_GENERATOR = new GeneratorFactory<BoolByteGenerator, String>() {
 
@@ -246,7 +247,7 @@ public abstract class GeneratorFactory<T extends BaseGenerator, V extends Object
         }
     };
     /**
-     * 定值文本数据生成器
+     * Fixed value text data generator
      */
     private static final GeneratorFactory FIX_BYTE_GENERATOR = new GeneratorFactory<FixByteGenerator, String>() {
 
@@ -265,7 +266,7 @@ public abstract class GeneratorFactory<T extends BaseGenerator, V extends Object
         }
     };
     /**
-     * 随机字符串数据生成器
+     * Random string data generator
      */
     private static final GeneratorFactory RANDOM_BYTE_GENERATOR = new GeneratorFactory<RandomByteGenerator, String>() {
 
@@ -280,7 +281,7 @@ public abstract class GeneratorFactory<T extends BaseGenerator, V extends Object
         }
     };
     /**
-     * 正则表达式字节生成器
+     * Regular expression byte generator
      */
     private static final GeneratorFactory REGEXP_BYTE_GENERATOR = new GeneratorFactory<RegExpByteGenerator, String>() {
 
@@ -298,7 +299,7 @@ public abstract class GeneratorFactory<T extends BaseGenerator, V extends Object
         }
     };
     /**
-     * 顺序日期生成器
+     * Sequential date generator
      */
     private static final GeneratorFactory STEP_TIMESTAMP_GENERATOR = new GeneratorFactory<StepTimestampGenerator, Object>() {
 
@@ -317,7 +318,7 @@ public abstract class GeneratorFactory<T extends BaseGenerator, V extends Object
         }
     };
     /**
-     * 随机日期数据生成器
+     * Random date data generator
      */
     private static final GeneratorFactory RANDOM_TIMESTAMP_GENERATOR = new GeneratorFactory<RandomTimestampGenerator, String>() {
 
@@ -327,7 +328,7 @@ public abstract class GeneratorFactory<T extends BaseGenerator, V extends Object
         }
     };
     /**
-     * 固定时间范围数据生成器
+     * Fixed time range data generator
      */
     private static final GeneratorFactory FIX_INTERVALYM_GENERATOR = new GeneratorFactory<FixIntervalYMGenerator, String>() {
 
@@ -341,7 +342,7 @@ public abstract class GeneratorFactory<T extends BaseGenerator, V extends Object
         }
     };
     /**
-     * 固定时间戳数据生成器
+     * Fixed timestamp data generator
      */
     private static final GeneratorFactory FIX_TIMESTAMP_GENERATOR = new GeneratorFactory<FixTimestampGenerator, Object>() {
 
@@ -358,7 +359,7 @@ public abstract class GeneratorFactory<T extends BaseGenerator, V extends Object
         }
     };
     /**
-     * 顺序日期生成器
+     * Sequential date generator
      */
     private static final GeneratorFactory STEP_DATE_GENERATOR = new GeneratorFactory<StepDateGenerator, Object>() {
 
@@ -377,7 +378,7 @@ public abstract class GeneratorFactory<T extends BaseGenerator, V extends Object
         }
     };
     /**
-     * 随机日期数据生成器
+     * Random date data generator
      */
     private static final GeneratorFactory RANDOM_DATE_GENERATOR = new GeneratorFactory<RandomDateGenerator, String>() {
 
@@ -387,7 +388,7 @@ public abstract class GeneratorFactory<T extends BaseGenerator, V extends Object
         }
     };
     /**
-     * 固定日期数据生成器
+     * Fixed date data generator
      */
     private static final GeneratorFactory FIX_DATE_GENERATOR = new GeneratorFactory<FixDateGenerator, Object>() {
 
@@ -403,9 +404,8 @@ public abstract class GeneratorFactory<T extends BaseGenerator, V extends Object
             return new FixDateGenerator(timestamp);
         }
     };
-
     /**
-     * 步长数据生成器
+     * Step data generator
      */
     private static final GeneratorFactory STEP_NUMBER_GENERATOR = new GeneratorFactory<StepNumGenerator, Object>() {
 
@@ -425,7 +425,7 @@ public abstract class GeneratorFactory<T extends BaseGenerator, V extends Object
         }
     };
     /**
-     * 随机数字生成器
+     * Random number generator
      */
     private static final GeneratorFactory RANDOM_NUMBER_GENERATOR = new GeneratorFactory<RandomNumGenerator, Object>() {
 
@@ -456,7 +456,7 @@ public abstract class GeneratorFactory<T extends BaseGenerator, V extends Object
         }
     };
     /**
-     * 步长日期数据生成器
+     * Random number generator
      */
     private static final GeneratorFactory STEP_DATE_CHAR_GENERATOR = new GeneratorFactory<StepDateCharGenerator, Object>() {
 
@@ -480,7 +480,7 @@ public abstract class GeneratorFactory<T extends BaseGenerator, V extends Object
         }
     };
     /**
-     * 定值日期数据生成器
+     * Fixed value date data generator
      */
     private static final GeneratorFactory FIX_DATE_CHAR_GENERATOR = new GeneratorFactory<FixDateCharGenerator, Object>() {
 
@@ -498,7 +498,7 @@ public abstract class GeneratorFactory<T extends BaseGenerator, V extends Object
         }
     };
     /**
-     * 随机日期生成器
+     * Random date generator
      */
     private static final GeneratorFactory RANDOM_DATE_CHAR_GENERATOR = new GeneratorFactory<RandomDateCharGenerator, Object>() {
 
@@ -518,7 +518,7 @@ public abstract class GeneratorFactory<T extends BaseGenerator, V extends Object
         }
     };
     /**
-     * 布尔文本数据生成器
+     * Boolean text data generator
      */
     private static final GeneratorFactory BOOL_CHAR_GENERATOR = new GeneratorFactory<BoolCharGenerator, String>() {
 
@@ -532,7 +532,7 @@ public abstract class GeneratorFactory<T extends BaseGenerator, V extends Object
         }
     };
     /**
-     * 定值文本数据生成器
+     * Fixed value text data generator
      */
     private static final GeneratorFactory FIX_CHAR_GENERATOR = new GeneratorFactory<FixCharGenerator, String>() {
 
@@ -551,7 +551,7 @@ public abstract class GeneratorFactory<T extends BaseGenerator, V extends Object
         }
     };
     /**
-     * 随机字符串数据生成器
+     * Random string data generator
      */
     private static final GeneratorFactory REGEXP_GENERATOR = new GeneratorFactory<RegExpGenerator, String>() {
 
@@ -569,7 +569,7 @@ public abstract class GeneratorFactory<T extends BaseGenerator, V extends Object
         }
     };
     /**
-     * 随机字符串数据生成器
+     * Random string data generator
      */
     private static final GeneratorFactory RANDOM_GENERATOR = new GeneratorFactory<RandomGenerator, String>() {
 
@@ -584,7 +584,7 @@ public abstract class GeneratorFactory<T extends BaseGenerator, V extends Object
         }
     };
     /**
-     * 步长数字数据生成器
+     * Step size digital data generator
      */
     private static final GeneratorFactory STEP_GENERATOR = new GeneratorFactory<StepGenerator, Object>() {
 
@@ -602,7 +602,7 @@ public abstract class GeneratorFactory<T extends BaseGenerator, V extends Object
         }
     };
     /**
-     * 固定的数字生成器
+     * Fixed number generator
      */
     private static final GeneratorFactory FIX_GENERATOR = new GeneratorFactory<FixNumGenerator, Object>() {
 
@@ -619,7 +619,7 @@ public abstract class GeneratorFactory<T extends BaseGenerator, V extends Object
         }
     };
     /**
-     * 正态分布数据生成器工厂类
+     * Normally distributed data generator factory class
      */
     private static final GeneratorFactory NORMAL_GENERATOR = new GeneratorFactory<NormalGenerator, Double>() {
         @Override
@@ -630,7 +630,7 @@ public abstract class GeneratorFactory<T extends BaseGenerator, V extends Object
         }
     };
     /**
-     * 随机分布数据生成器工厂类
+     * Randomly distributed data generator factory class
      */
     private static final GeneratorFactory UNIFORM_GENERATOR = new GeneratorFactory<UniformGenerator, Object>() {
         @Override
@@ -639,9 +639,8 @@ public abstract class GeneratorFactory<T extends BaseGenerator, V extends Object
         }
 
     };
-
     /**
-     * 实例映射表
+     * Instance mapping table
      */
     private static final Map<String, GeneratorFactory> FACTORYNAME_2_FACTORYINSTANCE = new HashMap<>();
 
@@ -660,18 +659,18 @@ public abstract class GeneratorFactory<T extends BaseGenerator, V extends Object
     }
 
     /**
-     * 抽象构建方法，用于示例化一个数据生成器
+     * Abstract construction method, used to instantiate a data generator
      *
-     * @param params 入参，根据数据生成器的不同传入不同的参数
-     * @return 返回实例化好的数据生成器
+     * @param params Input parameters, pass in different parameters according to different data generators
+     * @return Return the instantiated data generator
      */
     abstract public T make(Map<String, V> params);
 
     /**
-     * 根据名称获取一个类型工厂实例
+     * Get a type factory instance based on the name
      *
-     * @param factoryName 工厂实例名称
-     * @return 返回工厂实例对象
+     * @param factoryName Factory instance name
+     * @return Returns the factory instance object
      */
     public static GeneratorFactory getInstance(String factoryName) {
         GeneratorFactory returnVal = FACTORYNAME_2_FACTORYINSTANCE.get(factoryName);
@@ -682,9 +681,9 @@ public abstract class GeneratorFactory<T extends BaseGenerator, V extends Object
     }
 
     /**
-     * 获取所有的工厂类实例
+     * Get all the factory class instances
      *
-     * @return 返回所有的工厂类实例
+     * @return Return all instances of the factory class
      */
     public static List<GeneratorFactory> listInstances() {
         List<GeneratorFactory> returnVal = new ArrayList<>();

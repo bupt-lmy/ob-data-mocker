@@ -9,7 +9,8 @@ import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
 
 /**
- * Mock数据的配置对象，在该配置对象中配置Mock数据的关键参数
+ * The configuration object of Mock data,
+ * the key parameters of Mock data are configured in the configuration object
  *
  * @author yh263208
  * @date 2020-12-22 20:40
@@ -17,16 +18,19 @@ import com.oceanbase.tools.datamocker.model.exception.MockerException;
  */
 public abstract class AbstractTableConfig {
     /**
-     * 最大生成数量，必须是一个大于0的整数，最大限制在100000
+     * The maximum number of generations, must be an integer greater than 0,
+     * the maximum limit is 100000
      *
      * @return 返回数量
      */
     abstract protected Long maxRowCount();
 
     /**
-     * 获取数据生成任务的最大生成数量，在这里对用户传入的最大生成量做了校验，只允许传入一个0-1000000之间的值
+     * Get the maximum number of data generation tasks.
+     * Here, the maximum number of generations passed in by the user is checked.
+     * Only a value between 0-1000000 is allowed to be passed in.
      *
-     * @return 返回最大生成数量
+     * @return Returns the maximum number of generations
      */
     public Long maxCount() {
         if (maxRowCount() == null) {
@@ -41,23 +45,24 @@ public abstract class AbstractTableConfig {
     }
 
     /**
-     * 发生冲突时的处理方式，返回一个枚举值
+     * How to deal with conflicts, return an enumeration value
      *
-     * @return 返回一个枚举值
+     * @return Returns an enumeration value
      */
+    @Deprecated
     abstract public DuplicateStrategy duplicateStrategy();
 
     /**
-     * 批处理大小，支持一个0-100000的值
+     * Batch size, supports a value of 0-100000
      *
-     * @return 返回批处理大小
+     * @return Return batch size
      */
     abstract protected Long batchSize();
 
     /**
-     * 针对批处理大小的值进行校验
+     * Check the batch size value
      *
-     * @return 返回批处理大小
+     * @return Return batch size
      */
     public Long maxBatchSize() {
         if (batchSize() == null) {
@@ -72,64 +77,65 @@ public abstract class AbstractTableConfig {
     }
 
     /**
-     * 是否清空表
+     * Whether to empty the table
      *
-     * @return 返回一个布尔型的值
+     * @return Returns a boolean value
      */
     abstract public Boolean truncated();
 
     /**
-     * 返回要Mock的表的名称
+     * Returns the name of the table to be mocked
      *
-     * @return 返回表的名称
+     * @return Return the name of the table
      */
     abstract public String tableName();
 
     /**
-     * 获取列任务列表
+     * Get a list of tasks
      *
-     * @return 返回列任务集合
+     * @return Return to the list of tasks
      */
     abstract public List<? extends AbstractColumnConfig> columns();
 
     /**
-     * 返回表任务的schema名称
+     * Return the schema name of the table task
      *
-     * @return 返回schema名称
+     * @return Return the schema name
      */
     abstract public String schemaName();
 
     /**
-     * 表生成任务的超时时间
+     * Timeout period of table generation task
      *
-     * @return 返回超时时间
+     * @return Return timeout
      */
     abstract public Long timeoutMilliseconds();
 
     /**
-     * 脚本类型枚举，mock数据可以定义写出脚本类型，可以输出多个脚本
+     * Script type enumeration, mock data can be defined to write script type,
+     * multiple scripts can be output
      *
-     * @return 返回脚本类型数组
+     * @return Returns the script type array
      */
     abstract public ScriptType[] scriptType();
 
     /**
-     * 数据写出地址
+     * Data write address
      *
-     * @param scriptType 脚本类型
-     * @return 返回对应脚本的数据写出地址
+     * @param scriptType Script type
+     * @return Return the data write address of the corresponding script
      */
     abstract public String dataWriteLocation(ScriptType scriptType);
 
     /**
-     * 获取mock数据表约束
+     * Obtain mock data table constraints
      *
-     * @return 返回表约束集合
+     * @return Return table constraint set
      */
     abstract public List<AbstractConstraint> constraints();
 
     /**
-     * 最大留存数量，意为内存中最大滞留的批数据数量
+     * Maximum retention quantity, which means the maximum quantity of batch data retained in the memory
      */
     abstract public int maxRetainedCount();
 }

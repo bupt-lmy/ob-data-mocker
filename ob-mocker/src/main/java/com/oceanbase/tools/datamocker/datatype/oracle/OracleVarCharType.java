@@ -7,7 +7,7 @@ import com.oceanbase.tools.datamocker.model.enums.CharsetType;
 import com.oceanbase.tools.datamocker.model.enums.ObModeType;
 
 /**
- * oracle中的varchar类型
+ * Varchar type in oracle
  *
  * @author yh263208
  * @date 2020-12-16 21:30
@@ -15,12 +15,14 @@ import com.oceanbase.tools.datamocker.model.enums.ObModeType;
  */
 public class OracleVarCharType extends AbstractCharDataType {
     /**
-     * 构造函数
+     * Constructor
      *
-     * @param length      字符类型的长度
-     * @param charsetType 字符类型的编码格式
-     * @param generator   字符类型绑定的数据生成器
-     * @param allowNull   是否允许空值
+     * @param length       Length of character type
+     * @param charsetType  Character type encoding format
+     * @param generator    Character type binding data generator
+     * @param allowNull    Whether to allow null values
+     * @param isUnicode    Is it a unicode string
+     * @param defaultValue default value for string type
      */
     public OracleVarCharType(CharGeneratorBase generator, Integer length, String defaultValue, Boolean allowNull, CharsetType charsetType,
             Boolean isUnicode) {
@@ -28,11 +30,13 @@ public class OracleVarCharType extends AbstractCharDataType {
     }
 
     /**
-     * 构造函数
+     * Constructor
      *
-     * @param length      字符类型的长度
-     * @param charsetType 字符类型的编码格式
-     * @param allowNull   是否允许空值
+     * @param length Length of character type
+     * @param charsetType Character type encoding format
+     * @param allowNull Whether to allow null values
+     * @param isUnicode Is it a unicode string
+     * @param defaultValue default value for string type
      */
     public OracleVarCharType(Integer length, String defaultValue, Boolean allowNull, CharsetType charsetType, Boolean isUnicode) {
         super(ObModeType.OB_ORACLE, charsetType, length, defaultValue, allowNull, isUnicode);

@@ -14,7 +14,8 @@ import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
 
 /**
- * ODC对象反序列化工具类，用于从DB中以对象形式读取对象
+ * ODC object deserialization tool class,
+ * used to read objects from the DB in the form of objects
  *
  * @author yh263208
  * @date 2020-12-02 17:24
@@ -22,12 +23,13 @@ import com.oceanbase.tools.datamocker.model.exception.MockerException;
  */
 public class SerializeUtil {
     /**
-     * 从数据库中反序列化对象集合
+     * Deserialize a collection of objects from the database
      *
-     * @param result 查询的结果
+     * @param result Query result
      * @param clazz  目标对象的类型
-     * @return 返回反序列化后的对象集合
-     * @throws Exception 反射生成对象以及列集合长度和结果集和长度不一致时都会抛异常
+     * @return Return the deserialized collection of objects
+     * @throws Exception An exception will be thrown when the length of the reflection generated
+     * object and the column collection is inconsistent with the result set
      */
     public static <T> List<T> getList(ResultSet result, Class<T> clazz) throws SQLException, InstantiationException,
                                                                                IllegalAccessException {
@@ -70,12 +72,13 @@ public class SerializeUtil {
     }
 
     /**
-     * 从数据库中反序列化对象
+     * Deserialize objects from the database
      *
-     * @param result 查询的结果
-     * @param clazz  目标对象的类型
-     * @return 返回反序列化后的对象
-     * @throws Exception 反射生成对象以及列集合长度和结果集和长度不一致时都会抛异常
+     * @param result Query Result
+     * @param clazz Target type
+     * @return Return the deserialized object
+     * @throws Exception An exception will be thrown when the length of the reflection
+     * generated object and the column collection is inconsistent with the result set
      */
     public static <T> T getObject(ResultSet result, Class<T> clazz) throws SQLException, InstantiationException, IllegalAccessException {
         if (result == null) {
@@ -108,13 +111,14 @@ public class SerializeUtil {
     }
 
     /**
-     * 内部方法，从一个list中得到一个对象
+     * Internal method, get an object from a list
      *
-     * @param input     输入的集合
-     * @param columnMap 列名与索引之间的映射关系
-     * @param clazz     目标对象的类型
-     * @return 返回反序列化后的对象
-     * @throws Exception 反射生成对象以及列集合长度和结果集和长度不一致时都会抛异常
+     * @param input Input set
+     * @param columnMap The mapping relationship between column names and indexes
+     * @param clazz Target type
+     * @return Return the deserialized object
+     * @throws Exception An exception will be thrown when the length of the reflection generated
+     * object and the column collection is inconsistent with the result set
      */
     private static <T> T parseObject(List<Object> input, Map<String, Integer> columnMap, Class<T> clazz)
             throws IllegalAccessException, InstantiationException {

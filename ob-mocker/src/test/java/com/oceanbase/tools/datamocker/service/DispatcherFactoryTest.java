@@ -37,20 +37,14 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * 分发器工厂类的测试类
+ * Test class for dispatcher factory class
  *
  * @author yh263208
  * @date 2021-01-11 21:50
  * @since OBMOCKER_snaoshot_0.1.0
  */
 public class DispatcherFactoryTest extends MockerTestBase {
-    /**
-     * mysql数据库连接配置文件所在地
-     */
     private final String mysqlEnv = "db/mysql-env.properties";
-    /**
-     * oracle数据库连接配置文件所在地
-     */
     private final String oracleEnv = "db/oracle-env.properties";
     private final String ddlOracle = "CREATE TABLE \"EMP\" (\n"
                                      + "  \"COL\" NUMBER(5,2) NOT NULL,\n"
@@ -74,15 +68,9 @@ public class DispatcherFactoryTest extends MockerTestBase {
                                                       + "\"SYS\".\"EMP\"(\"COL\")\n"
                                                       + ");";
     private DataSource oracleDatasource = null;
-    /**
-     * 表任务有关的参数
-     */
     private final Long maxBatchsize = 1024L;
     private final Long maxGenerateCount = 9800L;
 
-    /**
-     * 初始化一个数字类型的数据生成器配置
-     */
     private DataTypeConfig initDigitGen(Map<String, Double> builderParams, String typeName, BigDecimal lowValue, BigDecimal highValue,
             String genName, Integer precision, Integer scale) {
         DigitDataTypeConfig digit = new DigitDataTypeConfig();
@@ -187,12 +175,6 @@ public class DispatcherFactoryTest extends MockerTestBase {
         return tableConfig;
     }
 
-    /**
-     * 获取测试数据库连接配置信息
-     *
-     * @param dialectType 方言类型
-     * @throws IOException 文件读取操作可能会抛出异常
-     */
     private DataBaseConfig getDBConfig(ObModeType dialectType) throws IOException {
         DataBaseConfig config = new DataBaseConfig();
         Properties properties = new Properties();

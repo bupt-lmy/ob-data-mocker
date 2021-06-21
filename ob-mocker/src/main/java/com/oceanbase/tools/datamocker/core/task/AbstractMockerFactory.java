@@ -50,7 +50,7 @@ import org.apache.commons.lang.Validate;
 import org.slf4j.MDC;
 
 /**
- * 抽象数据模拟器，用于new一个数据模拟器出来
+ * Abstract data simulator, used to create a new data simulator
  *
  * @author yh263208
  * @date 2021-02-03 20:10
@@ -59,19 +59,20 @@ import org.slf4j.MDC;
 @Slf4j
 public abstract class AbstractMockerFactory {
     /**
-     * 抽象任务配置
+     * Abstract task configuration
      */
     private AbstractTaskConfig taskConfig;
     /**
-     * 工厂类型的内部数据源，使用该数据源进行表存在性校验，约束等信息的校验
+     * The internal data source of the factory type, which is used to verify the existence of tables, check constraints and other
+     * information
      */
     private MockerDataSource innerDatasource = null;
     /**
-     * 该数据源是业务数据源
+     * The data source is a business data source
      */
     private Map<String, DataSource> taskId2DataSource;
     /**
-     * mock数据文件管理器集合
+     * Mock data file manager collection
      */
     private Map<String, List<MockerFile>> taskId2MockerFiles;
 
@@ -85,36 +86,30 @@ public abstract class AbstractMockerFactory {
     }
 
     /**
-     * 验证数据库配置对象封装体的有效性
+     * Verify the validity of the database configuration object package
      *
-     * @param dbConfig 数据库配置
-     * @return 返回验证结果
+     * @param dbConfig configuration for database
+     * @return verify result
      */
     private boolean validateDbConfig(DataBaseConfig dbConfig) {
         if (dbConfig == null) {
             return false;
         }
-        if (StringUtils.isBlank(dbConfig.getUser()) || StringUtils.isBlank(dbConfig.getTenant()) || StringUtils.isBlank(
-                dbConfig.getHost())) {
-            return false;
-        }
-        return true;
+        return !StringUtils.isBlank(dbConfig.getUser()) && !StringUtils.isBlank(dbConfig.getTenant()) && !StringUtils.isBlank(
+                dbConfig.getHost());
     }
 
     /**
-     * 获取模拟数据对象
-     *
-     * @throws Exception 可能会抛出异常
+     * Get simulated data object
      */
     public ObDataMocker create() {
         return create(new DefaultScheduler(this.taskConfig.maxConnection()));
     }
 
     /**
-     * 获取模拟数据对象
+     * Get Mock data object
      *
-     * @param scheduler 调度器对象，用于线程资源的调度
-     * @throws Exception 生成mocker对象可能会抛出异常
+     * @param scheduler Scheduler object, used for thread resource scheduling
      */
     public ObDataMocker create(AbstractScheduler scheduler) {
         if (scheduler == null) {
@@ -140,20 +135,20 @@ public abstract class AbstractMockerFactory {
     }
 
     /**
-     * 实现者自己定义分发器对象的逻辑
+     * The implementer himself defines the logic of the dispatcher object
      *
-     * @param task   任务配置读喜庆封装体
-     * @param taskId 任务Id
-     * @return 返回分发器对象
+     * @param task Task configuration
+     * @param taskId Task Id
+     * @return Returns the dispatcher object
      */
     abstract protected Dispatcher<TableTaskInfo> generate(AbstractTaskConfig task, String taskId) throws Throwable;
 
     /**
-     * 验证表的存在性
+     * Verify the existence of the table
      *
-     * @param table  表名
-     * @param schema 所在数据库或者schema
-     * @throws MockerException 表存在性校验失败时抛出异常
+     * @param table table name
+     * @param schema The database or schema
+     * @throws MockerException Throw an exception when the table existence check fails
      */
     protected void validateTableFromDB(String schema, String table) throws Throwable {
         if (this.innerDatasource == null) {
@@ -184,10 +179,10 @@ public abstract class AbstractMockerFactory {
     }
 
     /**
-     * 获取表结构
+     * Get the table structure
      *
-     * @param tableConfig 表配置信息
-     * @return 返回表结构
+     * @param tableConfig table configuration
+     * @return schema for a certain table
      */
     protected Map<String, AbstractDataType> getTableSchema(AbstractTableConfig tableConfig) {
         Map<String, AbstractDataType> columnName2DataType = new HashMap<>();
@@ -198,10 +193,10 @@ public abstract class AbstractMockerFactory {
     }
 
     /**
-     * 获取表相关的约束对象
+     * Get the constraint object related to the table
      *
-     * @param tableConfig 表定义
-     * @return 返回约束集合
+     * @param tableConfig table configuration
+     * @return list of constraint
      */
     protected List<AbstractConstraint> getConstraints(AbstractTableConfig tableConfig, ObModeType dialectType) throws Throwable {
         if (tableConfig.constraints() != null) {
@@ -223,9 +218,11 @@ public abstract class AbstractMockerFactory {
     }
 
     /**
-     * 获取数据源
+     * Get data source
      *
-     * @return 返回数据源
+     * @param tableTaskId table task Id
+     * @return data source
+     * @exception SQLException An exception is thrown if the connection establishment fails
      */
     protected synchronized DataSource getDataSource(String tableTaskId) throws SQLException {
         if (tableTaskId == null) {
@@ -257,9 +254,12 @@ public abstract class AbstractMockerFactory {
     }
 
     /**
-     * 获取文件管理器集合
+     * Get file manager collection
      *
-     * @return 返回数据源
+     * @param tableTaskId table task id
+     * @param tableConfig config for table task
+     * @return list of file manager
+     * @exception IOException Throw an exception when the file operation fails
      */
     protected synchronized List<MockerFile> getFileManager(String tableTaskId, AbstractTableConfig tableConfig) throws IOException {
         Validate.notEmpty(tableTaskId, "Table task id can not be null");
@@ -278,10 +278,13 @@ public abstract class AbstractMockerFactory {
     }
 
     /**
-     * 获取数据库写入原语
+     * Get data writer
      *
-     * @param tableConfig 表生成任务封装体
-     * @return 返回原语集合
+     * @param tableConfig table task config
+     * @param buffer buffer which is bound to writer
+     * @param managers list of file managers
+     * @param ds datasource
+     * @return list of mock writer
      */
     protected List<AbstractMockWriter> getDataWriter(AbstractTableConfig tableConfig, MockerBuffer buffer, List<MockerFile> managers,
             DataSource ds) {
@@ -308,11 +311,11 @@ public abstract class AbstractMockerFactory {
     }
 
     /**
-     * 获取一个表生成任务的全部列数据原语
+     * Get all column data reader of a table generation task
      *
-     * @param tableConfig 表生成任务
-     * @param constraints 约束集合
-     * @return 返回原语列表
+     * @param tableConfig table task config
+     * @param constraints constraint list
+     * @return list of column reader
      */
     protected List<ColumnReader> getColumnReader(AbstractTableConfig tableConfig, List<AbstractConstraint> constraints) {
         List<? extends AbstractColumnConfig> columnConfigs = tableConfig.columns();
@@ -360,11 +363,6 @@ public abstract class AbstractMockerFactory {
         return returnValue;
     }
 
-    /**
-     * 获取任务名称
-     *
-     * @return 返回任务名称
-     */
     protected String getTaskName() {
         TimeZone timeZone = TimeZone.getDefault();
         Date date = new Date();

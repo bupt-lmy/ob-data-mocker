@@ -5,7 +5,7 @@ import com.oceanbase.tools.datamocker.generator.chartype.FixDateCharGenerator;
 import com.oceanbase.tools.datamocker.model.enums.CharCaseOption;
 
 /**
- * 固定日期类型数据生成器
+ * Fixed date type data generator
  *
  * @author yh263208
  * @date 2020-12-16 23:14

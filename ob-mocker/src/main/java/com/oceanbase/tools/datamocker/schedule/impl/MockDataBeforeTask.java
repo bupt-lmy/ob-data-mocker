@@ -18,7 +18,8 @@ import com.oceanbase.tools.datamocker.util.SqlUtil;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * mock数据业务逻辑开始前的准备逻辑，在这里主要是进行表的清空以及约束的重新装载逻辑
+ * The preparation logic before the start of the mock data business logic,
+ * here is mainly the emptying of the table and the reloading logic of the constraints
  *
  * @author yh263208
  * @date 20210-01-13 22:37
@@ -26,9 +27,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class MockDataBeforeTask extends AbstractMockTask {
-    /**
-     * 数据源
-     */
+
     private final DataSource dataSource;
 
     public MockDataBeforeTask(TableTaskMetaData metaData, TableTaskContext context, DataSource dataSource) {

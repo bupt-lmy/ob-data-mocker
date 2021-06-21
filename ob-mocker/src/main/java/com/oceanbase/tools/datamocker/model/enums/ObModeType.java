@@ -1,7 +1,7 @@
 package com.oceanbase.tools.datamocker.model.enums;
 
 /**
- * OB模式枚举，目前支持OB的mysql模式以及OB的oracle模式
+ * OB mode enumeration, currently supports OB's mysql mode and OB's oracle mode
  *
  * @author yh263208
  * @date 2020-12-11 14:34
@@ -9,15 +9,11 @@ package com.oceanbase.tools.datamocker.model.enums;
  */
 public enum ObModeType {
     /**
-     * OB的mysql模式
+     * OB's mysql mode
      */
     OB_MYSQL,
     /**
-     * OB的oracle模式
+     * OB's oracle mode
      */
-    OB_ORACLE,
-    /**
-     * 未知的ob模式
-     */
-    UNKNOWN;
+    OB_ORACLE
 }

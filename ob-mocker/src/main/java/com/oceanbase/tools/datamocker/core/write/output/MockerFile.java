@@ -10,7 +10,7 @@ import com.oceanbase.tools.datamocker.model.exception.MockerException;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * mock数据的文件管理器，用于文件的增删改查和数据的写入
+ * File manager for mock data, used for file addition, deletion, modification, and data writing
  *
  * @author yh263208
  * @date 2021-01-08 20:48
@@ -19,15 +19,15 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class MockerFile {
     /**
-     * 操作文件
+     * Original file
      */
     private final File file;
     /**
-     * 文件输出流
+     * Raw file output stream
      */
     private final FileOutputStream output;
     /**
-     * 脚本类型
+     * Script Type
      */
     private final ScriptType scriptType;
 
@@ -59,9 +59,6 @@ public class MockerFile {
         this.scriptType = scriptType;
     }
 
-    /**
-     * 关闭文件管理器
-     */
     public void close() {
         try {
             this.output.close();
@@ -72,10 +69,10 @@ public class MockerFile {
     }
 
     /**
-     * 创建一个文件
+     * Create a file
      *
-     * @param file 需要创建的文件
-     * @throws IOException 文件操作可能会抛出异常
+     * @param file Files to be created
+     * @throws IOException File operations may throw exceptions
      */
     private void create(File file) throws IOException {
         if (!file.getParentFile().exists()) {
@@ -84,15 +81,18 @@ public class MockerFile {
                         String.format("Fail to create dir \"%s\"", file.getParent()));
             }
         }
-        file.createNewFile();
+        if (!file.createNewFile()) {
+            throw new MockerException(MockerError.OPERATION_FAILURE,
+                    String.format("Fail to create file \"%s\"", file.getName()));
+        }
     }
 
     /**
-     * 写入数据
+     * Write data to file
      *
-     * @param bytes 缓冲，要写入的数据放在此处
-     * @return 返回写入的字节数
-     * @throws IOException 文件操作可能会导致异常
+     * @param bytes Buffer, the data to be written is placed here
+     * @return Returns the number of bytes written
+     * @throws IOException File operations may cause exceptions
      */
     synchronized public long write(byte[] bytes, int offset, int length, boolean immediateFlush) throws IOException {
         if (this.output == null) {
@@ -105,20 +105,15 @@ public class MockerFile {
         return length;
     }
 
-    /**
-     * 获取文件对象
-     *
-     * @return 返回文件对象
-     */
     public File getFile() {
         return this.file;
     }
 
     /**
-     * 清理一个文件管理器，将文件管理器关联的文件删除
+     * Clean up a file manager and delete files associated with the file manager
      *
-     * @return 返回清理结果
-     * @throws IOException 可能会抛出异常
+     * @return Return cleanup results
+     * @throws IOException May throw an exception when clear files
      */
     public synchronized boolean clear() throws IOException {
         this.output.close();

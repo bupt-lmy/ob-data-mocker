@@ -1,7 +1,8 @@
 package com.oceanbase.tools.datamocker.generator;
 
 /**
- * 随机数据生成器接口，用于生成随机数据，提供两个接口用于实现
+ * Random data generator interface, used to generate random data,
+ * provides two interfaces for implementation
  *
  * @author yh263208
  * @date 2020-12-11 18:00
@@ -9,11 +10,11 @@ package com.oceanbase.tools.datamocker.generator;
  */
 public abstract class DigitalGeneratorBase<T extends Comparable> extends BaseGenerator<T, T> {
     /**
-     * 预检查步骤，用于根据边界值校验该生成器是否可以正常工作
+     * Pre-checking step, used to check whether the generator can work normally according to the boundary value
      *
-     * @param minValue 最小值，
-     * @param maxValue 最大值
-     * @return 返回校验结果
+     * @param minValue min value for number type
+     * @param maxValue max value for number type
+     * @return Return the verification result
      */
     @Override
     abstract public Boolean preCheck(T minValue, T maxValue);
@@ -21,19 +22,19 @@ public abstract class DigitalGeneratorBase<T extends Comparable> extends BaseGen
     /**
      * 数据生成方法接口
      *
-     * @param minValue 最小值，对于不同类型的数据生成器含义略有不同，对于数字型的生成任务反映的是生成数字的最小值，
-     *                 如果是字符型的生成任务反映的是字符的字节最小值
-     * @param maxValue 最大值，对于不同类型的数据生成器含义略有不同，对于数字型的生成任务反映的是生成数字的最小值，
-     *                 如果是字符型的生成任务反映的是字符的字节最小值
-     * @return 返回一个生成的具体值
+     * @param minValue The minimum value has slightly different meanings for different types of data generators.
+     *                 For digital generation tasks, it reflects the minimum value of the generated numbers.
+     * @param maxValue The maximum value has slightly different meanings for different types of data generators.
+     *                 For digital generation tasks, it reflects the maximum value of the generated numbers.
+     * @return Returns a generated specific value
      */
     @Override
     abstract public T generate(T minValue, T maxValue);
 
     /**
-     * 返回数据生成器一共能够生成的不重复的数据个数
+     * Return the total number of unique data that the data generator can generate
      *
-     * @return 返回具体的数值，如果数据生成器可以无限制生成数据则返回null
+     * @return Return a specific value, or null if the data generator can generate data without limitation
      */
     @Override
     abstract public Long count(T minValue, T maxValue);

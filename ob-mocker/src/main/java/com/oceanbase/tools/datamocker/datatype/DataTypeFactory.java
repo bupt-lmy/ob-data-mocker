@@ -55,7 +55,7 @@ import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
 
 /**
- * 抽象数据类型类，用于封装一些基础的数据类型逻辑
+ * Abstract data type class, used to encapsulate some basic data type logic
  *
  * @author yh263208
  * @date 2020-12-10 15:42
@@ -63,7 +63,7 @@ import com.oceanbase.tools.datamocker.model.exception.MockerException;
  */
 public abstract class DataTypeFactory<T extends AbstractDataType, V extends DataTypeConfig, K extends BaseGenerator> {
     /**
-     * mysql模式下的year类型
+     * The year type in mysql mode
      */
     private static final DataTypeFactory OB_MYSQL_YEAR = new DataTypeFactory<MysqlYearType, DateDataTypeConfig, DateGeneratorBase>() {
 
@@ -95,7 +95,7 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
     };
 
     /**
-     * mysql模式下的datetime类型
+     * The datetime type in mysql mode
      */
     private static final DataTypeFactory OB_MYSQL_DATETIME
             = new DataTypeFactory<MysqlDateTimeType, DateDataTypeConfig, DateGeneratorBase>() {
@@ -128,7 +128,7 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
     };
 
     /**
-     * mysql模式下的time类型
+     * The time type in mysql mode
      */
     private static final DataTypeFactory OB_MYSQL_TIME = new DataTypeFactory<MysqlTimeType, DateDataTypeConfig, DateGeneratorBase>() {
 
@@ -160,7 +160,7 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
     };
 
     /**
-     * mysql模式下的timstamp类型
+     * The timestamp type in mysql mode
      */
     private static final DataTypeFactory OB_MYSQL_TIMESTAMP
             = new DataTypeFactory<MysqlTimestampType, DateDataTypeConfig, DateGeneratorBase>() {
@@ -193,7 +193,7 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
     };
 
     /**
-     * mysql模式下的date类型
+     * The date type in mysql mode
      */
     private static final DataTypeFactory OB_MYSQL_DATE = new DataTypeFactory<MysqlDateType, DateDataTypeConfig, DateGeneratorBase>() {
 
@@ -224,7 +224,7 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
     };
 
     /**
-     * mysql模式下的varbinary类型
+     * The varbinary type in mysql mode
      */
     private static final DataTypeFactory OB_MYSQL_VARBINARY
             = new DataTypeFactory<MysqlBinaryType, CharDataTypeConfig, ByteGeneratorBase>() {
@@ -254,7 +254,7 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
     };
 
     /**
-     * mysql模式下的bit类型
+     * The bit type in mysql mode
      */
     private static final DataTypeFactory OB_MYSQL_BIT = new DataTypeFactory<MysqlBinaryType, CharDataTypeConfig, ByteGeneratorBase>() {
         @Override
@@ -287,7 +287,7 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
     };
 
     /**
-     * mysql模式下的binary类型
+     * The binary type in mysql mode
      */
     private static final DataTypeFactory OB_MYSQL_BINARY = new DataTypeFactory<MysqlBinaryType, CharDataTypeConfig, ByteGeneratorBase>() {
         @Override
@@ -316,7 +316,7 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
     };
 
     /**
-     * mysql模式下的longblob类型
+     * The longblob type in mysql mode
      */
     private static final DataTypeFactory OB_MYSQL_LONGBLOB = new DataTypeFactory<MysqlBlobType, CharDataTypeConfig, ByteGeneratorBase>() {
         @Override
@@ -338,7 +338,7 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
     };
 
     /**
-     * mysql模式下的mediumblob类型
+     * The mediumblob type in mysql mode
      */
     private static final DataTypeFactory OB_MYSQL_MEDIUMBLOB = new DataTypeFactory<MysqlBlobType, CharDataTypeConfig, ByteGeneratorBase>() {
         @Override
@@ -360,7 +360,7 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
     };
 
     /**
-     * mysql模式下的blob类型
+     * The blob type in mysql mode
      */
     private static final DataTypeFactory OB_MYSQL_BLOB = new DataTypeFactory<MysqlBlobType, CharDataTypeConfig, ByteGeneratorBase>() {
         @Override
@@ -382,7 +382,7 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
     };
 
     /**
-     * mysql模式下的tinyblob类型
+     * The tinyblob type in mysql mode
      */
     private static final DataTypeFactory OB_MYSQL_TINYBLOB = new DataTypeFactory<MysqlBlobType, CharDataTypeConfig, ByteGeneratorBase>() {
         @Override
@@ -404,7 +404,7 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
     };
 
     /**
-     * mysql模式下的LONGTEXT类型
+     * The longtext type in mysql mode
      */
     private static final DataTypeFactory OB_MYSQL_LONGTEXT = new DataTypeFactory<MysqlTextType, CharDataTypeConfig, CharGeneratorBase>() {
         @Override
@@ -432,7 +432,7 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
     };
 
     /**
-     * mysql模式下的MEDIUMTEXT类型
+     * The mediumtext type in mysql mode
      */
     private static final DataTypeFactory OB_MYSQL_MEDIUMTEXT = new DataTypeFactory<MysqlTextType, CharDataTypeConfig, CharGeneratorBase>() {
         @Override
@@ -460,7 +460,7 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
     };
 
     /**
-     * mysql模式下的TEXT类型
+     * The text type in mysql mode
      */
     private static final DataTypeFactory OB_MYSQL_TEXT = new DataTypeFactory<MysqlTextType, CharDataTypeConfig, CharGeneratorBase>() {
         @Override
@@ -488,7 +488,7 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
     };
 
     /**
-     * mysql模式下的TINYTEXT类型
+     * The tinytext type in mysql mode
      */
     private static final DataTypeFactory OB_MYSQL_TINYTEXT = new DataTypeFactory<MysqlTextType, CharDataTypeConfig, CharGeneratorBase>() {
         @Override
@@ -516,7 +516,7 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
     };
 
     /**
-     * mysql模式下的varchar类型
+     * The varchar type in mysql mode
      */
     private static final DataTypeFactory OB_MYSQL_VARCHAR = new DataTypeFactory<MysqlVarCharType, CharDataTypeConfig, CharGeneratorBase>() {
         @Override
@@ -545,7 +545,7 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
     };
 
     /**
-     * mysql模式下的char类型
+     * The char type in mysql mode
      */
     private static final DataTypeFactory OB_MYSQL_CHAR = new DataTypeFactory<MysqlCharType, CharDataTypeConfig, CharGeneratorBase>() {
         @Override
@@ -574,7 +574,7 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
     };
 
     /**
-     * mysql模式下的double unsigned类型
+     * The double unsigned type in mysql mode
      */
     private static final DataTypeFactory OB_MYSQL_DOUBLE_UNSIGNED
             = new DataTypeFactory<MysqlFloatType, DigitDataTypeConfig, DigitalGeneratorBase>() {
@@ -606,7 +606,7 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
     };
 
     /**
-     * mysql模式下的double类型
+     * The double type in mysql mode
      */
     private static final DataTypeFactory OB_MYSQL_DOUBLE
             = new DataTypeFactory<MysqlFloatType, DigitDataTypeConfig, DigitalGeneratorBase>() {
@@ -638,7 +638,7 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
     };
 
     /**
-     * mysql模式下的float unsigned类型
+     * The float unsigned type in mysql mode
      */
     private static final DataTypeFactory OB_MYSQL_FLOAT_UNSIGNED
             = new DataTypeFactory<MysqlFloatType, DigitDataTypeConfig, DigitalGeneratorBase>() {
@@ -670,7 +670,7 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
     };
 
     /**
-     * mysql模式下的float类型
+     * The float type in mysql mode
      */
     private static final DataTypeFactory OB_MYSQL_FLOAT = new DataTypeFactory<MysqlFloatType, DigitDataTypeConfig, DigitalGeneratorBase>() {
         @Override
@@ -701,7 +701,7 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
     };
 
     /**
-     * mysql模式下的decimal unsigned类型
+     * The decimal unsigned type in mysql mode
      */
     private static final DataTypeFactory OB_MYSQL_DECIMAL_UNSIGNED
             = new DataTypeFactory<MysqlDecimalType, DigitDataTypeConfig, DigitalGeneratorBase>() {
@@ -730,7 +730,7 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
     };
 
     /**
-     * mysql模式下的decimal类型
+     * The decimal type in mysql mode
      */
     private static final DataTypeFactory OB_MYSQL_DECIMAL
             = new DataTypeFactory<MysqlDecimalType, DigitDataTypeConfig, DigitalGeneratorBase>() {
@@ -759,7 +759,7 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
     };
 
     /**
-     * mysql模式下的int unsigned类型
+     * The bigint unsigned type in mysql mode
      */
     private static final DataTypeFactory OB_MYSQL_BIGINT_UNSIGNED
             = new DataTypeFactory<MysqlBigIntType, DigitDataTypeConfig, DigitalGeneratorBase>() {
@@ -786,7 +786,7 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
     };
 
     /**
-     * mysql模式下的int类型
+     * The int type in mysql mode
      */
     private static final DataTypeFactory OB_MYSQL_BIGINT
             = new DataTypeFactory<MysqlBigIntType, DigitDataTypeConfig, DigitalGeneratorBase>() {
@@ -813,7 +813,7 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
     };
 
     /**
-     * mysql模式下的int unsigned类型
+     * The int unsigned type in mysql mode
      */
     private static final DataTypeFactory OB_MYSQL_INT_UNSIGNED
             = new DataTypeFactory<MysqlIntType, DigitDataTypeConfig, DigitalGeneratorBase>() {
@@ -840,7 +840,7 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
     };
 
     /**
-     * mysql模式下的int类型
+     * The int type in mysql mode
      */
     private static final DataTypeFactory OB_MYSQL_INT = new DataTypeFactory<MysqlIntType, DigitDataTypeConfig, DigitalGeneratorBase>() {
         @Override
@@ -866,7 +866,7 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
     };
 
     /**
-     * mysql模式下的mediumInt unsigned类型
+     * The mediumInt unsigned type in mysql mode
      */
     private static final DataTypeFactory OB_MYSQL_MEDIUMINT_UNSIGNED
             = new DataTypeFactory<MysqlMediumIntType, DigitDataTypeConfig, DigitalGeneratorBase>() {
@@ -893,7 +893,7 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
     };
 
     /**
-     * mysql模式下的mediumInt类型
+     * The medium int type in mysql mode
      */
     private static final DataTypeFactory OB_MYSQL_MEDIUMINT
             = new DataTypeFactory<MysqlMediumIntType, DigitDataTypeConfig, DigitalGeneratorBase>() {
@@ -920,7 +920,7 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
     };
 
     /**
-     * mysql模式下的SmallInt unsigned类型
+     * The smallint unsigned type in mysql mode
      */
     private static final DataTypeFactory OB_MYSQL_SMALLINT_UNSIGNED
             = new DataTypeFactory<MysqlSmallIntType, DigitDataTypeConfig, DigitalGeneratorBase>() {
@@ -947,7 +947,7 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
     };
 
     /**
-     * mysql模式下的SmallInt类型
+     * The smallint type in mysql mode
      */
     private static final DataTypeFactory OB_MYSQL_SMALLINT
             = new DataTypeFactory<MysqlSmallIntType, DigitDataTypeConfig, DigitalGeneratorBase>() {
@@ -974,7 +974,7 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
     };
 
     /**
-     * mysql模式下的tinyint unsigned类型
+     * The tinyint unsigned type in mysql mode
      */
     private static final DataTypeFactory OB_MYSQL_TINYINT_UNSIGNED
             = new DataTypeFactory<MysqlTinyIntType, DigitDataTypeConfig, DigitalGeneratorBase>() {
@@ -1001,7 +1001,7 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
     };
 
     /**
-     * mysql模式下的tinyint类型
+     * The tinyint type in mysql mode
      */
     private static final DataTypeFactory OB_MYSQL_TINYINT
             = new DataTypeFactory<MysqlTinyIntType, DigitDataTypeConfig, DigitalGeneratorBase>() {
@@ -1028,7 +1028,7 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
     };
 
     /**
-     * oracle模式下的RAW类型
+     * The raw type in oracle mode
      */
     private static final DataTypeFactory OB_ORACLE_RAW = new DataTypeFactory<OracleRawType, CharDataTypeConfig, ByteGeneratorBase>() {
         @Override
@@ -1050,7 +1050,7 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
     };
 
     /**
-     * oracle模式下的clob类型
+     * The clob type in oracle mode
      */
     private static final DataTypeFactory OB_ORACLE_CLOB = new DataTypeFactory<OracleBlobType, CharDataTypeConfig, ByteGeneratorBase>() {
         @Override
@@ -1072,7 +1072,7 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
     };
 
     /**
-     * oracle模式下的blob类型
+     * The blob type in oracle mode
      */
     private static final DataTypeFactory OB_ORACLE_BLOB = new DataTypeFactory<OracleBlobType, CharDataTypeConfig, ByteGeneratorBase>() {
         @Override
@@ -1094,7 +1094,7 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
     };
 
     /**
-     * oracle模式下的timstamp with local time zone类型
+     * timstamp with local time zone type in oracle mode
      */
     private static final DataTypeFactory OB_ORACLE_TIMESTAMP_WITH_LOCAL_TIME_ZONE
             = new DataTypeFactory<OracleTimestampType, DateDataTypeConfig, DateGeneratorBase>() {
@@ -1130,7 +1130,7 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
     };
 
     /**
-     * oracle模式下的timstamp with time zone类型
+     * timstamp with time zone type in oracle mode
      */
     private static final DataTypeFactory OB_ORACLE_TIMESTAMP_WITH_TIME_ZONE
             = new DataTypeFactory<OracleTimestampType, DateDataTypeConfig, DateGeneratorBase>() {
@@ -1166,7 +1166,7 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
     };
 
     /**
-     * oracle模式下的timstamp类型
+     * The timestamp type in oracle mode
      */
     private static final DataTypeFactory OB_ORACLE_TIMESTAMP
             = new DataTypeFactory<OracleTimestampType, DateDataTypeConfig, DateGeneratorBase>() {
@@ -1199,7 +1199,7 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
     };
 
     /**
-     * oracle模式下的date类型
+     * The date type in oracle mode
      */
     private static final DataTypeFactory OB_ORACLE_DATE = new DataTypeFactory<OracleDateType, DateDataTypeConfig, DateGeneratorBase>() {
 
@@ -1230,7 +1230,7 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
     };
 
     /**
-     * oracle模式下的interval year to month类型
+     * interval year to month type in oracle mode
      */
     private static final DataTypeFactory OB_ORACLE_INTERVAL_YEAR_TO_MONTH
             = new DataTypeFactory<OracleIntervalYMType, DateDataTypeConfig, BaseGenerator>() {
@@ -1259,7 +1259,7 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
     };
 
     /**
-     * oracle模式下的interval year to month类型
+     * interval year to month type in oracle mode
      */
     private static final DataTypeFactory OB_ORACLE_INTERVAL_DAY_TO_SECOND
             = new DataTypeFactory<OracleIntervalYMType, DateDataTypeConfig, BaseGenerator>() {
@@ -1288,7 +1288,7 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
     };
 
     /**
-     * oracle模式下的nvarchar2类型
+     * The nvarchar type in oracle mode
      */
     private static final DataTypeFactory OB_ORACLE_NVARCHAR
             = new DataTypeFactory<OracleNvarCharType, CharDataTypeConfig, CharGeneratorBase>() {
@@ -1319,7 +1319,7 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
     };
 
     /**
-     * oracle模式下的varchar2类型
+     * The varchar2 type in oracle mode
      */
     private static final DataTypeFactory OB_ORACLE_VARCHAR2
             = new DataTypeFactory<OracleVarCharType, CharDataTypeConfig, CharGeneratorBase>() {
@@ -1349,7 +1349,7 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
     };
 
     /**
-     * oracle模式下的varchar类型
+     * The varchar type in oracle mode
      */
     private static final DataTypeFactory OB_ORACLE_VARCHAR
             = new DataTypeFactory<OracleVarCharType, CharDataTypeConfig, CharGeneratorBase>() {
@@ -1379,7 +1379,7 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
     };
 
     /**
-     * oracle模式下字符类型的工厂实例
+     * The char type in oracle mode
      */
     private static final DataTypeFactory OB_ORACLE_CHAR = new DataTypeFactory<OracleCharType, CharDataTypeConfig, CharGeneratorBase>() {
 
@@ -1409,7 +1409,7 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
     };
 
     /**
-     * oracle模式下NUMBER数据类型的工厂类实例
+     * The number type in oracle mode
      */
     private static final DataTypeFactory OB_ORACLE_NUMBER
             = new DataTypeFactory<OracleNumberType, DigitDataTypeConfig, DigitalGeneratorBase>() {
@@ -1441,7 +1441,7 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
     };
 
     /**
-     * 实例映射表
+     * Instance mapping table
      */
     private static final Map<String, DataTypeFactory> FACTORYNAME_2_FACTORYINSTANCE = new HashMap<>();
 
@@ -1460,17 +1460,17 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
     }
 
     /**
-     * 获取类型工厂类的名称
+     * Get the name of the type factory class
      *
-     * @return 返回名称
+     * @return Return name
      */
     abstract public String name();
 
     /**
-     * 公共方法，通过该方法将一个列的config对象转为一个具体的列对象
+     * Public method, through which a column config object is converted into a specific column object
      *
-     * @param config 列配置对象
-     * @return 返回列对象
+     * @param config Column configuration object
+     * @return Return column object
      */
     public T make(V config) {
         try {
@@ -1489,20 +1489,15 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
     }
 
     /**
-     * 内部构造对象方法，用于从列配置对象内部的数据生成器构造器中实例化一个数据生成器
+     * The internal construction object method is used to instantiate a data generator
+     * from the data generator constructor inside the column configuration object
      *
-     * @param config    列配置对象
-     * @param generator 由上游传过来的数据生成器对象
-     * @return 返回列对象
+     * @param config    Column configuration object
+     * @param generator Data generator object passed from upstream
+     * @return Return column object
      */
     abstract protected T newInstance(V config, K generator);
 
-    /**
-     * 根据名称获取一个类型工厂实例
-     *
-     * @param factoryName 工厂实例名称
-     * @return 返回工厂实例对象
-     */
     public static DataTypeFactory getInstance(String factoryName) {
         DataTypeFactory returnVal = FACTORYNAME_2_FACTORYINSTANCE.get(factoryName);
         if (returnVal == null) {
@@ -1511,11 +1506,6 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
         return returnVal;
     }
 
-    /**
-     * 获取所有的工厂类实例
-     *
-     * @return 返回所有的工厂类实例
-     */
     public static List<DataTypeFactory> listInstances() {
         List<DataTypeFactory> returnVal = new ArrayList<>();
         Set<Map.Entry<String, DataTypeFactory>> entries = FACTORYNAME_2_FACTORYINSTANCE.entrySet();

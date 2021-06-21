@@ -6,7 +6,7 @@ import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
 
 /**
- * 随机数字数据生成器
+ * Random number data generator
  *
  * @author yh263208
  * @date 2020-12-16 11:11
@@ -14,11 +14,11 @@ import com.oceanbase.tools.datamocker.model.exception.MockerException;
  */
 public class RandomNumGenerator extends CharGeneratorBase {
     /**
-     * 随机数据开始值
+     * Random data start value
      */
     private Long start;
     /**
-     * 随机数据结束值
+     * Random data end value
      */
     private Long end;
 
@@ -55,12 +55,12 @@ public class RandomNumGenerator extends CharGeneratorBase {
 
     @Override
     public String generate(Integer minLength, Integer maxLength) {
-        Long interval = end - start;
-        Long result = new Double(Math.random() * interval + start).longValue();
-        if (result.toString().length() < minLength || result.toString().length() > maxLength) {
+        long interval = end - start;
+        long result = new Double(Math.random() * interval + start).longValue();
+        if (Long.toString(result).length() < minLength || Long.toString(result).length() > maxLength) {
             throw new MockerException("Number result for random number generator is illegal");
         }
-        return result.toString();
+        return Long.toString(result);
     }
 
     @Override

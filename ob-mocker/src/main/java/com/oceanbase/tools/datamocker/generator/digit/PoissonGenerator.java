@@ -7,7 +7,7 @@ import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
 
 /**
- * 泊松分布随机数生成器
+ * Poisson Distribution Random Number Generator
  *
  * @author yh263208
  * @date 2020-12-09 13:51
@@ -15,14 +15,14 @@ import com.oceanbase.tools.datamocker.model.exception.MockerException;
  */
 public class PoissonGenerator extends DigitalGeneratorBase<BigDecimal> {
     /**
-     * 泊松分布的均值
+     * Mean of Poisson distribution
      */
     private final double lambda;
 
     /**
-     * 构造函数
+     * Constructor
      *
-     * @param lambda 传入一个平均值
+     * @param lambda Pass in an average
      */
     public PoissonGenerator(double lambda) {
         this.lambda = lambda;

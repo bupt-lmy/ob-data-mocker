@@ -3,7 +3,8 @@ package com.oceanbase.tools.datamocker.util;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
 
 /**
- * 表示一个数字区间，是一个左闭右闭区间
+ * Represents a numeric interval,
+ * which is a left-closed right-closed interval
  *
  * @author yh263208
  * @date 2020-12-11 20：55
@@ -11,11 +12,11 @@ import com.oceanbase.tools.datamocker.model.exception.MockerException;
  */
 public class Range<T extends Comparable> {
     /**
-     * 区间的左范围
+     * Left range of interval
      */
     private final T min;
     /**
-     * 区间的右范围
+     * Right range of interval
      */
     private final T max;
 
@@ -28,28 +29,29 @@ public class Range<T extends Comparable> {
     }
 
     /**
-     * 用于判断一个值是否在区间内，这是一个左闭右闭区间
+     * Used to judge whether a value is in the interval,
+     * this is a left-closed right-closed interval
      *
-     * @param value 用于判断的值
-     * @return 返回布尔型结果
+     * @param value Value used for judgment
+     * @return Return boolean result
      */
     public boolean contain(T value) {
         return min.compareTo(value) <= 0 && max.compareTo(value) >= 0;
     }
 
     /**
-     * 获取左边界
+     * Get the left margin
      *
-     * @return 返回左边界值
+     * @return Returns the left boundary value
      */
     public T getMin() {
         return this.min;
     }
 
     /**
-     * 获取右边界值
+     * Get the right boundary value
      *
-     * @return 返回右边界值
+     * @return Returns the right boundary value
      */
     public T getMax() {
         return this.max;

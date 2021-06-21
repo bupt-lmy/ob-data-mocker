@@ -18,7 +18,7 @@ import com.oceanbase.tools.datamocker.util.Pair;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * sql文本生成原语
+ * SQL text generation primitive
  *
  * @author yh263208
  * @date 2021-01-05 20:47
@@ -27,33 +27,27 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class SqlScriptWriter extends AbstractMockWriter {
     /**
-     * 写入的目标库，如果建连接的时候指定了目标库该值也可以不填写
+     * The written target library, if the target library is specified when the connection is established, this value can also be left blank
      */
     private final String database;
     /**
-     * 写入的目标表，该参数必传，指定传入的目标表
+     * The target table to be written, this parameter must be passed, specify the incoming target table
      */
     private final String tableName;
     /**
-     * OB的方言模式，默认为oracle模式
+     * The dialect mode of OB, the default is oracle mode
      */
     private ObModeType dialectType = ObModeType.OB_ORACLE;
-    /**
-     * 文件管理器
-     */
-    private MockerFile manager = null;
-    /**
-     * 该原语的分组ID
-     */
-    private String groupId = null;
+    private MockerFile manager;
+    private String groupId;
 
     /**
-     * 构造函数写入一个数据源，该数据源是必须的
+     * The constructor writes a mock file, which is required
      *
-     * @param manager     文件管理器对象
-     * @param dialectType 方言类型
-     * @param database    数据库名
-     * @param tableName   表名
+     * @param manager     mock file object
+     * @param dialectType dialect type
+     * @param database    schema or database name
+     * @param tableName   table name
      */
     public SqlScriptWriter(MockerFile manager, ObModeType dialectType, String database,
             String tableName) {
@@ -69,13 +63,13 @@ public class SqlScriptWriter extends AbstractMockWriter {
     }
 
     /**
-     * 构造函数写入一个数据源，该数据源是必须的
+     * The constructor writes a mock file, which is required
      *
-     * @param manager     文件管理器对象
-     * @param dialectType 方言类型
-     * @param database    数据库名
-     * @param tableName   表名
-     * @param groupId     分组ID
+     * @param manager mock file object
+     * @param dialectType dialect type
+     * @param database schema or database name
+     * @param tableName table name
+     * @param groupId group id
      */
     public SqlScriptWriter(MockerFile manager, ObModeType dialectType, String database,
             String tableName, String groupId) {
@@ -90,13 +84,13 @@ public class SqlScriptWriter extends AbstractMockWriter {
     }
 
     /**
-     * 验证原语的输入参数
+     * Validation primitive input parameters
      *
-     * @param manager     文件管理器
-     * @param dialectType 方言类型
-     * @param database    数据库名或schema名
-     * @param tableName   表名
-     * @throws MockerException 验证失败抛出异常
+     * @param manager mock file
+     * @param dialectType dialect type
+     * @param database database or schema name
+     * @param tableName table name
+     * @throws MockerException An exception is thrown when verification fails
      */
     private void validateParam(MockerFile manager, ObModeType dialectType, String database,
             String tableName) {

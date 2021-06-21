@@ -40,7 +40,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * mock数据任务测试类，用于测试mock数据的任务模块
+ * Mock data task test class, used to test the task module of mock data
  *
  * @author yh263208
  * @date 2021-01-17 16:14
@@ -49,17 +49,8 @@ import org.junit.Test;
 public class MockerTaskMysqlTest extends MockerTestBase {
     private final ThreadPoolExecutor executor = new ThreadPoolExecutor(3, 5, 0, TimeUnit.MILLISECONDS,
             new LinkedBlockingQueue<>(), new ThreadPoolExecutor.CallerRunsPolicy());
-    /**
-     * 任务配置文件目录
-     */
     private final String configFile = "task/config-mysql.json";
-    /**
-     * mysql数据库连接配置文件所在地
-     */
     private final String mysqlEnv = "db/mysql-env.properties";
-    /**
-     * oracle数据库连接配置文件所在地
-     */
     private final String oracleEnv = "db/oracle-env.properties";
     private final String[] ddls = new String[] {
             " CREATE TABLE `emp` (\n"
@@ -100,12 +91,6 @@ public class MockerTaskMysqlTest extends MockerTestBase {
     };
     private DataSource mysqlDatasource = null;
 
-    /**
-     * 获取测试数据库连接配置信息
-     *
-     * @param dialectType 方言类型
-     * @throws IOException 文件读取操作可能会抛出异常
-     */
     private DataBaseConfig getDBConfig(ObModeType dialectType) throws IOException {
         DataBaseConfig config = new DataBaseConfig();
         Properties properties = new Properties();
@@ -128,12 +113,6 @@ public class MockerTaskMysqlTest extends MockerTestBase {
         return config;
     }
 
-    /**
-     * 从配置文件中读取任务配置封装成一个任务配置对象
-     *
-     * @return 返回任务对象
-     * @throws IOException 可能找不到文件
-     */
     private AbstractTaskConfig getTask() throws IOException {
         URL url = this.getClass().getClassLoader().getResource(this.configFile);
         FileReader reader = new FileReader(url.getPath());
@@ -181,9 +160,8 @@ public class MockerTaskMysqlTest extends MockerTestBase {
                 }
                 for (TableTaskContext item : contexts) {
                     String interval = (System.currentTimeMillis() - start) / 1000 + "s";
-                    System.out.println(
-                            String.format("[\"%s\" - \"%s\"] : %s - %s - %f", item.getTaskName(), item.getTableTaskId(), item.getStatus(),
-                                    interval, context.getProgress()));
+                    System.out.printf("[\"%s\" - \"%s\"] : %s - %s - %f%n", item.getTaskName(), item.getTableTaskId(), item.getStatus(),
+                            interval, context.getProgress());
                     if (MockTaskStatus.CANCELED.equals(item.getStatus()) || MockTaskStatus.FAILED.equals(item.getStatus())) {
                         return false;
                     }

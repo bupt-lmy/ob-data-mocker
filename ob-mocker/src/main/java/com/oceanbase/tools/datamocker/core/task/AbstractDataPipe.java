@@ -13,8 +13,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.Validate;
 
 /**
- * 抽象数据管道，用于在两个线程之间进行数据传递
- * 范型T代表数据管道中传递的对象类型
+ * Abstract data pipeline, used for data transfer between two threads.
+ * Paradigm T represents the type of object passed in the data pipeline
  *
  * @author yh263208
  * @date 2021-01-14 15:32
@@ -23,27 +23,27 @@ import org.apache.commons.lang.Validate;
 @Slf4j
 public abstract class AbstractDataPipe<T> {
     /**
-     * 管道状态，用于描述管道当前的状态。有开启和关闭两种状态，默认为开启
+     * Pipeline state, used to describe the current state of the pipeline. There are two states of on and off, the default is on
      */
     private Boolean closed = Boolean.FALSE;
     /**
-     * 最大留存数量，意为留存在数据管道中最大的数据量
+     * The maximum retention amount means the maximum amount of data retained in the data pipeline
      */
     private int maxRetained = Integer.MAX_VALUE;
     /**
-     * 锁对象，用于进行留存数量控制
+     * Lock object, used to control the number of retained
      */
     private final Lock lock;
     /**
-     * 最大数量的条件控制对象
+     * Maximum number of conditional control objects
      */
     private final Condition notFullCondition;
     /**
-     * 数据管道全空条件控制对象
+     * Data pipeline full empty condition control object
      */
     private final Condition notEmptyCondition;
     /**
-     * 条件等待超时时间
+     * Condition wait timeout
      */
     private final static long CONDITION_WAIT_TIMEOUTSEC = 5;
 
@@ -57,11 +57,12 @@ public abstract class AbstractDataPipe<T> {
     }
 
     /**
-     * 管道的写入方法，通过该方法向管道中写入一条记录
+     * The write method of the pipeline, by which a record is written to the pipeline
      *
-     * @param timeout  最长阻塞时间
-     * @param timeUnit 时间单位
-     * @param row      写入的数据
+     * @param timeout  timeout for write operation
+     * @param timeUnit unit for timeout
+     * @param row      row of data
+     * @throws Exception exception will be thrown when fail to write data
      */
     public void write(List<T> row, long timeout, TimeUnit timeUnit) throws Exception {
         Validate.isTrue(timeout >= 0, "Timeout for pipeline write can not be negative");
@@ -99,39 +100,41 @@ public abstract class AbstractDataPipe<T> {
     }
 
     /**
-     * 管道的写入方法，通过该方法向管道中写入一条记录
+     * The write method of the pipeline, by which a record is written to the pipeline
      *
-     * @param row 写入的数据
+     * @param row row of data
+     * @exception Exception exception will be thrown when fail to write data
      */
     public void write(List<T> row) throws Exception {
         write(row, Long.MAX_VALUE, TimeUnit.SECONDS);
     }
 
     /**
-     * 管道的写入方法实现类
+     * The write method of the pipeline, by which a record is written to the pipeline
      *
-     * @param timeout  最长阻塞时间
-     * @param timeUnit 时间单位
-     * @param row      写入的数据
+     * @param timeout  timeout for write operation
+     * @param timeUnit unit for timeout
+     * @param row      row of data
+     * @throws Exception exception will be thrown when fail to write data
      */
-    abstract public void doWrite(List<T> row, long timeout, TimeUnit timeUnit)
-            throws Exception;
+    abstract public void doWrite(List<T> row, long timeout, TimeUnit timeUnit) throws Exception;
 
     /**
-     * 管道的读取方法，通过该方法从管道中读出一条记录
+     * The read method of the pipeline, by which a record is read from the pipeline
      *
-     * @return 返回一条记录
+     * @return list of data
      */
     public List<T> read() throws Exception {
         return read(Long.MAX_VALUE, TimeUnit.SECONDS);
     }
 
     /**
-     * 管道的读取方法，通过该方法从管道中读出一条记录
+     * The read method of the pipeline, by which a record is read from the pipeline
      *
-     * @param timeout  最长阻塞时间
-     * @param timeUnit 时间单位
-     * @return 返回一条记录
+     * @param timeout timeout for write operation
+     * @param timeUnit unit for timeout
+     * @return list of data
+     * @exception Exception exception will be thrown when fail to read
      */
     public List<T> read(long timeout, TimeUnit timeUnit) throws Exception {
         Validate.isTrue(timeout >= 0, "Timeout for pipeline write can not be negative");
@@ -168,32 +171,33 @@ public abstract class AbstractDataPipe<T> {
     }
 
     /**
-     * 管道的读出实现逻辑
+     * The read method of the pipeline, by which a record is read from the pipeline
      *
-     * @param timeout  最长阻塞时间
-     * @param timeUnit 时间单位
-     * @return 返回读出的数据
+     * @param timeout timeout for write operation
+     * @param timeUnit unit for timeout
+     * @return list of data
+     * @exception Exception exception will be thrown when fail to read
      */
     abstract public List<T> doRead(long timeout, TimeUnit timeUnit) throws Exception;
 
     /**
-     * 返回管道中数据的数量
+     * Returns the amount of data in the pipeline
      *
-     * @return 返回数量
+     * @return size for data pipe
      */
     abstract public Long size();
 
     /**
-     * 管道是否关闭
+     * Whether the pipeline is closed
      *
-     * @return 返回是否关闭的布尔值
+     * @return Returns a boolean value of whether to close
      */
     public Boolean isClosed() {
         return this.closed;
     }
 
     /**
-     * 关闭管道
+     * Method to close the pipeline
      */
     public synchronized void close() {
         this.closed = Boolean.TRUE;

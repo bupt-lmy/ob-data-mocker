@@ -13,7 +13,7 @@ import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
 
 /**
- * oracle模式下的时间戳类型
+ * Timestamp type in oracle mode
  *
  * @author yh263208
  * @date 2020-12-16 17:50
@@ -21,19 +21,15 @@ import com.oceanbase.tools.datamocker.model.exception.MockerException;
  */
 public class OracleTimestampType extends AbstractDateDataType<Timestamp> {
     /**
-     * oracle模式下数据库中的日期格式化字符串
+     * Date format string in the database in oracle mode
      */
     private final String oracleDateFormate;
     /**
-     * java应用程序中的日期格式化字符串
+     * Date format string in java application
      */
     private static final String JAVA_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
     /**
-     * 日期格式化器
-     */
-    private final SimpleDateFormat dateFormat = new SimpleDateFormat(JAVA_DATE_FORMAT);
-    /**
-     * 时间戳类型的精度，该精度范围在0-9范围内
+     * The precision of the timestamp type, the precision range is 0-9
      */
     private final int scale;
 
@@ -68,11 +64,6 @@ public class OracleTimestampType extends AbstractDateDataType<Timestamp> {
         oracleDateFormate = String.format("YYYY-MM-DD HH24:MI:SS.FF%d", scale);
     }
 
-    /**
-     * 绑定数据生成器方法
-     *
-     * @param generator 数据生成器
-     */
     @Override
     public void bind(BaseGenerator<Timestamp, Timestamp> generator) {
         super.bind(generator);
@@ -121,6 +112,7 @@ public class OracleTimestampType extends AbstractDateDataType<Timestamp> {
         if (value == null) {
             return "NULL";
         }
+        SimpleDateFormat dateFormat = new SimpleDateFormat(JAVA_DATE_FORMAT);
         dateFormat.setTimeZone(timeZone());
         return String.format("to_timestamp('%s.%d', '%s')", dateFormat.format(value), value.getNanos(), oracleDateFormate);
     }

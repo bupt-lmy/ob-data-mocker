@@ -8,7 +8,7 @@ import com.oceanbase.tools.datamocker.model.enums.ObModeType;
 import lombok.Getter;
 
 /**
- * 表生成任务元数据信息
+ * Table generation task metadata information
  *
  * @author yh263208
  * @date 2021-01-13 17:35
@@ -16,48 +16,25 @@ import lombok.Getter;
  */
 @Getter
 public class TableTaskMetaData {
-    /**
-     * 任务ID
-     */
     private final String tableTaskId;
     /**
-     * 表生成任务的最大数量，当生成一张表时totalCount代表要生成数据的最大条目数
+     * The maximum number of table generation tasks, when a table is generated,
+     * totalCount represents the maximum number of entries of data to be generated
      */
     private final Long totalCount;
     /**
-     * 表结构定义，用于描述表的结构，包括各字段名和类型的映射关系
-     *
-     * key：列名
-     * value：列名对应的数据类型
+     * Table structure definition, used to describe the structure of the table,
+     * including the mapping relationship between field names and types
+     * key：Column name
+     * value：Data type corresponding to column name
      */
     private final Map<String, AbstractDataType> tableSchema;
-    /**
-     * 表名
-     */
     private final String tableName;
-    /**
-     * 表所在的schema
-     */
     private final String schema;
-    /**
-     * 是否清空表
-     */
     private final Boolean shouldTruncate;
-    /**
-     * 超时时间
-     */
     private final Long timeoutMilliseconds;
-    /**
-     * 批处理大小
-     */
     private final Long batchSize;
-    /**
-     * 方言类型
-     */
     private final ObModeType dialectType;
-    /**
-     * 任务id
-     */
     private final String taskId;
 
     public TableTaskMetaData(Map<String, AbstractDataType> tableSchema, AbstractTableConfig tableConfig, ObModeType dialectType,

@@ -5,7 +5,7 @@ import com.oceanbase.tools.datamocker.generator.chartype.StepNumGenerator;
 import com.oceanbase.tools.datamocker.model.enums.CharCaseOption;
 
 /**
- * 顺序数字字节数据生成器
+ * Sequential digital byte data generator
  *
  * @author yh263208
  * @date 2020-12-16 23:42

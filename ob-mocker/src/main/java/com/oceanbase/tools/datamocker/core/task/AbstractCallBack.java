@@ -1,7 +1,7 @@
 package com.oceanbase.tools.datamocker.core.task;
 
 /**
- * 抽象回调函数类，用于执行回调函数
+ * Callback method, used to execute some call back logic
  *
  * @author yh263208
  * @date 2021-04-14 11:30
@@ -9,11 +9,11 @@ package com.oceanbase.tools.datamocker.core.task;
  */
 public abstract class AbstractCallBack<T> {
     /**
-     * 是否已经执行了onSuccess方法
+     * Has the onSuccess method been executed
      */
     private boolean onSuccessFlag;
     /**
-     * 是否已经执行了onFailure方法
+     * Has the onFailure method been executed
      */
     private boolean onFailureFlag;
 
@@ -23,10 +23,10 @@ public abstract class AbstractCallBack<T> {
     }
 
     /**
-     * 成功时的回调函数
+     * OnSuccess method, which is executed when operation is success
      *
-     * @param param 参数
-     * @throws Throwable 成功的回调函数允许抛出异常
+     * @param param custom parameter
+     * @throws Throwable exception is allow to be thrown when onSuccess method executed
      */
     public void onSuccess(T param) throws Throwable {
         if (!onFailureFlag && !onSuccessFlag) {
@@ -38,9 +38,11 @@ public abstract class AbstractCallBack<T> {
     protected abstract void doOnSuccess(T param) throws Throwable;
 
     /**
-     * 失败时的回调函数
+     * OnFailure method, which is executed when operation is failed
      *
-     * @param param 回调函数的参数
+     * @param param custom parameter
+     * @param e     input exception
+     * @throws Throwable exception is allow to be thrown when onFailure method executed
      */
     public void onFailure(T param, Throwable e) throws Throwable {
         if (onSuccessFlag || onFailureFlag) {

@@ -4,7 +4,7 @@ import com.oceanbase.tools.datamocker.model.enums.CharCaseOption;
 import com.oceanbase.tools.datamocker.model.enums.CharsetType;
 
 /**
- * 字符串类型的数据生成器，用于生成字符串类型的随机数据
+ * String type data generator, used to generate string type random data
  *
  * @author yh263208
  * @date 2020-12-11 20:26
@@ -12,89 +12,63 @@ import com.oceanbase.tools.datamocker.model.enums.CharsetType;
  */
 public abstract class CharGeneratorBase extends BaseGenerator<Integer, String> {
     /**
-     * 字符数据生成器的大小写设定，默认为大小写无关
+     * The case setting of the character data generator, the default is case-independent
      */
-    private CharCaseOption caseOption;
+    private final CharCaseOption caseOption;
     /**
-     * 是否为Unicode字符串
+     * Is it a Unicode string
      */
     private Boolean isUnicode = Boolean.FALSE;
-    /**
-     * 字符串编码格式
-     */
     private CharsetType charsetType = CharsetType.UTF_8;
 
     public CharGeneratorBase(CharCaseOption caseOption) {
         this.caseOption = caseOption;
     }
 
-    /**
-     * 设置字符编码格式
-     *
-     * @param charset 字符编码格式
-     */
     public void setCharset(CharsetType charset) {
         this.charsetType = charset;
     }
 
-    /**
-     * 设置是否为unicode字符串
-     *
-     * @param isUnicode 是否为unicode字符串设置
-     */
     public void setUnicode(Boolean isUnicode) {
         this.isUnicode = isUnicode;
     }
 
-    /**
-     * 获取字符串的编码格式
-     */
     protected CharsetType charset() {
         return this.charsetType;
     }
 
-    /**
-     * 返回是否为unicode字符串
-     *
-     * @return 返回结果
-     */
     protected Boolean unicode() {
         return this.isUnicode;
     }
 
-    /**
-     * 返回数据生成器的大小写设定
-     */
     protected CharCaseOption caseOption() {
         return this.caseOption;
     }
 
     /**
-     * 预检查步骤，用于根据边界值校验该生成器是否可以正常工作
+     * Pre-checking step, used to check whether the generator can work normally according to the boundary value
      *
-     * @param minLength 最小值，
-     * @param maxLength 最大值
-     * @return 返回校验结果
+     * @param minLength min length for string value
+     * @param maxLength max length for string value
+     * @return Return the verification result
      */
     @Override
     abstract public Boolean preCheck(Integer minLength, Integer maxLength);
 
     /**
-     * 数据生成方法接口
+     * Data generation method interface
      *
-     * @param minLength 最小值，对于不同类型的数据生成器含义略有不同，对于数字型的生成任务反映的是生成数字的最小值，
-     *                  如果是字符型的生成任务反映的是字符的字节最小值
-     * @param maxLength 最大值，对于不同类型的数据生成器含义略有不同，对于数字型的生成任务反映的是生成数字的最小值，
-     *                  如果是字符型的生成任务反映的是字符的字节最小值
-     * @return 返回一个生成的具体值
+     * @param minLength The minimum value, the character generation task reflects the minimum byte value of the character
+     * @param maxLength The maximum value, the character generation task reflects the minimum byte value of the character
+     * @return Returns a generated specific value
      */
     @Override
     abstract public String generate(Integer minLength, Integer maxLength);
 
     /**
-     * 返回数据生成器一共能够生成的不重复的数据个数
+     * Return the total number of unique data that the data generator can generate
      *
-     * @return 返回具体的数值，如果数据生成器可以无限制生成数据则返回null
+     * @return Return a specific value, or null if the data generator can generate data without limitation
      */
     @Override
     abstract public Long count(Integer minLength, Integer maxLength);

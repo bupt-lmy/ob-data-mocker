@@ -9,7 +9,7 @@ import com.oceanbase.tools.datamocker.model.enums.ObModeType;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
 
 /**
- * Oracle模式下的Number类型的数据
+ * Number type data in Oracle mode
  *
  * @author yh263208
  * @date 2020-12-10 15:05
@@ -17,11 +17,11 @@ import com.oceanbase.tools.datamocker.model.exception.MockerException;
  */
 public class OracleNumberType extends AbstractDigitDataType<BigDecimal> {
     /**
-     * 有效数字位数，在oracle中该值为0～38
+     * The number of significant digits, the value is 0 to 38 in oracle
      */
     private final int precision;
     /**
-     * 精度，在oracle中精度范围为-84～127
+     * Accuracy, the accuracy range in oracle is -84～127
      */
     private final int scale;
 
@@ -89,10 +89,14 @@ public class OracleNumberType extends AbstractDigitDataType<BigDecimal> {
     }
 
     /**
-     * oracle模式下的number数据类型中有有效数字和精度的要求，因此需要知道在指定精度和有效数字的约束下该数据类型的最大最小值
+     * The number data type in oracle mode has significant digits and precision requirements,
+     * so it is necessary to know the maximum and minimum values of the data type under the
+     * constraints of the specified precision and significant digits
      *
-     * @return 返回最大最小值的绝对值，如果是最大值则直接使用返回值就可以了，如果是最小值则取负值
-     * @throws MockerException 有效数字位数和精度有大小范围的要求，超过范围可能会抛错
+     * @return Return the absolute value of the maximum and minimum values, if it is the maximum value,
+     * just use the return value directly, if it is the minimum value, take a negative value
+     * @throws MockerException The number of significant digits and precision are required for the size
+     * range, and an error may be thrown if it exceeds the range
      */
     private BigDecimal maxOrMinForNumber() {
         if (precision > 38 || precision < 0 || scale < -84 || scale > 127) {

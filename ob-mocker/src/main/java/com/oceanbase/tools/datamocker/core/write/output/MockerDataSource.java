@@ -27,7 +27,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 
 /**
- * mock数据专用的数据连接池，用于封装数据库连接。和普通的数据库连接池不同的是这里严格限定了某一时刻和DB建立的最大数量的数据库连接数量
+ * A data connection pool dedicated to mock data is used to encapsulate database connections.
+ * Unlike ordinary database connection pools, the maximum number of database connections
+ * that can be established with DB at a certain time is strictly limited here
  *
  * @author yh263208
  * @date 2021-01-04 16:04
@@ -35,55 +37,51 @@ import org.apache.commons.lang.StringUtils;
  */
 @Slf4j
 public class MockerDataSource implements DataSource {
-    /**
-     * 数据库配置对象
-     */
     private final DataBaseConfig config;
-    /**
-     * jdbc连接URL
-     */
     private final String jdbcUrl;
     /**
-     * 数据库连接参数
+     * Database connection parameters
      */
     private final Map<String, String> connectParams;
     /**
-     * 驱动名称，使用OB默认的驱动
+     * Driver name, use OB default driver
      */
     private final static String DRIVER_CLASS_NAME = "com.alipay.oceanbase.obproxy.mysql.jdbc.Driver";
     /**
-     * 数据库连接池初始化时新建连接的数量
+     * The number of new connections when the database connection pool is initialized
      */
     private int minPoolSize = 10;
     /**
-     * 数据库连接池最大数据库连接数量
+     * Maximum number of database connections in the database connection pool
      */
     private int maxPoolSize = 20;
     /**
-     * 数据库连接数量从minPoolSize增长到maxPoolSize时的增益步长
+     * The gain step size when the number of database connections increases from minPoolSize to maxPoolSize
      */
     private int increaseStep = 5;
     /**
-     * 数据库连接池
+     * Database connection pool
      */
     private final Stack<Connection> connectionPool = new Stack<>();
     /**
-     * 封装正在被使用的数据库连接
+     * Encapsulate the database connection being used
      */
     private final List<Connection> connectionInUse = new LinkedList<>();
     /**
-     * 数据库里连接读锁
+     * Connection read lock in the database
      */
     private final ReentrantLock lock = new ReentrantLock();
     /**
-     * 等待条件，当连接池中没有更多连接可用时，调用线程在这个条件上挂起
+     * Waiting for the condition, when there are no more connections available in the connection pool,
+     * the calling thread hangs on this condition
      */
     private final Condition noMoreConnection = lock.newCondition();
 
     /**
-     * 根据数据库连接配置信息构造一个连接池
+     * Construct a connection pool according to the database connection configuration information
      *
-     * @param config 数据库连接信息
+     * @param config       Database connection information
+     * @param connectParam map between parameter name and parameter value
      */
     public MockerDataSource(DataBaseConfig config, Map<String, String> connectParam) throws SQLException {
         validate(config);
@@ -94,12 +92,12 @@ public class MockerDataSource implements DataSource {
     }
 
     /**
-     * 连接池构造函数
+     * Constructor for MockerDataSource
      *
-     * @param config       数据库连接配置对象
-     * @param minPoolSize  连接池的最小大小
-     * @param maxPoolSize  连接池的最大大小
-     * @param increaseStep 数据库连接数木增益
+     * @param config Database connection configuration object
+     * @param minPoolSize The minimum size of the connection pool
+     * @param maxPoolSize The maximum size of the connection pool
+     * @param increaseStep Database connection gain
      */
     public MockerDataSource(DataBaseConfig config, int minPoolSize, int maxPoolSize, int increaseStep,
             Map<String, String> connectParam) throws SQLException {
@@ -120,9 +118,6 @@ public class MockerDataSource implements DataSource {
         initPool();
     }
 
-    /**
-     * 初始化线程池，首先创建一个连接查看db是否可用
-     */
     private void initPool() throws SQLException {
         StringBuilder username = new StringBuilder(this.config.getUser());
         if (StringUtils.isNotBlank(this.config.getTenant())) {
@@ -138,10 +133,10 @@ public class MockerDataSource implements DataSource {
     }
 
     /**
-     * 校验数据库连接对象的信息合法性
+     * Verify the validity of the information of the database connection object
      *
-     * @param config 数据库连接配置对象
-     * @throws MockerException 如果校验失败则抛出异常
+     * @param config Database connection configuration object
+     * @throws MockerException If the verification fails, an exception is thrown
      */
     private void validate(DataBaseConfig config) {
         if (StringUtils.isBlank(config.getHost()) || StringUtils.isBlank(config.getUser()) || StringUtils.isBlank(config.getPassword())
@@ -150,11 +145,6 @@ public class MockerDataSource implements DataSource {
         }
     }
 
-    /**
-     * 获取数据库连接jdbc url的方法
-     *
-     * @return 返回数据库连接URL
-     */
     private String genJDBCUrl() {
         StringBuilder buffer = new StringBuilder("jdbc:oceanbase://");
         buffer.append(this.config.getHost())
@@ -171,9 +161,6 @@ public class MockerDataSource implements DataSource {
         return buffer.toString();
     }
 
-    /**
-     * 类初始化阶段
-     * */
     static {
         try {
             DriverManager.setLoginTimeout(15);
@@ -184,7 +171,8 @@ public class MockerDataSource implements DataSource {
     }
 
     /**
-     * 刷新连接池，当没有连接可用时调用此方法。该方法会清理已经被使用的连接
+     * Refresh the connection pool and call this method when no connection is available.
+     * This method will clean up the connections that have been used
      */
     private void refresh() {
         lock.lock();
@@ -286,7 +274,7 @@ public class MockerDataSource implements DataSource {
     }
 
     /**
-     * 清理逻辑，用于线程池销毁时清理没有使用的连接
+     * Cleanup logic, used to clean up unused connections when the thread pool is destroyed
      */
     public boolean clear() {
         if (lock.tryLock()) {
@@ -334,69 +322,48 @@ public class MockerDataSource implements DataSource {
     }
 
     /**
-     * 独立获取一个数据库连接，该连接不在连接池中托管
+     * Obtain a database connection independently, the connection is not hosted in the connection pool
      *
-     * @param username 数据库连接用户名
-     * @param password 数据连接密码
-     * @return 返回数据库连接
-     * @throws SQLException 连接建立时可能会抛出异常
+     * @param username Database connection user name
+     * @param password Data connection password
+     * @return Return to database connection
+     * @throws SQLException An exception may be thrown when the connection is established
      */
     @Override
     public Connection getConnection(String username, String password) throws SQLException {
         return DriverManager.getConnection(this.jdbcUrl, username, password);
     }
 
-    /**
-     * 设置login超时时间
-     */
     @Override
     public void setLoginTimeout(int seconds) throws SQLException {
         DriverManager.setLoginTimeout(seconds);
     }
 
-    /**
-     * 获取login超时时间
-     */
     @Override
     public int getLoginTimeout() throws SQLException {
         return DriverManager.getLoginTimeout();
     }
 
-    /**
-     * 不支持
-     */
     @Override
     public Logger getParentLogger() throws SQLFeatureNotSupportedException {
         throw new SQLFeatureNotSupportedException("not support for MockerDataSourceManager#getParentLogger method");
     }
 
-    /**
-     * 不支持
-     */
     @Override
     public <T> T unwrap(Class<T> iface) throws SQLException {
         throw new SQLFeatureNotSupportedException("not support for MockerDataSourceManager#unwrap method");
     }
 
-    /**
-     * 不支持
-     */
     @Override
     public boolean isWrapperFor(Class<?> iface) throws SQLException {
         throw new SQLFeatureNotSupportedException("not support for MockerDataSourceManager#isWrapperFor method");
     }
 
-    /**
-     * 不支持
-     */
     @Override
     public PrintWriter getLogWriter() throws SQLException {
         throw new SQLFeatureNotSupportedException("not support for MockerDataSourceManager#getLogWriter method");
     }
 
-    /**
-     * 不支持
-     */
     @Override
     public void setLogWriter(PrintWriter out) throws SQLException {
         throw new SQLFeatureNotSupportedException("not support for MockerDataSourceManager#setLogWriter method");
