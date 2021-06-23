@@ -1,6 +1,5 @@
 package com.oceanbase.tools.datamocker.datatype;
 
-import java.util.Date;
 import java.util.TimeZone;
 
 import com.oceanbase.tools.datamocker.generator.BaseDateGenerator;

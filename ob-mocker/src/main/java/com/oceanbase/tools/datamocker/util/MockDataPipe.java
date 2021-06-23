@@ -1,12 +1,10 @@
 package com.oceanbase.tools.datamocker.util;
 
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 import com.oceanbase.tools.datamocker.core.task.AbstractDataPipe;
-import com.oceanbase.tools.datamocker.datatype.AbstractDataType;
 import com.oceanbase.tools.datamocker.model.mock.MockRowData;
 
 /**

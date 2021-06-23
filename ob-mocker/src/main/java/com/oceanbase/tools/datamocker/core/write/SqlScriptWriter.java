@@ -4,11 +4,9 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import com.oceanbase.tools.datamocker.core.write.output.MockerFile;
-import com.oceanbase.tools.datamocker.datatype.AbstractDataType;
 import com.oceanbase.tools.datamocker.model.enums.ObModeType;
 import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
@@ -16,7 +14,6 @@ import com.oceanbase.tools.datamocker.model.mock.MockColumnData;
 import com.oceanbase.tools.datamocker.model.mock.MockRowData;
 import com.oceanbase.tools.datamocker.util.DbObjectNameUtil;
 import com.oceanbase.tools.datamocker.util.DigestUtil;
-import com.oceanbase.tools.datamocker.util.Pair;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.Validate;
 

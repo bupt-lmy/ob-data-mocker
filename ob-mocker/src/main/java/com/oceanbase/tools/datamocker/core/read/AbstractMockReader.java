@@ -1,9 +1,6 @@
 package com.oceanbase.tools.datamocker.core.read;
 
-import com.oceanbase.tools.datamocker.datatype.AbstractDataType;
 import com.oceanbase.tools.datamocker.model.mock.MockColumnData;
-import com.oceanbase.tools.datamocker.model.mock.MockRowData;
-import com.oceanbase.tools.datamocker.util.Pair;
 
 /**
  * Data reader, you can read data from this reader

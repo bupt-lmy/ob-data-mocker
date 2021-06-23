@@ -16,7 +16,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.UUID;
-import java.util.function.Function;
 
 import javax.sql.DataSource;
 
@@ -50,7 +49,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 import org.slf4j.MDC;
-import sun.awt.image.ImageWatched.Link;
 
 /**
  * Abstract data simulator, used to create a new data simulator

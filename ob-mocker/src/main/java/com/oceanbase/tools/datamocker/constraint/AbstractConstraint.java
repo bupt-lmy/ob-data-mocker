@@ -4,11 +4,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.oceanbase.tools.datamocker.datatype.AbstractDataType;
 import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
 import com.oceanbase.tools.datamocker.model.mock.MockRowData;
-import com.oceanbase.tools.datamocker.util.Pair;
 import org.apache.commons.lang.Validate;
 
 /**

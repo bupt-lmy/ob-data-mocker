@@ -1,8 +1,6 @@
 package com.oceanbase.tools.datamocker.core.read;
 
 import com.oceanbase.tools.datamocker.datatype.AbstractDataType;
-import com.oceanbase.tools.datamocker.model.exception.MockerError;
-import com.oceanbase.tools.datamocker.model.exception.MockerException;
 import com.oceanbase.tools.datamocker.model.mock.MockColumnData;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;

@@ -5,20 +5,17 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import javax.sql.DataSource;
 
 import com.oceanbase.tools.datamocker.core.task.AbstractCallBack;
-import com.oceanbase.tools.datamocker.datatype.AbstractDataType;
 import com.oceanbase.tools.datamocker.model.enums.ObModeType;
 import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
 import com.oceanbase.tools.datamocker.model.mock.MockRowData;
 import com.oceanbase.tools.datamocker.util.DbObjectNameUtil;
 import com.oceanbase.tools.datamocker.util.DigestUtil;
-import com.oceanbase.tools.datamocker.util.Pair;
 import com.oceanbase.tools.datamocker.util.SqlUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.Validate;

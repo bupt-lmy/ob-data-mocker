@@ -1,6 +1,5 @@
 package com.oceanbase.tools.datamocker;
 
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
@@ -18,8 +17,6 @@ import com.oceanbase.tools.datamocker.datatype.AbstractDataType;
 import com.oceanbase.tools.datamocker.model.config.AbstractTableConfig;
 import com.oceanbase.tools.datamocker.model.config.AbstractTaskConfig;
 import com.oceanbase.tools.datamocker.model.enums.ObModeType;
-import com.oceanbase.tools.datamocker.model.exception.MockerError;
-import com.oceanbase.tools.datamocker.model.exception.MockerException;
 import com.oceanbase.tools.datamocker.util.MockerBuffer;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.Validate;

@@ -1,9 +1,7 @@
 package com.oceanbase.tools.datamocker.util;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -12,7 +10,6 @@ import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.stream.Collectors;
 
 import com.oceanbase.tools.datamocker.core.task.AbstractDataPipe;
 import com.oceanbase.tools.datamocker.datatype.AbstractDataType;
