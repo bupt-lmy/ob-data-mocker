@@ -20,7 +20,7 @@ public class ColumnReader<T> extends AbstractMockReader<T> {
      */
     private final AbstractDataType<T, ? extends Comparable<?>> dataType;
     /**
-     * Dolumn name
+     * Column name
      */
     @Getter
     private final String columnName;
