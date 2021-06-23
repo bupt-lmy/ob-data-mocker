@@ -20,6 +20,7 @@ import com.oceanbase.tools.datamocker.schedule.impl.MockDataGenTask;
 import com.oceanbase.tools.datamocker.schedule.impl.MockDataOutputTask;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.Validate;
 
 /**
  * Task encapsulation object of mock data
@@ -35,16 +36,16 @@ public class TableTask {
      * environment
      */
     @Getter
-    private AbstractMockTask beforeTask;
+    private final AbstractMockTask beforeTask;
     /**
      * Tasks that need to be executed after all tasks are executed, usually used to clean up the
      * environment
      */
-    private AbstractMockTask afterTask;
+    private final AbstractMockTask afterTask;
     /**
      * List of Business Tasks
      */
-    private List<AbstractMockTask> businessTasks;
+    private final List<AbstractMockTask> businessTasks;
     /**
      * table task id
      */
@@ -67,23 +68,21 @@ public class TableTask {
      *        queue in the Dispatcher
      */
     public TableTask(TableTaskInfo taskBean, Set<Set<String>> columnGroups, Map<Set<String>, Integer> dataGroups,
-            String taskName,
-            int index) {
+            String taskName, int index) {
         this.tableTaskId = taskBean.getMetaData().getTableTaskId();
         this.context = new TableTaskContext(taskBean, taskName, index);
         this.businessTasks = new ArrayList<>();
         for (Set<String> groupSet : columnGroups) {
-            List<ColumnReader> tmpList = new LinkedList<>();
+            List<ColumnReader<?>> tmpList = new LinkedList<>();
             for (String item : groupSet) {
-                for (ColumnReader reader : taskBean.getColumnReaders()) {
+                for (ColumnReader<?> reader : taskBean.getColumnReaders()) {
                     if (item.equals(reader.groupId())) {
                         tmpList.add(reader);
                     }
                 }
             }
-            MockDataGenTask genTask =
-                    new MockDataGenTask(taskBean.getMetaData(), this.context, taskBean.getBuffer(), tmpList,
-                            taskBean.getConstraints());
+            MockDataGenTask genTask = new MockDataGenTask(taskBean.getMetaData(), this.context, taskBean.getBuffer(),
+                    tmpList, taskBean.getConstraints());
             businessTasks.add(genTask);
         }
         taskBean.getBuffer().setConcurrent(businessTasks.size());
@@ -120,10 +119,8 @@ public class TableTask {
      * @throws MockerException Parameter verification fails and throws an exception
      */
     public void init(MockExecutorService service, AbstractCallBack<TableTaskContext> callBack) {
-        if (callBack == null || service == null) {
-            throw new MockerException(MockerError.PARAMETER_ERROR,
-                    "Call back method or executor service can not be null for mock task bean");
-        }
+        Validate.notNull(callBack, "CallBack can not be null for TableTask#init");
+        Validate.notNull(service, "ExecutorService can not be null for TableTask#init");
         TableTask thisTaskBean = this;
         beforeTask.bind(new AbstractCallBack<TableTaskContext>() {
             @Override
@@ -133,7 +130,7 @@ public class TableTask {
                         MockTaskStatus.RUNNING);
                 for (AbstractMockTask task : thisTaskBean.businessTasks) {
                     if (task instanceof MockDataGenTask) {
-                        ((MockDataGenTask) task).setConstraints(param.getConstraints());
+                        ((MockDataGenTask) task).reloadConstraints(param.getConstraints());
                     }
                     if (!service.isShutdown() && !context.isShutdown()) {
                         service.submitCallable(task, param);
@@ -175,7 +172,11 @@ public class TableTask {
                     public void doOnSuccess(TableTaskContext param) throws Throwable {
                         StringBuilder builder = new StringBuilder();
                         for (Map.Entry<String, Long> item : param.getWriterName2writeCount().entrySet()) {
-                            builder.append("{\"" + item.getKey() + "\" : " + item.getValue() + "} ");
+                            builder.append("{\"")
+                                    .append(item.getKey())
+                                    .append("\" : ")
+                                    .append(item.getValue())
+                                    .append("} ");
                         }
                         log.info("Data writing task is completed, taskStatus={}, writingInfo={}", param.getStatus(),
                                 builder.toString());
@@ -212,7 +213,8 @@ public class TableTask {
         });
     }
 
-    private void startAfterTask(MockExecutorService service, AbstractCallBack callBack) throws Throwable {
+    private void startAfterTask(MockExecutorService service, AbstractCallBack<TableTaskContext> callBack)
+            throws Throwable {
         if (counter.incrementAndGet() == this.businessTasks.size()) {
             log.info("All mock data business tasks are completed, and the destructuring task is started");
             if (!service.isShutdown() && !context.isShutdown()) {

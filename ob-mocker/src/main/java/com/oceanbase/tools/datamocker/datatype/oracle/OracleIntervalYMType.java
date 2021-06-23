@@ -5,6 +5,7 @@ import com.alipay.oceanbase.jdbc.extend.datatype.INTERVALYM;
 import com.oceanbase.tools.datamocker.datatype.AbstractDataType;
 import com.oceanbase.tools.datamocker.datatype.DataTypeFactory;
 import com.oceanbase.tools.datamocker.generator.BaseGenerator;
+import com.oceanbase.tools.datamocker.model.config.model.DateDataTypeConfig;
 import com.oceanbase.tools.datamocker.model.enums.ObModeType;
 import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
@@ -47,7 +48,7 @@ public class OracleIntervalYMType extends AbstractDataType<INTERVALYM, Integer> 
     }
 
     @Override
-    public DataTypeFactory getFactory() {
+    public DataTypeFactory<OracleIntervalYMType, DateDataTypeConfig, BaseGenerator<Integer, INTERVALYM>> getFactory() {
         return DataTypeFactory.getInstance("OB_ORACLE_INTERVAL_YEAR_TO_MONTH");
     }
 
@@ -70,7 +71,7 @@ public class OracleIntervalYMType extends AbstractDataType<INTERVALYM, Integer> 
     }
 
     @Override
-    protected INTERVALYM preTreat(INTERVALYM value) {
+    protected INTERVALYM preProcessingBeforeOutput(INTERVALYM value) {
         if (value == null) {
             return null;
         }

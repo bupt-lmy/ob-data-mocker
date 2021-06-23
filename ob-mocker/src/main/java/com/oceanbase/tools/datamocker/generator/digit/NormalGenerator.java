@@ -3,7 +3,7 @@ package com.oceanbase.tools.datamocker.generator.digit;
 import java.math.BigDecimal;
 import java.util.Random;
 
-import com.oceanbase.tools.datamocker.generator.DigitalGeneratorBase;
+import com.oceanbase.tools.datamocker.generator.BaseDigitalGenerator;
 import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
 
@@ -14,7 +14,7 @@ import com.oceanbase.tools.datamocker.model.exception.MockerException;
  * @date 2020-12-11 16:50
  * @since OBMOCKER_snapshot_0.1.0
  */
-public class NormalGenerator extends DigitalGeneratorBase<BigDecimal> {
+public class NormalGenerator extends BaseDigitalGenerator<BigDecimal> {
     /**
      * Standard deviation of normal distribution
      */

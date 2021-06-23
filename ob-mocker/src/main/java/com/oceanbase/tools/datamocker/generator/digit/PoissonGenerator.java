@@ -2,7 +2,7 @@ package com.oceanbase.tools.datamocker.generator.digit;
 
 import java.math.BigDecimal;
 
-import com.oceanbase.tools.datamocker.generator.DigitalGeneratorBase;
+import com.oceanbase.tools.datamocker.generator.BaseDigitalGenerator;
 import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
 
@@ -13,7 +13,7 @@ import com.oceanbase.tools.datamocker.model.exception.MockerException;
  * @date 2020-12-09 13:51
  * @since ODCMOCKER_snapshot_0.1.0
  */
-public class PoissonGenerator extends DigitalGeneratorBase<BigDecimal> {
+public class PoissonGenerator extends BaseDigitalGenerator<BigDecimal> {
     /**
      * Mean of Poisson distribution
      */

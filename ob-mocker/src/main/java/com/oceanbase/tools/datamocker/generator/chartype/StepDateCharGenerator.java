@@ -5,7 +5,7 @@ import java.util.Date;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
-import com.oceanbase.tools.datamocker.generator.CharGeneratorBase;
+import com.oceanbase.tools.datamocker.generator.BaseCharGenerator;
 import com.oceanbase.tools.datamocker.model.enums.CharCaseOption;
 import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
@@ -18,7 +18,7 @@ import org.apache.commons.lang.StringUtils;
  * @date 2020-12-16 00:37
  * @since OBMOCKER_snapshot_0.1.0
  */
-public class StepDateCharGenerator extends CharGeneratorBase {
+public class StepDateCharGenerator extends BaseCharGenerator {
     private static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
     /**
      * Start timestamp

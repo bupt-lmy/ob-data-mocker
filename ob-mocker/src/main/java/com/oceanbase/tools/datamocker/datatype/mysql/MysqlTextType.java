@@ -2,7 +2,8 @@ package com.oceanbase.tools.datamocker.datatype.mysql;
 
 import com.oceanbase.tools.datamocker.datatype.AbstractCharDataType;
 import com.oceanbase.tools.datamocker.datatype.DataTypeFactory;
-import com.oceanbase.tools.datamocker.generator.CharGeneratorBase;
+import com.oceanbase.tools.datamocker.generator.BaseCharGenerator;
+import com.oceanbase.tools.datamocker.model.config.model.CharDataTypeConfig;
 import com.oceanbase.tools.datamocker.model.enums.CharsetType;
 import com.oceanbase.tools.datamocker.model.enums.ObModeType;
 
@@ -25,7 +26,7 @@ public class MysqlTextType extends AbstractCharDataType {
      * @param allowNull Whether to allow null values
      */
     public MysqlTextType(Integer length, String defaultValue, Boolean allowNull, CharsetType charsetType,
-            CharGeneratorBase generator,
+            BaseCharGenerator generator,
             Boolean isUnicode) {
         super(generator, ObModeType.OB_MYSQL, charsetType, length, defaultValue, allowNull, isUnicode);
     }
@@ -45,7 +46,7 @@ public class MysqlTextType extends AbstractCharDataType {
     }
 
     @Override
-    public DataTypeFactory getFactory() {
+    public DataTypeFactory<MysqlTextType, CharDataTypeConfig, BaseCharGenerator> getFactory() {
         return DataTypeFactory.getInstance("OB_MYSQL_TEXT");
     }
 

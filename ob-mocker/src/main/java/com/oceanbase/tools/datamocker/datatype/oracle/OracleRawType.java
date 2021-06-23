@@ -2,7 +2,8 @@ package com.oceanbase.tools.datamocker.datatype.oracle;
 
 import com.oceanbase.tools.datamocker.datatype.AbstractByteDataType;
 import com.oceanbase.tools.datamocker.datatype.DataTypeFactory;
-import com.oceanbase.tools.datamocker.generator.ByteGeneratorBase;
+import com.oceanbase.tools.datamocker.generator.BaseByteGenerator;
+import com.oceanbase.tools.datamocker.model.config.model.CharDataTypeConfig;
 import com.oceanbase.tools.datamocker.model.enums.ObModeType;
 
 /**
@@ -26,7 +27,7 @@ public class OracleRawType extends AbstractByteDataType {
      * @param width width of data type
      * @param allowNull Whether to allow null values
      */
-    public OracleRawType(byte[] defaultValue, Boolean allowNull, Integer width, ByteGeneratorBase generator) {
+    public OracleRawType(byte[] defaultValue, Boolean allowNull, Integer width, BaseByteGenerator generator) {
         super(generator, ObModeType.OB_ORACLE, defaultValue, allowNull);
         this.width = width;
     }
@@ -44,7 +45,7 @@ public class OracleRawType extends AbstractByteDataType {
     }
 
     @Override
-    public DataTypeFactory getFactory() {
+    public DataTypeFactory<OracleRawType, CharDataTypeConfig, BaseByteGenerator> getFactory() {
         return DataTypeFactory.getInstance("OB_ORACLE_RAW");
     }
 

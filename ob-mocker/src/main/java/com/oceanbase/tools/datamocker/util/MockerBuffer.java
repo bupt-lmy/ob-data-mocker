@@ -1,6 +1,8 @@
 package com.oceanbase.tools.datamocker.util;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,6 +18,8 @@ import com.oceanbase.tools.datamocker.core.task.AbstractDataPipe;
 import com.oceanbase.tools.datamocker.datatype.AbstractDataType;
 import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
+import com.oceanbase.tools.datamocker.model.mock.MockColumnData;
+import com.oceanbase.tools.datamocker.model.mock.MockRowData;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.Validate;
 
@@ -40,19 +44,19 @@ public class MockerBuffer {
     /**
      * Data buffer, buffer a batch of data
      */
-    private List<Map<String, Pair<AbstractDataType, Object>>> rows;
+    private List<MockRowData> rows;
     /**
      * Collection of column names of mock table
      */
-    private Set<String> columnSet;
+    private final Set<String> columnSet;
     /**
      * The current line in the buffer
      */
-    private Map<String, Pair<AbstractDataType, Object>> currentRow;
+    private MockRowData currentRow;
     /**
      * Data pipeline collection through which data is sent out
      */
-    private final List<AbstractDataPipe> dataPipes;
+    private final List<AbstractDataPipe<MockRowData>> dataPipes;
     /**
      * The data flushing threshold, the data in the buffer reaches this value and the value pipeline
      * will be forced to refresh
@@ -61,9 +65,10 @@ public class MockerBuffer {
     /**
      * Lock object, used to protect the currentRow object
      */
-    private Lock lock = new ReentrantLock();
+    private final Lock lock = new ReentrantLock();
 
-    public MockerBuffer(Map<String, AbstractDataType> tableSchema, Long batchSize, int concurrent) {
+    public MockerBuffer(Map<String, AbstractDataType<?, ? extends Comparable<?>>> tableSchema, Long batchSize,
+            int concurrent) {
         if (batchSize < 0 || concurrent < 0) {
             throw new MockerException(MockerError.PARAMETER_ERROR, "Batch size or concurrent size can not be null");
         }
@@ -77,7 +82,7 @@ public class MockerBuffer {
         this.synchronizer = new CyclicBarrier(concurrent, null);
     }
 
-    public MockerBuffer(Map<String, AbstractDataType> tableSchema, Long batchSize) {
+    public MockerBuffer(Map<String, AbstractDataType<?, ? extends Comparable<?>>> tableSchema, Long batchSize) {
         if (batchSize < 0) {
             throw new MockerException(MockerError.PARAMETER_ERROR, "Batch size can not be null");
         }
@@ -124,7 +129,7 @@ public class MockerBuffer {
      *
      * @param dataPipe Data pipeline
      */
-    public void register(AbstractDataPipe dataPipe) {
+    public void register(AbstractDataPipe<MockRowData> dataPipe) {
         if (dataPipe == null) {
             return;
         }
@@ -134,17 +139,16 @@ public class MockerBuffer {
     }
 
     /**
-     * Write a collection of column data to the buffer
+     * Write a row of data to the buffer
      *
-     * @param data Column data collection
+     * @param mockRowData row data
      * @param timeout Write timeout
      * @param timeUnit time unit
      * @throws InterruptedException May be interrupted
      */
-    public void write(Map<String, Pair<AbstractDataType, Object>> data, long timeout, TimeUnit timeUnit)
-            throws Exception {
-        Validate.notNull(timeUnit, "time unit for buffer write timeout can not be null");
-        Validate.isTrue(timeout > 0, "timeout for buffer write can not be negative");
+    public void write(MockRowData mockRowData, long timeout, TimeUnit timeUnit) throws Exception {
+        Validate.notNull(timeUnit, "TimeUnit for buffer write can not be null");
+        Validate.isTrue(timeout > 0, "Timeout for buffer write can not be negative");
         if (isClosed()) {
             throw new MockerException(MockerError.OPERATION_FAILURE, "Buffer has been closed");
         }
@@ -152,11 +156,11 @@ public class MockerBuffer {
         lock.lock();
         try {
             if (this.currentRow == null) {
-                this.currentRow = new HashMap<>();
+                this.currentRow = new MockRowData();
             }
-            Set<Map.Entry<String, Pair<AbstractDataType, Object>>> entrySet = data.entrySet();
-            for (Map.Entry<String, Pair<AbstractDataType, Object>> entry : entrySet) {
-                writeToCurrentRow(new Pair<>(entry.getKey(), entry.getValue()));
+            List<MockColumnData<?>> mockColumns = mockRowData.getMockColumns();
+            for (MockColumnData<?> mockColumn : mockColumns) {
+                writeToCurrentRow(mockColumn);
             }
             reload(timeout, timeUnit);
         } finally {
@@ -168,16 +172,13 @@ public class MockerBuffer {
     /**
      * Write a column of data to the buffer
      *
-     * @param column Column data
+     * @param mockColumn Column data
      * @param timeout Write timeout
      * @param timeUnit time unit
      * @throws InterruptedException May be interrupted
      */
-    public void write(Pair<String, Pair<AbstractDataType, Object>> column, long timeout, TimeUnit timeUnit)
-            throws Exception {
-        Map<String, Pair<AbstractDataType, Object>> inputRow = new HashMap<>();
-        inputRow.putIfAbsent(column.getKey(), column.getValue());
-        write(inputRow, timeout, timeUnit);
+    public void write(MockColumnData<?> mockColumn, long timeout, TimeUnit timeUnit) throws Exception {
+        write(new MockRowData(Collections.singletonList(mockColumn)), timeout, timeUnit);
     }
 
     /**
@@ -187,22 +188,22 @@ public class MockerBuffer {
      *
      * @param column Column data
      */
-    private void writeToCurrentRow(Pair<String, Pair<AbstractDataType, Object>> column) {
-        if (!this.columnSet.contains(column.getKey())) {
-            MockerException e = new MockerException(MockerError.UNKNOWN_COLUMN_NAME,
-                    String.format("Custom column \"%s\" is not in column set [%s]", column,
-                            this.columnSet.stream().collect(Collectors.joining(","))));
+    private void writeToCurrentRow(MockColumnData<?> column) {
+        Validate.notNull(column, "MockColumn can not be null for MockBuffer#writeToCurrentRow");
+        String columName = column.getColumnName();
+        if (!this.columnSet.contains(columName)) {
+            MockerException e = new MockerException(MockerError.UNKNOWN_COLUMN_NAME, String.format(
+                    "Custom column \"%s\" is not in column set [%s]", columName, String.join(",", this.columnSet)));
             log.error("Column error", e);
             throw e;
         }
-        if (this.currentRow.get(column.getKey()) != null) {
-            MockerException e =
-                    new MockerException(MockerError.PARAMETER_ERROR, String.format("Custom column \"%s\" is duplicate",
-                            column.getKey()));
+        if (this.currentRow.getMockColumn(columName) != null) {
+            MockerException e = new MockerException(MockerError.PARAMETER_ERROR,
+                    String.format("Custom column \"%s\" is duplicate", columName));
             log.error("Column error", e);
             throw e;
         }
-        this.currentRow.putIfAbsent(column.getKey(), column.getValue());
+        this.currentRow.addMockColumn(column);
     }
 
     /**
@@ -214,18 +215,17 @@ public class MockerBuffer {
      *         interrupted
      */
     private void reload(long timeout, TimeUnit timeUnit) throws Exception {
-        if (this.currentRow.size() > this.columnSet.size()) {
+        if (this.currentRow.columnNum() > this.columnSet.size()) {
             MockerException e = new MockerException(MockerError.UNKNOWN_COLUMN_NAME,
-                    String.format("There are unknown columns in current column [%s]",
-                            this.currentRow.keySet().stream().collect(Collectors.joining(","))));
+                    String.format("There are unknown columns in current column [%s]", this.currentRow.columnNames()));
             log.error("Column error", e);
             throw e;
-        } else if (this.currentRow.size() == this.columnSet.size()) {
+        } else if (this.currentRow.columnNum() == this.columnSet.size()) {
             this.rows.add(this.currentRow);
             if (this.rows.size() >= this.flushThreshold) {
                 this.flush(timeout, timeUnit);
             }
-            this.currentRow = new HashMap<>();
+            this.currentRow = new MockRowData();
         }
     }
 
@@ -243,7 +243,7 @@ public class MockerBuffer {
         this.synchronizer.await();
         synchronized (this.dataPipes) {
             if (!isClosed()) {
-                for (AbstractDataPipe dataPipe : this.dataPipes) {
+                for (AbstractDataPipe<MockRowData> dataPipe : this.dataPipes) {
                     if (!dataPipe.isClosed()) {
                         dataPipe.write(this.rows, timeout, timeUnit);
                         dataPipe.close();
@@ -272,10 +272,11 @@ public class MockerBuffer {
      */
     public synchronized void flush(long timeout, TimeUnit timeUnit) throws Exception {
         if (dataPipes != null) {
-            for (AbstractDataPipe dataPipe : dataPipes) {
+            for (AbstractDataPipe<MockRowData> dataPipe : dataPipes) {
                 dataPipe.write(this.rows, timeout, timeUnit);
             }
         }
         this.rows = new ArrayList<>(this.flushThreshold.intValue() * 2);
     }
+
 }

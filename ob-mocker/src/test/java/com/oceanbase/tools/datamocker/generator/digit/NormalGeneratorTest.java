@@ -21,7 +21,7 @@ public class NormalGeneratorTest {
         BigDecimal minValue = new BigDecimal("-100");
         BigDecimal maxValue = new BigDecimal("100");
         Long count = generator.count(minValue, maxValue);
-        Assert.assertEquals(null, count);
+        Assert.assertNull(count);
         BigDecimal result = new BigDecimal("0");
         int totalCount = 1000;
         for (int i = 0; i < totalCount; i++) {
@@ -29,7 +29,7 @@ public class NormalGeneratorTest {
         }
         result = result.divide(new BigDecimal(Double.toString(totalCount)), BigDecimal.ROUND_DOWN);
         result = result.subtract(new BigDecimal("0")).abs();
-        Assert.assertEquals(true, result.doubleValue() < 0.08);
+        Assert.assertTrue(result.doubleValue() < 0.08);
     }
 
     @Test(expected = MockerException.class)
@@ -39,7 +39,7 @@ public class NormalGeneratorTest {
         BigDecimal maxValue = new BigDecimal("100");
         Long count = generator.count(minValue, maxValue);
         generator.preCheck(minValue, maxValue);
-        Assert.assertEquals(null, count);
+        Assert.assertNull(count);
         for (int i = 0; i < 1000; i++) {
             generator.generate(minValue, maxValue);
         }
@@ -52,7 +52,7 @@ public class NormalGeneratorTest {
         BigDecimal maxValue = new BigDecimal("100");
         Long count = generator.count(minValue, maxValue);
         generator.preCheck(minValue, maxValue);
-        Assert.assertEquals(null, count);
+        Assert.assertNull(count);
         for (int i = 0; i < 1000; i++) {
             generator.generate(minValue, maxValue);
         }

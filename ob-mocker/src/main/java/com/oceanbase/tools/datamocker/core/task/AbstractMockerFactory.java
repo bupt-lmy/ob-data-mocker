@@ -16,6 +16,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.UUID;
+import java.util.function.Function;
 
 import javax.sql.DataSource;
 
@@ -38,6 +39,7 @@ import com.oceanbase.tools.datamocker.model.enums.ObModeType;
 import com.oceanbase.tools.datamocker.model.enums.ScriptType;
 import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
+import com.oceanbase.tools.datamocker.model.mock.MockRowData;
 import com.oceanbase.tools.datamocker.schedule.AbstractScheduler;
 import com.oceanbase.tools.datamocker.schedule.impl.DefaultScheduler;
 import com.oceanbase.tools.datamocker.util.DbObjectNameUtil;
@@ -48,6 +50,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 import org.slf4j.MDC;
+import sun.awt.image.ImageWatched.Link;
 
 /**
  * Abstract data simulator, used to create a new data simulator
@@ -61,7 +64,7 @@ public abstract class AbstractMockerFactory {
     /**
      * Abstract task configuration
      */
-    private AbstractTaskConfig taskConfig;
+    private final AbstractTaskConfig taskConfig;
     /**
      * The internal data source of the factory type, which is used to verify the existence of tables,
      * check constraints and other information
@@ -70,17 +73,15 @@ public abstract class AbstractMockerFactory {
     /**
      * The data source is a business data source
      */
-    private Map<String, DataSource> taskId2DataSource;
+    private final Map<String, DataSource> taskId2DataSource;
     /**
      * Mock data file manager collection
      */
-    private Map<String, List<MockerFile>> taskId2MockerFiles;
+    private final Map<String, List<MockerFile>> taskId2MockerFiles;
 
     public AbstractMockerFactory(AbstractTaskConfig taskConfig) {
+        Validate.notNull(taskConfig, "TaskConfig can not be null for AbstractMockerFactory");
         this.taskConfig = taskConfig;
-        if (taskConfig == null) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "Input task config can not be null");
-        }
         this.taskId2DataSource = new HashMap<>();
         this.taskId2MockerFiles = new HashMap<>();
     }
@@ -96,8 +97,7 @@ public abstract class AbstractMockerFactory {
             return false;
         }
         return !StringUtils.isBlank(dbConfig.getUser()) && !StringUtils.isBlank(dbConfig.getTenant())
-                && !StringUtils.isBlank(
-                        dbConfig.getHost());
+                && !StringUtils.isBlank(dbConfig.getHost());
     }
 
     /**
@@ -113,9 +113,7 @@ public abstract class AbstractMockerFactory {
      * @param scheduler Scheduler object, used for thread resource scheduling
      */
     public ObDataMocker create(AbstractScheduler scheduler) {
-        if (scheduler == null) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "Scheduler for mocker factory can not be null");
-        }
+        Validate.notNull(scheduler, "Scheduler can not be null for AbstractMockerFactory#create");
         try {
             String taskId = UUID.randomUUID().toString().toUpperCase();
             MDC.put("mocktask.workspace", taskId);
@@ -125,7 +123,7 @@ public abstract class AbstractMockerFactory {
                 }
             }
             for (AbstractTableConfig tableConfig : this.taskConfig.tasks()) {
-                validateTableFromDB(tableConfig.schemaName(), tableConfig.tableName());
+                validateTableByJdbc(tableConfig.schemaName(), tableConfig.tableName());
             }
             Dispatcher<TableTaskInfo> dispatcher = generate(this.taskConfig, taskId);
             this.innerDatasource.clear();
@@ -151,7 +149,7 @@ public abstract class AbstractMockerFactory {
      * @param schema The database or schema
      * @throws MockerException Throw an exception when the table existence check fails
      */
-    protected void validateTableFromDB(String schema, String table) throws Throwable {
+    protected void validateTableByJdbc(String schema, String table) throws Throwable {
         if (this.innerDatasource == null) {
             return;
         }
@@ -185,8 +183,9 @@ public abstract class AbstractMockerFactory {
      * @param tableConfig table configuration
      * @return schema for a certain table
      */
-    protected Map<String, AbstractDataType> getTableSchema(AbstractTableConfig tableConfig) {
-        Map<String, AbstractDataType> columnName2DataType = new HashMap<>();
+    protected Map<String, AbstractDataType<?, ? extends Comparable<?>>> getTableSchema(
+            AbstractTableConfig tableConfig) {
+        Map<String, AbstractDataType<?, ? extends Comparable<?>>> columnName2DataType = new HashMap<>();
         for (AbstractColumnConfig columnConfig : tableConfig.columns()) {
             columnName2DataType.putIfAbsent(columnConfig.columnName(), columnConfig.columnType());
         }
@@ -206,13 +205,13 @@ public abstract class AbstractMockerFactory {
         } else if (this.innerDatasource == null) {
             return Collections.emptyList();
         }
-        Map<String, AbstractDataType> columnName2DataType = getTableSchema(tableConfig);
+        Map<String, AbstractDataType<?, ? extends Comparable<?>>> columnName2DataType = getTableSchema(tableConfig);
         List<ConstraintFactory> factories = ConstraintFactory.listInstances();
         List<AbstractConstraint> returnVal = new ArrayList<>();
         for (ConstraintFactory factory : factories) {
             List<AbstractConstraint> customConstraint =
-                    factory.make(this.innerDatasource, dialectType, tableConfig.schemaName(),
-                            tableConfig.tableName(), columnName2DataType, tableConfig.maxCount().intValue());
+                    factory.make(this.innerDatasource, dialectType, tableConfig.schemaName(), tableConfig.tableName(),
+                            columnName2DataType, tableConfig.maxCount().intValue());
             if (customConstraint != null) {
                 returnVal.addAll(customConstraint);
             }
@@ -250,9 +249,8 @@ public abstract class AbstractMockerFactory {
                 realParam.putIfAbsent(entry.getKey(), entry.getValue());
             }
         }
-        dataSource =
-                new MockerDataSource(this.taskConfig.dbConfig(), taskConfig.minConnection(), taskConfig.maxConnection(),
-                        taskConfig.connectionIncreasementStep(), realParam);
+        dataSource = new MockerDataSource(this.taskConfig.dbConfig(), taskConfig.minConnection(),
+                taskConfig.maxConnection(), taskConfig.connectionIncreasementStep(), realParam);
         this.taskId2DataSource.putIfAbsent(tableTaskId, dataSource);
         return dataSource;
     }
@@ -288,30 +286,28 @@ public abstract class AbstractMockerFactory {
      * @param tableConfig table task config
      * @param buffer buffer which is bound to writer
      * @param managers list of file managers
-     * @param ds datasource
+     * @param dataSource datasource
      * @return list of mock writer
      */
     protected List<AbstractMockWriter> getDataWriter(AbstractTableConfig tableConfig, MockerBuffer buffer,
-            List<MockerFile> managers,
-            DataSource ds) {
+            List<MockerFile> managers, DataSource dataSource) {
         Validate.notNull(managers, "Mocker file manager list can not be null");
-        List<AbstractMockWriter> dataWriters = new ArrayList<>();
+        List<AbstractMockWriter> dataWriters = new LinkedList<>();
         for (MockerFile manager : managers) {
-            SqlScriptWriter writer =
-                    new SqlScriptWriter(manager, this.taskConfig.obDialectType(), tableConfig.schemaName(),
-                            tableConfig.tableName());
+            SqlScriptWriter writer = new SqlScriptWriter(manager, this.taskConfig.obDialectType(),
+                    tableConfig.schemaName(), tableConfig.tableName());
             dataWriters.add(writer);
         }
-        if (ds == null) {
+        if (dataSource == null) {
             return dataWriters;
         }
-        DataBaseWriter writer = new DataBaseWriter(ds, this.taskConfig.obDialectType(), tableConfig.schemaName(),
-                tableConfig.tableName());
+        DataBaseWriter writer = new DataBaseWriter(dataSource, this.taskConfig.obDialectType(),
+                tableConfig.schemaName(), tableConfig.tableName());
         dataWriters.add(writer);
-        Map<String, AbstractDataPipe> map = new HashMap<>();
+        Map<String, AbstractDataPipe<MockRowData>> groupId2DataPipe = new HashMap<>();
         for (AbstractMockWriter item : dataWriters) {
-            AbstractDataPipe dataPipe =
-                    map.getOrDefault(item.groupId(), new MockDataPipe(tableConfig.maxRetainedCount()));
+            AbstractDataPipe<MockRowData> dataPipe = groupId2DataPipe.computeIfAbsent(item.groupId(),
+                    s -> new MockDataPipe(tableConfig.maxRetainedCount()));
             item.register(dataPipe);
             buffer.register(dataPipe);
         }
@@ -325,7 +321,7 @@ public abstract class AbstractMockerFactory {
      * @param constraints constraint list
      * @return list of column reader
      */
-    protected List<ColumnReader> getColumnReader(AbstractTableConfig tableConfig,
+    protected List<ColumnReader<?>> getColumnReader(AbstractTableConfig tableConfig,
             List<AbstractConstraint> constraints) {
         List<? extends AbstractColumnConfig> columnConfigs = tableConfig.columns();
         List<Set<String>> colGroupList = new ArrayList<>();
@@ -351,21 +347,21 @@ public abstract class AbstractMockerFactory {
         for (Set<String> colSet : colGroupList) {
             groupMap.put(UUID.randomUUID().toString(), colSet);
         }
-        List<ColumnReader> returnValue = new ArrayList<>();
+        List<ColumnReader<?>> returnValue = new LinkedList<>();
         for (AbstractColumnConfig columnConfig : columnConfigs) {
-            AbstractDataType dataType = columnConfig.columnType();
+            AbstractDataType<?, ? extends Comparable<?>> dataType = columnConfig.columnType();
             String columnName = columnConfig.columnName();
             Set<Map.Entry<String, Set<String>>> entrySet = groupMap.entrySet();
-            ColumnReader reader = null;
+            ColumnReader<?> reader = null;
             for (Map.Entry<String, Set<String>> item : entrySet) {
                 String groupId = item.getKey();
                 if (item.getValue().contains(columnName)) {
-                    reader = new ColumnReader(dataType, columnName, groupId);
+                    reader = new ColumnReader<>(dataType, columnName, groupId);
                     break;
                 }
             }
             if (reader == null) {
-                reader = new ColumnReader(dataType, columnName, UUID.randomUUID().toString());
+                reader = new ColumnReader<>(dataType, columnName, UUID.randomUUID().toString());
             }
             returnValue.add(reader);
         }
@@ -379,4 +375,5 @@ public abstract class AbstractMockerFactory {
         dateFormat.setTimeZone(timeZone);
         return "datamock_" + dateFormat.format(date);
     }
+
 }

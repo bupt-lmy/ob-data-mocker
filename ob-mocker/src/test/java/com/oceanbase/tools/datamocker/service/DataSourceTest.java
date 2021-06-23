@@ -111,9 +111,10 @@ public class DataSourceTest extends MockerTestBase {
     @Test
     public void testDataSourceWithIllegalParam() throws IOException, SQLException {
         DataBaseConfig config = getDBConfig(ObModeType.OB_MYSQL);
+        assert config != null;
         config.setHost(null);
-        expect.expectMessage("Database's config is illegal");
-        expect.expect(MockerException.class);
+        expect.expectMessage("Host can not be blank for MockerDataSource#validate");
+        expect.expect(IllegalArgumentException.class);
         DataSource dataSource = new MockerDataSource(config, 3, 5, 2, params);
     }
 

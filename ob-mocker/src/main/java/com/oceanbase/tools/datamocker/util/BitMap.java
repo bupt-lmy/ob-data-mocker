@@ -107,8 +107,6 @@ public class BitMap {
 
     /**
      * Remake the entire bitmap
-     *
-     * @return Return reset result
      */
     public synchronized void clear() {
         int length = this.bytes.length;

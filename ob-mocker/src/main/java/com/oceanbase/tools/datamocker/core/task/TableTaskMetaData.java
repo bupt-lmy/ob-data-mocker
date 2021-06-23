@@ -6,6 +6,7 @@ import com.oceanbase.tools.datamocker.datatype.AbstractDataType;
 import com.oceanbase.tools.datamocker.model.config.AbstractTableConfig;
 import com.oceanbase.tools.datamocker.model.enums.ObModeType;
 import lombok.Getter;
+import org.apache.commons.lang.Validate;
 
 /**
  * Table generation task metadata information
@@ -27,7 +28,7 @@ public class TableTaskMetaData {
      * relationship between field names and types key：Column name value：Data type corresponding to
      * column name
      */
-    private final Map<String, AbstractDataType> tableSchema;
+    private final Map<String, AbstractDataType<?, ? extends Comparable<?>>> tableSchema;
     private final String tableName;
     private final String schema;
     private final Boolean shouldTruncate;
@@ -36,9 +37,12 @@ public class TableTaskMetaData {
     private final ObModeType dialectType;
     private final String taskId;
 
-    public TableTaskMetaData(Map<String, AbstractDataType> tableSchema, AbstractTableConfig tableConfig,
-            ObModeType dialectType,
-            String taskId, int columnIndex, int rowIndex) {
+    public TableTaskMetaData(Map<String, AbstractDataType<?, ? extends Comparable<?>>> tableSchema,
+            AbstractTableConfig tableConfig, ObModeType obModeType, String taskId, int columnIndex, int rowIndex) {
+        Validate.notNull(tableSchema, "TableSchema can not be null for TableTaskMetaData");
+        Validate.notNull(tableConfig, "TableConfig can not be null for TableTaskMetaData");
+        Validate.notNull(obModeType, "ObModeType can not be null for TableTaskMetaData");
+        Validate.notNull(taskId, "TaskId can not be null for TableTaskMetaData");
         this.tableSchema = tableSchema;
         this.tableName = tableConfig.tableName();
         this.schema = tableConfig.schemaName();
@@ -47,7 +51,7 @@ public class TableTaskMetaData {
         this.batchSize = tableConfig.maxBatchSize();
         this.totalCount = tableConfig.maxCount();
         this.tableTaskId = taskId + "-[" + columnIndex + "," + rowIndex + "]";
-        this.dialectType = dialectType;
+        this.dialectType = obModeType;
         this.taskId = taskId;
     }
 }

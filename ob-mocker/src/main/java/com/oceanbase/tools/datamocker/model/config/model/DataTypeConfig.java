@@ -40,7 +40,7 @@ public class DataTypeConfig {
      * The initialization parameter of the data generator bound to the column may have multiple values,
      * so it is encapsulated with a List object
      */
-    private Map<String, ?> genParams;
+    private Map<String, Object> genParams;
     /**
      * The data generator builder object is used to generate a specific data generator for the column
      * object to use based on the above params object

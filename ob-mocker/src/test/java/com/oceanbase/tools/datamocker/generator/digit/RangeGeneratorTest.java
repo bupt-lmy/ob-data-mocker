@@ -70,16 +70,16 @@ public class RangeGeneratorTest {
                     break;
                 }
             }
-            Assert.assertEquals(true, flag);
+            Assert.assertTrue(flag);
         }
         keySet = weightMap.keySet();
         iter = keySet.iterator();
         while (iter.hasNext()) {
-            Range key = iter.next();
+            Range<BigDecimal> key = iter.next();
             Double factor = weightMap.get(key);
             Double realFactor = countMap.get(key).doubleValue() / totalCount;
-            Double interval = Math.abs(factor - realFactor);
-            Assert.assertEquals(true, interval < 0.05);
+            double interval = Math.abs(factor - realFactor);
+            Assert.assertTrue(interval < 0.05);
         }
     }
 

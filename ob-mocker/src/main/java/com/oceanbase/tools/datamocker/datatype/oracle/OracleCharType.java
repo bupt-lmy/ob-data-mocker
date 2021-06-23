@@ -2,7 +2,8 @@ package com.oceanbase.tools.datamocker.datatype.oracle;
 
 import com.oceanbase.tools.datamocker.datatype.AbstractCharDataType;
 import com.oceanbase.tools.datamocker.datatype.DataTypeFactory;
-import com.oceanbase.tools.datamocker.generator.CharGeneratorBase;
+import com.oceanbase.tools.datamocker.generator.BaseCharGenerator;
+import com.oceanbase.tools.datamocker.model.config.model.CharDataTypeConfig;
 import com.oceanbase.tools.datamocker.model.enums.CharsetType;
 import com.oceanbase.tools.datamocker.model.enums.ObModeType;
 
@@ -25,7 +26,7 @@ public class OracleCharType extends AbstractCharDataType {
      * @param isUnicode Is it a unicode string
      */
     public OracleCharType(Integer length, String defaultValue, Boolean allowNull, CharsetType charsetType,
-            CharGeneratorBase generator,
+            BaseCharGenerator generator,
             Boolean isUnicode) {
         super(generator, ObModeType.OB_ORACLE, charsetType, length, defaultValue, allowNull, isUnicode);
     }
@@ -45,7 +46,7 @@ public class OracleCharType extends AbstractCharDataType {
     }
 
     @Override
-    public DataTypeFactory getFactory() {
+    public DataTypeFactory<OracleCharType, CharDataTypeConfig, BaseCharGenerator> getFactory() {
         return DataTypeFactory.getInstance("OB_ORACLE_CHAR");
     }
 

@@ -2,7 +2,7 @@ package com.oceanbase.tools.datamocker.generator.chartype;
 
 import java.io.UnsupportedEncodingException;
 
-import com.oceanbase.tools.datamocker.generator.CharGeneratorBase;
+import com.oceanbase.tools.datamocker.generator.BaseCharGenerator;
 import com.oceanbase.tools.datamocker.model.enums.CharCaseOption;
 import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
@@ -14,7 +14,7 @@ import com.oceanbase.tools.datamocker.model.exception.MockerException;
  * @date 2020-12-16 23:13
  * @since OBMOCKER_snapshot_0.1.0
  */
-public class FixCharGenerator extends CharGeneratorBase {
+public class FixCharGenerator extends BaseCharGenerator {
     /**
      * Fixed value text
      */
@@ -44,9 +44,7 @@ public class FixCharGenerator extends CharGeneratorBase {
             }
         }
         if (realLength >= minLength) {
-            if (realLength <= maxLength) {
-                return true;
-            }
+            return realLength <= maxLength;
         }
         return false;
     }

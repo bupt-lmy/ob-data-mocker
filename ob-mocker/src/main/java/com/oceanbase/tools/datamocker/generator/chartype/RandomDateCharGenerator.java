@@ -4,7 +4,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
 
-import com.oceanbase.tools.datamocker.generator.CharGeneratorBase;
+import com.oceanbase.tools.datamocker.generator.BaseCharGenerator;
 import com.oceanbase.tools.datamocker.model.enums.CharCaseOption;
 import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
@@ -17,7 +17,7 @@ import org.apache.commons.lang.StringUtils;
  * @date 2020-12-16 00:08
  * @since OBMOCKER_snapshot_0.1.0
  */
-public class RandomDateCharGenerator extends CharGeneratorBase {
+public class RandomDateCharGenerator extends BaseCharGenerator {
     private static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
     /**
      * Start timestamp
@@ -50,9 +50,7 @@ public class RandomDateCharGenerator extends CharGeneratorBase {
     public Boolean preCheck(Integer minLength, Integer maxLength) {
         int realLength = DATE_FORMAT.length();
         if (realLength >= minLength) {
-            if (realLength <= maxLength) {
-                return true;
-            }
+            return realLength <= maxLength;
         }
         return false;
     }

@@ -2,7 +2,7 @@ package com.oceanbase.tools.datamocker.generator.chartype;
 
 import java.util.Random;
 
-import com.oceanbase.tools.datamocker.generator.CharGeneratorBase;
+import com.oceanbase.tools.datamocker.generator.BaseCharGenerator;
 import com.oceanbase.tools.datamocker.model.enums.CharCaseOption;
 
 /**
@@ -12,7 +12,7 @@ import com.oceanbase.tools.datamocker.model.enums.CharCaseOption;
  * @date 2020-12-16 16:14
  * @since OBMOCKER_snapshot_0.1.0
  */
-public class RandomGenerator extends CharGeneratorBase {
+public class RandomGenerator extends BaseCharGenerator {
     /**
      * Printable character array
      */

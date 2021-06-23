@@ -133,7 +133,7 @@ public class MockerTaskOracleTest extends MockerTestBase {
         Callable<Boolean> task = () -> {
             long start = System.currentTimeMillis();
             while (true) {
-                Boolean flag = Boolean.TRUE;
+                boolean flag = Boolean.TRUE;
                 List<TableTaskContext> contexts = context.getTables();
                 if (contexts.size() == 0) {
                     flag = false;

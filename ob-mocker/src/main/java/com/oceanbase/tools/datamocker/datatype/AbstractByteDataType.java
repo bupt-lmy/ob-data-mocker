@@ -2,7 +2,7 @@ package com.oceanbase.tools.datamocker.datatype;
 
 import java.security.NoSuchAlgorithmException;
 
-import com.oceanbase.tools.datamocker.generator.ByteGeneratorBase;
+import com.oceanbase.tools.datamocker.generator.BaseByteGenerator;
 import com.oceanbase.tools.datamocker.model.enums.ObModeType;
 import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
@@ -25,7 +25,7 @@ public abstract class AbstractByteDataType extends AbstractDataType<byte[], Inte
      * @param dialectType OB dialect type
      * @param allowNull Whether to allow null values
      */
-    public AbstractByteDataType(ByteGeneratorBase generator, ObModeType dialectType, byte[] defaultValue,
+    public AbstractByteDataType(BaseByteGenerator generator, ObModeType dialectType, byte[] defaultValue,
             Boolean allowNull) {
         super(generator, dialectType, defaultValue, allowNull);
     }
@@ -75,7 +75,7 @@ public abstract class AbstractByteDataType extends AbstractDataType<byte[], Inte
      * @throws MockerException An exception is thrown if verification fails
      */
     @Override
-    protected byte[] preTreat(byte[] value) {
+    protected byte[] preProcessingBeforeOutput(byte[] value) {
         if (value == null) {
             return null;
         }

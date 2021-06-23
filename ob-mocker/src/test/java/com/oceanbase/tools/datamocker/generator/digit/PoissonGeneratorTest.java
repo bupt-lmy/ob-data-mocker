@@ -22,7 +22,7 @@ public class PoissonGeneratorTest {
         BigDecimal minValue = new BigDecimal("0");
         BigDecimal maxValue = new BigDecimal("500");
         Long count = generator.count(minValue, maxValue);
-        Assert.assertEquals(null, count);
+        Assert.assertNull(count);
         BigDecimal result = new BigDecimal("0");
         int totalCount = 1000;
         for (int i = 0; i < totalCount; i++) {
@@ -30,7 +30,7 @@ public class PoissonGeneratorTest {
         }
         result = result.divide(new BigDecimal(Double.toString(totalCount)));
         result = result.subtract(new BigDecimal(Double.toString(lambda))).abs();
-        Assert.assertEquals(true, result.doubleValue() < 1.0);
+        Assert.assertTrue(result.doubleValue() < 1.0);
     }
 
     @Test(expected = MockerException.class)
@@ -41,7 +41,7 @@ public class PoissonGeneratorTest {
         BigDecimal maxValue = new BigDecimal("500");
         Long count = generator.count(minValue, maxValue);
         generator.preCheck(minValue, maxValue);
-        Assert.assertEquals(null, count);
+        Assert.assertNull(count);
         for (int i = 0; i < 1000; i++) {
             generator.generate(minValue, maxValue);
         }
@@ -55,7 +55,7 @@ public class PoissonGeneratorTest {
         BigDecimal maxValue = new BigDecimal("500");
         Long count = generator.count(minValue, maxValue);
         generator.preCheck(minValue, maxValue);
-        Assert.assertEquals(null, count);
+        Assert.assertNull(count);
         for (int i = 0; i < 1000; i++) {
             generator.generate(minValue, maxValue);
         }
@@ -69,7 +69,7 @@ public class PoissonGeneratorTest {
         BigDecimal maxValue = new BigDecimal("500");
         Long count = generator.count(minValue, maxValue);
         generator.preCheck(minValue, maxValue);
-        Assert.assertEquals(null, count);
+        Assert.assertNull(count);
         for (int i = 0; i < 1000; i++) {
             generator.generate(minValue, maxValue);
         }

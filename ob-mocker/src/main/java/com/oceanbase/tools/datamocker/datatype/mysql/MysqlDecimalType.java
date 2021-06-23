@@ -4,7 +4,8 @@ import java.math.BigDecimal;
 
 import com.oceanbase.tools.datamocker.datatype.AbstractDigitDataType;
 import com.oceanbase.tools.datamocker.datatype.DataTypeFactory;
-import com.oceanbase.tools.datamocker.generator.DigitalGeneratorBase;
+import com.oceanbase.tools.datamocker.generator.BaseDigitalGenerator;
+import com.oceanbase.tools.datamocker.model.config.model.DigitDataTypeConfig;
 import com.oceanbase.tools.datamocker.model.enums.ObModeType;
 import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
@@ -26,7 +27,7 @@ public class MysqlDecimalType extends AbstractDigitDataType<BigDecimal> {
      */
     private final int scale;
 
-    public MysqlDecimalType(int precision, int scale, DigitalGeneratorBase<BigDecimal> generator,
+    public MysqlDecimalType(int precision, int scale, BaseDigitalGenerator<BigDecimal> generator,
             BigDecimal defaultValue,
             Boolean allowNull, Boolean signed) {
         super(generator, ObModeType.OB_MYSQL, defaultValue, allowNull, signed);
@@ -35,7 +36,7 @@ public class MysqlDecimalType extends AbstractDigitDataType<BigDecimal> {
         this.scale = scale;
     }
 
-    public MysqlDecimalType(DigitalGeneratorBase<BigDecimal> generator, BigDecimal defaultValue, Boolean allowNull,
+    public MysqlDecimalType(BaseDigitalGenerator<BigDecimal> generator, BigDecimal defaultValue, Boolean allowNull,
             Boolean signed) {
         super(generator, ObModeType.OB_MYSQL, defaultValue, allowNull, signed);
         this.precision = 10;
@@ -83,7 +84,7 @@ public class MysqlDecimalType extends AbstractDigitDataType<BigDecimal> {
     }
 
     @Override
-    protected BigDecimal preTreat(BigDecimal value) {
+    protected BigDecimal preProcessingBeforeOutput(BigDecimal value) {
         if (value == null) {
             return null;
         }
@@ -142,10 +143,10 @@ public class MysqlDecimalType extends AbstractDigitDataType<BigDecimal> {
     }
 
     @Override
-    public DataTypeFactory getFactory() {
+    public DataTypeFactory<MysqlDecimalType, DigitDataTypeConfig, BaseDigitalGenerator<BigDecimal>> getFactory() {
         if (signed()) {
-            return DataTypeFactory.getInstance("OB_ORACLE_DECIMAL");
+            return DataTypeFactory.getInstance("OB_MYSQL_DECIMAL");
         }
-        return DataTypeFactory.getInstance("OB_ORACLE_DECIMAL_UNSIGNED");
+        return DataTypeFactory.getInstance("OB_MYSQL_DECIMAL_UNSIGNED");
     }
 }

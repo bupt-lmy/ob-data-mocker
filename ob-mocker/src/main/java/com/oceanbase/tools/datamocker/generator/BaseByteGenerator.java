@@ -7,7 +7,7 @@ package com.oceanbase.tools.datamocker.generator;
  * @date 2020-12-16 22:39
  * @since OBMOCKER_snapshot_0.1.0
  */
-public abstract class ByteGeneratorBase extends BaseGenerator<Integer, byte[]> {
+public abstract class BaseByteGenerator extends BaseGenerator<Integer, byte[]> {
     /**
      * Pre-checking step, used to check whether the generator can work normally according to the
      * boundary value

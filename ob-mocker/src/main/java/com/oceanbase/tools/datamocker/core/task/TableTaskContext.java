@@ -20,6 +20,7 @@ import com.oceanbase.tools.datamocker.model.exception.MockerException;
 import com.oceanbase.tools.datamocker.util.Pair;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.lang.Validate;
 
 /**
  * The context of mock data is also the handle of the task of operating mock data
@@ -59,7 +60,7 @@ public class TableTaskContext {
      * relationship between field names and types
      */
     @Getter
-    private final Map<String, AbstractDataType> tableSchema;
+    private final Map<String, AbstractDataType<?, ? extends Comparable<?>>> tableSchema;
     /**
      * table name
      */
@@ -83,14 +84,14 @@ public class TableTaskContext {
     /**
      * Handle collection, used to control thread tasks
      */
-    private List<Future> handlers;
+    private final List<Future<?>> handlers;
     /**
      * Data write statistics. The Key here represents the names of different output sources: for
      * example, the name of the output source for writing DB and the name of the output source for
      * writing files. Value here represents the amount of data written by the output source.
      */
     @Getter
-    private Map<String, Long> writerName2writeCount;
+    private final Map<String, Long> writerName2writeCount;
     /**
      * Data generation statistics
      */
@@ -124,11 +125,11 @@ public class TableTaskContext {
     /**
      * Constraint collection, used to carry a collection of constraint objects
      */
-    @Setter
     @Getter
-    private List<AbstractConstraint> constraints;
+    private final List<AbstractConstraint> constraints = new LinkedList<>();
 
     public TableTaskContext(TableTaskInfo taskInfo, String taskName, int index) {
+        Validate.notNull(taskInfo, "TaskInfo can not be null for TableTaskContext");
         TableTaskMetaData metaData = taskInfo.getMetaData();
         this.tableTaskId = metaData.getTableTaskId();
         this.taskName = taskName;
@@ -148,7 +149,7 @@ public class TableTaskContext {
         this.topIndex = index;
     }
 
-    public void appendHandle(Future handle) {
+    public void appendHandle(Future<?> handle) {
         if (handle == null) {
             return;
         }
@@ -165,7 +166,7 @@ public class TableTaskContext {
     public synchronized boolean terminate() {
         shutdown = true;
         boolean returnVal = Boolean.TRUE;
-        for (Future task : this.handlers) {
+        for (Future<?> task : this.handlers) {
             if (!task.isCancelled() && !task.isDone()) {
                 returnVal &= task.cancel(true);
             }

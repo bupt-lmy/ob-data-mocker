@@ -17,7 +17,7 @@ public class DuplicatedJudger {
     /**
      * Set, used for judging whether it is repeated when the amount of data is small
      */
-    private Set set;
+    private Set<Object> set;
     /**
      * Bitmap, used to judge whether the data is duplicated when there is a large amount of data
      */
@@ -37,7 +37,7 @@ public class DuplicatedJudger {
                     "Count for DuplicatedJudger can not be equal to or smaleer than zero");
         }
         if (count < 10000) {
-            this.set = new HashSet();
+            this.set = new HashSet<>();
         } else {
             this.bitMap = new BitMap(count);
         }

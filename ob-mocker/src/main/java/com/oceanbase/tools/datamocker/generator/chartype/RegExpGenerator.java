@@ -1,6 +1,6 @@
 package com.oceanbase.tools.datamocker.generator.chartype;
 
-import com.oceanbase.tools.datamocker.generator.CharGeneratorBase;
+import com.oceanbase.tools.datamocker.generator.BaseCharGenerator;
 import com.oceanbase.tools.datamocker.model.enums.CharCaseOption;
 import com.oceanbase.tools.datamocker.util.RegExpTextBuilder;
 
@@ -12,7 +12,7 @@ import com.oceanbase.tools.datamocker.util.RegExpTextBuilder;
  * @date 2021-01-16 20:06
  * @since OBMOCKER_snapshot_0.1.0
  */
-public class RegExpGenerator extends CharGeneratorBase {
+public class RegExpGenerator extends BaseCharGenerator {
     /**
      * Regular expression string generation tool class, used to generate regular expression strings
      */

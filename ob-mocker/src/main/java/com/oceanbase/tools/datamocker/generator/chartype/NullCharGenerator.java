@@ -1,6 +1,6 @@
 package com.oceanbase.tools.datamocker.generator.chartype;
 
-import com.oceanbase.tools.datamocker.generator.CharGeneratorBase;
+import com.oceanbase.tools.datamocker.generator.BaseCharGenerator;
 import com.oceanbase.tools.datamocker.model.enums.CharCaseOption;
 
 /**
@@ -10,7 +10,7 @@ import com.oceanbase.tools.datamocker.model.enums.CharCaseOption;
  * @date 2021-01-26 14:41
  * @since OBMOCKER_snapshot_0.1.0
  */
-public class NullCharGenerator extends CharGeneratorBase {
+public class NullCharGenerator extends BaseCharGenerator {
     public NullCharGenerator() {
         super(CharCaseOption.DEFAULT);
     }

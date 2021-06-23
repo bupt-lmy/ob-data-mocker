@@ -1,6 +1,6 @@
 package com.oceanbase.tools.datamocker.generator.bytetype;
 
-import com.oceanbase.tools.datamocker.generator.ByteGeneratorBase;
+import com.oceanbase.tools.datamocker.generator.BaseByteGenerator;
 import com.oceanbase.tools.datamocker.generator.chartype.FixCharGenerator;
 import com.oceanbase.tools.datamocker.model.enums.CharCaseOption;
 
@@ -11,15 +11,9 @@ import com.oceanbase.tools.datamocker.model.enums.CharCaseOption;
  * @date 2020-12-16 23:09
  * @since OBMOCKER_snapshot_0.1.0
  */
-public class FixByteGenerator extends ByteGeneratorBase {
-    private FixCharGenerator customGen;
+public class FixByteGenerator extends BaseByteGenerator {
+    private final FixCharGenerator customGen;
 
-    /**
-     * 构造方法
-     *
-     * @param caseType 字符大小写控制配置
-     * @param fixText 定值文本
-     */
     public FixByteGenerator(CharCaseOption caseType, String fixText) {
         customGen = new FixCharGenerator(caseType, fixText);
     }

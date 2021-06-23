@@ -7,6 +7,7 @@ import java.util.concurrent.TimeUnit;
 
 import com.oceanbase.tools.datamocker.core.task.AbstractDataPipe;
 import com.oceanbase.tools.datamocker.datatype.AbstractDataType;
+import com.oceanbase.tools.datamocker.model.mock.MockRowData;
 
 /**
  * The concrete realization class of the data pipeline
@@ -15,25 +16,24 @@ import com.oceanbase.tools.datamocker.datatype.AbstractDataType;
  * @date 2021-01-14 19:38
  * @since OBMOCKER_snapshot_0.1.0
  */
-public class MockDataPipe extends AbstractDataPipe<Map<String, Pair<AbstractDataType, Object>>> {
+public class MockDataPipe extends AbstractDataPipe<MockRowData> {
     /**
      * Use blocking queues as the underlying implementation of data pipelines
      */
-    private final LinkedBlockingQueue<List<Map<String, Pair<AbstractDataType, Object>>>> queue =
-            new LinkedBlockingQueue<>();
+    private final LinkedBlockingQueue<List<MockRowData>> queue = new LinkedBlockingQueue<>();
 
     public MockDataPipe(int maxRetained) {
         super(maxRetained);
     }
 
     @Override
-    public void doWrite(List<Map<String, Pair<AbstractDataType, Object>>> row, long timout, TimeUnit timeUnit)
+    public void doWrite(List<MockRowData> row, long timout, TimeUnit timeUnit)
             throws Exception {
         queue.put(row);
     }
 
     @Override
-    public List<Map<String, Pair<AbstractDataType, Object>>> doRead(long timout, TimeUnit timeUnit) throws Exception {
+    public List<MockRowData> doRead(long timout, TimeUnit timeUnit) throws Exception {
         if (timout >= 0) {
             return queue.poll(timout, timeUnit);
         }

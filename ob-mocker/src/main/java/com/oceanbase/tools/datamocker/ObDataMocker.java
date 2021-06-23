@@ -60,7 +60,7 @@ public class ObDataMocker {
         if (this.dispatcher == null) {
             return -1;
         }
-        return this.dispatcher.count();
+        return this.dispatcher.getConcurrent();
     }
 
     /**

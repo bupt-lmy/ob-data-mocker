@@ -1,6 +1,6 @@
 package com.oceanbase.tools.datamocker.generator.chartype;
 
-import com.oceanbase.tools.datamocker.generator.CharGeneratorBase;
+import com.oceanbase.tools.datamocker.generator.BaseCharGenerator;
 import com.oceanbase.tools.datamocker.model.enums.CharCaseOption;
 
 /**
@@ -10,7 +10,7 @@ import com.oceanbase.tools.datamocker.model.enums.CharCaseOption;
  * @date 2020-12-16 23:38
  * @since OBMOCKER_snapshot_0.1.0
  */
-public class BoolCharGenerator extends CharGeneratorBase {
+public class BoolCharGenerator extends BaseCharGenerator {
     /**
      * Fixed boolean type, null if not passed, representing random boolean type
      */
@@ -29,9 +29,7 @@ public class BoolCharGenerator extends CharGeneratorBase {
     public Boolean preCheck(Integer minLength, Integer maxLength) {
         int realLength = "FALSE".length();
         if (realLength >= minLength) {
-            if (realLength <= maxLength) {
-                return true;
-            }
+            return realLength <= maxLength;
         }
         return false;
     }

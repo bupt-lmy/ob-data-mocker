@@ -12,10 +12,13 @@ import com.oceanbase.tools.datamocker.datatype.AbstractDataType;
 import com.oceanbase.tools.datamocker.model.enums.ObModeType;
 import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
+import com.oceanbase.tools.datamocker.model.mock.MockColumnData;
+import com.oceanbase.tools.datamocker.model.mock.MockRowData;
 import com.oceanbase.tools.datamocker.util.DbObjectNameUtil;
 import com.oceanbase.tools.datamocker.util.DigestUtil;
 import com.oceanbase.tools.datamocker.util.Pair;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.Validate;
 
 /**
  * SQL text generation primitive
@@ -39,8 +42,8 @@ public class SqlScriptWriter extends AbstractMockWriter {
      * The dialect mode of OB, the default is oracle mode
      */
     private ObModeType dialectType = ObModeType.OB_ORACLE;
-    private MockerFile manager;
-    private String groupId;
+    private final MockerFile manager;
+    private final String groupId;
 
     /**
      * The constructor writes a mock file, which is required
@@ -56,6 +59,7 @@ public class SqlScriptWriter extends AbstractMockWriter {
         this.database = database;
         this.tableName = tableName;
         this.manager = manager;
+        this.dialectType = dialectType;
         try {
             this.groupId = DigestUtil.getToken(manager.getFile().getAbsolutePath());
         } catch (NoSuchAlgorithmException e) {
@@ -72,12 +76,13 @@ public class SqlScriptWriter extends AbstractMockWriter {
      * @param tableName table name
      * @param groupId group id
      */
-    public SqlScriptWriter(MockerFile manager, ObModeType dialectType, String database,
-            String tableName, String groupId) {
+    public SqlScriptWriter(MockerFile manager, ObModeType dialectType, String database, String tableName,
+            String groupId) {
         validateParam(manager, dialectType, database, tableName);
         this.database = database;
         this.tableName = tableName;
         this.manager = manager;
+        this.dialectType = dialectType;
         if (groupId == null) {
             throw new MockerException(MockerError.PARAMETER_ERROR, "Group id can not be null");
         }
@@ -93,37 +98,21 @@ public class SqlScriptWriter extends AbstractMockWriter {
      * @param tableName table name
      * @throws MockerException An exception is thrown when verification fails
      */
-    private void validateParam(MockerFile manager, ObModeType dialectType, String database,
-            String tableName) {
-        if (manager == null) {
-            MockerException e = new MockerException(MockerError.PARAMETER_ERROR, "File manager can not be null");
-            log.error("SQL script writer is missing file manager", e);
-            throw e;
-        }
-        if (database == null) {
-            MockerException e = new MockerException(MockerError.PARAMETER_ERROR, "Database can not be null");
-            log.error("SQL script writer is missing schema name", e);
-            throw e;
-        }
-        if (tableName == null) {
-            MockerException e = new MockerException(MockerError.PARAMETER_ERROR, "Table name can not be null");
-            log.error("SQL script writer is missing table name", e);
-            throw e;
-        }
-        if (dialectType != null) {
-            if (!ObModeType.OB_ORACLE.equals(dialectType) && !ObModeType.OB_MYSQL.equals(dialectType)) {
-                throw new MockerException(MockerError.INVALID_OB_MODE);
-            }
-            this.dialectType = dialectType;
+    private void validateParam(MockerFile manager, ObModeType dialectType, String database, String tableName) {
+        Validate.notNull(manager, "File manager can not be null for SqlScriptWriter#validateParam");
+        Validate.notNull(database, "DataBase can not be null for SqlScriptWriter#validateParam");
+        Validate.notNull(tableName, "TableName can not be null for SqlScriptWriter#validateParam");
+        if (!ObModeType.OB_ORACLE.equals(dialectType) && !ObModeType.OB_MYSQL.equals(dialectType)) {
+            throw new MockerException(MockerError.INVALID_OB_MODE);
         }
     }
 
     @Override
-    protected Long doWrite(List<Map<String, Pair<AbstractDataType, Object>>> rows) throws IOException {
-        Map<String, ?> firstRow = rows.get(0);
-        Set<String> columnSet = firstRow.keySet();
+    protected Long doWrite(List<MockRowData> rows) throws IOException {
+        MockRowData firstRow = rows.get(0);
+        Set<String> columnSet = firstRow.columnNames();
         List<String> columnList = new ArrayList<>(columnSet);
-        StringBuffer sqlBuffer = null;
+        StringBuffer sqlBuffer;
         if (ObModeType.OB_ORACLE.equals(this.dialectType)) {
             sqlBuffer = new StringBuffer(
                     String.format("insert into \"%s\".\"%s\"(", DbObjectNameUtil.doubleCharToEscape(database, '"'),
@@ -132,6 +121,8 @@ public class SqlScriptWriter extends AbstractMockWriter {
             sqlBuffer = new StringBuffer(
                     String.format("insert into `%s`.`%s`(", DbObjectNameUtil.doubleCharToEscape(database, '`'),
                             DbObjectNameUtil.doubleCharToEscape(tableName, '`')));
+        } else {
+            throw new MockerException(MockerError.INVALID_OB_MODE);
         }
         int columnLength = columnList.size();
         for (int i = 0; i < columnLength; i++) {
@@ -154,12 +145,12 @@ public class SqlScriptWriter extends AbstractMockWriter {
         }
         String prefix = sqlBuffer.toString();
         List<String> sqlList = new ArrayList<>();
-        for (Map<String, Pair<AbstractDataType, Object>> row : rows) {
-            StringBuffer buffer = new StringBuffer(prefix);
+        for (MockRowData row : rows) {
+            StringBuilder buffer = new StringBuilder(prefix);
             for (int i = 0; i < columnLength; i++) {
                 String columnName = columnList.get(i);
-                Pair<AbstractDataType, Object> pair = row.get(columnName);
-                String value = pair.getKey().toString(pair.getValue());
+                MockColumnData<?> mockColumn = row.getMockColumn(columnName);
+                String value = mockColumn.getColumnValueString();
                 if (value == null) {
                     throw new MockerException(MockerError.ILLEGAL_RETURN_VALUE,
                             String.format("Value for column \"%s\" is null", columnName));
@@ -181,4 +172,5 @@ public class SqlScriptWriter extends AbstractMockWriter {
     public String groupId() {
         return this.groupId;
     }
+
 }

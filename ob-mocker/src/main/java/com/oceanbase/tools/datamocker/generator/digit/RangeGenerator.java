@@ -5,7 +5,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import com.oceanbase.tools.datamocker.generator.DigitalGeneratorBase;
+import com.oceanbase.tools.datamocker.generator.BaseDigitalGenerator;
 import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
 import com.oceanbase.tools.datamocker.util.Range;
@@ -17,7 +17,7 @@ import com.oceanbase.tools.datamocker.util.Range;
  * @date 2020-12-11 21:20
  * @since OBMOCKER_snapshot_0.1.0
  */
-public class RangeGenerator extends DigitalGeneratorBase<BigDecimal> {
+public class RangeGenerator extends BaseDigitalGenerator<BigDecimal> {
     /**
      * Weight mapping table
      */
@@ -38,7 +38,7 @@ public class RangeGenerator extends DigitalGeneratorBase<BigDecimal> {
         Iterator<Range<BigDecimal>> iter = keySet.iterator();
         Double result = 0D;
         while (iter.hasNext()) {
-            Range key = iter.next();
+            Range<BigDecimal> key = iter.next();
             result += weightMap.get(key);
         }
         if (result <= 1.0 && Math.abs(result - 1.0) > 0.01) {
@@ -50,9 +50,7 @@ public class RangeGenerator extends DigitalGeneratorBase<BigDecimal> {
     public Boolean preCheck(BigDecimal minValue, BigDecimal maxValue) {
         Boolean validate = null;
         Set<Range<BigDecimal>> keySet = weightMap.keySet();
-        Iterator<Range<BigDecimal>> iter = keySet.iterator();
-        while (iter.hasNext()) {
-            Range key = iter.next();
+        for (Range<BigDecimal> key : keySet) {
             if (key.getMin().compareTo(minValue) < 0) {
                 validate = false;
             } else if (key.getMax().compareTo(maxValue) > 0) {
@@ -84,14 +82,14 @@ public class RangeGenerator extends DigitalGeneratorBase<BigDecimal> {
      *
      * @return Return range
      */
-    private Range getRange() {
+    private Range<BigDecimal> getRange() {
         double random = Math.random();
         Set<Range<BigDecimal>> keySet = weightMap.keySet();
         Iterator<Range<BigDecimal>> iter = keySet.iterator();
         Double sum = 0.0;
-        Range returnValue = null;
+        Range<BigDecimal> returnValue = null;
         while (iter.hasNext()) {
-            Range key = iter.next();
+            Range<BigDecimal> key = iter.next();
             if (sum > random) {
                 break;
             }

@@ -2,7 +2,7 @@ package com.oceanbase.tools.datamocker.generator.digit;
 
 import java.math.BigDecimal;
 
-import com.oceanbase.tools.datamocker.generator.DigitalGeneratorBase;
+import com.oceanbase.tools.datamocker.generator.BaseDigitalGenerator;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
 
 /**
@@ -12,7 +12,7 @@ import com.oceanbase.tools.datamocker.model.exception.MockerException;
  * @date 2020-12-11 17:16
  * @since OBMOCKER_snapshot_0.1.0
  */
-public class StepGenerator extends DigitalGeneratorBase<BigDecimal> {
+public class StepGenerator extends BaseDigitalGenerator<BigDecimal> {
     private final double step;
     /**
      * Number currently generated

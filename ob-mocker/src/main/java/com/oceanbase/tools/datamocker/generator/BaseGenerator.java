@@ -10,7 +10,7 @@ import com.oceanbase.tools.datamocker.model.exception.MockerException;
  * @date 2020-12-11 21:16
  * @since OBMOCKER_snapshot_0.1.0
  */
-public abstract class BaseGenerator<T extends Comparable, V> {
+public abstract class BaseGenerator<T extends Comparable<? super T>, V> {
     private V defaultValue;
     private Boolean allowNull = Boolean.FALSE;
 

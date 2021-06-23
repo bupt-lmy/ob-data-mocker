@@ -10,7 +10,7 @@ import java.util.concurrent.TimeUnit;
  * @date 2020-12-16 16:27
  * @since OBMOCKER_snapshot_0.1.0
  */
-public abstract class DateGeneratorBase<T extends Comparable> extends BaseGenerator<T, T> {
+public abstract class BaseDateGenerator<T extends Comparable<? super T>> extends BaseGenerator<T, T> {
     /**
      * The smallest precision unit of the data generator, the second of the date type is used by default
      */

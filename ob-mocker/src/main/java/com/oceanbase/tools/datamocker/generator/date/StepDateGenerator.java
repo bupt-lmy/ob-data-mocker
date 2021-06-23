@@ -3,7 +3,7 @@ package com.oceanbase.tools.datamocker.generator.date;
 import java.sql.Date;
 import java.util.concurrent.TimeUnit;
 
-import com.oceanbase.tools.datamocker.generator.DateGeneratorBase;
+import com.oceanbase.tools.datamocker.generator.BaseDateGenerator;
 import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
 
@@ -14,7 +14,7 @@ import com.oceanbase.tools.datamocker.model.exception.MockerException;
  * @date 2020-12-16 16:44
  * @since OBMOCKER_snapshot_0.1.0
  */
-public class StepDateGenerator extends DateGeneratorBase<Date> {
+public class StepDateGenerator extends BaseDateGenerator<Date> {
     /**
      * Date step
      */

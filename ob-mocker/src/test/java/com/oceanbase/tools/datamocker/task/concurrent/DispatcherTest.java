@@ -38,7 +38,7 @@ public class DispatcherTest extends MockerTestBase {
                 dispatcher.setObj(i, list.get(j));
             }
         }
-        for (int i = 0; i < dispatcher.count(); i++) {
+        for (int i = 0; i < dispatcher.getConcurrent(); i++) {
             for (int j = 0; j < dispatcher.getTaskSize(i); j++) {
                 String obj = dispatcher.getObj(i, 0);
                 String obj1 = dispatcher.pop(i);
@@ -59,7 +59,7 @@ public class DispatcherTest extends MockerTestBase {
                 dispatcher.setObj(i, list.get(j));
             }
         }
-        for (int i = 0; i < dispatcher.count(); i++) {
+        for (int i = 0; i < dispatcher.getConcurrent(); i++) {
             for (int j = 0; j < dispatcher.getTaskSize(i); j++) {
                 String obj = dispatcher.getObj(i, 0);
                 String obj1 = dispatcher.pop(i);

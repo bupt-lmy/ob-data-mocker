@@ -2,7 +2,8 @@ package com.oceanbase.tools.datamocker.datatype.mysql;
 
 import com.oceanbase.tools.datamocker.datatype.AbstractByteDataType;
 import com.oceanbase.tools.datamocker.datatype.DataTypeFactory;
-import com.oceanbase.tools.datamocker.generator.ByteGeneratorBase;
+import com.oceanbase.tools.datamocker.generator.BaseByteGenerator;
+import com.oceanbase.tools.datamocker.model.config.model.CharDataTypeConfig;
 import com.oceanbase.tools.datamocker.model.enums.ObModeType;
 
 /**
@@ -25,7 +26,7 @@ public class MysqlBinaryType extends AbstractByteDataType {
      * @param width width of data type
      * @param allowNull Whether to allow null values
      */
-    public MysqlBinaryType(byte[] defaultValue, Boolean allowNull, Integer width, ByteGeneratorBase generator) {
+    public MysqlBinaryType(byte[] defaultValue, Boolean allowNull, Integer width, BaseByteGenerator generator) {
         super(generator, ObModeType.OB_MYSQL, defaultValue, allowNull);
         this.width = width;
     }
@@ -43,7 +44,7 @@ public class MysqlBinaryType extends AbstractByteDataType {
     }
 
     @Override
-    public DataTypeFactory getFactory() {
+    public DataTypeFactory<MysqlBinaryType, CharDataTypeConfig, BaseByteGenerator> getFactory() {
         return DataTypeFactory.getInstance("OB_MYSQL_BINARY");
     }
 

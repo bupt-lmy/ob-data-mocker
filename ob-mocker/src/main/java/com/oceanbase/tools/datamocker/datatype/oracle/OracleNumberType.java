@@ -4,7 +4,8 @@ import java.math.BigDecimal;
 
 import com.oceanbase.tools.datamocker.datatype.AbstractDigitDataType;
 import com.oceanbase.tools.datamocker.datatype.DataTypeFactory;
-import com.oceanbase.tools.datamocker.generator.DigitalGeneratorBase;
+import com.oceanbase.tools.datamocker.generator.BaseDigitalGenerator;
+import com.oceanbase.tools.datamocker.model.config.model.DigitDataTypeConfig;
 import com.oceanbase.tools.datamocker.model.enums.ObModeType;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
 
@@ -25,7 +26,7 @@ public class OracleNumberType extends AbstractDigitDataType<BigDecimal> {
      */
     private final int scale;
 
-    public OracleNumberType(int precision, int scale, DigitalGeneratorBase<BigDecimal> generator,
+    public OracleNumberType(int precision, int scale, BaseDigitalGenerator<BigDecimal> generator,
             BigDecimal defaultValue,
             Boolean allowNull) {
         super(generator, ObModeType.OB_ORACLE, defaultValue, allowNull);
@@ -33,7 +34,7 @@ public class OracleNumberType extends AbstractDigitDataType<BigDecimal> {
         this.scale = scale;
     }
 
-    public OracleNumberType(int precision, DigitalGeneratorBase<BigDecimal> generator, BigDecimal defaultValue,
+    public OracleNumberType(int precision, BaseDigitalGenerator<BigDecimal> generator, BigDecimal defaultValue,
             Boolean allowNull) {
         super(generator, ObModeType.OB_ORACLE, defaultValue, allowNull);
         this.precision = precision;
@@ -70,7 +71,7 @@ public class OracleNumberType extends AbstractDigitDataType<BigDecimal> {
     }
 
     @Override
-    protected BigDecimal preTreat(BigDecimal value) {
+    protected BigDecimal preProcessingBeforeOutput(BigDecimal value) {
         if (value == null) {
             return null;
         }
@@ -131,7 +132,7 @@ public class OracleNumberType extends AbstractDigitDataType<BigDecimal> {
     }
 
     @Override
-    public DataTypeFactory getFactory() {
+    public DataTypeFactory<OracleNumberType, DigitDataTypeConfig, BaseDigitalGenerator<BigDecimal>> getFactory() {
         return DataTypeFactory.getInstance("OB_ORACLE_NUMBER");
     }
 }

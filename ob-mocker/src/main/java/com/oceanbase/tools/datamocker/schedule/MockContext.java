@@ -78,7 +78,7 @@ public class MockContext {
      */
     public Boolean shutdown() {
         this.service.shutdown();
-        Boolean returnVal = true;
+        boolean returnVal = true;
         for (TableTaskContext context : this.tables) {
             returnVal &= context.shutdown();
         }
@@ -91,7 +91,7 @@ public class MockContext {
      * @return progress
      */
     public double getProgress() {
-        if (this.tables != null && this.tables.size() != 0) {
+        if (this.tables.size() != 0) {
             double returnVal = 0.0;
             for (TableTaskContext context : this.tables) {
                 returnVal += context.getProgress();

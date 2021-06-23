@@ -2,6 +2,7 @@ package com.oceanbase.tools.datamocker.core;
 
 import java.util.concurrent.locks.ReentrantLock;
 
+import lombok.Getter;
 import org.apache.commons.lang.Validate;
 
 /**
@@ -16,10 +17,12 @@ import org.apache.commons.lang.Validate;
  * @since OBMOCKER_0.1.0_snapshot
  */
 public class Dispatcher<T> {
+    @Getter
     private final String taskId;
     /**
      * The name can refer to the name of the distributor or the name of the entire task
      */
+    @Getter
     private final String name;
     /**
      * The lock object, the data encapsulation object uses an array to maintain the top pointers of
@@ -32,11 +35,12 @@ public class Dispatcher<T> {
      * The length of the pointer data on the top of the stack can also be used to describe the current
      * number of concurrent tasks
      */
+    @Getter
     private int concurrent;
     /**
      * Stack top pointer array
      */
-    private TopNode[] queuePointers;
+    private TopNode<T>[] queuePointers;
 
     /**
      * The default constructor, at this time, initialize the length of the pointer array at the top of
@@ -48,7 +52,7 @@ public class Dispatcher<T> {
      * @param taskId task id
      */
     public Dispatcher(String name, String taskId) {
-        Validate.notEmpty(taskId, "task id can not be null");
+        Validate.notEmpty(taskId, "TaskId can not be null for Dispatcher");
         this.name = name;
         this.taskId = taskId;
         this.concurrent = 0;
@@ -63,26 +67,15 @@ public class Dispatcher<T> {
      * @param taskId task id
      */
     public Dispatcher(int concurrent, String name, String taskId) {
-        Validate.notEmpty(taskId, "task id can not be null");
+        Validate.notEmpty(taskId, "TaskId can not be null for Dispatcher");
+        Validate.isTrue(concurrent > 0, "Concurrent can not be negative");
         this.name = name;
         this.taskId = taskId;
         this.concurrent = concurrent;
         queuePointers = new TopNode[concurrent];
         for (int i = 0; i < concurrent; i++) {
-            queuePointers[i] = new TopNode();
+            queuePointers[i] = new TopNode<>();
         }
-    }
-
-    public String name() {
-        return this.name;
-    }
-
-    public String taskId() {
-        return this.taskId;
-    }
-
-    public int count() {
-        return this.concurrent;
     }
 
     /**
@@ -91,7 +84,7 @@ public class Dispatcher<T> {
      * @return Return specific quantity
      */
     public int totalCount() {
-        int queueSize = count();
+        int queueSize = getConcurrent();
         int returnVal = 0;
         for (int i = 0; i < queueSize; i++) {
             returnVal += getTaskSize(i);
@@ -109,7 +102,7 @@ public class Dispatcher<T> {
         if (index >= this.concurrent || index < 0) {
             throw new IllegalArgumentException(String.format("index %d out of bound [0,%d)", index, this.concurrent));
         }
-        TopNode topNode = this.queuePointers[index];
+        TopNode<T> topNode = this.queuePointers[index];
         return topNode.length;
     }
 
@@ -123,11 +116,11 @@ public class Dispatcher<T> {
      *        according to this index
      * @return Return the queried object
      */
-    public T getObj(int index, int columnIndex) throws Exception {
+    public T getObj(int index, int columnIndex) {
         if (index >= this.concurrent || index < 0) {
-            throw new Exception(String.format("index %d out of bound [0,%d)", index, this.concurrent));
+            throw new IllegalArgumentException(String.format("index %d out of bound [0,%d)", index, this.concurrent));
         }
-        TopNode topNode = this.queuePointers[index];
+        TopNode<T> topNode = this.queuePointers[index];
         if (columnIndex >= topNode.length) {
             return null;
         }
@@ -136,6 +129,9 @@ public class Dispatcher<T> {
             if ((columnIndex--) == 0) {
                 break;
             }
+        }
+        if (destNode == null) {
+            throw new NullPointerException("Can't find data node");
         }
         return destNode.getObj();
     }
@@ -146,11 +142,11 @@ public class Dispatcher<T> {
      * @param index Which task queue to "pop"
      * @return Return the specific task object
      */
-    public T pop(int index) throws Exception {
+    public T pop(int index) {
         if (index >= this.concurrent || index < 0) {
-            throw new Exception(String.format("index %d out of bound [0,%d)", index, this.concurrent));
+            throw new IllegalArgumentException(String.format("index %d out of bound [0,%d)", index, this.concurrent));
         }
-        TopNode topNode = this.queuePointers[index];
+        TopNode<T> topNode = this.queuePointers[index];
         if (topNode.length <= 0) {
             return null;
         }
@@ -194,16 +190,16 @@ public class Dispatcher<T> {
      *        performs an expansion operation.
      * @param obj Task object to be inserted
      */
-    public void setObj(int index, T obj) throws Exception {
+    public void setObj(int index, T obj) {
         if (obj == null) {
             return;
         }
         // The index of the top pointer of the stack is within the range of the array, and the insertion
         // operation is performed directly
         if (index < this.concurrent) {
-            TopNode topNode = queuePointers[index];
+            TopNode<T> topNode = queuePointers[index];
             if (topNode == null) {
-                throw new Exception(String.format("index %d is invaild", index));
+                throw new IllegalArgumentException(String.format("index %d is invaild", index));
             }
             // Lock the current stack pointer
             topNode.writeLock.lock();
@@ -233,11 +229,11 @@ public class Dispatcher<T> {
             try {
                 if (index == this.concurrent) {
                     this.concurrent++;
-                    TopNode[] newTopNodes = new TopNode[this.concurrent];
+                    TopNode<T>[] newTopNodes = new TopNode[this.concurrent];
                     for (int i = 0; i < this.concurrent - 1; i++) {
                         newTopNodes[i] = this.queuePointers[i];
                     }
-                    newTopNodes[this.concurrent - 1] = new TopNode();
+                    newTopNodes[this.concurrent - 1] = new TopNode<>();
                     this.queuePointers = newTopNodes;
                 }
             } finally {
@@ -246,7 +242,7 @@ public class Dispatcher<T> {
             this.setObj(index, obj);
         } else {
             // Illegal index
-            throw new Exception(String.format("index %d out of bound", index));
+            throw new IllegalArgumentException(String.format("index %d out of bound", index));
         }
     }
 
@@ -286,8 +282,8 @@ public class Dispatcher<T> {
  * @date 2021-01-08 20:32
  * @since OBMOCKER_0.1.0_snapshot
  */
-class TopNode {
-    public Dispatcher.Node downNext = null;
+class TopNode<T> {
+    public Dispatcher<T>.Node downNext = null;
     public ReentrantLock readLock;
     public ReentrantLock writeLock;
     public int length = 0;

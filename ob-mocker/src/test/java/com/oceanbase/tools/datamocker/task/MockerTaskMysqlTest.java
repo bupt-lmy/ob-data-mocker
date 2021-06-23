@@ -85,7 +85,6 @@ public class MockerTaskMysqlTest extends MockerTestBase {
                     + "  `col29` timestamp(5) DEFAULT NULL,\n"
                     + "  `col30` time(2) DEFAULT NULL,\n"
                     + "  `col31` datetime DEFAULT NULL,\n"
-                    + "  `col32` year(4) DEFAULT NULL,\n"
                     + "  `col33` bit(16) DEFAULT NULL\n"
                     + ") ;"
     };
@@ -153,7 +152,7 @@ public class MockerTaskMysqlTest extends MockerTestBase {
         Callable<Boolean> task = () -> {
             long start = System.currentTimeMillis();
             while (true) {
-                Boolean flag = Boolean.TRUE;
+                boolean flag = Boolean.TRUE;
                 List<TableTaskContext> contexts = context.getTables();
                 if (contexts.size() == 0) {
                     flag = false;

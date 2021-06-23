@@ -4,7 +4,8 @@ import java.math.BigDecimal;
 
 import com.oceanbase.tools.datamocker.datatype.AbstractDigitDataType;
 import com.oceanbase.tools.datamocker.datatype.DataTypeFactory;
-import com.oceanbase.tools.datamocker.generator.DigitalGeneratorBase;
+import com.oceanbase.tools.datamocker.generator.BaseDigitalGenerator;
+import com.oceanbase.tools.datamocker.model.config.model.DigitDataTypeConfig;
 import com.oceanbase.tools.datamocker.model.enums.ObModeType;
 
 /**
@@ -23,7 +24,7 @@ public class MysqlBigIntType extends AbstractDigitDataType<BigDecimal> {
      * @param allowNull Whether it is allowed to be empty
      * @param signed Is it a signed number
      */
-    public MysqlBigIntType(DigitalGeneratorBase<BigDecimal> generator, BigDecimal defaultValue, Boolean allowNull,
+    public MysqlBigIntType(BaseDigitalGenerator<BigDecimal> generator, BigDecimal defaultValue, Boolean allowNull,
             Boolean signed) {
         super(generator, ObModeType.OB_MYSQL, defaultValue, allowNull, signed);
     }
@@ -50,7 +51,7 @@ public class MysqlBigIntType extends AbstractDigitDataType<BigDecimal> {
     }
 
     @Override
-    public DataTypeFactory getFactory() {
+    public DataTypeFactory<MysqlBigIntType, DigitDataTypeConfig, BaseDigitalGenerator<BigDecimal>> getFactory() {
         if (signed()) {
             return DataTypeFactory.getInstance("OB_MYSQL_BIGINT");
         }
@@ -74,7 +75,7 @@ public class MysqlBigIntType extends AbstractDigitDataType<BigDecimal> {
     }
 
     @Override
-    protected BigDecimal preTreat(BigDecimal value) {
+    protected BigDecimal preProcessingBeforeOutput(BigDecimal value) {
         if (value == null) {
             return null;
         }

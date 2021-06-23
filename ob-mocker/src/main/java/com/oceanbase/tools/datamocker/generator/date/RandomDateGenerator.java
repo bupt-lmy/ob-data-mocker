@@ -3,7 +3,7 @@ package com.oceanbase.tools.datamocker.generator.date;
 import java.sql.Date;
 import java.util.concurrent.TimeUnit;
 
-import com.oceanbase.tools.datamocker.generator.DateGeneratorBase;
+import com.oceanbase.tools.datamocker.generator.BaseDateGenerator;
 
 /**
  * Random date data generator
@@ -12,7 +12,7 @@ import com.oceanbase.tools.datamocker.generator.DateGeneratorBase;
  * @date 2020-12-16 16:09
  * @since OBMOCKER_snapshot_0.1.0
  */
-public class RandomDateGenerator extends DateGeneratorBase<Date> {
+public class RandomDateGenerator extends BaseDateGenerator<Date> {
 
     @Override
     public Boolean preCheck(Date minValue, Date maxValue) {

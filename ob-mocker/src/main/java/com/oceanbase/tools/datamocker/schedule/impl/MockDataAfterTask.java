@@ -44,7 +44,7 @@ public class MockDataAfterTask extends AbstractMockTask {
     }
 
     @Override
-    public Void execute(TableTaskMetaData metaData, TableTaskContext context) throws Throwable {
+    public void execute(TableTaskMetaData metaData, TableTaskContext context) throws Throwable {
         log.info("Start the mock data destruction task");
         String sql;
         if (ObModeType.OB_ORACLE.equals(metaData.getDialectType())) {
@@ -83,6 +83,6 @@ public class MockDataAfterTask extends AbstractMockTask {
                 throw e;
             }
         });
-        return null;
     }
+
 }

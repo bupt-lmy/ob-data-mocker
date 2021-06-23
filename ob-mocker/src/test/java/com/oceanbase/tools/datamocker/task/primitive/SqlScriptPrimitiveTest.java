@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -18,6 +19,8 @@ import com.oceanbase.tools.datamocker.datatype.oracle.OracleNumberType;
 import com.oceanbase.tools.datamocker.model.enums.ObModeType;
 import com.oceanbase.tools.datamocker.model.enums.ScriptType;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
+import com.oceanbase.tools.datamocker.model.mock.MockColumnData;
+import com.oceanbase.tools.datamocker.model.mock.MockRowData;
 import com.oceanbase.tools.datamocker.util.MockDataPipe;
 import com.oceanbase.tools.datamocker.util.Pair;
 import org.junit.After;
@@ -44,14 +47,13 @@ public class SqlScriptPrimitiveTest extends MockerTestBase {
         manager = new MockerFile("test/mock/mock.sql", ScriptType.SQL);
     }
 
-    private List<Map<String, Pair<AbstractDataType, Object>>> getRows(int size) {
-        List<Map<String, Pair<AbstractDataType, Object>>> list = new ArrayList<>();
+    private List<MockRowData> getRows(int size) {
+        List<MockRowData> list = new LinkedList<>();
         for (int i = 0; i < size; i++) {
-            Map<String, Pair<AbstractDataType, Object>> row = new HashMap<>();
+            MockRowData row = new MockRowData(size);
             for (String column : columnList) {
-                row.put(column,
-                        new Pair<>(new OracleNumberType(8, 5, null, false),
-                                new BigDecimal(String.valueOf(new Random().nextInt(1000)))));
+                row.addMockColumn(new MockColumnData<>(column, new OracleNumberType(8, 5, null, false),
+                        new BigDecimal(new Random().nextInt(1000))));
             }
             list.add(row);
         }
@@ -60,9 +62,9 @@ public class SqlScriptPrimitiveTest extends MockerTestBase {
 
     @Test
     public void testSqlPrimitive() throws Throwable {
-        List<Map<String, Pair<AbstractDataType, Object>>> list = getRows(48);
+        List<MockRowData> list = getRows(48);
         SqlScriptWriter primitive = new SqlScriptWriter(manager, ObModeType.OB_ORACLE, "test", "emp");
-        AbstractDataPipe pipe = new MockDataPipe(1);
+        AbstractDataPipe<MockRowData> pipe = new MockDataPipe(1);
         primitive.register(pipe);
         pipe.write(list);
         primitive.write();
@@ -70,22 +72,22 @@ public class SqlScriptPrimitiveTest extends MockerTestBase {
 
     @Test
     public void testPrimitiveWithoutDataSource() {
-        expect.expectMessage("File manager can not be null");
-        expect.expect(MockerException.class);
+        expect.expectMessage("File manager can not be null for SqlScriptWriter#validateParam");
+        expect.expect(IllegalArgumentException.class);
         SqlScriptWriter primitive = new SqlScriptWriter(null, null, null, null);
     }
 
     @Test
     public void testPrimitiveWithoutDatabase() {
-        expect.expectMessage("Database can not be null");
-        expect.expect(MockerException.class);
+        expect.expectMessage("DataBase can not be null for SqlScriptWriter#validateParam");
+        expect.expect(IllegalArgumentException.class);
         SqlScriptWriter primitive = new SqlScriptWriter(manager, ObModeType.OB_ORACLE, null, null);
     }
 
     @Test
-    public void testPrimitiveWithouttable() throws IOException {
-        expect.expectMessage("Table name can not be null");
-        expect.expect(MockerException.class);
+    public void testPrimitiveWithouttable() {
+        expect.expectMessage("TableName can not be null for SqlScriptWriter#validateParam");
+        expect.expect(IllegalArgumentException.class);
         ObModeType dialectType = ObModeType.OB_ORACLE;
         SqlScriptWriter primitive = new SqlScriptWriter(manager, dialectType, "test", null);
     }

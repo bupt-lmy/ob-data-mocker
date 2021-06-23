@@ -41,10 +41,10 @@ import com.oceanbase.tools.datamocker.datatype.oracle.OracleRawType;
 import com.oceanbase.tools.datamocker.datatype.oracle.OracleTimestampType;
 import com.oceanbase.tools.datamocker.datatype.oracle.OracleVarCharType;
 import com.oceanbase.tools.datamocker.generator.BaseGenerator;
-import com.oceanbase.tools.datamocker.generator.ByteGeneratorBase;
-import com.oceanbase.tools.datamocker.generator.CharGeneratorBase;
-import com.oceanbase.tools.datamocker.generator.DateGeneratorBase;
-import com.oceanbase.tools.datamocker.generator.DigitalGeneratorBase;
+import com.oceanbase.tools.datamocker.generator.BaseByteGenerator;
+import com.oceanbase.tools.datamocker.generator.BaseCharGenerator;
+import com.oceanbase.tools.datamocker.generator.BaseDateGenerator;
+import com.oceanbase.tools.datamocker.generator.BaseDigitalGenerator;
 import com.oceanbase.tools.datamocker.generator.GeneratorFactory;
 import com.oceanbase.tools.datamocker.model.config.model.CharDataTypeConfig;
 import com.oceanbase.tools.datamocker.model.config.model.DataTypeConfig;
@@ -53,6 +53,7 @@ import com.oceanbase.tools.datamocker.model.config.model.DigitDataTypeConfig;
 import com.oceanbase.tools.datamocker.model.enums.CharsetType;
 import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
+import org.apache.commons.lang.Validate;
 
 /**
  * Abstract data type class, used to encapsulate some basic data type logic
@@ -61,12 +62,12 @@ import com.oceanbase.tools.datamocker.model.exception.MockerException;
  * @date 2020-12-10 15:42
  * @since OBMOCKER_snapshot_0.1.0
  */
-public abstract class DataTypeFactory<T extends AbstractDataType, V extends DataTypeConfig, K extends BaseGenerator> {
+public abstract class DataTypeFactory<T extends AbstractDataType<?, ? extends Comparable<?>>, V extends DataTypeConfig, K extends BaseGenerator<? extends Comparable<?>, ?>> {
     /**
      * The year type in mysql mode
      */
-    private static final DataTypeFactory OB_MYSQL_YEAR =
-            new DataTypeFactory<MysqlYearType, DateDataTypeConfig, DateGeneratorBase>() {
+    private static final DataTypeFactory<MysqlYearType, DateDataTypeConfig, BaseDateGenerator<Date>> OB_MYSQL_YEAR =
+            new DataTypeFactory<MysqlYearType, DateDataTypeConfig, BaseDateGenerator<Date>>() {
 
                 @Override
                 public String name() {
@@ -74,7 +75,7 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
                 }
 
                 @Override
-                protected MysqlYearType newInstance(DateDataTypeConfig config, DateGeneratorBase generator) {
+                protected MysqlYearType newInstance(DateDataTypeConfig config, BaseDateGenerator<Date> generator) {
                     int scale = config.getScale() == null ? 3 : config.getScale();
                     Date defaultValue = null;
                     Object val = config.getDefaultValue();
@@ -95,12 +96,11 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
                     return returnValue;
                 }
             };
-
     /**
      * The datetime type in mysql mode
      */
-    private static final DataTypeFactory OB_MYSQL_DATETIME =
-            new DataTypeFactory<MysqlDateTimeType, DateDataTypeConfig, DateGeneratorBase>() {
+    private static final DataTypeFactory<MysqlDateTimeType, DateDataTypeConfig, BaseDateGenerator<Timestamp>> OB_MYSQL_DATETIME =
+            new DataTypeFactory<MysqlDateTimeType, DateDataTypeConfig, BaseDateGenerator<Timestamp>>() {
 
                 @Override
                 public String name() {
@@ -108,7 +108,8 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
                 }
 
                 @Override
-                protected MysqlDateTimeType newInstance(DateDataTypeConfig config, DateGeneratorBase generator) {
+                protected MysqlDateTimeType newInstance(DateDataTypeConfig config,
+                        BaseDateGenerator<Timestamp> generator) {
                     int scale = config.getScale() == null ? 0 : config.getScale();
                     Timestamp defaultValue = null;
                     Object val = config.getDefaultValue();
@@ -129,12 +130,11 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
                     return returnValue;
                 }
             };
-
     /**
      * The time type in mysql mode
      */
-    private static final DataTypeFactory OB_MYSQL_TIME =
-            new DataTypeFactory<MysqlTimeType, DateDataTypeConfig, DateGeneratorBase>() {
+    private static final DataTypeFactory<MysqlTimeType, DateDataTypeConfig, BaseDateGenerator<Timestamp>> OB_MYSQL_TIME =
+            new DataTypeFactory<MysqlTimeType, DateDataTypeConfig, BaseDateGenerator<Timestamp>>() {
 
                 @Override
                 public String name() {
@@ -142,7 +142,7 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
                 }
 
                 @Override
-                protected MysqlTimeType newInstance(DateDataTypeConfig config, DateGeneratorBase generator) {
+                protected MysqlTimeType newInstance(DateDataTypeConfig config, BaseDateGenerator<Timestamp> generator) {
                     int scale = config.getScale() == null ? 3 : config.getScale();
                     Timestamp defaultValue = null;
                     Object val = config.getDefaultValue();
@@ -163,12 +163,11 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
                     return returnValue;
                 }
             };
-
     /**
      * The timestamp type in mysql mode
      */
-    private static final DataTypeFactory OB_MYSQL_TIMESTAMP =
-            new DataTypeFactory<MysqlTimestampType, DateDataTypeConfig, DateGeneratorBase>() {
+    private static final DataTypeFactory<MysqlTimestampType, DateDataTypeConfig, BaseDateGenerator<Timestamp>> OB_MYSQL_TIMESTAMP =
+            new DataTypeFactory<MysqlTimestampType, DateDataTypeConfig, BaseDateGenerator<Timestamp>>() {
 
                 @Override
                 public String name() {
@@ -176,7 +175,8 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
                 }
 
                 @Override
-                protected MysqlTimestampType newInstance(DateDataTypeConfig config, DateGeneratorBase generator) {
+                protected MysqlTimestampType newInstance(DateDataTypeConfig config,
+                        BaseDateGenerator<Timestamp> generator) {
                     int scale = config.getScale() == null ? 3 : config.getScale();
                     Timestamp defaultValue = null;
                     Object val = config.getDefaultValue();
@@ -197,12 +197,11 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
                     return returnValue;
                 }
             };
-
     /**
      * The date type in mysql mode
      */
-    private static final DataTypeFactory OB_MYSQL_DATE =
-            new DataTypeFactory<MysqlDateType, DateDataTypeConfig, DateGeneratorBase>() {
+    private static final DataTypeFactory<MysqlDateType, DateDataTypeConfig, BaseDateGenerator<Date>> OB_MYSQL_DATE =
+            new DataTypeFactory<MysqlDateType, DateDataTypeConfig, BaseDateGenerator<Date>>() {
 
                 @Override
                 public String name() {
@@ -210,7 +209,7 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
                 }
 
                 @Override
-                protected MysqlDateType newInstance(DateDataTypeConfig config, DateGeneratorBase generator) {
+                protected MysqlDateType newInstance(DateDataTypeConfig config, BaseDateGenerator<Date> generator) {
                     Date defaultValue = null;
                     Object val = config.getDefaultValue();
                     if (val != null) {
@@ -229,26 +228,21 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
                     return returnValue;
                 }
             };
-
     /**
      * The varbinary type in mysql mode
      */
-    private static final DataTypeFactory OB_MYSQL_VARBINARY =
-            new DataTypeFactory<MysqlBinaryType, CharDataTypeConfig, ByteGeneratorBase>() {
+    private static final DataTypeFactory<MysqlBinaryType, CharDataTypeConfig, BaseByteGenerator> OB_MYSQL_VARBINARY =
+            new DataTypeFactory<MysqlBinaryType, CharDataTypeConfig, BaseByteGenerator>() {
                 @Override
                 public String name() {
                     return "OB_MYSQL_VARBINARY";
                 }
 
                 @Override
-                protected MysqlBinaryType newInstance(CharDataTypeConfig config, ByteGeneratorBase generator) {
-                    if (config.getWidth() == null) {
-                        throw new MockerException(MockerError.PARAMETER_ERROR, "Width for varbinary can not be null");
-                    }
-                    if (config.getWidth() > 1048576) {
-                        throw new MockerException(MockerError.PARAMETER_ERROR,
-                                String.format("Width for varbinary is too big (max = %d)", config.getWidth()));
-                    }
+                protected MysqlBinaryType newInstance(CharDataTypeConfig config, BaseByteGenerator generator) {
+                    Validate.notNull(config.getWidth(), "Width for varbinary can not be null");
+                    Validate.isTrue(config.getWidth() <= 1048576,
+                            String.format("Width for varbinary is too big (max = %d)", config.getWidth()));
                     MysqlBinaryType returnValue =
                             new MysqlBinaryType(null, config.getAllowNull(), config.getWidth(), generator);
                     if (config.getLowValue() != null) {
@@ -260,31 +254,23 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
                     return returnValue;
                 }
             };
-
     /**
      * The bit type in mysql mode
      */
-    private static final DataTypeFactory OB_MYSQL_BIT =
-            new DataTypeFactory<MysqlBinaryType, CharDataTypeConfig, ByteGeneratorBase>() {
+    private static final DataTypeFactory<MysqlBinaryType, CharDataTypeConfig, BaseByteGenerator> OB_MYSQL_BIT =
+            new DataTypeFactory<MysqlBinaryType, CharDataTypeConfig, BaseByteGenerator>() {
                 @Override
                 public String name() {
                     return "OB_MYSQL_BIT";
                 }
 
                 @Override
-                protected MysqlBinaryType newInstance(CharDataTypeConfig config, ByteGeneratorBase generator) {
-                    if (config.getWidth() == null) {
-                        throw new MockerException(MockerError.PARAMETER_ERROR, "Width for bit can not be null");
-                    }
-                    if (config.getWidth() > 64) {
-                        throw new MockerException(MockerError.PARAMETER_ERROR,
-                                String.format("Width for bit is too big (max = %d)", config.getWidth()));
-                    }
+                protected MysqlBinaryType newInstance(CharDataTypeConfig config, BaseByteGenerator generator) {
+                    Validate.notNull(config.getWidth(), "Width for bit can not be null");
+                    Validate.isTrue(config.getWidth() <= 64,
+                            String.format("Width for bit is too big (max = %d)", config.getWidth()));
                     int byteWidth = config.getWidth() / 8;
-                    if (byteWidth <= 0) {
-                        throw new MockerException(MockerError.PARAMETER_ERROR,
-                                "Byte width can not be equal to or smaller than zero");
-                    }
+                    Validate.isTrue(byteWidth > 0, "Byte width can not be equal to or smaller than zero");
                     MysqlBinaryType returnValue =
                             new MysqlBinaryType(null, config.getAllowNull(), byteWidth, generator);
                     if (config.getLowValue() != null) {
@@ -296,26 +282,21 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
                     return returnValue;
                 }
             };
-
     /**
      * The binary type in mysql mode
      */
-    private static final DataTypeFactory OB_MYSQL_BINARY =
-            new DataTypeFactory<MysqlBinaryType, CharDataTypeConfig, ByteGeneratorBase>() {
+    private static final DataTypeFactory<MysqlBinaryType, CharDataTypeConfig, BaseByteGenerator> OB_MYSQL_BINARY =
+            new DataTypeFactory<MysqlBinaryType, CharDataTypeConfig, BaseByteGenerator>() {
                 @Override
                 public String name() {
                     return "OB_MYSQL_BINARY";
                 }
 
                 @Override
-                protected MysqlBinaryType newInstance(CharDataTypeConfig config, ByteGeneratorBase generator) {
-                    if (config.getWidth() == null) {
-                        throw new MockerException(MockerError.PARAMETER_ERROR, "Width for binary can not be null");
-                    }
-                    if (config.getWidth() > 256) {
-                        throw new MockerException(MockerError.PARAMETER_ERROR,
-                                String.format("Width for binary is too big (max = %d)", config.getWidth()));
-                    }
+                protected MysqlBinaryType newInstance(CharDataTypeConfig config, BaseByteGenerator generator) {
+                    Validate.notNull(config.getWidth(), "Width for binary can not be null");
+                    Validate.isTrue(config.getWidth() <= 256,
+                            String.format("Width for binary is too big (max = %d)", config.getWidth()));
                     MysqlBinaryType returnValue =
                             new MysqlBinaryType(null, config.getAllowNull(), config.getWidth(), generator);
                     if (config.getLowValue() != null) {
@@ -327,19 +308,18 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
                     return returnValue;
                 }
             };
-
     /**
      * The longblob type in mysql mode
      */
-    private static final DataTypeFactory OB_MYSQL_LONGBLOB =
-            new DataTypeFactory<MysqlBlobType, CharDataTypeConfig, ByteGeneratorBase>() {
+    private static final DataTypeFactory<MysqlBlobType, CharDataTypeConfig, BaseByteGenerator> OB_MYSQL_LONGBLOB =
+            new DataTypeFactory<MysqlBlobType, CharDataTypeConfig, BaseByteGenerator>() {
                 @Override
                 public String name() {
                     return "OB_MYSQL_LONGBLOB";
                 }
 
                 @Override
-                protected MysqlBlobType newInstance(CharDataTypeConfig config, ByteGeneratorBase generator) {
+                protected MysqlBlobType newInstance(CharDataTypeConfig config, BaseByteGenerator generator) {
                     MysqlBlobType returnValue = new MysqlBlobType(8192, null, config.getAllowNull(), generator);
                     if (config.getLowValue() != null) {
                         returnValue.setLowValue((Integer) config.getLowValue());
@@ -350,19 +330,18 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
                     return returnValue;
                 }
             };
-
     /**
      * The mediumblob type in mysql mode
      */
-    private static final DataTypeFactory OB_MYSQL_MEDIUMBLOB =
-            new DataTypeFactory<MysqlBlobType, CharDataTypeConfig, ByteGeneratorBase>() {
+    private static final DataTypeFactory<MysqlBlobType, CharDataTypeConfig, BaseByteGenerator> OB_MYSQL_MEDIUMBLOB =
+            new DataTypeFactory<MysqlBlobType, CharDataTypeConfig, BaseByteGenerator>() {
                 @Override
                 public String name() {
                     return "OB_MYSQL_MEDIUMBLOB";
                 }
 
                 @Override
-                protected MysqlBlobType newInstance(CharDataTypeConfig config, ByteGeneratorBase generator) {
+                protected MysqlBlobType newInstance(CharDataTypeConfig config, BaseByteGenerator generator) {
                     MysqlBlobType returnValue = new MysqlBlobType(8192, null, config.getAllowNull(), generator);
                     if (config.getLowValue() != null) {
                         returnValue.setLowValue((Integer) config.getLowValue());
@@ -373,19 +352,18 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
                     return returnValue;
                 }
             };
-
     /**
      * The blob type in mysql mode
      */
-    private static final DataTypeFactory OB_MYSQL_BLOB =
-            new DataTypeFactory<MysqlBlobType, CharDataTypeConfig, ByteGeneratorBase>() {
+    private static final DataTypeFactory<MysqlBlobType, CharDataTypeConfig, BaseByteGenerator> OB_MYSQL_BLOB =
+            new DataTypeFactory<MysqlBlobType, CharDataTypeConfig, BaseByteGenerator>() {
                 @Override
                 public String name() {
                     return "OB_MYSQL_BLOB";
                 }
 
                 @Override
-                protected MysqlBlobType newInstance(CharDataTypeConfig config, ByteGeneratorBase generator) {
+                protected MysqlBlobType newInstance(CharDataTypeConfig config, BaseByteGenerator generator) {
                     MysqlBlobType returnValue = new MysqlBlobType(4096, null, config.getAllowNull(), generator);
                     if (config.getLowValue() != null) {
                         returnValue.setLowValue((Integer) config.getLowValue());
@@ -396,19 +374,18 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
                     return returnValue;
                 }
             };
-
     /**
      * The tinyblob type in mysql mode
      */
-    private static final DataTypeFactory OB_MYSQL_TINYBLOB =
-            new DataTypeFactory<MysqlBlobType, CharDataTypeConfig, ByteGeneratorBase>() {
+    private static final DataTypeFactory<MysqlBlobType, CharDataTypeConfig, BaseByteGenerator> OB_MYSQL_TINYBLOB =
+            new DataTypeFactory<MysqlBlobType, CharDataTypeConfig, BaseByteGenerator>() {
                 @Override
                 public String name() {
                     return "OB_MYSQL_TINYBLOB";
                 }
 
                 @Override
-                protected MysqlBlobType newInstance(CharDataTypeConfig config, ByteGeneratorBase generator) {
+                protected MysqlBlobType newInstance(CharDataTypeConfig config, BaseByteGenerator generator) {
                     MysqlBlobType returnValue = new MysqlBlobType(255, null, config.getAllowNull(), generator);
                     if (config.getLowValue() != null) {
                         returnValue.setLowValue((Integer) config.getLowValue());
@@ -419,27 +396,23 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
                     return returnValue;
                 }
             };
-
     /**
      * The longtext type in mysql mode
      */
-    private static final DataTypeFactory OB_MYSQL_LONGTEXT =
-            new DataTypeFactory<MysqlTextType, CharDataTypeConfig, CharGeneratorBase>() {
+    private static final DataTypeFactory<MysqlTextType, CharDataTypeConfig, BaseCharGenerator> OB_MYSQL_LONGTEXT =
+            new DataTypeFactory<MysqlTextType, CharDataTypeConfig, BaseCharGenerator>() {
                 @Override
                 public String name() {
                     return "OB_MYSQL_LONGTEXT";
                 }
 
                 @Override
-                protected MysqlTextType newInstance(CharDataTypeConfig config, CharGeneratorBase generator) {
+                protected MysqlTextType newInstance(CharDataTypeConfig config, BaseCharGenerator generator) {
                     String charset = config.getCharset();
-                    if (charset == null) {
-                        throw new MockerException(MockerError.PARAMETER_ERROR, "Error parameters for longtext");
-                    }
+                    Validate.notNull(charset, "Charset can not be null for longtext");
                     CharsetType charsetType = CharsetType.valueOf(charset);
-                    MysqlTextType returnValue =
-                            new MysqlTextType(4096, (String) config.getDefaultValue(), config.getAllowNull(),
-                                    charsetType, generator, false);
+                    MysqlTextType returnValue = new MysqlTextType(4096, (String) config.getDefaultValue(),
+                            config.getAllowNull(), charsetType, generator, false);
                     if (config.getLowValue() != null) {
                         returnValue.setLowValue((Integer) config.getLowValue());
                     }
@@ -449,27 +422,23 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
                     return returnValue;
                 }
             };
-
     /**
      * The mediumtext type in mysql mode
      */
-    private static final DataTypeFactory OB_MYSQL_MEDIUMTEXT =
-            new DataTypeFactory<MysqlTextType, CharDataTypeConfig, CharGeneratorBase>() {
+    private static final DataTypeFactory<MysqlTextType, CharDataTypeConfig, BaseCharGenerator> OB_MYSQL_MEDIUMTEXT =
+            new DataTypeFactory<MysqlTextType, CharDataTypeConfig, BaseCharGenerator>() {
                 @Override
                 public String name() {
                     return "OB_MYSQL_MEDIUMTEXT";
                 }
 
                 @Override
-                protected MysqlTextType newInstance(CharDataTypeConfig config, CharGeneratorBase generator) {
+                protected MysqlTextType newInstance(CharDataTypeConfig config, BaseCharGenerator generator) {
                     String charset = config.getCharset();
-                    if (charset == null) {
-                        throw new MockerException(MockerError.PARAMETER_ERROR, "Error parametes for mediumtext");
-                    }
+                    Validate.notNull(charset, "Charset can not be null for mediumtext");
                     CharsetType charsetType = CharsetType.valueOf(charset);
-                    MysqlTextType returnValue =
-                            new MysqlTextType(4096, (String) config.getDefaultValue(), config.getAllowNull(),
-                                    charsetType, generator, false);
+                    MysqlTextType returnValue = new MysqlTextType(4096, (String) config.getDefaultValue(),
+                            config.getAllowNull(), charsetType, generator, false);
                     if (config.getLowValue() != null) {
                         returnValue.setLowValue((Integer) config.getLowValue());
                     }
@@ -479,27 +448,23 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
                     return returnValue;
                 }
             };
-
     /**
      * The text type in mysql mode
      */
-    private static final DataTypeFactory OB_MYSQL_TEXT =
-            new DataTypeFactory<MysqlTextType, CharDataTypeConfig, CharGeneratorBase>() {
+    private static final DataTypeFactory<MysqlTextType, CharDataTypeConfig, BaseCharGenerator> OB_MYSQL_TEXT =
+            new DataTypeFactory<MysqlTextType, CharDataTypeConfig, BaseCharGenerator>() {
                 @Override
                 public String name() {
                     return "OB_MYSQL_TEXT";
                 }
 
                 @Override
-                protected MysqlTextType newInstance(CharDataTypeConfig config, CharGeneratorBase generator) {
+                protected MysqlTextType newInstance(CharDataTypeConfig config, BaseCharGenerator generator) {
                     String charset = config.getCharset();
-                    if (charset == null) {
-                        throw new MockerException(MockerError.PARAMETER_ERROR, "Error parametes for text");
-                    }
+                    Validate.notNull(charset, "Charset can not be null for text");
                     CharsetType charsetType = CharsetType.valueOf(charset);
-                    MysqlTextType returnValue =
-                            new MysqlTextType(4096, (String) config.getDefaultValue(), config.getAllowNull(),
-                                    charsetType, generator, false);
+                    MysqlTextType returnValue = new MysqlTextType(4096, (String) config.getDefaultValue(),
+                            config.getAllowNull(), charsetType, generator, false);
                     if (config.getLowValue() != null) {
                         returnValue.setLowValue((Integer) config.getLowValue());
                     }
@@ -509,27 +474,23 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
                     return returnValue;
                 }
             };
-
     /**
      * The tinytext type in mysql mode
      */
-    private static final DataTypeFactory OB_MYSQL_TINYTEXT =
-            new DataTypeFactory<MysqlTextType, CharDataTypeConfig, CharGeneratorBase>() {
+    private static final DataTypeFactory<MysqlTextType, CharDataTypeConfig, BaseCharGenerator> OB_MYSQL_TINYTEXT =
+            new DataTypeFactory<MysqlTextType, CharDataTypeConfig, BaseCharGenerator>() {
                 @Override
                 public String name() {
                     return "OB_MYSQL_TINYTEXT";
                 }
 
                 @Override
-                protected MysqlTextType newInstance(CharDataTypeConfig config, CharGeneratorBase generator) {
+                protected MysqlTextType newInstance(CharDataTypeConfig config, BaseCharGenerator generator) {
                     String charset = config.getCharset();
-                    if (charset == null) {
-                        throw new MockerException(MockerError.PARAMETER_ERROR, "Error parametes for tinytext");
-                    }
+                    Validate.notNull(charset, "Charset can not be null for tinytext");
                     CharsetType charsetType = CharsetType.valueOf(charset);
-                    MysqlTextType returnValue =
-                            new MysqlTextType(255, (String) config.getDefaultValue(), config.getAllowNull(),
-                                    charsetType, generator, false);
+                    MysqlTextType returnValue = new MysqlTextType(255, (String) config.getDefaultValue(),
+                            config.getAllowNull(), charsetType, generator, false);
                     if (config.getLowValue() != null) {
                         returnValue.setLowValue((Integer) config.getLowValue());
                     }
@@ -539,28 +500,25 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
                     return returnValue;
                 }
             };
-
     /**
      * The varchar type in mysql mode
      */
-    private static final DataTypeFactory OB_MYSQL_VARCHAR =
-            new DataTypeFactory<MysqlVarCharType, CharDataTypeConfig, CharGeneratorBase>() {
+    private static final DataTypeFactory<MysqlVarCharType, CharDataTypeConfig, BaseCharGenerator> OB_MYSQL_VARCHAR =
+            new DataTypeFactory<MysqlVarCharType, CharDataTypeConfig, BaseCharGenerator>() {
                 @Override
                 public String name() {
                     return "OB_MYSQL_VARCHAR";
                 }
 
                 @Override
-                protected MysqlVarCharType newInstance(CharDataTypeConfig config, CharGeneratorBase generator) {
+                protected MysqlVarCharType newInstance(CharDataTypeConfig config, BaseCharGenerator generator) {
                     String charset = config.getCharset();
+                    Validate.notNull(charset, "Charset can not be null for varchar");
                     Integer length = config.getWidth();
-                    if (length == null || charset == null) {
-                        throw new MockerException(MockerError.PARAMETER_ERROR, "Error parametes for VARCHAR");
-                    }
+                    Validate.notNull(length, "Length can not be null for varchar");
                     CharsetType charsetType = CharsetType.valueOf(charset);
-                    MysqlVarCharType returnValue =
-                            new MysqlVarCharType(length, (String) config.getDefaultValue(), config.getAllowNull(),
-                                    charsetType, generator, false);
+                    MysqlVarCharType returnValue = new MysqlVarCharType(length, (String) config.getDefaultValue(),
+                            config.getAllowNull(), charsetType, generator, false);
                     if (config.getLowValue() != null) {
                         returnValue.setLowValue((Integer) config.getLowValue());
                     }
@@ -570,28 +528,25 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
                     return returnValue;
                 }
             };
-
     /**
      * The char type in mysql mode
      */
-    private static final DataTypeFactory OB_MYSQL_CHAR =
-            new DataTypeFactory<MysqlCharType, CharDataTypeConfig, CharGeneratorBase>() {
+    private static final DataTypeFactory<MysqlCharType, CharDataTypeConfig, BaseCharGenerator> OB_MYSQL_CHAR =
+            new DataTypeFactory<MysqlCharType, CharDataTypeConfig, BaseCharGenerator>() {
                 @Override
                 public String name() {
                     return "OB_MYSQL_CHAR";
                 }
 
                 @Override
-                protected MysqlCharType newInstance(CharDataTypeConfig config, CharGeneratorBase generator) {
+                protected MysqlCharType newInstance(CharDataTypeConfig config, BaseCharGenerator generator) {
                     String charset = config.getCharset();
+                    Validate.notNull(charset, "Charset can not be null for char");
                     Integer length = config.getWidth();
-                    if (length == null || charset == null) {
-                        throw new MockerException(MockerError.PARAMETER_ERROR, "Error parametes for CHAR");
-                    }
+                    Validate.notNull(length, "Length can not be null for char");
                     CharsetType charsetType = CharsetType.valueOf(charset);
-                    MysqlCharType returnValue =
-                            new MysqlCharType(length, (String) config.getDefaultValue(), config.getAllowNull(),
-                                    charsetType, generator, false);
+                    MysqlCharType returnValue = new MysqlCharType(length, (String) config.getDefaultValue(),
+                            config.getAllowNull(), charsetType, generator, false);
                     if (config.getLowValue() != null) {
                         returnValue.setLowValue((Integer) config.getLowValue());
                     }
@@ -601,24 +556,24 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
                     return returnValue;
                 }
             };
-
     /**
      * The double unsigned type in mysql mode
      */
-    private static final DataTypeFactory OB_MYSQL_DOUBLE_UNSIGNED =
-            new DataTypeFactory<MysqlFloatType, DigitDataTypeConfig, DigitalGeneratorBase>() {
+    private static final DataTypeFactory<MysqlFloatType, DigitDataTypeConfig, BaseDigitalGenerator<BigDecimal>> OB_MYSQL_DOUBLE_UNSIGNED =
+            new DataTypeFactory<MysqlFloatType, DigitDataTypeConfig, BaseDigitalGenerator<BigDecimal>>() {
                 @Override
                 public String name() {
                     return "OB_MYSQL_DOUBLE_UNSIGNED";
                 }
 
                 @Override
-                protected MysqlFloatType newInstance(DigitDataTypeConfig config, DigitalGeneratorBase generator) {
+                protected MysqlFloatType newInstance(DigitDataTypeConfig config,
+                        BaseDigitalGenerator<BigDecimal> generator) {
                     if (config.getScale() != null && config.getPrecision() == null) {
                         throw new MockerException(MockerError.PARAMETER_ERROR, "Param settings is illegal for double");
                     }
-                    Integer scale = config.getScale() == null ? -1 : config.getScale();
-                    Integer precision = config.getPrecision() == null ? -1 : config.getPrecision();
+                    int scale = config.getScale() == null ? -1 : config.getScale();
+                    int precision = config.getPrecision() == null ? -1 : config.getPrecision();
                     if (scale == -1 && precision != -1) {
                         precision = -1;
                     }
@@ -635,24 +590,24 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
                     return returnValue;
                 }
             };
-
     /**
      * The double type in mysql mode
      */
-    private static final DataTypeFactory OB_MYSQL_DOUBLE =
-            new DataTypeFactory<MysqlFloatType, DigitDataTypeConfig, DigitalGeneratorBase>() {
+    private static final DataTypeFactory<MysqlFloatType, DigitDataTypeConfig, BaseDigitalGenerator<BigDecimal>> OB_MYSQL_DOUBLE =
+            new DataTypeFactory<MysqlFloatType, DigitDataTypeConfig, BaseDigitalGenerator<BigDecimal>>() {
                 @Override
                 public String name() {
                     return "OB_MYSQL_DOUBLE";
                 }
 
                 @Override
-                protected MysqlFloatType newInstance(DigitDataTypeConfig config, DigitalGeneratorBase generator) {
+                protected MysqlFloatType newInstance(DigitDataTypeConfig config,
+                        BaseDigitalGenerator<BigDecimal> generator) {
                     if (config.getScale() != null && config.getPrecision() == null) {
                         throw new MockerException(MockerError.PARAMETER_ERROR, "Param settings is illegal for double");
                     }
-                    Integer scale = config.getScale() == null ? -1 : config.getScale();
-                    Integer precision = config.getPrecision() == null ? -1 : config.getPrecision();
+                    int scale = config.getScale() == null ? -1 : config.getScale();
+                    int precision = config.getPrecision() == null ? -1 : config.getPrecision();
                     if (scale == -1 && precision != -1) {
                         precision = -1;
                     }
@@ -669,24 +624,24 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
                     return returnValue;
                 }
             };
-
     /**
      * The float unsigned type in mysql mode
      */
-    private static final DataTypeFactory OB_MYSQL_FLOAT_UNSIGNED =
-            new DataTypeFactory<MysqlFloatType, DigitDataTypeConfig, DigitalGeneratorBase>() {
+    private static final DataTypeFactory<MysqlFloatType, DigitDataTypeConfig, BaseDigitalGenerator<BigDecimal>> OB_MYSQL_FLOAT_UNSIGNED =
+            new DataTypeFactory<MysqlFloatType, DigitDataTypeConfig, BaseDigitalGenerator<BigDecimal>>() {
                 @Override
                 public String name() {
                     return "OB_MYSQL_FLOAT_UNSIGNED";
                 }
 
                 @Override
-                protected MysqlFloatType newInstance(DigitDataTypeConfig config, DigitalGeneratorBase generator) {
+                protected MysqlFloatType newInstance(DigitDataTypeConfig config,
+                        BaseDigitalGenerator<BigDecimal> generator) {
                     if (config.getScale() != null && config.getPrecision() == null) {
                         throw new MockerException(MockerError.PARAMETER_ERROR, "Param settings is illegal for float");
                     }
-                    Integer scale = config.getScale() == null ? -1 : config.getScale();
-                    Integer precision = config.getPrecision() == null ? -1 : config.getPrecision();
+                    int scale = config.getScale() == null ? -1 : config.getScale();
+                    int precision = config.getPrecision() == null ? -1 : config.getPrecision();
                     if (scale == -1 && precision != -1) {
                         precision = -1;
                     }
@@ -703,24 +658,24 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
                     return returnValue;
                 }
             };
-
     /**
      * The float type in mysql mode
      */
-    private static final DataTypeFactory OB_MYSQL_FLOAT =
-            new DataTypeFactory<MysqlFloatType, DigitDataTypeConfig, DigitalGeneratorBase>() {
+    private static final DataTypeFactory<MysqlFloatType, DigitDataTypeConfig, BaseDigitalGenerator<BigDecimal>> OB_MYSQL_FLOAT =
+            new DataTypeFactory<MysqlFloatType, DigitDataTypeConfig, BaseDigitalGenerator<BigDecimal>>() {
                 @Override
                 public String name() {
                     return "OB_MYSQL_FLOAT";
                 }
 
                 @Override
-                protected MysqlFloatType newInstance(DigitDataTypeConfig config, DigitalGeneratorBase generator) {
+                protected MysqlFloatType newInstance(DigitDataTypeConfig config,
+                        BaseDigitalGenerator<BigDecimal> generator) {
                     if (config.getScale() != null && config.getPrecision() == null) {
                         throw new MockerException(MockerError.PARAMETER_ERROR, "Param settings is illegal for float");
                     }
-                    Integer scale = config.getScale() == null ? -1 : config.getScale();
-                    Integer precision = config.getPrecision() == null ? -1 : config.getPrecision();
+                    int scale = config.getScale() == null ? -1 : config.getScale();
+                    int precision = config.getPrecision() == null ? -1 : config.getPrecision();
                     if (scale == -1 && precision != -1) {
                         precision = -1;
                     }
@@ -737,24 +692,24 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
                     return returnValue;
                 }
             };
-
     /**
      * The decimal unsigned type in mysql mode
      */
-    private static final DataTypeFactory OB_MYSQL_DECIMAL_UNSIGNED =
-            new DataTypeFactory<MysqlDecimalType, DigitDataTypeConfig, DigitalGeneratorBase>() {
+    private static final DataTypeFactory<MysqlDecimalType, DigitDataTypeConfig, BaseDigitalGenerator<BigDecimal>> OB_MYSQL_DECIMAL_UNSIGNED =
+            new DataTypeFactory<MysqlDecimalType, DigitDataTypeConfig, BaseDigitalGenerator<BigDecimal>>() {
                 @Override
                 public String name() {
                     return "OB_MYSQL_DECIMAL_UNSIGNED";
                 }
 
                 @Override
-                protected MysqlDecimalType newInstance(DigitDataTypeConfig config, DigitalGeneratorBase generator) {
+                protected MysqlDecimalType newInstance(DigitDataTypeConfig config,
+                        BaseDigitalGenerator<BigDecimal> generator) {
                     if (config.getScale() != null && config.getPrecision() == null) {
                         throw new MockerException(MockerError.PARAMETER_ERROR, "Param settings is illegal for decimal");
                     }
-                    Integer scale = config.getScale() == null ? 0 : config.getScale();
-                    Integer precision = config.getPrecision() == null ? 10 : config.getPrecision();
+                    int scale = config.getScale() == null ? 0 : config.getScale();
+                    int precision = config.getPrecision() == null ? 10 : config.getPrecision();
                     BigDecimal defaultValue = config.getDefaultValue() == null ? null
                             : new BigDecimal(config.getDefaultValue().toString());
                     MysqlDecimalType returnValue = new MysqlDecimalType(precision, scale, generator, defaultValue,
@@ -768,24 +723,24 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
                     return returnValue;
                 }
             };
-
     /**
      * The decimal type in mysql mode
      */
-    private static final DataTypeFactory OB_MYSQL_DECIMAL =
-            new DataTypeFactory<MysqlDecimalType, DigitDataTypeConfig, DigitalGeneratorBase>() {
+    private static final DataTypeFactory<MysqlDecimalType, DigitDataTypeConfig, BaseDigitalGenerator<BigDecimal>> OB_MYSQL_DECIMAL =
+            new DataTypeFactory<MysqlDecimalType, DigitDataTypeConfig, BaseDigitalGenerator<BigDecimal>>() {
                 @Override
                 public String name() {
                     return "OB_MYSQL_DECIMAL";
                 }
 
                 @Override
-                protected MysqlDecimalType newInstance(DigitDataTypeConfig config, DigitalGeneratorBase generator) {
+                protected MysqlDecimalType newInstance(DigitDataTypeConfig config,
+                        BaseDigitalGenerator<BigDecimal> generator) {
                     if (config.getScale() != null && config.getPrecision() == null) {
                         throw new MockerException(MockerError.PARAMETER_ERROR, "Param settings is illegal for decimal");
                     }
-                    Integer scale = config.getScale() == null ? 0 : config.getScale();
-                    Integer precision = config.getPrecision() == null ? 10 : config.getPrecision();
+                    int scale = config.getScale() == null ? 0 : config.getScale();
+                    int precision = config.getPrecision() == null ? 10 : config.getPrecision();
                     BigDecimal defaultValue = config.getDefaultValue() == null ? null
                             : new BigDecimal(config.getDefaultValue().toString());
                     MysqlDecimalType returnValue = new MysqlDecimalType(precision, scale, generator, defaultValue,
@@ -799,19 +754,19 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
                     return returnValue;
                 }
             };
-
     /**
      * The bigint unsigned type in mysql mode
      */
-    private static final DataTypeFactory OB_MYSQL_BIGINT_UNSIGNED =
-            new DataTypeFactory<MysqlBigIntType, DigitDataTypeConfig, DigitalGeneratorBase>() {
+    private static final DataTypeFactory<MysqlBigIntType, DigitDataTypeConfig, BaseDigitalGenerator<BigDecimal>> OB_MYSQL_BIGINT_UNSIGNED =
+            new DataTypeFactory<MysqlBigIntType, DigitDataTypeConfig, BaseDigitalGenerator<BigDecimal>>() {
                 @Override
                 public String name() {
                     return "OB_MYSQL_BIGINT_UNSIGNED";
                 }
 
                 @Override
-                protected MysqlBigIntType newInstance(DigitDataTypeConfig config, DigitalGeneratorBase generator) {
+                protected MysqlBigIntType newInstance(DigitDataTypeConfig config,
+                        BaseDigitalGenerator<BigDecimal> generator) {
                     BigDecimal defaultValue = null;
                     if (config.getDefaultValue() != null) {
                         defaultValue = new BigDecimal(config.getDefaultValue().toString());
@@ -827,19 +782,19 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
                     return returnValue;
                 }
             };
-
     /**
      * The int type in mysql mode
      */
-    private static final DataTypeFactory OB_MYSQL_BIGINT =
-            new DataTypeFactory<MysqlBigIntType, DigitDataTypeConfig, DigitalGeneratorBase>() {
+    private static final DataTypeFactory<MysqlBigIntType, DigitDataTypeConfig, BaseDigitalGenerator<BigDecimal>> OB_MYSQL_BIGINT =
+            new DataTypeFactory<MysqlBigIntType, DigitDataTypeConfig, BaseDigitalGenerator<BigDecimal>>() {
                 @Override
                 public String name() {
                     return "OB_MYSQL_BIGINT";
                 }
 
                 @Override
-                protected MysqlBigIntType newInstance(DigitDataTypeConfig config, DigitalGeneratorBase generator) {
+                protected MysqlBigIntType newInstance(DigitDataTypeConfig config,
+                        BaseDigitalGenerator<BigDecimal> generator) {
                     BigDecimal defaultValue = null;
                     if (config.getDefaultValue() != null) {
                         defaultValue = new BigDecimal(config.getDefaultValue().toString());
@@ -855,19 +810,19 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
                     return returnValue;
                 }
             };
-
     /**
      * The int unsigned type in mysql mode
      */
-    private static final DataTypeFactory OB_MYSQL_INT_UNSIGNED =
-            new DataTypeFactory<MysqlIntType, DigitDataTypeConfig, DigitalGeneratorBase>() {
+    private static final DataTypeFactory<MysqlIntType, DigitDataTypeConfig, BaseDigitalGenerator<BigDecimal>> OB_MYSQL_INT_UNSIGNED =
+            new DataTypeFactory<MysqlIntType, DigitDataTypeConfig, BaseDigitalGenerator<BigDecimal>>() {
                 @Override
                 public String name() {
                     return "OB_MYSQL_INT_UNSIGNED";
                 }
 
                 @Override
-                protected MysqlIntType newInstance(DigitDataTypeConfig config, DigitalGeneratorBase generator) {
+                protected MysqlIntType newInstance(DigitDataTypeConfig config,
+                        BaseDigitalGenerator<BigDecimal> generator) {
                     BigDecimal defaultValue = null;
                     if (config.getDefaultValue() != null) {
                         defaultValue = new BigDecimal(config.getDefaultValue().toString());
@@ -882,19 +837,19 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
                     return returnValue;
                 }
             };
-
     /**
      * The int type in mysql mode
      */
-    private static final DataTypeFactory OB_MYSQL_INT =
-            new DataTypeFactory<MysqlIntType, DigitDataTypeConfig, DigitalGeneratorBase>() {
+    private static final DataTypeFactory<MysqlIntType, DigitDataTypeConfig, BaseDigitalGenerator<BigDecimal>> OB_MYSQL_INT =
+            new DataTypeFactory<MysqlIntType, DigitDataTypeConfig, BaseDigitalGenerator<BigDecimal>>() {
                 @Override
                 public String name() {
                     return "OB_MYSQL_INT";
                 }
 
                 @Override
-                protected MysqlIntType newInstance(DigitDataTypeConfig config, DigitalGeneratorBase generator) {
+                protected MysqlIntType newInstance(DigitDataTypeConfig config,
+                        BaseDigitalGenerator<BigDecimal> generator) {
                     BigDecimal defaultValue = null;
                     if (config.getDefaultValue() != null) {
                         defaultValue = new BigDecimal(config.getDefaultValue().toString());
@@ -909,19 +864,19 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
                     return returnValue;
                 }
             };
-
     /**
      * The mediumInt unsigned type in mysql mode
      */
-    private static final DataTypeFactory OB_MYSQL_MEDIUMINT_UNSIGNED =
-            new DataTypeFactory<MysqlMediumIntType, DigitDataTypeConfig, DigitalGeneratorBase>() {
+    private static final DataTypeFactory<MysqlMediumIntType, DigitDataTypeConfig, BaseDigitalGenerator<BigDecimal>> OB_MYSQL_MEDIUMINT_UNSIGNED =
+            new DataTypeFactory<MysqlMediumIntType, DigitDataTypeConfig, BaseDigitalGenerator<BigDecimal>>() {
                 @Override
                 public String name() {
                     return "OB_MYSQL_MEDIUMINT_UNSIGNED";
                 }
 
                 @Override
-                protected MysqlMediumIntType newInstance(DigitDataTypeConfig config, DigitalGeneratorBase generator) {
+                protected MysqlMediumIntType newInstance(DigitDataTypeConfig config,
+                        BaseDigitalGenerator<BigDecimal> generator) {
                     BigDecimal defaultValue = null;
                     if (config.getDefaultValue() != null) {
                         defaultValue = new BigDecimal(config.getDefaultValue().toString());
@@ -937,19 +892,19 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
                     return returnValue;
                 }
             };
-
     /**
      * The medium int type in mysql mode
      */
-    private static final DataTypeFactory OB_MYSQL_MEDIUMINT =
-            new DataTypeFactory<MysqlMediumIntType, DigitDataTypeConfig, DigitalGeneratorBase>() {
+    private static final DataTypeFactory<MysqlMediumIntType, DigitDataTypeConfig, BaseDigitalGenerator<BigDecimal>> OB_MYSQL_MEDIUMINT =
+            new DataTypeFactory<MysqlMediumIntType, DigitDataTypeConfig, BaseDigitalGenerator<BigDecimal>>() {
                 @Override
                 public String name() {
                     return "OB_MYSQL_MEDIUMINT";
                 }
 
                 @Override
-                protected MysqlMediumIntType newInstance(DigitDataTypeConfig config, DigitalGeneratorBase generator) {
+                protected MysqlMediumIntType newInstance(DigitDataTypeConfig config,
+                        BaseDigitalGenerator<BigDecimal> generator) {
                     BigDecimal defaultValue = null;
                     if (config.getDefaultValue() != null) {
                         defaultValue = new BigDecimal(config.getDefaultValue().toString());
@@ -965,19 +920,19 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
                     return returnValue;
                 }
             };
-
     /**
      * The smallint unsigned type in mysql mode
      */
-    private static final DataTypeFactory OB_MYSQL_SMALLINT_UNSIGNED =
-            new DataTypeFactory<MysqlSmallIntType, DigitDataTypeConfig, DigitalGeneratorBase>() {
+    private static final DataTypeFactory<MysqlSmallIntType, DigitDataTypeConfig, BaseDigitalGenerator<BigDecimal>> OB_MYSQL_SMALLINT_UNSIGNED =
+            new DataTypeFactory<MysqlSmallIntType, DigitDataTypeConfig, BaseDigitalGenerator<BigDecimal>>() {
                 @Override
                 public String name() {
                     return "OB_MYSQL_SMALLINT_UNSIGNED";
                 }
 
                 @Override
-                protected MysqlSmallIntType newInstance(DigitDataTypeConfig config, DigitalGeneratorBase generator) {
+                protected MysqlSmallIntType newInstance(DigitDataTypeConfig config,
+                        BaseDigitalGenerator<BigDecimal> generator) {
                     BigDecimal defaultValue = null;
                     if (config.getDefaultValue() != null) {
                         defaultValue = new BigDecimal(config.getDefaultValue().toString());
@@ -993,19 +948,19 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
                     return returnValue;
                 }
             };
-
     /**
      * The smallint type in mysql mode
      */
-    private static final DataTypeFactory OB_MYSQL_SMALLINT =
-            new DataTypeFactory<MysqlSmallIntType, DigitDataTypeConfig, DigitalGeneratorBase>() {
+    private static final DataTypeFactory<MysqlSmallIntType, DigitDataTypeConfig, BaseDigitalGenerator<BigDecimal>> OB_MYSQL_SMALLINT =
+            new DataTypeFactory<MysqlSmallIntType, DigitDataTypeConfig, BaseDigitalGenerator<BigDecimal>>() {
                 @Override
                 public String name() {
                     return "OB_MYSQL_SMALLINT";
                 }
 
                 @Override
-                protected MysqlSmallIntType newInstance(DigitDataTypeConfig config, DigitalGeneratorBase generator) {
+                protected MysqlSmallIntType newInstance(DigitDataTypeConfig config,
+                        BaseDigitalGenerator<BigDecimal> generator) {
                     BigDecimal defaultValue = null;
                     if (config.getDefaultValue() != null) {
                         defaultValue = new BigDecimal(config.getDefaultValue().toString());
@@ -1021,19 +976,19 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
                     return returnValue;
                 }
             };
-
     /**
      * The tinyint unsigned type in mysql mode
      */
-    private static final DataTypeFactory OB_MYSQL_TINYINT_UNSIGNED =
-            new DataTypeFactory<MysqlTinyIntType, DigitDataTypeConfig, DigitalGeneratorBase>() {
+    private static final DataTypeFactory<MysqlTinyIntType, DigitDataTypeConfig, BaseDigitalGenerator<BigDecimal>> OB_MYSQL_TINYINT_UNSIGNED =
+            new DataTypeFactory<MysqlTinyIntType, DigitDataTypeConfig, BaseDigitalGenerator<BigDecimal>>() {
                 @Override
                 public String name() {
                     return "OB_MYSQL_TINYINT_UNSIGNED";
                 }
 
                 @Override
-                protected MysqlTinyIntType newInstance(DigitDataTypeConfig config, DigitalGeneratorBase generator) {
+                protected MysqlTinyIntType newInstance(DigitDataTypeConfig config,
+                        BaseDigitalGenerator<BigDecimal> generator) {
                     BigDecimal defaultValue = null;
                     if (config.getDefaultValue() != null) {
                         defaultValue = new BigDecimal(config.getDefaultValue().toString());
@@ -1049,19 +1004,19 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
                     return returnValue;
                 }
             };
-
     /**
      * The tinyint type in mysql mode
      */
-    private static final DataTypeFactory OB_MYSQL_TINYINT =
-            new DataTypeFactory<MysqlTinyIntType, DigitDataTypeConfig, DigitalGeneratorBase>() {
+    private static final DataTypeFactory<MysqlTinyIntType, DigitDataTypeConfig, BaseDigitalGenerator<BigDecimal>> OB_MYSQL_TINYINT =
+            new DataTypeFactory<MysqlTinyIntType, DigitDataTypeConfig, BaseDigitalGenerator<BigDecimal>>() {
                 @Override
                 public String name() {
                     return "OB_MYSQL_TINYINT";
                 }
 
                 @Override
-                protected MysqlTinyIntType newInstance(DigitDataTypeConfig config, DigitalGeneratorBase generator) {
+                protected MysqlTinyIntType newInstance(DigitDataTypeConfig config,
+                        BaseDigitalGenerator<BigDecimal> generator) {
                     BigDecimal defaultValue = null;
                     if (config.getDefaultValue() != null) {
                         defaultValue = new BigDecimal(config.getDefaultValue().toString());
@@ -1077,19 +1032,18 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
                     return returnValue;
                 }
             };
-
     /**
      * The raw type in oracle mode
      */
-    private static final DataTypeFactory OB_ORACLE_RAW =
-            new DataTypeFactory<OracleRawType, CharDataTypeConfig, ByteGeneratorBase>() {
+    private static final DataTypeFactory<OracleRawType, CharDataTypeConfig, BaseByteGenerator> OB_ORACLE_RAW =
+            new DataTypeFactory<OracleRawType, CharDataTypeConfig, BaseByteGenerator>() {
                 @Override
                 public String name() {
                     return "OB_ORACLE_RAW";
                 }
 
                 @Override
-                protected OracleRawType newInstance(CharDataTypeConfig config, ByteGeneratorBase generator) {
+                protected OracleRawType newInstance(CharDataTypeConfig config, BaseByteGenerator generator) {
                     OracleRawType returnValue =
                             new OracleRawType(null, config.getAllowNull(), config.getWidth(), generator);
                     if (config.getLowValue() != null) {
@@ -1101,19 +1055,18 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
                     return returnValue;
                 }
             };
-
     /**
      * The clob type in oracle mode
      */
-    private static final DataTypeFactory OB_ORACLE_CLOB =
-            new DataTypeFactory<OracleBlobType, CharDataTypeConfig, ByteGeneratorBase>() {
+    private static final DataTypeFactory<OracleBlobType, CharDataTypeConfig, BaseByteGenerator> OB_ORACLE_CLOB =
+            new DataTypeFactory<OracleBlobType, CharDataTypeConfig, BaseByteGenerator>() {
                 @Override
                 public String name() {
                     return "OB_ORACLE_CLOB";
                 }
 
                 @Override
-                protected OracleBlobType newInstance(CharDataTypeConfig config, ByteGeneratorBase generator) {
+                protected OracleBlobType newInstance(CharDataTypeConfig config, BaseByteGenerator generator) {
                     OracleBlobType returnValue = new OracleBlobType(null, config.getAllowNull(), generator);
                     if (config.getLowValue() != null) {
                         returnValue.setLowValue((Integer) config.getLowValue());
@@ -1124,19 +1077,18 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
                     return returnValue;
                 }
             };
-
     /**
      * The blob type in oracle mode
      */
-    private static final DataTypeFactory OB_ORACLE_BLOB =
-            new DataTypeFactory<OracleBlobType, CharDataTypeConfig, ByteGeneratorBase>() {
+    private static final DataTypeFactory<OracleBlobType, CharDataTypeConfig, BaseByteGenerator> OB_ORACLE_BLOB =
+            new DataTypeFactory<OracleBlobType, CharDataTypeConfig, BaseByteGenerator>() {
                 @Override
                 public String name() {
                     return "OB_ORACLE_BLOB";
                 }
 
                 @Override
-                protected OracleBlobType newInstance(CharDataTypeConfig config, ByteGeneratorBase generator) {
+                protected OracleBlobType newInstance(CharDataTypeConfig config, BaseByteGenerator generator) {
                     OracleBlobType returnValue = new OracleBlobType(null, config.getAllowNull(), generator);
                     if (config.getLowValue() != null) {
                         returnValue.setLowValue((Integer) config.getLowValue());
@@ -1147,12 +1099,11 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
                     return returnValue;
                 }
             };
-
     /**
      * timstamp with local time zone type in oracle mode
      */
-    private static final DataTypeFactory OB_ORACLE_TIMESTAMP_WITH_LOCAL_TIME_ZONE =
-            new DataTypeFactory<OracleTimestampType, DateDataTypeConfig, DateGeneratorBase>() {
+    private static final DataTypeFactory<OracleTimestampType, DateDataTypeConfig, BaseDateGenerator<Timestamp>> OB_ORACLE_TIMESTAMP_WITH_LOCAL_TIME_ZONE =
+            new DataTypeFactory<OracleTimestampType, DateDataTypeConfig, BaseDateGenerator<Timestamp>>() {
 
                 @Override
                 public String name() {
@@ -1160,7 +1111,8 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
                 }
 
                 @Override
-                protected OracleTimestampType newInstance(DateDataTypeConfig config, DateGeneratorBase generator) {
+                protected OracleTimestampType newInstance(DateDataTypeConfig config,
+                        BaseDateGenerator<Timestamp> generator) {
                     int scale = 3;
                     if (config.getScale() != null) {
                         scale = config.getScale();
@@ -1184,12 +1136,11 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
                     return returnValue;
                 }
             };
-
     /**
      * timstamp with time zone type in oracle mode
      */
-    private static final DataTypeFactory OB_ORACLE_TIMESTAMP_WITH_TIME_ZONE =
-            new DataTypeFactory<OracleTimestampType, DateDataTypeConfig, DateGeneratorBase>() {
+    private static final DataTypeFactory<OracleTimestampType, DateDataTypeConfig, BaseDateGenerator<Timestamp>> OB_ORACLE_TIMESTAMP_WITH_TIME_ZONE =
+            new DataTypeFactory<OracleTimestampType, DateDataTypeConfig, BaseDateGenerator<Timestamp>>() {
 
                 @Override
                 public String name() {
@@ -1197,7 +1148,8 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
                 }
 
                 @Override
-                protected OracleTimestampType newInstance(DateDataTypeConfig config, DateGeneratorBase generator) {
+                protected OracleTimestampType newInstance(DateDataTypeConfig config,
+                        BaseDateGenerator<Timestamp> generator) {
                     int scale = 3;
                     if (config.getScale() != null) {
                         scale = config.getScale();
@@ -1221,12 +1173,11 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
                     return returnValue;
                 }
             };
-
     /**
      * The timestamp type in oracle mode
      */
-    private static final DataTypeFactory OB_ORACLE_TIMESTAMP =
-            new DataTypeFactory<OracleTimestampType, DateDataTypeConfig, DateGeneratorBase>() {
+    private static final DataTypeFactory<OracleTimestampType, DateDataTypeConfig, BaseDateGenerator<Timestamp>> OB_ORACLE_TIMESTAMP =
+            new DataTypeFactory<OracleTimestampType, DateDataTypeConfig, BaseDateGenerator<Timestamp>>() {
 
                 @Override
                 public String name() {
@@ -1234,7 +1185,8 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
                 }
 
                 @Override
-                protected OracleTimestampType newInstance(DateDataTypeConfig config, DateGeneratorBase generator) {
+                protected OracleTimestampType newInstance(DateDataTypeConfig config,
+                        BaseDateGenerator<Timestamp> generator) {
                     int scale = config.getScale() == null ? 3 : config.getScale();
                     Timestamp defaultValue = null;
                     Object val = config.getDefaultValue();
@@ -1255,12 +1207,11 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
                     return returnValue;
                 }
             };
-
     /**
      * The date type in oracle mode
      */
-    private static final DataTypeFactory OB_ORACLE_DATE =
-            new DataTypeFactory<OracleDateType, DateDataTypeConfig, DateGeneratorBase>() {
+    private static final DataTypeFactory<OracleDateType, DateDataTypeConfig, BaseDateGenerator<Date>> OB_ORACLE_DATE =
+            new DataTypeFactory<OracleDateType, DateDataTypeConfig, BaseDateGenerator<Date>>() {
 
                 @Override
                 public String name() {
@@ -1268,7 +1219,7 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
                 }
 
                 @Override
-                protected OracleDateType newInstance(DateDataTypeConfig config, DateGeneratorBase generator) {
+                protected OracleDateType newInstance(DateDataTypeConfig config, BaseDateGenerator<Date> generator) {
                     Date defaultValue = null;
                     Object val = config.getDefaultValue();
                     if (val != null) {
@@ -1287,12 +1238,11 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
                     return returnValue;
                 }
             };
-
     /**
      * interval year to month type in oracle mode
      */
-    private static final DataTypeFactory OB_ORACLE_INTERVAL_YEAR_TO_MONTH =
-            new DataTypeFactory<OracleIntervalYMType, DateDataTypeConfig, BaseGenerator>() {
+    private static final DataTypeFactory<OracleIntervalYMType, DateDataTypeConfig, BaseGenerator<Integer, INTERVALYM>> OB_ORACLE_INTERVAL_YEAR_TO_MONTH =
+            new DataTypeFactory<OracleIntervalYMType, DateDataTypeConfig, BaseGenerator<Integer, INTERVALYM>>() {
 
                 @Override
                 public String name() {
@@ -1300,11 +1250,12 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
                 }
 
                 @Override
-                protected OracleIntervalYMType newInstance(DateDataTypeConfig config, BaseGenerator generator) {
+                protected OracleIntervalYMType newInstance(DateDataTypeConfig config,
+                        BaseGenerator<Integer, INTERVALYM> generator) {
                     INTERVALYM defaultValue = null;
                     Object val = config.getDefaultValue();
                     if (val != null) {
-                        defaultValue = new INTERVALYM(defaultValue.toString());
+                        defaultValue = new INTERVALYM(val.toString());
                     }
                     OracleIntervalYMType returnValue =
                             new OracleIntervalYMType(generator, config.getScale(), defaultValue, config.getAllowNull());
@@ -1317,12 +1268,11 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
                     return returnValue;
                 }
             };
-
     /**
      * interval year to month type in oracle mode
      */
-    private static final DataTypeFactory OB_ORACLE_INTERVAL_DAY_TO_SECOND =
-            new DataTypeFactory<OracleIntervalYMType, DateDataTypeConfig, BaseGenerator>() {
+    private static final DataTypeFactory<OracleIntervalYMType, DateDataTypeConfig, BaseGenerator<Integer, INTERVALYM>> OB_ORACLE_INTERVAL_DAY_TO_SECOND =
+            new DataTypeFactory<OracleIntervalYMType, DateDataTypeConfig, BaseGenerator<Integer, INTERVALYM>>() {
 
                 @Override
                 public String name() {
@@ -1330,11 +1280,12 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
                 }
 
                 @Override
-                protected OracleIntervalYMType newInstance(DateDataTypeConfig config, BaseGenerator generator) {
+                protected OracleIntervalYMType newInstance(DateDataTypeConfig config,
+                        BaseGenerator<Integer, INTERVALYM> generator) {
                     INTERVALYM defaultValue = null;
                     Object val = config.getDefaultValue();
                     if (val != null) {
-                        defaultValue = new INTERVALYM(defaultValue.toString());
+                        defaultValue = new INTERVALYM(val.toString());
                     }
                     OracleIntervalYMType returnValue =
                             new OracleIntervalYMType(generator, config.getScale(), defaultValue, config.getAllowNull());
@@ -1347,12 +1298,11 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
                     return returnValue;
                 }
             };
-
     /**
      * The nvarchar type in oracle mode
      */
-    private static final DataTypeFactory OB_ORACLE_NVARCHAR =
-            new DataTypeFactory<OracleNvarCharType, CharDataTypeConfig, CharGeneratorBase>() {
+    private static final DataTypeFactory<OracleNvarCharType, CharDataTypeConfig, BaseCharGenerator> OB_ORACLE_NVARCHAR =
+            new DataTypeFactory<OracleNvarCharType, CharDataTypeConfig, BaseCharGenerator>() {
 
                 @Override
                 public String name() {
@@ -1360,16 +1310,14 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
                 }
 
                 @Override
-                protected OracleNvarCharType newInstance(CharDataTypeConfig config, CharGeneratorBase generator) {
+                protected OracleNvarCharType newInstance(CharDataTypeConfig config, BaseCharGenerator generator) {
                     String charset = config.getCharset();
+                    Validate.notNull(charset, "Charset can not be null for nvarchar");
                     Integer length = config.getWidth();
-                    if (length == null || charset == null) {
-                        throw new MockerException(MockerError.PARAMETER_ERROR, "Error parametes for VARCHAR2");
-                    }
+                    Validate.notNull(length, "Length can not be null for nvarchar2");
                     CharsetType charsetType = CharsetType.valueOf(charset);
-                    OracleNvarCharType returnValue =
-                            new OracleNvarCharType(generator, length, (String) config.getDefaultValue(),
-                                    config.getAllowNull(), charsetType);
+                    OracleNvarCharType returnValue = new OracleNvarCharType(generator, length,
+                            (String) config.getDefaultValue(), config.getAllowNull(), charsetType);
                     if (config.getLowValue() != null) {
                         returnValue.setLowValue((Integer) config.getLowValue());
                     }
@@ -1379,28 +1327,25 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
                     return returnValue;
                 }
             };
-
     /**
      * The varchar2 type in oracle mode
      */
-    private static final DataTypeFactory OB_ORACLE_VARCHAR2 =
-            new DataTypeFactory<OracleVarCharType, CharDataTypeConfig, CharGeneratorBase>() {
+    private static final DataTypeFactory<OracleVarCharType, CharDataTypeConfig, BaseCharGenerator> OB_ORACLE_VARCHAR2 =
+            new DataTypeFactory<OracleVarCharType, CharDataTypeConfig, BaseCharGenerator>() {
                 @Override
                 public String name() {
                     return "OB_ORACLE_VARCHAR2";
                 }
 
                 @Override
-                protected OracleVarCharType newInstance(CharDataTypeConfig config, CharGeneratorBase generator) {
+                protected OracleVarCharType newInstance(CharDataTypeConfig config, BaseCharGenerator generator) {
                     String charset = config.getCharset();
+                    Validate.notNull(charset, "Charset can not be null for varchar2");
                     Integer length = config.getWidth();
-                    if (length == null || charset == null) {
-                        throw new MockerException(MockerError.PARAMETER_ERROR, "Error parametes for VARCHAR2");
-                    }
+                    Validate.notNull(length, "Length can not be null for varchar2");
                     CharsetType charsetType = CharsetType.valueOf(charset);
-                    OracleVarCharType returnValue =
-                            new OracleVarCharType(generator, length, (String) config.getDefaultValue(),
-                                    config.getAllowNull(), charsetType, config.isUnicode());
+                    OracleVarCharType returnValue = new OracleVarCharType(generator, length,
+                            (String) config.getDefaultValue(), config.getAllowNull(), charsetType, config.isUnicode());
                     if (config.getLowValue() != null) {
                         returnValue.setLowValue((Integer) config.getLowValue());
                     }
@@ -1410,28 +1355,25 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
                     return returnValue;
                 }
             };
-
     /**
      * The varchar type in oracle mode
      */
-    private static final DataTypeFactory OB_ORACLE_VARCHAR =
-            new DataTypeFactory<OracleVarCharType, CharDataTypeConfig, CharGeneratorBase>() {
+    private static final DataTypeFactory<OracleVarCharType, CharDataTypeConfig, BaseCharGenerator> OB_ORACLE_VARCHAR =
+            new DataTypeFactory<OracleVarCharType, CharDataTypeConfig, BaseCharGenerator>() {
                 @Override
                 public String name() {
                     return "OB_ORACLE_VARCHAR";
                 }
 
                 @Override
-                protected OracleVarCharType newInstance(CharDataTypeConfig config, CharGeneratorBase generator) {
+                protected OracleVarCharType newInstance(CharDataTypeConfig config, BaseCharGenerator generator) {
                     String charset = config.getCharset();
+                    Validate.notNull(charset, "Charset can not be null for varchar");
                     Integer length = config.getWidth();
-                    if (length == null || charset == null) {
-                        throw new MockerException(MockerError.PARAMETER_ERROR, "Error parametes for VARCHAR");
-                    }
+                    Validate.notNull(length, "Length can not be null for varchar");
                     CharsetType charsetType = CharsetType.valueOf(charset);
-                    OracleVarCharType returnValue =
-                            new OracleVarCharType(generator, length, (String) config.getDefaultValue(),
-                                    config.getAllowNull(), charsetType, config.isUnicode());
+                    OracleVarCharType returnValue = new OracleVarCharType(generator, length,
+                            (String) config.getDefaultValue(), config.getAllowNull(), charsetType, config.isUnicode());
                     if (config.getLowValue() != null) {
                         returnValue.setLowValue((Integer) config.getLowValue());
                     }
@@ -1441,12 +1383,11 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
                     return returnValue;
                 }
             };
-
     /**
      * The char type in oracle mode
      */
-    private static final DataTypeFactory OB_ORACLE_CHAR =
-            new DataTypeFactory<OracleCharType, CharDataTypeConfig, CharGeneratorBase>() {
+    private static final DataTypeFactory<OracleCharType, CharDataTypeConfig, BaseCharGenerator> OB_ORACLE_CHAR =
+            new DataTypeFactory<OracleCharType, CharDataTypeConfig, BaseCharGenerator>() {
 
                 @Override
                 public String name() {
@@ -1454,16 +1395,14 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
                 }
 
                 @Override
-                protected OracleCharType newInstance(CharDataTypeConfig config, CharGeneratorBase generator) {
+                protected OracleCharType newInstance(CharDataTypeConfig config, BaseCharGenerator generator) {
                     String charset = config.getCharset();
+                    Validate.notNull(charset, "Charset can not be null for char");
                     Integer length = config.getWidth();
-                    if (length == null || charset == null) {
-                        throw new MockerException(MockerError.PARAMETER_ERROR, "Error parametes for CHAR");
-                    }
+                    Validate.notNull(length, "Length can not be null for char");
                     CharsetType charsetType = CharsetType.valueOf(charset);
                     OracleCharType returnValue = new OracleCharType(length, (String) config.getDefaultValue(),
-                            config.getAllowNull(), charsetType,
-                            generator, config.isUnicode());
+                            config.getAllowNull(), charsetType, generator, config.isUnicode());
                     if (config.getLowValue() != null) {
                         returnValue.setLowValue((Integer) config.getLowValue());
                     }
@@ -1473,24 +1412,22 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
                     return returnValue;
                 }
             };
-
     /**
      * The number type in oracle mode
      */
-    private static final DataTypeFactory OB_ORACLE_NUMBER =
-            new DataTypeFactory<OracleNumberType, DigitDataTypeConfig, DigitalGeneratorBase>() {
+    private static final DataTypeFactory<OracleNumberType, DigitDataTypeConfig, BaseDigitalGenerator<BigDecimal>> OB_ORACLE_NUMBER =
+            new DataTypeFactory<OracleNumberType, DigitDataTypeConfig, BaseDigitalGenerator<BigDecimal>>() {
                 @Override
                 public String name() {
                     return "OB_ORACLE_NUMBER";
                 }
 
                 @Override
-                protected OracleNumberType newInstance(DigitDataTypeConfig config, DigitalGeneratorBase generator) {
-                    Integer scale = config.getScale() == null ? 0 : config.getScale();
+                protected OracleNumberType newInstance(DigitDataTypeConfig config,
+                        BaseDigitalGenerator<BigDecimal> generator) {
+                    int scale = config.getScale() == null ? 0 : config.getScale();
                     Integer precision = config.getPrecision();
-                    if (precision == null) {
-                        throw new MockerException(MockerError.PARAMETER_ERROR, "Error parametes for NUMBER");
-                    }
+                    Validate.notNull(precision, "Precision can not be null for number");
                     BigDecimal defaultValue = null;
                     if (config.getDefaultValue() != null) {
                         defaultValue = new BigDecimal(config.getDefaultValue().toString());
@@ -1506,11 +1443,11 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
                     return returnValue;
                 }
             };
-
     /**
      * Instance mapping table
      */
-    private static final Map<String, DataTypeFactory> FACTORYNAME_2_FACTORYINSTANCE = new HashMap<>();
+    private static final Map<String, DataTypeFactory<? extends AbstractDataType<?, ? extends Comparable<?>>, ? extends DataTypeConfig, ? extends BaseGenerator<? extends Comparable<?>, ?>>> FACTORYNAME_2_FACTORYINSTANCE =
+            new HashMap<>();
 
     static {
         try {
@@ -1541,14 +1478,14 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
      */
     public T make(V config) {
         try {
-            if (config == null || config.getGenerator() == null) {
-                throw new MockerException(MockerError.PARAMETER_ERROR,
-                        "Generator or generator builder can not be null");
-            }
-            GeneratorFactory factory = GeneratorFactory.getInstance(config.getGenerator());
+            Validate.notNull(config, "Config can not be null for DataTypeFactory#make");
+            Validate.notNull(config.getGenerator(), "DataGeneratorName can not be null for DataTypeFactory#make");
+            GeneratorFactory<? extends BaseGenerator<? extends Comparable<?>, ?>> factory =
+                    GeneratorFactory.getInstance(config.getGenerator());
             K generator = (K) factory.make(config.getGenParams());
             if (generator == null) {
-                throw new MockerException(MockerError.PARAMETER_ERROR, "Generator can not be null");
+                throw new MockerException(MockerError.PARAMETER_ERROR,
+                        "Unknown Data generator \"" + config.getGenerator() + "\"");
             }
             return newInstance(config, generator);
         } catch (Exception e) {
@@ -1566,20 +1503,24 @@ public abstract class DataTypeFactory<T extends AbstractDataType, V extends Data
      */
     abstract protected T newInstance(V config, K generator);
 
-    public static DataTypeFactory getInstance(String factoryName) {
-        DataTypeFactory returnVal = FACTORYNAME_2_FACTORYINSTANCE.get(factoryName);
+    public static <T extends AbstractDataType<?, ? extends Comparable<?>>, V extends DataTypeConfig, K extends BaseGenerator<? extends Comparable<?>, ?>> DataTypeFactory<T, V, K> getInstance(
+            String factoryName) {
+        DataTypeFactory<T, V, K> returnVal = (DataTypeFactory<T, V, K>) FACTORYNAME_2_FACTORYINSTANCE.get(factoryName);
         if (returnVal == null) {
             throw new MockerException(MockerError.UNKNOWN_DATA_TYPE);
         }
         return returnVal;
     }
 
-    public static List<DataTypeFactory> listInstances() {
-        List<DataTypeFactory> returnVal = new ArrayList<>();
-        Set<Map.Entry<String, DataTypeFactory>> entries = FACTORYNAME_2_FACTORYINSTANCE.entrySet();
-        for (Map.Entry<String, DataTypeFactory> entry : entries) {
+    public static List<DataTypeFactory<? extends AbstractDataType<?, ? extends Comparable<?>>, ? extends DataTypeConfig, ? extends BaseGenerator<? extends Comparable<?>, ?>>> listInstances() {
+        List<DataTypeFactory<? extends AbstractDataType<?, ? extends Comparable<?>>, ? extends DataTypeConfig, ? extends BaseGenerator<? extends Comparable<?>, ?>>> returnVal =
+                new ArrayList<>();
+        Set<Map.Entry<String, DataTypeFactory<? extends AbstractDataType<?, ? extends Comparable<?>>, ? extends DataTypeConfig, ? extends BaseGenerator<? extends Comparable<?>, ?>>>> entries =
+                FACTORYNAME_2_FACTORYINSTANCE.entrySet();
+        for (Map.Entry<String, DataTypeFactory<? extends AbstractDataType<?, ? extends Comparable<?>>, ? extends DataTypeConfig, ? extends BaseGenerator<? extends Comparable<?>, ?>>> entry : entries) {
             returnVal.add(entry.getValue());
         }
         return returnVal;
     }
+
 }

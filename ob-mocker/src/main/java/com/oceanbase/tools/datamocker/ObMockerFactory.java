@@ -22,6 +22,7 @@ import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
 import com.oceanbase.tools.datamocker.util.MockerBuffer;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.Validate;
 
 /**
  * The implementation class of the simple dispatcher factory, used to generate a simple table
@@ -36,7 +37,8 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class ObMockerFactory extends AbstractMockerFactory {
-    public ObMockerFactory(AbstractTaskConfig taskConfig) throws SQLException {
+
+    public ObMockerFactory(AbstractTaskConfig taskConfig) {
         super(taskConfig);
     }
 
@@ -44,25 +46,24 @@ public class ObMockerFactory extends AbstractMockerFactory {
     protected Dispatcher<TableTaskInfo> generate(AbstractTaskConfig taskConfig, String taskId) throws Throwable {
         String taskName = taskConfig.taskName() == null ? getTaskName() : taskConfig.taskName();
         List<? extends AbstractTableConfig> tableConfigs = taskConfig.tasks();
-        if (tableConfigs == null || tableConfigs.size() == 0) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "Table task's count can not be null or zero");
-        }
+        Validate.notEmpty(tableConfigs, "TaskConfig can not be empty for ObMockerFactory");
         ObModeType obModeType = taskConfig.obDialectType();
         Dispatcher<TableTaskInfo> dispatcher = new Dispatcher<>(tableConfigs.size(), taskName, taskId);
         for (int i = 0; i < tableConfigs.size(); i++) {
             AbstractTableConfig tableConfig = tableConfigs.get(i);
-            List<AbstractConstraint> constraints = this.getConstraints(tableConfig, taskConfig.obDialectType());
-            List<ColumnReader> columnReaders = this.getColumnReader(tableConfig, constraints);
-            Map<String, AbstractDataType> tableSchema = getTableSchema(tableConfig);
+            List<AbstractConstraint> constraints = getConstraints(tableConfig, taskConfig.obDialectType());
+            List<ColumnReader<?>> columnReaders = getColumnReader(tableConfig, constraints);
+            Map<String, AbstractDataType<?, ? extends Comparable<?>>> tableSchema = getTableSchema(tableConfig);
             MockerBuffer buffer = new MockerBuffer(tableSchema, tableConfig.maxBatchSize());
             TableTaskMetaData metaData = new TableTaskMetaData(tableSchema, tableConfig, obModeType, taskId, 0, i);
             DataSource dataSource = getDataSource(metaData.getTableTaskId());
             List<MockerFile> managers = getFileManager(metaData.getTableTaskId(), tableConfig);
-            List<AbstractMockWriter> dataWriter = this.getDataWriter(tableConfig, buffer, managers, dataSource);
+            List<AbstractMockWriter> dataWriter = getDataWriter(tableConfig, buffer, managers, dataSource);
             TableTaskInfo bean =
                     new TableTaskInfo(columnReaders, dataWriter, constraints, buffer, dataSource, managers, metaData);
             dispatcher.setObj(i, bean);
         }
         return dispatcher;
     }
+
 }

@@ -1,6 +1,6 @@
 package com.oceanbase.tools.datamocker.generator.bytetype;
 
-import com.oceanbase.tools.datamocker.generator.ByteGeneratorBase;
+import com.oceanbase.tools.datamocker.generator.BaseByteGenerator;
 import com.oceanbase.tools.datamocker.generator.chartype.RandomGenerator;
 import com.oceanbase.tools.datamocker.model.enums.CharCaseOption;
 
@@ -11,7 +11,7 @@ import com.oceanbase.tools.datamocker.model.enums.CharCaseOption;
  * @date 2020-12-16 23:37
  * @since OBMOCKER_snapshot_0.1.0
  */
-public class RandomByteGenerator extends ByteGeneratorBase {
+public class RandomByteGenerator extends BaseByteGenerator {
     private final RandomGenerator customGen;
 
     public RandomByteGenerator(CharCaseOption caseType) {

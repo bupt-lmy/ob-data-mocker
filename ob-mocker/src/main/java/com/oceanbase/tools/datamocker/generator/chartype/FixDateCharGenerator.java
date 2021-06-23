@@ -4,7 +4,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
 
-import com.oceanbase.tools.datamocker.generator.CharGeneratorBase;
+import com.oceanbase.tools.datamocker.generator.BaseCharGenerator;
 import com.oceanbase.tools.datamocker.model.enums.CharCaseOption;
 import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
@@ -17,7 +17,7 @@ import org.apache.commons.lang.StringUtils;
  * @date 2020-12-16 00:30
  * @since OBMOCKER_snapshot_0.1.0
  */
-public class FixDateCharGenerator extends CharGeneratorBase {
+public class FixDateCharGenerator extends BaseCharGenerator {
     /**
      * Date format
      */
@@ -44,9 +44,7 @@ public class FixDateCharGenerator extends CharGeneratorBase {
     public Boolean preCheck(Integer minLength, Integer maxLength) {
         int realLength = DATE_FORMAT.length();
         if (realLength >= minLength) {
-            if (realLength <= maxLength) {
-                return true;
-            }
+            return realLength <= maxLength;
         }
         return false;
     }

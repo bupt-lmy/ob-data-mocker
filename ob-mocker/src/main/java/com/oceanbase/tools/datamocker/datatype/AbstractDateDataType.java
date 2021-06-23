@@ -1,8 +1,9 @@
 package com.oceanbase.tools.datamocker.datatype;
 
+import java.util.Date;
 import java.util.TimeZone;
 
-import com.oceanbase.tools.datamocker.generator.DateGeneratorBase;
+import com.oceanbase.tools.datamocker.generator.BaseDateGenerator;
 import com.oceanbase.tools.datamocker.model.enums.ObModeType;
 import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
@@ -14,7 +15,7 @@ import com.oceanbase.tools.datamocker.model.exception.MockerException;
  * @date 2020-12-16 14:39
  * @since OBMOCKER_0.1.0_snapshot
  */
-public abstract class AbstractDateDataType<T extends Comparable> extends AbstractDataType<T, T> {
+public abstract class AbstractDateDataType<T extends Comparable<? super T>> extends AbstractDataType<T, T> {
     /**
      * Time zone, the default is the current time zone
      */
@@ -30,7 +31,7 @@ public abstract class AbstractDateDataType<T extends Comparable> extends Abstrac
      * @param defaultValue default value for type
      * @param allowNull Whether it is allowed to be empty
      */
-    public AbstractDateDataType(DateGeneratorBase<T> generator, ObModeType dialectType, T defaultValue,
+    public AbstractDateDataType(BaseDateGenerator<T> generator, ObModeType dialectType, T defaultValue,
             Boolean allowNull) {
         super(generator, dialectType, defaultValue, allowNull);
     }
@@ -101,7 +102,7 @@ public abstract class AbstractDateDataType<T extends Comparable> extends Abstrac
     }
 
     @Override
-    protected T preTreat(T value) {
+    protected T preProcessingBeforeOutput(T value) {
         if (value == null) {
             return null;
         }

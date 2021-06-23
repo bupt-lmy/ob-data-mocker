@@ -51,10 +51,9 @@ public abstract class AbstractMockTask implements Callable<Void> {
      * Task execution method, in which the user’s business logic is written
      *
      * @param metaData Table task configuration object
-     * @return Return the result of the task execution
      * @throws Exception Mainly to be compatible with exceptions thrown by the Call method
      */
-    public abstract Void execute(TableTaskMetaData metaData, TableTaskContext context) throws Throwable;
+    public abstract void execute(TableTaskMetaData metaData, TableTaskContext context) throws Throwable;
 
     @Override
     public Void call() {

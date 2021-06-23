@@ -3,8 +3,10 @@ package com.oceanbase.tools.datamocker.core.read;
 import com.oceanbase.tools.datamocker.datatype.AbstractDataType;
 import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
-import com.oceanbase.tools.datamocker.util.Pair;
+import com.oceanbase.tools.datamocker.model.mock.MockColumnData;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.Validate;
 
 /**
  * Column reader, which is used to get a column data from data generator
@@ -18,34 +20,28 @@ public class ColumnReader<T> extends AbstractMockReader<T> {
     /**
      * Data type for a column
      */
-    private AbstractDataType<T, ?> dataType;
+    private final AbstractDataType<T, ? extends Comparable<?>> dataType;
     /**
      * Dolumn name
      */
-    private String columnName;
+    @Getter
+    private final String columnName;
     /**
      * Group ID
      */
-    private String groupId;
+    private final String groupId;
 
-    public ColumnReader(AbstractDataType<T, ?> dataType, String columnName, String groupId) {
-        if (dataType == null || columnName == null) {
-            throw new MockerException(MockerError.PARAMETER_ERROR,
-                    "Abstract data type or column name for column reader can not be null");
-        }
+    public ColumnReader(AbstractDataType<T, ? extends Comparable<?>> dataType, String columnName, String groupId) {
+        Validate.notNull(dataType, "DataType can not be null for ColumnReader");
+        Validate.notNull(columnName, "ColumnName can not be null for ColumnReader");
         this.dataType = dataType;
         this.columnName = columnName;
         this.groupId = groupId;
     }
 
     @Override
-    public Pair<String, Pair<AbstractDataType, T>> read() throws Exception {
-        Pair<AbstractDataType, T> value = new Pair<>(dataType, dataType.acquire());
-        return new Pair<>(columnName, value);
-    }
-
-    public String columnName() {
-        return this.columnName;
+    public MockColumnData<T> read() {
+        return new MockColumnData<>(columnName, dataType, dataType.acquire());
     }
 
     @Override

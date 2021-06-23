@@ -8,8 +8,10 @@ import com.oceanbase.tools.datamocker.core.task.AbstractDataPipe;
 import com.oceanbase.tools.datamocker.datatype.AbstractDataType;
 import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
+import com.oceanbase.tools.datamocker.model.mock.MockRowData;
 import com.oceanbase.tools.datamocker.util.Pair;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.Validate;
 
 /**
  * Abstract data writer, used to write data to the data source
@@ -23,19 +25,15 @@ public abstract class AbstractMockWriter {
     /**
      * Data communication pipeline, obtain data through pipeline
      */
-    private AbstractDataPipe dataPipe;
+    private AbstractDataPipe<MockRowData> dataPipe;
 
     /**
      * Register a pipeline
      *
      * @param dataPipe Pipe object
      */
-    public void register(AbstractDataPipe dataPipe) {
-        if (dataPipe == null) {
-            MockerException e = new MockerException(MockerError.PARAMETER_ERROR, "Data pipe can not be null");
-            log.error("MockWriter is not bound to data pipeline", e);
-            throw e;
-        }
+    public void register(AbstractDataPipe<MockRowData> dataPipe) {
+        Validate.notNull(dataPipe, "DataPipe can not be null for AbstractMockWriter#register");
         this.dataPipe = dataPipe;
     }
 
@@ -46,11 +44,10 @@ public abstract class AbstractMockWriter {
      */
     public Long write() throws Throwable {
         if (this.dataPipe == null) {
-            MockerException e = new MockerException(MockerError.PARAMETER_ERROR, "Data pipe can not be null");
-            log.error("Fail to read any data from the data pipe because the data pipe is null", e);
-            throw e;
+            log.error("Fail to read any data from the data pipe because the data pipe is null");
+            throw new MockerException(MockerError.PARAMETER_ERROR, "Data pipe can not be null");
         }
-        List<Map<String, Pair<AbstractDataType, Object>>> rows = this.dataPipe.read(10, TimeUnit.SECONDS);
+        List<MockRowData> rows = this.dataPipe.read(10, TimeUnit.SECONDS);
         if (rows == null) {
             return null;
         } else if (rows.size() == 0) {
@@ -59,7 +56,7 @@ public abstract class AbstractMockWriter {
         return doWrite(rows);
     }
 
-    abstract protected Long doWrite(List<Map<String, Pair<AbstractDataType, Object>>> rows) throws Throwable;
+    abstract protected Long doWrite(List<MockRowData> rows) throws Throwable;
 
     /**
      * Mockwriter is used to output data to a database or script file. There are currently two output

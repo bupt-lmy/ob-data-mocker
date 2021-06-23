@@ -2,6 +2,7 @@ package com.oceanbase.tools.datamocker.model.config.impl;
 
 import com.oceanbase.tools.datamocker.datatype.AbstractDataType;
 import com.oceanbase.tools.datamocker.datatype.DataTypeFactory;
+import com.oceanbase.tools.datamocker.generator.BaseGenerator;
 import com.oceanbase.tools.datamocker.model.config.AbstractColumnConfig;
 import com.oceanbase.tools.datamocker.model.config.model.DataTypeConfig;
 import lombok.Getter;
@@ -34,7 +35,7 @@ public class DefaultColumnConfig extends AbstractColumnConfig {
     /**
      * Type information
      */
-    private AbstractDataType dataType = null;
+    private AbstractDataType<?, ? extends Comparable<?>> dataType = null;
 
     @Override
     public String columnName() {
@@ -42,14 +43,15 @@ public class DefaultColumnConfig extends AbstractColumnConfig {
     }
 
     @Override
-    public synchronized AbstractDataType columnType() {
+    public synchronized AbstractDataType<?, ? extends Comparable<?>> columnType() {
         if (dataType != null) {
             return dataType;
         }
-        DataTypeFactory factory = DataTypeFactory.getInstance(typeConfig.getColumnType());
+        DataTypeFactory<? extends AbstractDataType<?, ? extends Comparable<?>>, DataTypeConfig, ? extends BaseGenerator<? extends Comparable<?>, ?>> dataTypeFactory =
+                DataTypeFactory.getInstance(typeConfig.getColumnType());
         typeConfig.setAllowNull(allowNull());
         typeConfig.setDefaultValue(defaultValue());
-        this.dataType = factory.make(typeConfig);
+        this.dataType = dataTypeFactory.make(typeConfig);
         return this.dataType;
     }
 

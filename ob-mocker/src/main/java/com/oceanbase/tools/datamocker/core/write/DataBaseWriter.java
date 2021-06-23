@@ -15,11 +15,13 @@ import com.oceanbase.tools.datamocker.datatype.AbstractDataType;
 import com.oceanbase.tools.datamocker.model.enums.ObModeType;
 import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
+import com.oceanbase.tools.datamocker.model.mock.MockRowData;
 import com.oceanbase.tools.datamocker.util.DbObjectNameUtil;
 import com.oceanbase.tools.datamocker.util.DigestUtil;
 import com.oceanbase.tools.datamocker.util.Pair;
 import com.oceanbase.tools.datamocker.util.SqlUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.Validate;
 
 /**
  * The database write writer is used to write data directly to the database
@@ -63,6 +65,7 @@ public class DataBaseWriter extends AbstractMockWriter {
         this.dataSource = dataSource;
         this.database = database;
         this.tableName = tableName;
+        this.dialectType = dialectType;
         try {
             this.groupId = DigestUtil.getToken(this.dialectType.name() + this.database + this.tableName);
         } catch (NoSuchAlgorithmException e) {
@@ -79,15 +82,14 @@ public class DataBaseWriter extends AbstractMockWriter {
      * @param tableName table name
      * @param groupId group Id for Database writer
      */
-    public DataBaseWriter(DataSource dataSource, ObModeType dialectType, String database,
-            String tableName, String groupId) {
+    public DataBaseWriter(DataSource dataSource, ObModeType dialectType, String database, String tableName,
+            String groupId) {
         validate(dataSource, dialectType, database, tableName);
         this.dataSource = dataSource;
         this.database = database;
         this.tableName = tableName;
-        if (groupId == null) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "Group id can not be null");
-        }
+        this.dialectType = dialectType;
+        Validate.notNull(groupId, "Group id can not be null for DataBaseWriter");
         this.groupId = groupId;
     }
 
@@ -101,26 +103,11 @@ public class DataBaseWriter extends AbstractMockWriter {
      * @throws MockerException An exception is thrown if verification fails
      */
     private void validate(DataSource dataSource, ObModeType dialectType, String database, String tableName) {
-        if (dataSource == null) {
-            MockerException e = new MockerException(MockerError.PARAMETER_ERROR, "Datasource can not be null");
-            log.error("JDBC writer is missing data source", e);
-            throw e;
-        }
-        if (database == null) {
-            MockerException e = new MockerException(MockerError.PARAMETER_ERROR, "Database can not be null");
-            log.error("JDBC writer is missing schema name", e);
-            throw e;
-        }
-        if (tableName == null) {
-            MockerException e = new MockerException(MockerError.PARAMETER_ERROR, "Table name can not be null");
-            log.error("JDBC writer is missing table name", e);
-            throw e;
-        }
-        if (dialectType != null) {
-            if (!ObModeType.OB_ORACLE.equals(dialectType) && !ObModeType.OB_MYSQL.equals(dialectType)) {
-                throw new MockerException(MockerError.INVALID_OB_MODE);
-            }
-            this.dialectType = dialectType;
+        Validate.notNull(dataSource, "DataSource can not be null for DataBaseWriter#validate");
+        Validate.notNull(database, "Database can not be null for DataBaseWriter#validate");
+        Validate.notNull(tableName, "TableName can not be null for DataBaseWriter#validate");
+        if (!ObModeType.OB_ORACLE.equals(dialectType) && !ObModeType.OB_MYSQL.equals(dialectType)) {
+            throw new MockerException(MockerError.INVALID_OB_MODE);
         }
     }
 
@@ -155,12 +142,12 @@ public class DataBaseWriter extends AbstractMockWriter {
     }
 
     @Override
-    protected Long doWrite(List<Map<String, Pair<AbstractDataType, Object>>> rows) throws Throwable {
+    protected Long doWrite(List<MockRowData> rows) throws Throwable {
         preCheck();
-        Map<String, ?> firstRow = rows.get(0);
-        Set<String> columnSet = firstRow.keySet();
+        MockRowData firstRow = rows.get(0);
+        Set<String> columnSet = firstRow.columnNames();
         List<String> columnList = new ArrayList<>(columnSet);
-        StringBuffer sqlBuffer = null;
+        StringBuffer sqlBuffer;
         if (ObModeType.OB_ORACLE.equals(this.dialectType)) {
             sqlBuffer = new StringBuffer(
                     String.format("insert into \"%s\".\"%s\"(", DbObjectNameUtil.doubleCharToEscape(database, '"'),
@@ -169,6 +156,8 @@ public class DataBaseWriter extends AbstractMockWriter {
             sqlBuffer = new StringBuffer(
                     String.format("insert into `%s`.`%s`(", DbObjectNameUtil.doubleCharToEscape(database, '`'),
                             DbObjectNameUtil.doubleCharToEscape(tableName, '`')));
+        } else {
+            throw new MockerException(MockerError.INVALID_OB_MODE);
         }
         int columnLength = columnList.size();
         for (int i = 0; i < columnLength; i++) {
@@ -199,11 +188,11 @@ public class DataBaseWriter extends AbstractMockWriter {
         int rowLength = rows.size();
         Object[][] params = new Object[rows.size()][];
         for (int j = 0; j < rowLength; j++) {
-            Map<String, Pair<AbstractDataType, Object>> row = rows.get(j);
+            MockRowData row = rows.get(j);
             Object[] innerParam = new Object[columnLength];
             for (int i = 0; i < columnLength; i++) {
                 String columnName = columnList.get(i);
-                innerParam[i] = row.get(columnName).getValue();
+                innerParam[i] = row.getMockColumn(columnName).getColumnValue();
             }
             params[j] = innerParam;
         }

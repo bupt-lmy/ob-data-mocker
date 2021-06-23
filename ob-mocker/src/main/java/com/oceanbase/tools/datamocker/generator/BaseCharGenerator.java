@@ -10,7 +10,7 @@ import com.oceanbase.tools.datamocker.model.enums.CharsetType;
  * @date 2020-12-11 20:26
  * @since OBMOCKER_snapshot_0.1.0
  */
-public abstract class CharGeneratorBase extends BaseGenerator<Integer, String> {
+public abstract class BaseCharGenerator extends BaseGenerator<Integer, String> {
     /**
      * The case setting of the character data generator, the default is case-independent
      */
@@ -21,7 +21,7 @@ public abstract class CharGeneratorBase extends BaseGenerator<Integer, String> {
     private Boolean isUnicode = Boolean.FALSE;
     private CharsetType charsetType = CharsetType.UTF_8;
 
-    public CharGeneratorBase(CharCaseOption caseOption) {
+    public BaseCharGenerator(CharCaseOption caseOption) {
         this.caseOption = caseOption;
     }
 

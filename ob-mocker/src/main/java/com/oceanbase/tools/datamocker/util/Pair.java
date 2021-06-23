@@ -12,8 +12,8 @@ import java.util.UUID;
  */
 public class Pair<T, V> {
     private final String uniqueId = UUID.randomUUID().toString();
-    private T key;
-    private V value;
+    private final T key;
+    private final V value;
 
     public Pair(T key, V value) {
         this.key = key;

@@ -8,7 +8,7 @@ package com.oceanbase.tools.datamocker.generator;
  * @date 2020-12-11 18:00
  * @since OBMOCKER_snapshot_0.1.0
  */
-public abstract class DigitalGeneratorBase<T extends Comparable> extends BaseGenerator<T, T> {
+public abstract class BaseDigitalGenerator<T extends Comparable<T>> extends BaseGenerator<T, T> {
     /**
      * Pre-checking step, used to check whether the generator can work normally according to the
      * boundary value

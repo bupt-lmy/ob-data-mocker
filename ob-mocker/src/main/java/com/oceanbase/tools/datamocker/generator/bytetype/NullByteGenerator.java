@@ -1,6 +1,6 @@
 package com.oceanbase.tools.datamocker.generator.bytetype;
 
-import com.oceanbase.tools.datamocker.generator.ByteGeneratorBase;
+import com.oceanbase.tools.datamocker.generator.BaseByteGenerator;
 
 /**
  * Null data generator
@@ -9,7 +9,7 @@ import com.oceanbase.tools.datamocker.generator.ByteGeneratorBase;
  * @date 2021-01-26 14:40
  * @since OBMOCKER_snapshot_0.1.0
  */
-public class NullByteGenerator extends ByteGeneratorBase {
+public class NullByteGenerator extends BaseByteGenerator {
 
     @Override
     public Boolean preCheck(Integer minLength, Integer maxLength) {

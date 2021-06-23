@@ -3,7 +3,7 @@ package com.oceanbase.tools.datamocker.datatype;
 import java.io.UnsupportedEncodingException;
 
 import com.oceanbase.tools.datamocker.generator.BaseGenerator;
-import com.oceanbase.tools.datamocker.generator.CharGeneratorBase;
+import com.oceanbase.tools.datamocker.generator.BaseCharGenerator;
 import com.oceanbase.tools.datamocker.model.enums.CharsetType;
 import com.oceanbase.tools.datamocker.model.enums.ObModeType;
 import com.oceanbase.tools.datamocker.model.exception.MockerError;
@@ -41,7 +41,7 @@ public abstract class AbstractCharDataType extends AbstractDataType<String, Inte
      * @param length Type length
      * @param allowNull Whether to allow null values
      */
-    public AbstractCharDataType(CharGeneratorBase generator, ObModeType dialectType, CharsetType charsetType,
+    public AbstractCharDataType(BaseCharGenerator generator, ObModeType dialectType, CharsetType charsetType,
             Integer length,
             String defaultValue, Boolean allowNull, Boolean isUnicode) {
         super(generator, dialectType, defaultValue, allowNull);
@@ -120,8 +120,8 @@ public abstract class AbstractCharDataType extends AbstractDataType<String, Inte
     @Override
     public void bind(BaseGenerator<Integer, String> generator) {
         super.bind(generator);
-        ((CharGeneratorBase) generator).setCharset(charset());
-        ((CharGeneratorBase) generator).setUnicode(isUnicode());
+        ((BaseCharGenerator) generator).setCharset(charset());
+        ((BaseCharGenerator) generator).setUnicode(isUnicode());
     }
 
     public CharsetType charset() {
@@ -154,7 +154,7 @@ public abstract class AbstractCharDataType extends AbstractDataType<String, Inte
      * @throws MockerException An exception is thrown if verification fails
      */
     @Override
-    protected String preTreat(String value) {
+    protected String preProcessingBeforeOutput(String value) {
         if (value == null) {
             return null;
         }

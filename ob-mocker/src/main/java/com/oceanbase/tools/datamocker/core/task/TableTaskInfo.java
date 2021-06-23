@@ -12,6 +12,7 @@ import com.oceanbase.tools.datamocker.core.write.AbstractMockWriter;
 import com.oceanbase.tools.datamocker.core.write.output.MockerFile;
 import com.oceanbase.tools.datamocker.util.MockerBuffer;
 import lombok.Getter;
+import org.apache.commons.lang.Validate;
 
 /**
  * Table generation task object, used to encapsulate all objects related to a table generation task
@@ -30,7 +31,7 @@ public class TableTaskInfo {
      * Mock data buffer object
      */
     private final MockerBuffer buffer;
-    private final List<ColumnReader> columnReaders;
+    private final List<ColumnReader<?>> columnReaders;
     private final List<AbstractMockWriter> dataWriters;
     private final List<AbstractConstraint> constraints;
     private final DataSource dataSource;
@@ -47,10 +48,16 @@ public class TableTaskInfo {
      * @param fileManagers list file manager
      * @param metaData meta data for table task
      */
-    public TableTaskInfo(List<ColumnReader> columnReaders, List<AbstractMockWriter> dataWriters,
+    public TableTaskInfo(List<ColumnReader<?>> columnReaders, List<AbstractMockWriter> dataWriters,
             List<AbstractConstraint> constraints, MockerBuffer buffer, DataSource dataSource,
-            List<MockerFile> fileManagers,
-            TableTaskMetaData metaData) {
+            List<MockerFile> fileManagers, TableTaskMetaData metaData) {
+        Validate.notNull(columnReaders, "ColumnReaders can not be null for TableTaskInfo");
+        Validate.notNull(dataWriters, "DataWriters can not be null for TableTaskInfo");
+        Validate.notNull(constraints, "Constraints can not be null for TableTaskInfo");
+        Validate.notNull(metaData, "TaskMetaData can not be null for TableTaskInfo");
+        Validate.notNull(buffer, "MockBuffer can not be null for TableTaskInfo");
+        Validate.notNull(dataSource, "DataSource can not be null for TableTaskInfo");
+        Validate.notNull(fileManagers, "FileManagers can not be null for TableTaskInfo");
         this.columnReaders = columnReaders;
         this.dataWriters = dataWriters;
         this.constraints = constraints;
@@ -67,7 +74,7 @@ public class TableTaskInfo {
      */
     public Set<String> columnGroups() {
         Set<String> returnVal = new HashSet<>();
-        for (ColumnReader reader : this.columnReaders) {
+        for (ColumnReader<?> reader : this.columnReaders) {
             returnVal.add(reader.groupId());
         }
         return returnVal;

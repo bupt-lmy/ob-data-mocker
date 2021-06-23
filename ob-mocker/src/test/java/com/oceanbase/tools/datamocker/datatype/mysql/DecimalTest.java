@@ -92,7 +92,7 @@ public class DecimalTest extends MockerTestBase {
         MysqlDecimalType decimal = new MysqlDecimalType(5, 3, new UniformGenerator(), null, false, false);
         Assert.assertEquals(0, decimal.lowValue().compareTo(new BigDecimal("0")));
         Assert.assertEquals(0, decimal.highValue().compareTo(new BigDecimal("99.9995")));
-        Assert.assertTrue(decimal.distinctLimit() == 99999L);
+        Assert.assertEquals(99999L, (long) decimal.distinctLimit());
         int minValue = -10;
         int maxValue = 20;
         thrown.expectMessage("Max or min value -10 for data type decimal(5, 3) is out of range [0,99.99950]");

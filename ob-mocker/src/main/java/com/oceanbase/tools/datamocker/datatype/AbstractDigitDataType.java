@@ -1,6 +1,6 @@
 package com.oceanbase.tools.datamocker.datatype;
 
-import com.oceanbase.tools.datamocker.generator.DigitalGeneratorBase;
+import com.oceanbase.tools.datamocker.generator.BaseDigitalGenerator;
 import com.oceanbase.tools.datamocker.model.enums.ObModeType;
 
 /**
@@ -10,7 +10,7 @@ import com.oceanbase.tools.datamocker.model.enums.ObModeType;
  * @date 2020-12-10 15:54
  * @since OBMOCKER_snashot_0.1.0
  */
-public abstract class AbstractDigitDataType<T extends Comparable> extends AbstractDataType<T, T> {
+public abstract class AbstractDigitDataType<T extends Comparable<T>> extends AbstractDataType<T, T> {
     /**
      * Is it a signed number
      */
@@ -26,7 +26,7 @@ public abstract class AbstractDigitDataType<T extends Comparable> extends Abstra
      * @param defaultValue default value for type
      * @param allowNull Whether it is allowed to be empty
      */
-    public AbstractDigitDataType(DigitalGeneratorBase<T> generator, ObModeType dialectType, T defaultValue,
+    public AbstractDigitDataType(BaseDigitalGenerator<T> generator, ObModeType dialectType, T defaultValue,
             Boolean allowNull) {
         super(generator, dialectType, defaultValue, allowNull);
     }
@@ -42,9 +42,8 @@ public abstract class AbstractDigitDataType<T extends Comparable> extends Abstra
      * @param allowNull Whether it is allowed to be empty
      * @param isSigned Is it a signed number
      */
-    public AbstractDigitDataType(DigitalGeneratorBase<T> generator, ObModeType dialectType, T defaultValue,
-            Boolean allowNull,
-            Boolean isSigned) {
+    public AbstractDigitDataType(BaseDigitalGenerator<T> generator, ObModeType dialectType, T defaultValue,
+            Boolean allowNull, Boolean isSigned) {
         super(generator, dialectType, defaultValue, allowNull);
         this.isSigned = isSigned;
     }

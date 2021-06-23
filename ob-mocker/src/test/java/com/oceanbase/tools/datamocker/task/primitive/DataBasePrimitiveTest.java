@@ -2,6 +2,7 @@ package com.oceanbase.tools.datamocker.task.primitive;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.net.URL;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -28,6 +29,8 @@ import com.oceanbase.tools.datamocker.datatype.oracle.OracleNumberType;
 import com.oceanbase.tools.datamocker.model.config.model.DataBaseConfig;
 import com.oceanbase.tools.datamocker.model.enums.ObModeType;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
+import com.oceanbase.tools.datamocker.model.mock.MockColumnData;
+import com.oceanbase.tools.datamocker.model.mock.MockRowData;
 import com.oceanbase.tools.datamocker.util.MockDataPipe;
 import com.oceanbase.tools.datamocker.util.Pair;
 import lombok.extern.slf4j.Slf4j;
@@ -67,6 +70,7 @@ public class DataBasePrimitiveTest extends MockerTestBase {
         } else {
             return null;
         }
+        assert url != null;
         properties.load(new FileInputStream(url.getPath()));
         config.setDefaultSchame(properties.getProperty("schema"));
         config.setPassword(properties.getProperty("passwd"));
@@ -95,15 +99,15 @@ public class DataBasePrimitiveTest extends MockerTestBase {
         }
     }
 
-    private List<Map<String, Pair<AbstractDataType, Object>>> getRows(int size) {
-        List<Map<String, Pair<AbstractDataType, Object>>> list = new ArrayList<>();
+    private List<MockRowData> getRows(int size) {
+        List<MockRowData> list = new ArrayList<>();
         for (int i = 0; i < size; i++) {
-            Map<String, Pair<AbstractDataType, Object>> row = new HashMap<>();
+            MockRowData mockRowData = new MockRowData(size);
             for (String column : columnList) {
-                row.put(column, new Pair<>(new OracleNumberType(8, 5, null, false),
-                        String.valueOf(new Random().nextInt(1000))));
+                mockRowData.addMockColumn(new MockColumnData<>(column, new OracleNumberType(8, 5, null, false),
+                        new BigDecimal(new Random().nextInt(1000))));
             }
-            list.add(row);
+            list.add(mockRowData);
         }
         return list;
     }
@@ -144,36 +148,38 @@ public class DataBasePrimitiveTest extends MockerTestBase {
 
     @Test
     public void testPrimitiveWithoutDataSource() {
-        expect.expectMessage("Datasource can not be null");
-        expect.expect(MockerException.class);
+        expect.expectMessage("DataSource can not be null for DataBaseWriter#validate");
+        expect.expect(IllegalArgumentException.class);
         AbstractMockWriter primitive = new DataBaseWriter(null, null, null, null);
     }
 
     @Test
     public void testPrimitiveWithoutDatabase() {
-        expect.expectMessage("Database can not be null");
-        expect.expect(MockerException.class);
+        expect.expectMessage("Database can not be null for DataBaseWriter#validate");
+        expect.expect(IllegalArgumentException.class);
         AbstractMockWriter primitive = new DataBaseWriter(oracleDataSource, ObModeType.OB_ORACLE, null, null);
     }
 
     @Test
     public void testPrimitiveWithouttable() throws IOException {
-        expect.expectMessage("Table name can not be null");
-        expect.expect(MockerException.class);
+        expect.expectMessage("TableName can not be null for DataBaseWriter#validate");
+        expect.expect(IllegalArgumentException.class);
         ObModeType dialectType = ObModeType.OB_ORACLE;
         DataBaseConfig config = getDBConfig(dialectType);
+        assert config != null;
         AbstractMockWriter primitive =
                 new DataBaseWriter(oracleDataSource, dialectType, config.getDefaultSchame(), null);
     }
 
     @Test
     public void testInsertDataForMysql() throws Throwable {
-        List<Map<String, Pair<AbstractDataType, Object>>> rows = getRows(24);
+        List<MockRowData> rows = getRows(24);
         ObModeType dialectType = ObModeType.OB_MYSQL;
         DataBaseConfig config = getDBConfig(dialectType);
+        assert config != null;
         DataBaseWriter primitive =
                 new DataBaseWriter(mysqlDataSource, dialectType, config.getDefaultSchame(), tableName);
-        AbstractDataPipe pipe = new MockDataPipe(1);
+        AbstractDataPipe<MockRowData> pipe = new MockDataPipe(1);
         primitive.register(pipe);
         pipe.write(rows);
         Long count = primitive.write();
@@ -182,12 +188,13 @@ public class DataBasePrimitiveTest extends MockerTestBase {
 
     @Test
     public void testInsertDataForOracle() throws Throwable {
-        List<Map<String, Pair<AbstractDataType, Object>>> rows = getRows(24);
+        List<MockRowData> rows = getRows(24);
         ObModeType dialectType = ObModeType.OB_ORACLE;
         DataBaseConfig config = getDBConfig(dialectType);
+        assert config != null;
         DataBaseWriter primitive =
                 new DataBaseWriter(oracleDataSource, dialectType, config.getDefaultSchame(), tableName);
-        AbstractDataPipe pipe = new MockDataPipe(1);
+        AbstractDataPipe<MockRowData> pipe = new MockDataPipe(1);
         primitive.register(pipe);
         pipe.write(rows);
         Long count = primitive.write();

@@ -20,7 +20,7 @@ public abstract class AbstractColumnConfig {
      *
      * @return Return data type package object
      */
-    abstract public AbstractDataType columnType();
+    abstract public AbstractDataType<?, ? extends Comparable<?>> columnType();
 
     /**
      * Whether it is allowed to be empty, if it is true, it is possible to insert a null value into it

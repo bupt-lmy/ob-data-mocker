@@ -7,7 +7,8 @@ import java.util.concurrent.TimeUnit;
 import com.oceanbase.tools.datamocker.datatype.AbstractDateDataType;
 import com.oceanbase.tools.datamocker.datatype.DataTypeFactory;
 import com.oceanbase.tools.datamocker.generator.BaseGenerator;
-import com.oceanbase.tools.datamocker.generator.DateGeneratorBase;
+import com.oceanbase.tools.datamocker.generator.BaseDateGenerator;
+import com.oceanbase.tools.datamocker.model.config.model.DateDataTypeConfig;
 import com.oceanbase.tools.datamocker.model.enums.ObModeType;
 import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
@@ -29,7 +30,7 @@ public class MysqlTimeType extends AbstractDateDataType<Timestamp> {
      */
     private final int scale;
 
-    public MysqlTimeType(DateGeneratorBase<Timestamp> generator, int scale, Timestamp defaultValue, Boolean allowNull) {
+    public MysqlTimeType(BaseDateGenerator<Timestamp> generator, int scale, Timestamp defaultValue, Boolean allowNull) {
         super(generator, ObModeType.OB_MYSQL, defaultValue, allowNull);
         if (scale < 0 || scale > 6) {
             throw new MockerException(MockerError.PARAMETER_ERROR,
@@ -44,7 +45,7 @@ public class MysqlTimeType extends AbstractDateDataType<Timestamp> {
         }
     }
 
-    public MysqlTimeType(DateGeneratorBase<Timestamp> generator, Timestamp defaultValue, Boolean allowNull) {
+    public MysqlTimeType(BaseDateGenerator<Timestamp> generator, Timestamp defaultValue, Boolean allowNull) {
         super(generator, ObModeType.OB_MYSQL, defaultValue, allowNull);
         this.scale = 3;
         generator.setScale(this.scale);
@@ -54,11 +55,11 @@ public class MysqlTimeType extends AbstractDateDataType<Timestamp> {
     @Override
     public void bind(BaseGenerator<Timestamp, Timestamp> generator) {
         super.bind(generator);
-        ((DateGeneratorBase) generator).setScale(scale);
+        ((BaseDateGenerator<Timestamp>) generator).setScale(scale);
         if (scale > 3) {
-            ((DateGeneratorBase) generator).setTimeUnit(TimeUnit.MILLISECONDS);
+            ((BaseDateGenerator<Timestamp>) generator).setTimeUnit(TimeUnit.MILLISECONDS);
         } else {
-            ((DateGeneratorBase) generator).setTimeUnit(TimeUnit.SECONDS);
+            ((BaseDateGenerator<Timestamp>) generator).setTimeUnit(TimeUnit.SECONDS);
         }
     }
 
@@ -68,7 +69,7 @@ public class MysqlTimeType extends AbstractDateDataType<Timestamp> {
     }
 
     @Override
-    public DataTypeFactory getFactory() {
+    public DataTypeFactory<MysqlTimeType, DateDataTypeConfig, BaseDateGenerator<Timestamp>> getFactory() {
         return DataTypeFactory.getInstance("OB_MYSQL_TIME");
     }
 

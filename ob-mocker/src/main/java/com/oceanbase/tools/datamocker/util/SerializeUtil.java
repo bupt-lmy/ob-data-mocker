@@ -76,8 +76,9 @@ public class SerializeUtil {
      * @param result Query Result
      * @param clazz Target type
      * @return Return the deserialized object
-     * @throws Exception An exception will be thrown when the length of the reflection generated object
-     *         and the column collection is inconsistent with the result set
+     * @throws SQLException,InstantiationException,IllegalAccessException An exception will be thrown
+     *         when the length of the reflection generated object and the column collection is
+     *         inconsistent with the result set
      */
     public static <T> T getObject(ResultSet result, Class<T> clazz)
             throws SQLException, InstantiationException, IllegalAccessException {
@@ -118,8 +119,9 @@ public class SerializeUtil {
      * @param columnMap The mapping relationship between column names and indexes
      * @param clazz Target type
      * @return Return the deserialized object
-     * @throws Exception An exception will be thrown when the length of the reflection generated object
-     *         and the column collection is inconsistent with the result set
+     * @throws IllegalAccessException,InstantiationException An exception will be thrown when the length
+     *         of the reflection generated object and the column collection is inconsistent with the
+     *         result set
      */
     private static <T> T parseObject(List<Object> input, Map<String, Integer> columnMap, Class<T> clazz)
             throws IllegalAccessException, InstantiationException {

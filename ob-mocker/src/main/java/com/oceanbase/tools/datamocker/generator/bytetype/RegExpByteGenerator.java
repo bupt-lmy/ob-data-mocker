@@ -1,6 +1,6 @@
 package com.oceanbase.tools.datamocker.generator.bytetype;
 
-import com.oceanbase.tools.datamocker.generator.ByteGeneratorBase;
+import com.oceanbase.tools.datamocker.generator.BaseByteGenerator;
 import com.oceanbase.tools.datamocker.generator.chartype.RegExpGenerator;
 import com.oceanbase.tools.datamocker.model.enums.CharCaseOption;
 
@@ -12,7 +12,7 @@ import com.oceanbase.tools.datamocker.model.enums.CharCaseOption;
  * @date 2021-01-16 20:06
  * @since OBMOCKER_snapshot_0.1.0
  */
-public class RegExpByteGenerator extends ByteGeneratorBase {
+public class RegExpByteGenerator extends BaseByteGenerator {
     private final RegExpGenerator customGen;
 
     public RegExpByteGenerator(CharCaseOption caseType, String regExp) {

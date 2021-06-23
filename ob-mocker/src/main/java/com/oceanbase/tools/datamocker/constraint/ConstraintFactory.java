@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import javax.sql.DataSource;
@@ -24,6 +25,8 @@ import com.oceanbase.tools.datamocker.model.dbobject.TableColumn;
 import com.oceanbase.tools.datamocker.model.enums.ObModeType;
 import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
+import com.oceanbase.tools.datamocker.model.mock.MockRowData;
+import com.oceanbase.tools.datamocker.model.mock.MockRowData;
 import com.oceanbase.tools.datamocker.util.DbObjectNameUtil;
 import com.oceanbase.tools.datamocker.util.Pair;
 import com.oceanbase.tools.datamocker.util.SerializeUtil;
@@ -99,23 +102,17 @@ public abstract class ConstraintFactory {
     private static final ConstraintFactory UNIQUE_CONSTRAINT = new ConstraintFactory() {
         @Override
         public List<AbstractConstraint> make(DataSource dataSource, ObModeType dialectType, String database,
-                String tableName,
-                Map<String, AbstractDataType> columnName2DataType, int totalCount) throws Throwable {
+                String tableName, Map<String, AbstractDataType<?, ? extends Comparable<?>>> columnName2DataType,
+                int totalCount) throws Throwable {
             List<AbstractConstraint> constraints;
             if (ObModeType.OB_ORACLE.equals(dialectType)) {
                 constraints = getConstraints(dataSource, ORACLE_UNIQUE_CONSTRAINT_SQL, database, tableName,
-                        columnName2DataType, totalCount,
-                        ObModeType.OB_ORACLE,
-                        new OracleValidation());
+                        columnName2DataType, totalCount, ObModeType.OB_ORACLE, new OracleValidation());
             } else if (ObModeType.OB_MYSQL.equals(dialectType)) {
                 constraints = getConstraints(dataSource, MYSQL_UNIQUE_CONSTRAINT_SQL, database, tableName,
-                        columnName2DataType, totalCount,
-                        ObModeType.OB_MYSQL,
-                        new MysqlValidation());
+                        columnName2DataType, totalCount, ObModeType.OB_MYSQL, new MysqlValidation());
             } else {
-                throw new MockerException(MockerError.NOT_SUPPORT_FEATURE,
-                        String.format("\"%s\" mode is not support yet",
-                                dialectType == null ? "null" : dialectType.name()));
+                throw new MockerException(MockerError.INVALID_OB_MODE);
             }
             validateConstraints(constraints, tableName, columnName2DataType, totalCount);
             return constraints;
@@ -127,21 +124,17 @@ public abstract class ConstraintFactory {
     private static final ConstraintFactory PRIMARY_CONSTRAINT = new ConstraintFactory() {
         @Override
         public List<AbstractConstraint> make(DataSource dataSource, ObModeType dialectType, String database,
-                String tableName,
-                Map<String, AbstractDataType> columnName2DataType, int totalCount) throws Throwable {
+                String tableName, Map<String, AbstractDataType<?, ? extends Comparable<?>>> columnName2DataType,
+                int totalCount) throws Throwable {
             List<AbstractConstraint> constraints;
             if (ObModeType.OB_ORACLE.equals(dialectType)) {
                 constraints = getConstraints(dataSource, ORACLE_PRIMARY_CONSTRAINT_SQL, database, tableName,
-                        columnName2DataType,
-                        totalCount, ObModeType.OB_ORACLE, null);
+                        columnName2DataType, totalCount, ObModeType.OB_ORACLE, null);
             } else if (ObModeType.OB_MYSQL.equals(dialectType)) {
                 constraints = getConstraints(dataSource, MYSQL_PRIMARY_CONSTRAINT_SQL, database, tableName,
-                        columnName2DataType,
-                        totalCount, ObModeType.OB_MYSQL, null);
+                        columnName2DataType, totalCount, ObModeType.OB_MYSQL, null);
             } else {
-                throw new MockerException(MockerError.NOT_SUPPORT_FEATURE,
-                        String.format("\"%s\" mode is not support yet",
-                                dialectType == null ? "null" : dialectType.name()));
+                throw new MockerException(MockerError.INVALID_OB_MODE);
             }
             validateConstraints(constraints, tableName, columnName2DataType, totalCount);
             return constraints;
@@ -154,8 +147,8 @@ public abstract class ConstraintFactory {
     private static final ConstraintFactory CHECK_CONSTRAINT = new ConstraintFactory() {
         @Override
         public List<AbstractConstraint> make(DataSource dataSource, ObModeType dialectType, String database,
-                String tableName,
-                Map<String, AbstractDataType> columnName2DataType, int totalCount) throws Throwable {
+                String tableName, Map<String, AbstractDataType<?, ? extends Comparable<?>>> columnName2DataType,
+                int totalCount) throws Throwable {
             String[] params = new String[] {database, tableName};
             if (ObModeType.OB_ORACLE.equals(dialectType)) {
                 SqlUtil.executeQuery(dataSource, ORACLE_CHECK_CONSTRAINT_SQL, params,
@@ -178,9 +171,7 @@ public abstract class ConstraintFactory {
                 // OB-Mysql does not support query check constraint
                 return null;
             } else {
-                throw new MockerException(MockerError.NOT_SUPPORT_FEATURE,
-                        String.format("\"%s\" mode is not support yet",
-                                dialectType == null ? "null" : dialectType.name()));
+                throw new MockerException(MockerError.INVALID_OB_MODE);
             }
             return null;
         }
@@ -192,8 +183,8 @@ public abstract class ConstraintFactory {
     private static final ConstraintFactory FOREIGN_CONSTRAINT = new ConstraintFactory() {
         @Override
         public List<AbstractConstraint> make(DataSource dataSource, ObModeType dialectType, String database,
-                String tableName,
-                Map<String, AbstractDataType> columnName2DataType, int totalCount) throws Throwable {
+                String tableName, Map<String, AbstractDataType<?, ? extends Comparable<?>>> columnName2DataType,
+                int totalCount) throws Throwable {
             if (ObModeType.OB_ORACLE.equals(dialectType)) {
                 String[] params = new String[] {database, tableName};
                 SqlUtil.executeQuery(dataSource, ORACLE_FOREIGN_CONSTRAINT_SQL, params,
@@ -216,9 +207,7 @@ public abstract class ConstraintFactory {
                 // OB-Mysql does not support query foreign constraint
                 return null;
             } else {
-                throw new MockerException(MockerError.NOT_SUPPORT_FEATURE,
-                        String.format("\"%s\" mode is not support yet",
-                                dialectType == null ? "null" : dialectType.name()));
+                throw new MockerException(MockerError.INVALID_OB_MODE);
             }
             return null;
         }
@@ -249,8 +238,8 @@ public abstract class ConstraintFactory {
      * @param totalCount data count
      */
     abstract public List<AbstractConstraint> make(DataSource dataSource, ObModeType dialectType, String database,
-            String tableName,
-            Map<String, AbstractDataType> columnName2DataType, int totalCount) throws Throwable;
+            String tableName, Map<String, AbstractDataType<?, ? extends Comparable<?>>> columnName2DataType,
+            int totalCount) throws Throwable;
 
     /**
      * Verify method for constraint object eg. If a unique constraint restricts at most n different
@@ -264,14 +253,13 @@ public abstract class ConstraintFactory {
      * @throws MockerException exception will be thrown when error occured
      */
     private static void validateConstraints(List<AbstractConstraint> constraints, String tableName,
-            Map<String, AbstractDataType> columnName2DataType,
-            int totalCount) {
+            Map<String, AbstractDataType<?, ? extends Comparable<?>>> columnName2DataType, int totalCount) {
         for (AbstractConstraint constraint : constraints) {
             Map<String, Integer> cols = constraint.columns().get(tableName);
             Set<String> colSet = cols.keySet();
             Long limitCount = 1L;
             for (String col : colSet) {
-                AbstractDataType dataType = columnName2DataType.get(col);
+                AbstractDataType<?, ? extends Comparable<?>> dataType = columnName2DataType.get(col);
                 Long typeLimit = dataType.distinctLimit();
                 if (typeLimit > totalCount) {
                     limitCount = (long) totalCount;
@@ -283,17 +271,16 @@ public abstract class ConstraintFactory {
                 }
             }
             if (limitCount < totalCount) {
-                throw new MockerException(MockerError.PARAMETER_ERROR,
-                        String.format(
-                                "The given data generator can only generate %d unique data for cols {%s}, but the goal is %d",
-                                limitCount.intValue(), String.join(", ", colSet), totalCount));
+                throw new MockerException(MockerError.PARAMETER_ERROR, String.format(
+                        "The given data generator can only generate %d unique data for cols {%s}, but the goal is %d",
+                        limitCount.intValue(), String.join(", ", colSet), totalCount));
             }
         }
     }
 
     protected static List<AbstractConstraint> getConstraints(DataSource dataSource, String sql, String database,
-            String tableName, Map<String, AbstractDataType> columnName2DataType, int totalCount, ObModeType obModeType,
-            Validation validation) throws Throwable {
+            String tableName, Map<String, AbstractDataType<?, ? extends Comparable<?>>> columnName2DataType,
+            int totalCount, ObModeType obModeType, Validation validation) throws Throwable {
         List<AbstractConstraint> constraints = new ArrayList<>();
         SqlUtil.executeQuery(dataSource, sql, new String[] {database, tableName}, new AbstractCallBack<ResultSet>() {
             @Override
@@ -301,9 +288,7 @@ public abstract class ConstraintFactory {
                 List<ConstraintColumn> cols = SerializeUtil.getList(result, ConstraintColumn.class);
                 Map<String, List<ConstraintColumn>> returnVal = reduce(cols);
                 Set<Entry<String, List<ConstraintColumn>>> entrySet = returnVal.entrySet();
-                Iterator<Entry<String, List<ConstraintColumn>>> iter = entrySet.iterator();
-                while (iter.hasNext()) {
-                    Map.Entry<String, List<ConstraintColumn>> entry = iter.next();
+                for (Entry<String, List<ConstraintColumn>> entry : entrySet) {
                     List<ConstraintColumn> colsList = entry.getValue();
                     Map<String, Map<String, Integer>> columnMap = new HashMap<>();
                     for (ConstraintColumn item : colsList) {
@@ -378,8 +363,8 @@ public abstract class ConstraintFactory {
      * @param columnName2DataType table schema
      */
     private static void initConstraint(DataSource dataSource, List<ConstraintColumn> colsList, String table,
-            Map<String, AbstractDataType> columnName2DataType, AbstractConstraint constraint, ObModeType obModeType)
-            throws Throwable {
+            Map<String, AbstractDataType<?, ? extends Comparable<?>>> columnName2DataType,
+            AbstractConstraint constraint, ObModeType obModeType) throws Throwable {
         Validate.notNull(obModeType, "OBModeType can not be null for ConstraintFactory#initConstraint");
         String columnStr = colsList.stream().map(column -> {
             if (ObModeType.OB_ORACLE.equals(obModeType)) {
@@ -399,19 +384,19 @@ public abstract class ConstraintFactory {
                 ResultSetMetaData metaData = result.getMetaData();
                 int count = metaData.getColumnCount();
                 while (result.next()) {
-                    Map<String, Pair<AbstractDataType, Object>> row = new HashMap<>();
+                    MockRowData mockRowData = new MockRowData();
                     for (int i = 0; i < count; i++) {
                         String columnName = metaData.getColumnLabel(i + 1);
-                        AbstractDataType dataType = columnName2DataType.get(columnName);
+                        AbstractDataType<?, ? extends Comparable<?>> dataType = columnName2DataType.get(columnName);
                         if (dataType == null) {
                             throw new MockerException(MockerError.ILLEGAL_RETURN_VALUE,
                                     String.format("Data type for column \"%s.%s\" can not be null", table, columnName));
                         }
                         Object value = result.getObject(i + 1);
-                        row.putIfAbsent(columnName, new Pair<>(dataType, value));
+                        mockRowData.addMockColumn(dataType.toMockColumn(columnName, value));
                     }
-                    constraint.check(row);
-                    constraint.mark(row);
+                    constraint.check(mockRowData);
+                    constraint.mark(mockRowData);
                 }
             }
 
@@ -514,8 +499,7 @@ class MysqlValidation implements Validation {
                 if (StringUtils.isNotBlank(tableCol.getExpression())) {
                     throw new MockerException(MockerError.NOT_SUPPORT_FEATURE,
                             String.format("Virtual column \"%s.%s\" for constraint is not support yet",
-                                    tableCol.getTableName(),
-                                    tableCol.getColumnName()));
+                                    tableCol.getTableName(), tableCol.getColumnName()));
                 }
             }
 
@@ -552,8 +536,7 @@ class OracleValidation implements Validation {
                 if ("YES".equals(tableCol.getVirtualColumn())) {
                     throw new MockerException(MockerError.NOT_SUPPORT_FEATURE,
                             String.format("Virtual column \"%s.%s\" for constraint is not support yet",
-                                    tableCol.getTableName(),
-                                    tableCol.getColumnName()));
+                                    tableCol.getTableName(), tableCol.getColumnName()));
                 }
             }
 

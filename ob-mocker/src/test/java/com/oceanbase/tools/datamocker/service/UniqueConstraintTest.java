@@ -15,6 +15,8 @@ import com.oceanbase.tools.datamocker.constraint.impl.UniqueConstraint;
 import com.oceanbase.tools.datamocker.datatype.AbstractDataType;
 import com.oceanbase.tools.datamocker.datatype.oracle.OracleNumberType;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
+import com.oceanbase.tools.datamocker.model.mock.MockColumnData;
+import com.oceanbase.tools.datamocker.model.mock.MockRowData;
 import com.oceanbase.tools.datamocker.util.Pair;
 import org.junit.Assert;
 import org.junit.Test;
@@ -42,27 +44,27 @@ public class UniqueConstraintTest extends MockerTestBase {
         return consColumns;
     }
 
-    private Map<String, Pair<AbstractDataType, Object>> getData() {
-        Map<String, Pair<AbstractDataType, Object>> row = new HashMap<>();
+    private MockRowData getData() {
+        MockRowData mockRowData = new MockRowData();
         for (String column : columnNames) {
             BigDecimal value = BigDecimal.valueOf(new Random().nextDouble());
-            row.put(column, new Pair<>(new OracleNumberType(10, 5, null, false), value));
+            mockRowData.addMockColumn(new MockColumnData<>(column, new OracleNumberType(10, 5, null, false), value));
         }
-        row.put("column",
-                new Pair<>(new OracleNumberType(10, 5, null, false), BigDecimal.valueOf(new Random().nextDouble())));
-        return row;
+        mockRowData.addMockColumn(new MockColumnData<>("column", new OracleNumberType(10, 5, null, false),
+                BigDecimal.valueOf(new Random().nextDouble())));
+        return mockRowData;
     }
 
     @Test
     public void testUnqiueConstraint() {
-        List<Map<String, Pair<AbstractDataType, Object>>> list = new ArrayList<>();
+        List<MockRowData> list = new ArrayList<>();
         for (int i = 0; i < 1000; i++) {
-            Map<String, Pair<AbstractDataType, Object>> row = getData();
+            MockRowData row = getData();
             list.add(row);
         }
         UniqueConstraint unique = new UniqueConstraint(constaintName, database, tableName, getColumns(), list, 15000);
         for (int i = 0; i < 1000; i++) {
-            Map<String, Pair<AbstractDataType, Object>> row = list.get(i);
+            MockRowData row = list.get(i);
             Assert.assertFalse(unique.check(row));
         }
         Assert.assertFalse(unique.check(null));
@@ -70,20 +72,20 @@ public class UniqueConstraintTest extends MockerTestBase {
 
     @Test
     public void testUnqiueConstraintWithIllegalCount() {
-        List<Map<String, Pair<AbstractDataType, Object>>> list = new ArrayList<>();
+        List<MockRowData> list = new ArrayList<>();
         for (int i = 0; i < 1000; i++) {
-            Map<String, Pair<AbstractDataType, Object>> row = getData();
+            MockRowData row = getData();
             list.add(row);
         }
-        thrown.expect(MockerException.class);
-        thrown.expectMessage("Count for unique constraint can not be equal to or smaller than zero");
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("Count for UniqueConstraint can not be negative");
         UniqueConstraint unique = new UniqueConstraint(constaintName, database, tableName, getColumns(), list, 0);
     }
 
     @Test
     public void testUniqueConstraintWithIllegalCount() {
-        thrown.expect(MockerException.class);
-        thrown.expectMessage("Count for unique constraint can not be equal to or smaller than zero");
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("Count for UniqueConstraint can not be negative");
         UniqueConstraint unique = new UniqueConstraint(constaintName, database, tableName, getColumns(), -100);
     }
 
@@ -94,12 +96,12 @@ public class UniqueConstraintTest extends MockerTestBase {
         Set<String> set = new HashSet<>();
         int counter = 0;
         for (int i = 0; i < size; i++) {
-            Map<String, Pair<AbstractDataType, Object>> row = getData();
+            MockRowData row = getData();
             List<String> buffer = new ArrayList<>();
-            Set<String> keys = row.keySet();
+            Set<String> keys = row.columnNames();
             for (String key : keys) {
-                Pair<AbstractDataType, ?> value = row.get(key);
-                buffer.add(value.getKey().toString(value.getValue()));
+                MockColumnData<?> value = row.getMockColumn(key);
+                buffer.add(value.getColumnValueString());
             }
             String tmp = String.join(",", buffer);
             if (set.contains(tmp) == unique.check(row)) {
@@ -112,16 +114,16 @@ public class UniqueConstraintTest extends MockerTestBase {
 
     @Test
     public void testUniqueConstraintWithIllegalColumn() {
-        List<Map<String, Pair<AbstractDataType, Object>>> list = new ArrayList<>();
+        List<MockRowData> list = new ArrayList<>();
         for (int i = 0; i < 1000; i++) {
-            Map<String, Pair<AbstractDataType, Object>> row = getData();
+            MockRowData row = getData();
             list.add(row);
         }
         UniqueConstraint unique = new UniqueConstraint(constaintName, database, tableName, getColumns(), list, 15000);
-        Map<String, Pair<AbstractDataType, Object>> row = list.get(0);
+        MockRowData row = list.get(0);
         row.remove("COL3");
         thrown.expectMessage("Input constraint's columns must contain init constraint's columns");
         thrown.expect(MockerException.class);
-        Assert.assertNull(unique.check(row));
+        unique.check(row);
     }
 }

@@ -2,7 +2,7 @@ package com.oceanbase.tools.datamocker.generator.digit;
 
 import java.math.BigDecimal;
 
-import com.oceanbase.tools.datamocker.generator.DigitalGeneratorBase;
+import com.oceanbase.tools.datamocker.generator.BaseDigitalGenerator;
 
 /**
  * Numerical null data generator
@@ -11,7 +11,7 @@ import com.oceanbase.tools.datamocker.generator.DigitalGeneratorBase;
  * @date 2021-01-26 14:43
  * @since OBMOCKER_0.1.0_dev
  */
-public class NullDigitGenerator extends DigitalGeneratorBase<BigDecimal> {
+public class NullDigitGenerator extends BaseDigitalGenerator<BigDecimal> {
 
     @Override
     public Boolean preCheck(BigDecimal minValue, BigDecimal maxValue) {

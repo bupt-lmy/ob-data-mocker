@@ -8,7 +8,8 @@ import java.util.concurrent.TimeUnit;
 import com.oceanbase.tools.datamocker.datatype.AbstractDateDataType;
 import com.oceanbase.tools.datamocker.datatype.DataTypeFactory;
 import com.oceanbase.tools.datamocker.generator.BaseGenerator;
-import com.oceanbase.tools.datamocker.generator.DateGeneratorBase;
+import com.oceanbase.tools.datamocker.generator.BaseDateGenerator;
+import com.oceanbase.tools.datamocker.model.config.model.DateDataTypeConfig;
 import com.oceanbase.tools.datamocker.model.enums.ObModeType;
 import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
@@ -26,7 +27,7 @@ public class MysqlDateType extends AbstractDateDataType<Date> {
      */
     private static final String JAVA_DATE_FORMAT = "yyyy-MM-dd";
 
-    public MysqlDateType(DateGeneratorBase<Date> generator, Date defaultValue, Boolean allowNull) {
+    public MysqlDateType(BaseDateGenerator<Date> generator, Date defaultValue, Boolean allowNull) {
         super(generator, ObModeType.OB_MYSQL, defaultValue, allowNull);
         generator.setTimeUnit(TimeUnit.DAYS);
     }
@@ -42,7 +43,7 @@ public class MysqlDateType extends AbstractDateDataType<Date> {
     @Override
     public void bind(BaseGenerator<Date, Date> generator) {
         super.bind(generator);
-        ((DateGeneratorBase) generator).setTimeUnit(TimeUnit.DAYS);
+        ((BaseDateGenerator<Date>) generator).setTimeUnit(TimeUnit.DAYS);
     }
 
     @Override
@@ -55,7 +56,7 @@ public class MysqlDateType extends AbstractDateDataType<Date> {
     }
 
     @Override
-    public DataTypeFactory getFactory() {
+    public DataTypeFactory<MysqlDateType, DateDataTypeConfig, BaseDateGenerator<Date>> getFactory() {
         return DataTypeFactory.getInstance("OB_MYSQL_DATE");
     }
 

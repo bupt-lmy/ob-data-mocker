@@ -2,17 +2,23 @@ package com.oceanbase.tools.datamocker.constraint.impl;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import com.oceanbase.tools.datamocker.constraint.AbstractConstraint;
 import com.oceanbase.tools.datamocker.datatype.AbstractDataType;
 import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
+import com.oceanbase.tools.datamocker.model.mock.MockColumnData;
+import com.oceanbase.tools.datamocker.model.mock.MockRowData;
 import com.oceanbase.tools.datamocker.util.DuplicatedJudger;
 import com.oceanbase.tools.datamocker.util.Pair;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.Validate;
 
 /**
  * Packaged Object for Unique Constraint, used to verify whether the unique constraint of the
@@ -45,10 +51,7 @@ public class UniqueConstraint extends AbstractConstraint {
     public UniqueConstraint(String constraintName, String database, String tableName,
             Map<String, Map<String, Integer>> consColumns, int count) {
         super(constraintName, database, tableName, consColumns);
-        if (count <= 0) {
-            throw new MockerException(MockerError.PARAMETER_ERROR,
-                    "Count for unique constraint can not be equal to or smaller than zero");
-        }
+        Validate.isTrue(count > 0, "Count for UniqueConstraint can not be negative");
         this.judger = new DuplicatedJudger(count);
     }
 
@@ -64,16 +67,12 @@ public class UniqueConstraint extends AbstractConstraint {
      * @param count the row count which is needed to be verified
      */
     public UniqueConstraint(String constraintName, String database, String tableName,
-            Map<String, Map<String, Integer>> consColumns, List<Map<String, Pair<AbstractDataType, Object>>> rows,
-            int count) {
+            Map<String, Map<String, Integer>> consColumns, List<MockRowData> rows, int count) {
         super(constraintName, database, tableName, consColumns, rows);
-        if (count <= 0) {
-            throw new MockerException(MockerError.PARAMETER_ERROR,
-                    "Count for unique constraint can not be equal to or smaller than zero");
-        }
+        Validate.isTrue(count > 0, "Count for UniqueConstraint can not be negative");
         if (rows != null && rows.size() != 0) {
             this.judger = new DuplicatedJudger(rows.size() + count);
-            for (Map<String, Pair<AbstractDataType, Object>> row : rows) {
+            for (MockRowData row : rows) {
                 String result = convert(row);
                 judger.add(result);
             }
@@ -83,13 +82,12 @@ public class UniqueConstraint extends AbstractConstraint {
     }
 
     @Override
-    protected void initWithRows(Map<String, Integer> columns, List<Map<String, Pair<AbstractDataType, Object>>> rows) {
+    protected void initWithRows(Map<String, Integer> columns, List<MockRowData> rows) {
         this.sortedList = sortMapByValue(columns);
     }
 
     @Override
-    protected boolean doCheck(Map<String, Integer> columns, Map<String, Pair<AbstractDataType, Object>> value,
-            Boolean markable) {
+    protected boolean doCheck(Map<String, Integer> columns, MockRowData value, Boolean markable) {
         String checkValue = convert(value);
         if (judger.contains(checkValue)) {
             // log.warn(String.format("value \"%s\" for columns \"%s\" can not pass the unique constraint, will
@@ -108,23 +106,19 @@ public class UniqueConstraint extends AbstractConstraint {
     /**
      * Convert method, which is to convert a data to string value, used to verify
      *
-     * @param row row of data
+     * @param mockRowData row of data
      * @return string value for this row of data
      */
-    private String convert(Map<String, Pair<AbstractDataType, Object>> row) {
-        List<String> list = new ArrayList<>();
-        for (String column : sortedList) {
-            Pair<AbstractDataType, ?> value = row.get(column);
-            if (value == null) {
+    private String convert(MockRowData mockRowData) {
+        String columnList = String.join(",", sortedList);
+        return sortedList.stream().map(s -> {
+            MockColumnData<?> mockColumn = mockRowData.getMockColumn(s);
+            if (mockColumn == null) {
                 throw new MockerException(MockerError.OPERATION_FAILURE,
-                        String.format("Data for unique constraint have to have same column list \"%s\"",
-                                sortedList.stream().collect(Collectors.joining(","))));
+                        String.format("Data for unique constraint have to have same column list \"%s\"", columnList));
             }
-            Object convertVal = value.getKey().convert(value.getValue());
-            Object digestVal = value.getKey().toDigest(convertVal);
-            list.add(value.getKey().toString(digestVal));
-        }
-        return list.stream().collect(Collectors.joining(","));
+            return mockColumn.toDisgestString();
+        }).collect(Collectors.joining(","));
     }
 
     /**
@@ -139,7 +133,7 @@ public class UniqueConstraint extends AbstractConstraint {
         }
         List<String> sortedList = new ArrayList<>();
         List<Map.Entry<String, Integer>> entryList = new ArrayList<>(map.entrySet());
-        Collections.sort(entryList, (o1, o2) -> o1.getValue().compareTo(o2.getValue()));
+        entryList.sort(Entry.comparingByValue());
         for (Map.Entry<String, Integer> entry : entryList) {
             sortedList.add(entry.getKey());
         }

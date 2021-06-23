@@ -2,7 +2,7 @@ package com.oceanbase.tools.datamocker.generator.date;
 
 import java.sql.Date;
 
-import com.oceanbase.tools.datamocker.generator.DateGeneratorBase;
+import com.oceanbase.tools.datamocker.generator.BaseDateGenerator;
 
 /**
  * Null data generator of date type
@@ -11,7 +11,7 @@ import com.oceanbase.tools.datamocker.generator.DateGeneratorBase;
  * @date 2021-01-26 14:42
  * @since OBMOCKER_snapshot_0.1.0
  */
-public class NullDateGenerator extends DateGeneratorBase<Date> {
+public class NullDateGenerator extends BaseDateGenerator<Date> {
     @Override
     public Boolean preCheck(Date startTime, Date endTime) {
         return true;

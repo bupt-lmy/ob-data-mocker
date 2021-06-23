@@ -8,7 +8,8 @@ import java.util.concurrent.TimeUnit;
 import com.oceanbase.tools.datamocker.datatype.AbstractDateDataType;
 import com.oceanbase.tools.datamocker.datatype.DataTypeFactory;
 import com.oceanbase.tools.datamocker.generator.BaseGenerator;
-import com.oceanbase.tools.datamocker.generator.DateGeneratorBase;
+import com.oceanbase.tools.datamocker.generator.BaseDateGenerator;
+import com.oceanbase.tools.datamocker.model.config.model.DateDataTypeConfig;
 import com.oceanbase.tools.datamocker.model.enums.ObModeType;
 import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
@@ -30,7 +31,7 @@ public class OracleDateType extends AbstractDateDataType<Date> {
      */
     private static final String JAVA_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
-    public OracleDateType(DateGeneratorBase<Date> generator, Date defaultValue, Boolean allowNull) {
+    public OracleDateType(BaseDateGenerator<Date> generator, Date defaultValue, Boolean allowNull) {
         super(generator, ObModeType.OB_ORACLE, defaultValue, allowNull);
         generator.setTimeUnit(TimeUnit.SECONDS);
     }
@@ -46,7 +47,7 @@ public class OracleDateType extends AbstractDateDataType<Date> {
     @Override
     public void bind(BaseGenerator<Date, Date> generator) {
         super.bind(generator);
-        ((DateGeneratorBase) generator).setTimeUnit(TimeUnit.SECONDS);
+        ((BaseDateGenerator<Date>) generator).setTimeUnit(TimeUnit.SECONDS);
     }
 
     @Override
@@ -59,7 +60,7 @@ public class OracleDateType extends AbstractDateDataType<Date> {
     }
 
     @Override
-    public DataTypeFactory getFactory() {
+    public DataTypeFactory<OracleDateType, DateDataTypeConfig, BaseDateGenerator<Date>> getFactory() {
         return DataTypeFactory.getInstance("OB_ORACLE_DATE");
     }
 

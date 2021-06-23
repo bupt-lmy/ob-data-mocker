@@ -31,6 +31,8 @@ import com.oceanbase.tools.datamocker.generator.digit.NormalGenerator;
 import com.oceanbase.tools.datamocker.model.config.model.DataBaseConfig;
 import com.oceanbase.tools.datamocker.model.enums.ObModeType;
 import com.oceanbase.tools.datamocker.model.enums.ScriptType;
+import com.oceanbase.tools.datamocker.model.mock.MockColumnData;
+import com.oceanbase.tools.datamocker.model.mock.MockRowData;
 import com.oceanbase.tools.datamocker.task.primitive.DataBasePrimitiveTest;
 import com.oceanbase.tools.datamocker.util.MockDataPipe;
 import com.oceanbase.tools.datamocker.util.MockerBuffer;
@@ -70,6 +72,7 @@ public class MockBufferTest extends MockerTestBase {
         } else {
             return null;
         }
+        assert url != null;
         properties.load(new FileInputStream(url.getPath()));
         config.setDefaultSchame(properties.getProperty("schema"));
         config.setPassword(properties.getProperty("passwd"));
@@ -97,9 +100,9 @@ public class MockBufferTest extends MockerTestBase {
         manager = new MockerFile("test/mock/mock.sql", ScriptType.SQL);
     }
 
-    private Map<String, AbstractDataType> getTableSchma() {
+    private Map<String, AbstractDataType<?, ? extends Comparable<?>>> getTableSchma() {
         List<String> columns = Arrays.asList("COL1", "COL2", "COL3");
-        Map<String, AbstractDataType> map = new HashMap<>();
+        Map<String, AbstractDataType<?, ? extends Comparable<?>>> map = new HashMap<>();
         for (String column : columns) {
             map.putIfAbsent(column, new OracleNumberType(5, 2, null, false));
         }
@@ -114,13 +117,13 @@ public class MockBufferTest extends MockerTestBase {
         return new ColumnReader<>(number, columnName, null);
     }
 
-    private void startDataGenerateTask(AbstractDataPipe dataPipe, int batchSize, int maxCount) {
-        Map<String, AbstractDataType> map = getTableSchma();
+    private void startDataGenerateTask(AbstractDataPipe<MockRowData> dataPipe, int batchSize, int maxCount) {
+        Map<String, AbstractDataType<?, ? extends Comparable<?>>> map = getTableSchma();
         MockerBuffer buffer = new MockerBuffer(map, (long) batchSize);
         buffer.setConcurrent(2);
         buffer.register(dataPipe);
-        List<ColumnReader> first = new ArrayList<>();
-        List<ColumnReader> second = new ArrayList<>();
+        List<ColumnReader<BigDecimal>> first = new ArrayList<>();
+        List<ColumnReader<BigDecimal>> second = new ArrayList<>();
         List<String> keySet = new ArrayList<>(map.keySet());
         for (int i = 0; i < keySet.size(); i++) {
             if ((i + 1) % 2 == 0) {
@@ -133,15 +136,15 @@ public class MockBufferTest extends MockerTestBase {
             try {
                 for (int i = 0; i < maxCount; i++) {
                     if (first.size() == 1) {
-                        ColumnReader primitive = first.get(0);
+                        ColumnReader<BigDecimal> primitive = first.get(0);
                         buffer.write(primitive.read(), Long.MAX_VALUE, TimeUnit.SECONDS);
                     } else {
-                        Map<String, Pair<AbstractDataType, Object>> data = new HashMap<>(first.size());
-                        for (ColumnReader primitive : first) {
-                            Pair<String, Pair<AbstractDataType, Object>> pair = primitive.read();
-                            data.put(pair.getKey(), pair.getValue());
+                        MockRowData mockRowData = new MockRowData(first.size());
+                        for (ColumnReader<BigDecimal> primitive : first) {
+                            MockColumnData<BigDecimal> mockColumn = primitive.read();
+                            mockRowData.addMockColumn(mockColumn);
                         }
-                        buffer.write(data, Long.MAX_VALUE, TimeUnit.SECONDS);
+                        buffer.write(mockRowData, Long.MAX_VALUE, TimeUnit.SECONDS);
                     }
                 }
                 buffer.close(0, TimeUnit.SECONDS);
@@ -154,15 +157,15 @@ public class MockBufferTest extends MockerTestBase {
             try {
                 for (int i = 0; i < maxCount; i++) {
                     if (second.size() == 1) {
-                        ColumnReader primitive = second.get(0);
+                        ColumnReader<BigDecimal> primitive = second.get(0);
                         buffer.write(primitive.read(), Long.MAX_VALUE, TimeUnit.SECONDS);
                     } else {
-                        Map<String, Pair<AbstractDataType, Object>> data = new HashMap<>(first.size());
-                        for (ColumnReader primitive : second) {
-                            Pair<String, Pair<AbstractDataType, Object>> pair = primitive.read();
-                            data.put(pair.getKey(), pair.getValue());
+                        MockRowData mockRowData = new MockRowData(first.size());
+                        for (ColumnReader<BigDecimal> primitive : second) {
+                            MockColumnData<BigDecimal> mockColumn = primitive.read();
+                            mockRowData.addMockColumn(mockColumn);
                         }
-                        buffer.write(data, Long.MAX_VALUE, TimeUnit.SECONDS);
+                        buffer.write(mockRowData, Long.MAX_VALUE, TimeUnit.SECONDS);
                     }
                 }
                 buffer.close(0, TimeUnit.SECONDS);
@@ -175,10 +178,11 @@ public class MockBufferTest extends MockerTestBase {
 
     @Test
     public void testDataBasePrimitive() throws IOException, InterruptedException {
-        AbstractDataPipe dataPipe = new MockDataPipe(1);
+        AbstractDataPipe<MockRowData> dataPipe = new MockDataPipe(1);
         startDataGenerateTask(dataPipe, 256, 600);
         ObModeType dialectType = ObModeType.OB_ORACLE;
         DataBaseConfig config = getDBConfig(dialectType);
+        assert config != null;
         DataBaseWriter primitive = new DataBaseWriter(dataSource, dialectType, config.getDefaultSchame(), "EMP");
         primitive.register(dataPipe);
         List<Thread> threads = new ArrayList<>();
@@ -204,7 +208,7 @@ public class MockBufferTest extends MockerTestBase {
 
     @Test
     public void testScriptPrimitive() throws InterruptedException {
-        AbstractDataPipe dataPipe = new MockDataPipe(1);
+        AbstractDataPipe<MockRowData> dataPipe = new MockDataPipe(1);
         startDataGenerateTask(dataPipe, 256, 123);
         SqlScriptWriter primitive = new SqlScriptWriter(manager, ObModeType.OB_ORACLE, "test", "emp");
         primitive.register(dataPipe);

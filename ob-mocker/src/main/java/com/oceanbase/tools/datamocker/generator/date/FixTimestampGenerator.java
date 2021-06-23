@@ -2,7 +2,7 @@ package com.oceanbase.tools.datamocker.generator.date;
 
 import java.sql.Timestamp;
 
-import com.oceanbase.tools.datamocker.generator.DateGeneratorBase;
+import com.oceanbase.tools.datamocker.generator.BaseDateGenerator;
 
 /**
  * Data generator with fixed timestamp
@@ -11,7 +11,7 @@ import com.oceanbase.tools.datamocker.generator.DateGeneratorBase;
  * @date 2020-12-16 19:19
  * @since OBMOCKER_snapshot_0.1.0
  */
-public class FixTimestampGenerator extends DateGeneratorBase<Timestamp> {
+public class FixTimestampGenerator extends BaseDateGenerator<Timestamp> {
     /**
      * Fixed date and time stamp
      */

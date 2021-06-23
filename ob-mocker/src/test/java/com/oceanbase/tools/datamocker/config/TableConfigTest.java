@@ -26,37 +26,35 @@ import org.junit.Test;
  * @since OBMOCKER-snapshot-0.1.0
  */
 public class TableConfigTest extends MockerTestBase {
-    /**
-     * List task-related parameters
-     */
-    private Integer precision = 5;
-    private Integer scale = 2;
-    private Boolean allowNull = false;
-    private String columnName = "SALARY";
-    private Object defaultValue = "DEFAULT_VALUE";
-    private String genName = "NORMAL_GENERATOR";
-    private String typeName = "OB_ORACLE_NUMBER";
-    private BigDecimal lowValue = BigDecimal.ZERO;
-    private BigDecimal highValue = BigDecimal.TEN.multiply(BigDecimal.TEN);
-    private Map<String, Double> builderParams = new HashMap<>();
+    private final Object defaultValue = "DEFAULT_VALUE";
+    private final BigDecimal lowValue = BigDecimal.ZERO;
+    private final BigDecimal highValue = BigDecimal.TEN.multiply(BigDecimal.TEN);
+    private final Map<String, Object> builderParams = new HashMap<>();
     /**
      * Table task-related initialization parameters
      */
-    private int configListSize = 3;
-    private Long batchSize = 1024L;
-    private Long totalCount = 1000000L;
-    private String tableName = "test_table";
-    private String schemaName = "schema_name";
+    private final int configListSize = 3;
+    private final Long batchSize = 1024L;
+    private final Long totalCount = 1000000L;
+    private final String tableName = "test_table";
+    private final String schemaName = "schema_name";
     private DefaultTableConfig tableConfig = null;
 
     private DataTypeConfig initDigitGen() {
         DigitDataTypeConfig digit = new DigitDataTypeConfig();
+        String typeName = "OB_ORACLE_NUMBER";
         digit.setColumnType(typeName);
         digit.setLowValue(lowValue);
         digit.setHighValue(highValue);
         digit.setGenParams(builderParams);
+        String genName = "NORMAL_GENERATOR";
         digit.setGenerator(genName);
+        /**
+         * List task-related parameters
+         */
+        Integer precision = 5;
         digit.setPrecision(precision);
+        Integer scale = 2;
         digit.setScale(scale);
         return digit;
     }
@@ -74,7 +72,9 @@ public class TableConfigTest extends MockerTestBase {
         DataTypeConfig typeConfig = initDigitGen();
         for (int i = 0; i < size; i++) {
             DefaultColumnConfig config = new DefaultColumnConfig();
+            String columnName = "SALARY";
             config.setColumnName(columnName);
+            Boolean allowNull = false;
             config.setAllowNull(allowNull);
             config.setDefaultValue(defaultValue);
             config.setTypeConfig(typeConfig);

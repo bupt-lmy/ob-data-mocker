@@ -83,9 +83,7 @@ public abstract class AbstractDataPipe<T> {
             if (maxLoopCount == -1) {
                 log.warn(
                         "Data pipeline write operation timed out and will return, currentSize={}, maxRetained={}, threadName={}",
-                        size(),
-                        maxRetained,
-                        Thread.currentThread().getName());
+                        size(), maxRetained, Thread.currentThread().getName());
                 return;
             }
         } finally {
@@ -154,9 +152,7 @@ public abstract class AbstractDataPipe<T> {
             if (maxLoopCount == -1) {
                 log.warn(
                         "Data pipeline read operation timed out and will return, currentSize={}, maxRetained={}, threadName={}",
-                        size(),
-                        maxRetained,
-                        Thread.currentThread().getName());
+                        size(), maxRetained, Thread.currentThread().getName());
                 return Collections.emptyList();
             }
         } finally {

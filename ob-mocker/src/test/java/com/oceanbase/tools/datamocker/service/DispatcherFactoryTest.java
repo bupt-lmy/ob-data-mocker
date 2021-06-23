@@ -71,7 +71,7 @@ public class DispatcherFactoryTest extends MockerTestBase {
     private final Long maxBatchsize = 1024L;
     private final Long maxGenerateCount = 9800L;
 
-    private DataTypeConfig initDigitGen(Map<String, Double> builderParams, String typeName, BigDecimal lowValue,
+    private DataTypeConfig initDigitGen(Map<String, Object> builderParams, String typeName, BigDecimal lowValue,
             BigDecimal highValue,
             String genName, Integer precision, Integer scale) {
         DigitDataTypeConfig digit = new DigitDataTypeConfig();
@@ -88,7 +88,7 @@ public class DispatcherFactoryTest extends MockerTestBase {
     private List<DefaultColumnConfig> initColumnConfig(String tableName) {
         List<DefaultColumnConfig> configList = new ArrayList<>();
         if ("EMP".equals(tableName)) {
-            Map<String, Double> builderParams = new HashMap<>();
+            Map<String, Object> builderParams = new HashMap<>();
             builderParams.put("average", 50.21);
             builderParams.put("variance", 16.43);
 
@@ -119,7 +119,7 @@ public class DispatcherFactoryTest extends MockerTestBase {
                     "NORMAL_GENERATOR", 4, 2));
             configList.add(col3);
         } else if ("EMP1".equals(tableName)) {
-            Map<String, Double> builderParams = new HashMap<>();
+            Map<String, Object> builderParams = new HashMap<>();
             builderParams.put("average", 50.21);
             builderParams.put("variance", 16.43);
 

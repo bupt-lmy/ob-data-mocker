@@ -9,7 +9,7 @@ import com.oceanbase.tools.datamocker.model.exception.MockerException;
  * @date 2020-12-11 20：55
  * @since OBMOCKER_snapshot_0.1.0
  */
-public class Range<T extends Comparable> {
+public class Range<T extends Comparable<? super T>> {
     /**
      * Left range of interval
      */
@@ -63,7 +63,7 @@ public class Range<T extends Comparable> {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        Range that = (Range) o;
+        Range<T> that = (Range<T>) o;
         return this.min.compareTo(that.min) == 0 && this.max.compareTo(that.max) == 0;
     }
 

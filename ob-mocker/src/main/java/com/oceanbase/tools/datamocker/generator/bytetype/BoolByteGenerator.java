@@ -1,6 +1,6 @@
 package com.oceanbase.tools.datamocker.generator.bytetype;
 
-import com.oceanbase.tools.datamocker.generator.ByteGeneratorBase;
+import com.oceanbase.tools.datamocker.generator.BaseByteGenerator;
 import com.oceanbase.tools.datamocker.generator.chartype.BoolCharGenerator;
 import com.oceanbase.tools.datamocker.model.enums.CharCaseOption;
 
@@ -11,7 +11,7 @@ import com.oceanbase.tools.datamocker.model.enums.CharCaseOption;
  * @date 2020-12-16 23:01
  * @since OBMOCKER_snapshot_0.1.0
  */
-public class BoolByteGenerator extends ByteGeneratorBase {
+public class BoolByteGenerator extends BaseByteGenerator {
     private final BoolCharGenerator customGen;
 
     public BoolByteGenerator(CharCaseOption caseType, String fixBool) {

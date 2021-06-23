@@ -7,7 +7,8 @@ import java.util.concurrent.TimeUnit;
 import com.oceanbase.tools.datamocker.datatype.AbstractDateDataType;
 import com.oceanbase.tools.datamocker.datatype.DataTypeFactory;
 import com.oceanbase.tools.datamocker.generator.BaseGenerator;
-import com.oceanbase.tools.datamocker.generator.DateGeneratorBase;
+import com.oceanbase.tools.datamocker.generator.BaseDateGenerator;
+import com.oceanbase.tools.datamocker.model.config.model.DateDataTypeConfig;
 import com.oceanbase.tools.datamocker.model.enums.ObModeType;
 import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
@@ -33,7 +34,7 @@ public class OracleTimestampType extends AbstractDateDataType<Timestamp> {
      */
     private final int scale;
 
-    public OracleTimestampType(DateGeneratorBase<Timestamp> generator, int scale, Timestamp defaultValue,
+    public OracleTimestampType(BaseDateGenerator<Timestamp> generator, int scale, Timestamp defaultValue,
             Boolean allowNull) {
         super(generator, ObModeType.OB_ORACLE, defaultValue, allowNull);
         if (scale < 0 || scale > 9) {
@@ -54,26 +55,22 @@ public class OracleTimestampType extends AbstractDateDataType<Timestamp> {
         }
     }
 
-    public OracleTimestampType(DateGeneratorBase<Timestamp> generator, Timestamp defaultValue, Boolean allowNull) {
+    public OracleTimestampType(BaseDateGenerator<Timestamp> generator, Timestamp defaultValue, Boolean allowNull) {
         super(generator, ObModeType.OB_ORACLE, defaultValue, allowNull);
         this.scale = 3;
         generator.setScale(this.scale);
-        if (scale > 3) {
-            generator.setTimeUnit(TimeUnit.MILLISECONDS);
-        } else {
-            generator.setTimeUnit(TimeUnit.SECONDS);
-        }
+        generator.setTimeUnit(TimeUnit.SECONDS);
         oracleDateFormate = String.format("YYYY-MM-DD HH24:MI:SS.FF%d", scale);
     }
 
     @Override
     public void bind(BaseGenerator<Timestamp, Timestamp> generator) {
         super.bind(generator);
-        ((DateGeneratorBase) generator).setScale(scale);
+        ((BaseDateGenerator<Timestamp>) generator).setScale(scale);
         if (scale > 3) {
-            ((DateGeneratorBase) generator).setTimeUnit(TimeUnit.MILLISECONDS);
+            ((BaseDateGenerator<Timestamp>) generator).setTimeUnit(TimeUnit.MILLISECONDS);
         } else {
-            ((DateGeneratorBase) generator).setTimeUnit(TimeUnit.SECONDS);
+            ((BaseDateGenerator<Timestamp>) generator).setTimeUnit(TimeUnit.SECONDS);
         }
     }
 
@@ -90,7 +87,7 @@ public class OracleTimestampType extends AbstractDateDataType<Timestamp> {
     }
 
     @Override
-    public DataTypeFactory getFactory() {
+    public DataTypeFactory<OracleTimestampType, DateDataTypeConfig, BaseDateGenerator<Timestamp>> getFactory() {
         return DataTypeFactory.getInstance("OB_ORACLE_TIMESTAMP");
     }
 

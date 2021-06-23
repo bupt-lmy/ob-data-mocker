@@ -3,7 +3,7 @@ package com.oceanbase.tools.datamocker.generator.digit;
 import java.math.BigDecimal;
 import java.util.concurrent.locks.ReentrantLock;
 
-import com.oceanbase.tools.datamocker.generator.DigitalGeneratorBase;
+import com.oceanbase.tools.datamocker.generator.BaseDigitalGenerator;
 
 /**
  * Obey a uniformly distributed data generator
@@ -12,7 +12,7 @@ import com.oceanbase.tools.datamocker.generator.DigitalGeneratorBase;
  * @date 2020-12-10 17:58
  * @since OB_MOCK_snapshot_0.1.0
  */
-public class UniformGenerator extends DigitalGeneratorBase<BigDecimal> {
+public class UniformGenerator extends BaseDigitalGenerator<BigDecimal> {
     /**
      * Multiplier factor
      */

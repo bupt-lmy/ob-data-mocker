@@ -2,7 +2,8 @@ package com.oceanbase.tools.datamocker.datatype.oracle;
 
 import com.oceanbase.tools.datamocker.datatype.AbstractCharDataType;
 import com.oceanbase.tools.datamocker.datatype.DataTypeFactory;
-import com.oceanbase.tools.datamocker.generator.CharGeneratorBase;
+import com.oceanbase.tools.datamocker.generator.BaseCharGenerator;
+import com.oceanbase.tools.datamocker.model.config.model.CharDataTypeConfig;
 import com.oceanbase.tools.datamocker.model.enums.CharsetType;
 import com.oceanbase.tools.datamocker.model.enums.ObModeType;
 
@@ -23,7 +24,7 @@ public class OracleNvarCharType extends AbstractCharDataType {
      * @param allowNull Whether to allow null values
      * @param defaultValue default value for data type
      */
-    public OracleNvarCharType(CharGeneratorBase generator, Integer length, String defaultValue, Boolean allowNull,
+    public OracleNvarCharType(BaseCharGenerator generator, Integer length, String defaultValue, Boolean allowNull,
             CharsetType charsetType) {
         super(generator, ObModeType.OB_ORACLE, charsetType, length, defaultValue, allowNull, Boolean.TRUE);
     }
@@ -40,7 +41,7 @@ public class OracleNvarCharType extends AbstractCharDataType {
     }
 
     @Override
-    public DataTypeFactory getFactory() {
+    public DataTypeFactory<OracleNvarCharType, CharDataTypeConfig, BaseCharGenerator> getFactory() {
         return DataTypeFactory.getInstance("OB_ORACLE_NVARCHAR");
     }
 

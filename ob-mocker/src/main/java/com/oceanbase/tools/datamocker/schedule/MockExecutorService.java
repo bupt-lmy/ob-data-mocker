@@ -75,7 +75,7 @@ public class MockExecutorService {
                     "Callable or context for executor service can not be null");
         }
         if (!context.isShutdown() && !isShutdown()) {
-            Future future = executor.submit(newTaskFor(task));
+            Future<?> future = executor.submit(newTaskFor(task));
             context.appendHandle(future);
         }
     }
@@ -99,7 +99,7 @@ public class MockExecutorService {
             throw new MockerException(MockerError.PARAMETER_ERROR, "Callable for executor service can not be null");
         }
         RunnableFuture<V> f = newTaskFor(task, result);
-        Future future = executor.submit(f);
+        Future<?> future = executor.submit(f);
         context.appendHandle(future);
     }
 

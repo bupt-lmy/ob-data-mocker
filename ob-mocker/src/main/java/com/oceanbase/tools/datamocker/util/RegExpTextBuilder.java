@@ -38,7 +38,7 @@ public class RegExpTextBuilder {
      * Traversing automata may encounter multiple paths, and use a random object to increase the
      * diversity of generated data
      */
-    private Random random;
+    private final Random random;
 
     /**
      * Constructor, used to construct a regular expression tool class

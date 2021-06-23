@@ -1,6 +1,8 @@
 package com.oceanbase.tools.datamocker.core.read;
 
 import com.oceanbase.tools.datamocker.datatype.AbstractDataType;
+import com.oceanbase.tools.datamocker.model.mock.MockColumnData;
+import com.oceanbase.tools.datamocker.model.mock.MockRowData;
 import com.oceanbase.tools.datamocker.util.Pair;
 
 /**
@@ -17,7 +19,7 @@ public abstract class AbstractMockReader<T> {
      * @return data which is read
      * @throws Exception exception will be thrown when error occured
      */
-    abstract public Pair<String, Pair<AbstractDataType, T>> read() throws Exception;
+    abstract public MockColumnData<T> read() throws Exception;
 
     /**
      * Get the groupId of the primitive. The primitive is an atomic part of an overall operation, so a

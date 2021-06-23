@@ -25,6 +25,7 @@ import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.Validate;
 
 /**
  * A data connection pool dedicated to mock data is used to encapsulate database connections. Unlike
@@ -88,7 +89,7 @@ public class MockerDataSource implements DataSource {
         validate(config);
         this.config = config;
         this.connectParams = connectParam;
-        this.jdbcUrl = genJDBCUrl();
+        this.jdbcUrl = generateJdbcUrl();
         initPool();
     }
 
@@ -116,7 +117,7 @@ public class MockerDataSource implements DataSource {
         this.increaseStep = increaseStep;
         this.maxPoolSize = maxPoolSize;
         this.connectParams = connectParam;
-        this.jdbcUrl = genJDBCUrl();
+        this.jdbcUrl = generateJdbcUrl();
         initPool();
     }
 
@@ -141,14 +142,16 @@ public class MockerDataSource implements DataSource {
      * @throws MockerException If the verification fails, an exception is thrown
      */
     private void validate(DataBaseConfig config) {
-        if (StringUtils.isBlank(config.getHost()) || StringUtils.isBlank(config.getUser())
-                || StringUtils.isBlank(config.getPassword())
-                || StringUtils.isBlank(config.getDefaultSchame()) || config.getPort() == null) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "Database's config is illegal");
-        }
+        Validate.notNull(config, "DataBase config can not be null for MockerDataSource#validate");
+        Validate.notEmpty(config.getHost(), "Host can not be blank for MockerDataSource#validate");
+        Validate.notEmpty(config.getUser(), "User can not be blank for MockerDataSource#validate");
+        Validate.notEmpty(config.getPassword(), "Password can not be blank for MockerDataSource#validate");
+        Validate.notEmpty(config.getDefaultSchame(),
+                "DefaultSchemaName can not be blank for MockerDataSource#validate");
+        Validate.notNull(config.getPort(), "Port can not be blank for MockerDataSource#validate");
     }
 
-    private String genJDBCUrl() {
+    private String generateJdbcUrl() {
         StringBuilder buffer = new StringBuilder("jdbc:oceanbase://");
         buffer.append(this.config.getHost())
                 .append(":")
@@ -206,8 +209,7 @@ public class MockerDataSource implements DataSource {
             if (liveConnectionCount < minPoolSize) {
                 int interval = minPoolSize - liveConnectionCount;
                 log.info(
-                        "The number of surviving connections is less than the minimum number of connections, start adding connections, "
-                                + "liveConnectionsCount={}, minPoolSize={}, triggeredThreadName={}",
+                        "The number of surviving connections is less than the minimum number of connections, start adding connections, liveConnectionsCount={}, minPoolSize={}, triggeredThreadName={}",
                         liveConnectionCount, liveConnectionCount + interval, Thread.currentThread().getName());
                 for (int i = 0; i < interval; i++) {
                     this.connectionPool.push(getConnection(username.toString(), this.config.getPassword()));
@@ -215,8 +217,7 @@ public class MockerDataSource implements DataSource {
             } else if (liveConnectionCount > maxPoolSize) {
                 int count = Math.min(liveConnectionCount - maxPoolSize, connectionPool.size());
                 log.info(
-                        "The number of surviving connections is greater than the maximum number of connections, start to reduce the "
-                                + "number of connections, liveConnectionsCount={}, maxPoolSize={}, triggeredThreadName={}",
+                        "The number of surviving connections is greater than the maximum number of connections, start to reduce the number of connections, liveConnectionsCount={}, maxPoolSize={}, triggeredThreadName={}",
                         liveConnectionCount, liveConnectionCount - count, Thread.currentThread().getName());
                 for (int i = 0; i < count; i++) {
                     try {
@@ -267,8 +268,7 @@ public class MockerDataSource implements DataSource {
             }
             this.connectionInUse.add(connection);
             log.debug(
-                    "The thread gets the database connection from the connection pool successfully, threadName={}, currentPoolSize={}, "
-                            + "connectionInUseSize={}",
+                    "The thread gets the database connection from the connection pool successfully, threadName={}, currentPoolSize={}, connectionInUseSize={}",
                     Thread.currentThread().getName(), this.connectionPool.size(), this.connectionInUse.size());
             return connection;
         } catch (InterruptedException e) {
@@ -301,8 +301,7 @@ public class MockerDataSource implements DataSource {
                 }
                 log.info(
                         "Free database connection closed completely, clearConnectionCount={}, failedConnectionCount={}",
-                        clearSize,
-                        count - clearSize);
+                        clearSize, count - clearSize);
                 count = this.connectionInUse.size();
                 log.info("The database connection in use will be closed, connectionInUseCount={}", count);
                 clearSize = 0;

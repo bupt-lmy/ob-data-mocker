@@ -1,6 +1,6 @@
 package com.oceanbase.tools.datamocker.generator.chartype;
 
-import com.oceanbase.tools.datamocker.generator.CharGeneratorBase;
+import com.oceanbase.tools.datamocker.generator.BaseCharGenerator;
 import com.oceanbase.tools.datamocker.model.enums.CharCaseOption;
 import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
@@ -12,7 +12,7 @@ import com.oceanbase.tools.datamocker.model.exception.MockerException;
  * @date 2020-12-16 13:08
  * @since OBMOCKER_snapshot_0.1.0
  */
-public class StepNumGenerator extends CharGeneratorBase {
+public class StepNumGenerator extends BaseCharGenerator {
     /**
      * Random data start value
      */

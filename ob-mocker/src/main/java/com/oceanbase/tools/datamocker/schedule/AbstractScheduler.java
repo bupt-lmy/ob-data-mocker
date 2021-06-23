@@ -44,7 +44,7 @@ public abstract class AbstractScheduler {
     /**
      * Object encapsulation of thread pool
      */
-    private MockExecutorService service;
+    private final MockExecutorService service;
     private final long startTimestamp;
 
     static {
@@ -75,9 +75,9 @@ public abstract class AbstractScheduler {
     public MockContext execute(Dispatcher<TableTaskInfo> dispatcher) {
         log.info("Thread pool's initialization has been done. coreSize={},maxSize={}", CORE_POOL_SIZE, MAX_POOL_SIZE);
         MockContext context =
-                new MockContext(this.service, dispatcher.taskId(), dispatcher.name(), dispatcher.totalCount());
+                new MockContext(this.service, dispatcher.getTaskId(), dispatcher.getName(), dispatcher.totalCount());
         AbstractScheduler thisScheduler = this;
-        int concurrentCount = dispatcher.count();
+        int concurrentCount = dispatcher.getConcurrent();
         // 标识数组，数组长度和tasks的任务队列数量相同，每一位分别用于标示对应任务队列中是否还有任务等待执行
         boolean[] flags = new boolean[concurrentCount];
         for (int i = 0; i < concurrentCount; i++) {
@@ -87,9 +87,9 @@ public abstract class AbstractScheduler {
             MDC.put("mocktask.workspace", context.getTaskId());
             int totalCount = 0;
             int total = 0;
-            Long maxTimeout = 0L;
+            long maxTimeout = 0L;
             Long timeoutSum = 0L;
-            for (int i = 0; i < dispatcher.count(); i++) {
+            for (int i = 0; i < dispatcher.getConcurrent(); i++) {
                 for (int j = 0; j < dispatcher.getTaskSize(i); j++) {
                     TableTaskInfo tableTask = dispatcher.getObj(i, j);
                     Long timeout = tableTask.getMetaData().getTimeoutMilliseconds();
@@ -162,7 +162,7 @@ public abstract class AbstractScheduler {
                             flags[i] = false;
                             // 初始化TaskBean，主要是定义TaskBean的回调函数
                             TableTask mockTaskBean =
-                                    new TableTask(task, columnGroups, dataGroups, dispatcher.name(), i);
+                                    new TableTask(task, columnGroups, dataGroups, dispatcher.getName(), i);
                             mockTaskBean.getContext().setStatus(MockTaskStatus.PENDING);
                             mockTaskBean.init(service, new AbstractCallBack<TableTaskContext>() {
                                 @Override
@@ -233,7 +233,7 @@ public abstract class AbstractScheduler {
      * @throws Exception The release of resources may be abnormal
      */
     private void clearResource(Dispatcher<TableTaskInfo> dispatcher) throws Exception {
-        for (int i = 0; i < dispatcher.count(); i++) {
+        for (int i = 0; i < dispatcher.getConcurrent(); i++) {
             for (int j = 0; j < dispatcher.getTaskSize(i); j++) {
                 TableTaskInfo bean = dispatcher.getObj(i, j);
                 ((MockerDataSource) bean.getDataSource()).clear();
