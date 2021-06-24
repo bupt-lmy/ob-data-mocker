@@ -22,7 +22,7 @@ import javax.sql.DataSource;
 import com.oceanbase.tools.datamocker.MockerTestBase;
 import com.oceanbase.tools.datamocker.core.task.AbstractDataPipe;
 import com.oceanbase.tools.datamocker.core.write.AbstractMockWriter;
-import com.oceanbase.tools.datamocker.core.write.DataBaseWriter;
+import com.oceanbase.tools.datamocker.core.write.JdbcWriter;
 import com.oceanbase.tools.datamocker.core.write.output.MockerDataSource;
 import com.oceanbase.tools.datamocker.datatype.AbstractDataType;
 import com.oceanbase.tools.datamocker.datatype.oracle.OracleNumberType;
@@ -148,27 +148,27 @@ public class DataBasePrimitiveTest extends MockerTestBase {
 
     @Test
     public void testPrimitiveWithoutDataSource() {
-        expect.expectMessage("DataSource can not be null for DataBaseWriter#validate");
+        expect.expectMessage("DataSource can not be null for JdbcWriter#validate");
         expect.expect(IllegalArgumentException.class);
-        AbstractMockWriter primitive = new DataBaseWriter(null, null, null, null);
+        AbstractMockWriter primitive = new JdbcWriter(null, null, null, null);
     }
 
     @Test
     public void testPrimitiveWithoutDatabase() {
-        expect.expectMessage("Database can not be null for DataBaseWriter#validate");
+        expect.expectMessage("Database can not be null for JdbcWriter#validate");
         expect.expect(IllegalArgumentException.class);
-        AbstractMockWriter primitive = new DataBaseWriter(oracleDataSource, ObModeType.OB_ORACLE, null, null);
+        AbstractMockWriter primitive = new JdbcWriter(oracleDataSource, ObModeType.OB_ORACLE, null, null);
     }
 
     @Test
     public void testPrimitiveWithouttable() throws IOException {
-        expect.expectMessage("TableName can not be null for DataBaseWriter#validate");
+        expect.expectMessage("TableName can not be null for JdbcWriter#validate");
         expect.expect(IllegalArgumentException.class);
         ObModeType dialectType = ObModeType.OB_ORACLE;
         DataBaseConfig config = getDBConfig(dialectType);
         assert config != null;
         AbstractMockWriter primitive =
-                new DataBaseWriter(oracleDataSource, dialectType, config.getDefaultSchame(), null);
+                new JdbcWriter(oracleDataSource, dialectType, config.getDefaultSchame(), null);
     }
 
     @Test
@@ -177,8 +177,8 @@ public class DataBasePrimitiveTest extends MockerTestBase {
         ObModeType dialectType = ObModeType.OB_MYSQL;
         DataBaseConfig config = getDBConfig(dialectType);
         assert config != null;
-        DataBaseWriter primitive =
-                new DataBaseWriter(mysqlDataSource, dialectType, config.getDefaultSchame(), tableName);
+        JdbcWriter primitive =
+                new JdbcWriter(mysqlDataSource, dialectType, config.getDefaultSchame(), tableName);
         AbstractDataPipe<MockRowData> pipe = new MockDataPipe(1);
         primitive.register(pipe);
         pipe.write(rows);
@@ -192,8 +192,8 @@ public class DataBasePrimitiveTest extends MockerTestBase {
         ObModeType dialectType = ObModeType.OB_ORACLE;
         DataBaseConfig config = getDBConfig(dialectType);
         assert config != null;
-        DataBaseWriter primitive =
-                new DataBaseWriter(oracleDataSource, dialectType, config.getDefaultSchame(), tableName);
+        JdbcWriter primitive =
+                new JdbcWriter(oracleDataSource, dialectType, config.getDefaultSchame(), tableName);
         AbstractDataPipe<MockRowData> pipe = new MockDataPipe(1);
         primitive.register(pipe);
         pipe.write(rows);

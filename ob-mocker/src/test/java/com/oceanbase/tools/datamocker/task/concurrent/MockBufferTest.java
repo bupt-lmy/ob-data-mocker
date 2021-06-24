@@ -21,7 +21,7 @@ import javax.sql.DataSource;
 import com.oceanbase.tools.datamocker.MockerTestBase;
 import com.oceanbase.tools.datamocker.core.read.ColumnReader;
 import com.oceanbase.tools.datamocker.core.task.AbstractDataPipe;
-import com.oceanbase.tools.datamocker.core.write.DataBaseWriter;
+import com.oceanbase.tools.datamocker.core.write.JdbcWriter;
 import com.oceanbase.tools.datamocker.core.write.SqlScriptWriter;
 import com.oceanbase.tools.datamocker.core.write.output.MockerDataSource;
 import com.oceanbase.tools.datamocker.core.write.output.MockerFile;
@@ -183,7 +183,7 @@ public class MockBufferTest extends MockerTestBase {
         ObModeType dialectType = ObModeType.OB_ORACLE;
         DataBaseConfig config = getDBConfig(dialectType);
         assert config != null;
-        DataBaseWriter primitive = new DataBaseWriter(dataSource, dialectType, config.getDefaultSchame(), "EMP");
+        JdbcWriter primitive = new JdbcWriter(dataSource, dialectType, config.getDefaultSchame(), "EMP");
         primitive.register(dataPipe);
         List<Thread> threads = new ArrayList<>();
         for (int i = 0; i < 10; i++) {

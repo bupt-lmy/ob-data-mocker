@@ -25,7 +25,7 @@ import com.oceanbase.tools.datamocker.constraint.ConstraintFactory;
 import com.oceanbase.tools.datamocker.core.Dispatcher;
 import com.oceanbase.tools.datamocker.core.read.ColumnReader;
 import com.oceanbase.tools.datamocker.core.write.AbstractMockWriter;
-import com.oceanbase.tools.datamocker.core.write.DataBaseWriter;
+import com.oceanbase.tools.datamocker.core.write.JdbcWriter;
 import com.oceanbase.tools.datamocker.core.write.SqlScriptWriter;
 import com.oceanbase.tools.datamocker.core.write.output.MockerDataSource;
 import com.oceanbase.tools.datamocker.core.write.output.MockerFile;
@@ -299,7 +299,7 @@ public abstract class AbstractMockerFactory {
         if (dataSource == null) {
             return dataWriters;
         }
-        DataBaseWriter writer = new DataBaseWriter(dataSource, this.taskConfig.obDialectType(),
+        JdbcWriter writer = new JdbcWriter(dataSource, this.taskConfig.obDialectType(),
                 tableConfig.schemaName(), tableConfig.tableName());
         dataWriters.add(writer);
         Map<String, AbstractDataPipe<MockRowData>> groupId2DataPipe = new HashMap<>();

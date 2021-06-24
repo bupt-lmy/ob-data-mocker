@@ -28,7 +28,7 @@ import org.apache.commons.lang.Validate;
  * @since OBMOCKER_0.1.0_snapshot
  */
 @Slf4j
-public class DataBaseWriter extends AbstractMockWriter {
+public class JdbcWriter extends AbstractMockWriter {
     /**
      * Get a database connection pool, use the connection pool to get database connections for data
      * writing
@@ -57,7 +57,7 @@ public class DataBaseWriter extends AbstractMockWriter {
      * @param database schema or database name
      * @param tableName table name
      */
-    public DataBaseWriter(DataSource dataSource, ObModeType dialectType, String database, String tableName) {
+    public JdbcWriter(DataSource dataSource, ObModeType dialectType, String database, String tableName) {
         validate(dataSource, dialectType, database, tableName);
         this.dataSource = dataSource;
         this.database = database;
@@ -79,14 +79,14 @@ public class DataBaseWriter extends AbstractMockWriter {
      * @param tableName table name
      * @param groupId group Id for Database writer
      */
-    public DataBaseWriter(DataSource dataSource, ObModeType dialectType, String database, String tableName,
+    public JdbcWriter(DataSource dataSource, ObModeType dialectType, String database, String tableName,
             String groupId) {
         validate(dataSource, dialectType, database, tableName);
         this.dataSource = dataSource;
         this.database = database;
         this.tableName = tableName;
         this.dialectType = dialectType;
-        Validate.notNull(groupId, "Group id can not be null for DataBaseWriter");
+        Validate.notNull(groupId, "Group id can not be null for JdbcWriter");
         this.groupId = groupId;
     }
 
@@ -100,9 +100,9 @@ public class DataBaseWriter extends AbstractMockWriter {
      * @throws MockerException An exception is thrown if verification fails
      */
     private void validate(DataSource dataSource, ObModeType dialectType, String database, String tableName) {
-        Validate.notNull(dataSource, "DataSource can not be null for DataBaseWriter#validate");
-        Validate.notNull(database, "Database can not be null for DataBaseWriter#validate");
-        Validate.notNull(tableName, "TableName can not be null for DataBaseWriter#validate");
+        Validate.notNull(dataSource, "DataSource can not be null for JdbcWriter#validate");
+        Validate.notNull(database, "Database can not be null for JdbcWriter#validate");
+        Validate.notNull(tableName, "TableName can not be null for JdbcWriter#validate");
         if (!ObModeType.OB_ORACLE.equals(dialectType) && !ObModeType.OB_MYSQL.equals(dialectType)) {
             throw new MockerException(MockerError.INVALID_OB_MODE);
         }
