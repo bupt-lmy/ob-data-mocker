@@ -2,6 +2,7 @@ package com.oceanbase.tools.datamocker.generator.chartype;
 
 import com.oceanbase.tools.datamocker.generator.BaseCharGenerator;
 import com.oceanbase.tools.datamocker.model.enums.CharCaseOption;
+import com.oceanbase.tools.datamocker.model.enums.CharsetType;
 import com.oceanbase.tools.datamocker.util.RegExpTextBuilder;
 
 /**
@@ -30,7 +31,9 @@ public class RegExpGenerator extends BaseCharGenerator {
     }
 
     @Override
-    public Boolean preCheck(Integer minLength, Integer maxLength) {
+    protected Boolean doPreCheck(Integer minLength, Integer maxLength, CharsetType charsetType,
+            CharCaseOption caseOption,
+            boolean isUnicode) {
         try {
             this.builder.generate(minLength, maxLength);
         } catch (Exception e) {
@@ -40,12 +43,16 @@ public class RegExpGenerator extends BaseCharGenerator {
     }
 
     @Override
-    public String generate(Integer minLength, Integer maxLength) {
-        return caseOption().convert(this.builder.generate(minLength, maxLength));
+    protected String doGenerate(Integer minLength, Integer maxLength, CharsetType charsetType,
+            CharCaseOption caseOption,
+            boolean isUnicode) {
+        return caseOption.convert(this.builder.generate(minLength, maxLength));
     }
 
     @Override
-    public Long count(Integer minLength, Integer maxLength) {
+    protected Long doCount(Integer minLength, Integer maxLength, CharsetType charsetType, CharCaseOption caseOption,
+            boolean isUnicode) {
         return null;
     }
+
 }

@@ -4,6 +4,7 @@ import java.util.Random;
 
 import com.oceanbase.tools.datamocker.generator.BaseCharGenerator;
 import com.oceanbase.tools.datamocker.model.enums.CharCaseOption;
+import com.oceanbase.tools.datamocker.model.enums.CharsetType;
 
 /**
  * Random text data generator
@@ -39,23 +40,28 @@ public class RandomGenerator extends BaseCharGenerator {
      * @return Return check result
      */
     @Override
-    public Boolean preCheck(Integer minLength, Integer maxLength) {
+    protected Boolean doPreCheck(Integer minLength, Integer maxLength, CharsetType charsetType,
+            CharCaseOption caseOption,
+            boolean isUnicode) {
         return true;
     }
 
     @Override
-    public String generate(Integer minLength, Integer maxLength) {
+    protected String doGenerate(Integer minLength, Integer maxLength, CharsetType charsetType,
+            CharCaseOption caseOption,
+            boolean isUnicode) {
         int actualLength = minLength + new Random().nextInt((maxLength - minLength) + 1);
         char[] returnVal = new char[actualLength];
         for (int i = 0; i < actualLength; i++) {
             int index = new Random().nextInt(PRINT_CHAR.length);
             returnVal[i] = PRINT_CHAR[index];
         }
-        return caseOption().convert(new String(returnVal));
+        return caseOption.convert(new String(returnVal));
     }
 
     @Override
-    public Long count(Integer minLength, Integer maxLength) {
+    protected Long doCount(Integer minLength, Integer maxLength, CharsetType charsetType, CharCaseOption caseOption,
+            boolean isUnicode) {
         if (maxLength >= 4) {
             return Long.MAX_VALUE;
         }
@@ -67,4 +73,5 @@ public class RandomGenerator extends BaseCharGenerator {
         returnVal *= Math.pow(PRINT_CHAR.length, minLength);
         return (long) returnVal;
     }
+
 }

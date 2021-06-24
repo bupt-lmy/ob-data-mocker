@@ -2,6 +2,7 @@ package com.oceanbase.tools.datamocker.generator.chartype;
 
 import com.oceanbase.tools.datamocker.generator.BaseCharGenerator;
 import com.oceanbase.tools.datamocker.model.enums.CharCaseOption;
+import com.oceanbase.tools.datamocker.model.enums.CharsetType;
 
 /**
  * Boolean data generator
@@ -26,7 +27,9 @@ public class BoolCharGenerator extends BaseCharGenerator {
     }
 
     @Override
-    public Boolean preCheck(Integer minLength, Integer maxLength) {
+    protected Boolean doPreCheck(Integer minLength, Integer maxLength, CharsetType charsetType,
+            CharCaseOption caseOption,
+            boolean isUnicode) {
         int realLength = "FALSE".length();
         if (realLength >= minLength) {
             return realLength <= maxLength;
@@ -35,9 +38,11 @@ public class BoolCharGenerator extends BaseCharGenerator {
     }
 
     @Override
-    public String generate(Integer minLength, Integer maxLength) {
+    protected String doGenerate(Integer minLength, Integer maxLength, CharsetType charsetType,
+            CharCaseOption caseOption,
+            boolean isUnicode) {
         if (this.fixBool != null) {
-            return caseOption().convert(this.fixBool.toString());
+            return caseOption.convert(this.fixBool.toString());
         }
         if (Math.random() > 0.5) {
             return "TRUE";
@@ -46,10 +51,12 @@ public class BoolCharGenerator extends BaseCharGenerator {
     }
 
     @Override
-    public Long count(Integer minLength, Integer maxLength) {
+    protected Long doCount(Integer minLength, Integer maxLength, CharsetType charsetType, CharCaseOption caseOption,
+            boolean isUnicode) {
         if (this.fixBool == null) {
             return 2L;
         }
         return 1L;
     }
+
 }

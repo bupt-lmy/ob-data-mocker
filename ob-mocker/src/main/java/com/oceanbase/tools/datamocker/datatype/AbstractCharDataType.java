@@ -8,6 +8,7 @@ import com.oceanbase.tools.datamocker.model.enums.CharsetType;
 import com.oceanbase.tools.datamocker.model.enums.ObModeType;
 import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
+import lombok.Getter;
 
 /**
  * Abstract character type, used to describe the data type of the string type in the database
@@ -20,10 +21,12 @@ public abstract class AbstractCharDataType extends AbstractDataType<String, Inte
     /**
      * Whether to store as a unicode string
      */
-    private final Boolean isUnicode;
+    @Getter
+    private final boolean isUnicode;
     /**
      * String encoding format of the database
      */
+    @Getter
     private final CharsetType charsetType;
     /**
      * Field length
@@ -46,7 +49,7 @@ public abstract class AbstractCharDataType extends AbstractDataType<String, Inte
             String defaultValue, Boolean allowNull, Boolean isUnicode) {
         super(generator, dialectType, defaultValue, allowNull);
         validateParam(charsetType, length);
-        generator.setCharset(charsetType);
+        generator.setCharsetType(charsetType);
         generator.setUnicode(isUnicode);
         this.charsetType = charsetType;
         this.length = length;
@@ -120,16 +123,8 @@ public abstract class AbstractCharDataType extends AbstractDataType<String, Inte
     @Override
     public void bind(BaseGenerator<Integer, String> generator) {
         super.bind(generator);
-        ((BaseCharGenerator) generator).setCharset(charset());
+        ((BaseCharGenerator) generator).setCharsetType(getCharsetType());
         ((BaseCharGenerator) generator).setUnicode(isUnicode());
-    }
-
-    public CharsetType charset() {
-        return this.charsetType;
-    }
-
-    public Boolean isUnicode() {
-        return this.isUnicode;
     }
 
     /**
@@ -164,7 +159,7 @@ public abstract class AbstractCharDataType extends AbstractDataType<String, Inte
             if (isUnicode()) {
                 realLength = value.length();
             } else {
-                realLength = value.getBytes(charset().getCharSet()).length;
+                realLength = value.getBytes(getCharsetType().getCharSet()).length;
             }
         } catch (UnsupportedEncodingException e) {
             throw new MockerException(MockerError.UNKNOWN_ERROR, e.getMessage());

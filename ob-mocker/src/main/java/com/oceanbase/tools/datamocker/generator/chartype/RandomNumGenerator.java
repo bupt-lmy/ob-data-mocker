@@ -2,6 +2,7 @@ package com.oceanbase.tools.datamocker.generator.chartype;
 
 import com.oceanbase.tools.datamocker.generator.BaseCharGenerator;
 import com.oceanbase.tools.datamocker.model.enums.CharCaseOption;
+import com.oceanbase.tools.datamocker.model.enums.CharsetType;
 import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
 
@@ -37,7 +38,9 @@ public class RandomNumGenerator extends BaseCharGenerator {
     }
 
     @Override
-    public Boolean preCheck(Integer minLength, Integer maxLength) {
+    protected Boolean doPreCheck(Integer minLength, Integer maxLength, CharsetType charsetType,
+            CharCaseOption caseOption,
+            boolean isUnicode) {
         int min = this.start.toString().length();
         int max = this.end.toString().length();
         if (min > maxLength) {
@@ -56,7 +59,9 @@ public class RandomNumGenerator extends BaseCharGenerator {
     }
 
     @Override
-    public String generate(Integer minLength, Integer maxLength) {
+    protected String doGenerate(Integer minLength, Integer maxLength, CharsetType charsetType,
+            CharCaseOption caseOption,
+            boolean isUnicode) {
         long interval = end - start;
         long result = new Double(Math.random() * interval + start).longValue();
         if (Long.toString(result).length() < minLength || Long.toString(result).length() > maxLength) {
@@ -66,7 +71,8 @@ public class RandomNumGenerator extends BaseCharGenerator {
     }
 
     @Override
-    public Long count(Integer minLength, Integer maxLength) {
+    protected Long doCount(Integer minLength, Integer maxLength, CharsetType charsetType, CharCaseOption caseOption,
+            boolean isUnicode) {
         int min = this.start.toString().length();
         int max = this.end.toString().length();
         if (min < minLength) {
@@ -77,4 +83,5 @@ public class RandomNumGenerator extends BaseCharGenerator {
         }
         return this.end - this.start;
     }
+
 }

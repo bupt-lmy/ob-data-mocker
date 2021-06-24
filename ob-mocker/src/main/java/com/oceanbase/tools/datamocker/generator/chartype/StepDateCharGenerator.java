@@ -7,6 +7,7 @@ import java.util.concurrent.TimeUnit;
 
 import com.oceanbase.tools.datamocker.generator.BaseCharGenerator;
 import com.oceanbase.tools.datamocker.model.enums.CharCaseOption;
+import com.oceanbase.tools.datamocker.model.enums.CharsetType;
 import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
 import org.apache.commons.lang.StringUtils;
@@ -78,7 +79,9 @@ public class StepDateCharGenerator extends BaseCharGenerator {
     }
 
     @Override
-    public Boolean preCheck(Integer minLength, Integer maxLength) {
+    protected Boolean doPreCheck(Integer minLength, Integer maxLength, CharsetType charsetType,
+            CharCaseOption caseOption,
+            boolean isUnicode) {
         int realLength = DATE_FORMAT.length();
         if (realLength >= minLength) {
             return realLength <= maxLength;
@@ -87,12 +90,21 @@ public class StepDateCharGenerator extends BaseCharGenerator {
     }
 
     @Override
-    public String generate(Integer minLength, Integer maxLength) {
+    protected String doGenerate(Integer minLength, Integer maxLength, CharsetType charsetType,
+            CharCaseOption caseOption,
+            boolean isUnicode) {
         SimpleDateFormat formater = new SimpleDateFormat(DATE_FORMAT);
         if (step < 0) {
             return formater.format(new Date(minus()));
         }
         return formater.format(new Date(positive()));
+    }
+
+    @Override
+    protected Long doCount(Integer minLength, Integer maxLength, CharsetType charsetType, CharCaseOption caseOption,
+            boolean isUnicode) {
+        long interval = this.endTime - this.startTime;
+        return interval / Math.abs(step);
     }
 
     /**
@@ -137,9 +149,4 @@ public class StepDateCharGenerator extends BaseCharGenerator {
         return timestamp;
     }
 
-    @Override
-    public Long count(Integer minLength, Integer maxLength) {
-        long interval = this.endTime - this.startTime;
-        return interval / Math.abs(step);
-    }
 }

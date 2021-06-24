@@ -2,6 +2,7 @@ package com.oceanbase.tools.datamocker.generator.chartype;
 
 import com.oceanbase.tools.datamocker.generator.BaseCharGenerator;
 import com.oceanbase.tools.datamocker.model.enums.CharCaseOption;
+import com.oceanbase.tools.datamocker.model.enums.CharsetType;
 import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
 
@@ -48,7 +49,9 @@ public class StepNumGenerator extends BaseCharGenerator {
     }
 
     @Override
-    public Boolean preCheck(Integer minLength, Integer maxLength) {
+    protected Boolean doPreCheck(Integer minLength, Integer maxLength, CharsetType charsetType,
+            CharCaseOption caseOption,
+            boolean isUnicode) {
         int min = this.start.toString().length();
         int max = this.end.toString().length();
         if (min > maxLength) {
@@ -67,11 +70,27 @@ public class StepNumGenerator extends BaseCharGenerator {
     }
 
     @Override
-    public String generate(Integer minLength, Integer maxLength) {
+    protected String doGenerate(Integer minLength, Integer maxLength, CharsetType charsetType,
+            CharCaseOption caseOption,
+            boolean isUnicode) {
         if (step < 0) {
             return Long.toString(minus());
         }
         return Long.toString(positive());
+    }
+
+    @Override
+    protected Long doCount(Integer minLength, Integer maxLength, CharsetType charsetType, CharCaseOption caseOption,
+            boolean isUnicode) {
+        int min = this.start.toString().length();
+        int max = this.end.toString().length();
+        if (min < minLength) {
+            this.start = new Double(Math.pow(10, minLength - 1)).longValue();
+        }
+        if (max > maxLength) {
+            this.end = new Double(Math.pow(10, maxLength) - 1).longValue();
+        }
+        return this.end - this.start;
     }
 
     /**
@@ -116,16 +135,4 @@ public class StepNumGenerator extends BaseCharGenerator {
         return current;
     }
 
-    @Override
-    public Long count(Integer minLength, Integer maxLength) {
-        int min = this.start.toString().length();
-        int max = this.end.toString().length();
-        if (min < minLength) {
-            this.start = new Double(Math.pow(10, minLength - 1)).longValue();
-        }
-        if (max > maxLength) {
-            this.end = new Double(Math.pow(10, maxLength) - 1).longValue();
-        }
-        return this.end - this.start;
-    }
 }

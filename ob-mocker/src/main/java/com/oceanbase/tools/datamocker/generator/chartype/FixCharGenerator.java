@@ -4,6 +4,7 @@ import java.io.UnsupportedEncodingException;
 
 import com.oceanbase.tools.datamocker.generator.BaseCharGenerator;
 import com.oceanbase.tools.datamocker.model.enums.CharCaseOption;
+import com.oceanbase.tools.datamocker.model.enums.CharsetType;
 import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
 
@@ -32,13 +33,15 @@ public class FixCharGenerator extends BaseCharGenerator {
     }
 
     @Override
-    public Boolean preCheck(Integer minLength, Integer maxLength) {
-        int realLength = -1;
-        if (unicode()) {
+    protected Boolean doPreCheck(Integer minLength, Integer maxLength, CharsetType charsetType,
+            CharCaseOption caseOption,
+            boolean isUnicode) {
+        int realLength;
+        if (isUnicode) {
             realLength = this.fixText.length();
         } else {
             try {
-                realLength = this.fixText.getBytes(this.charset().getCharSet()).length;
+                realLength = this.fixText.getBytes(charsetType.getCharSet()).length;
             } catch (UnsupportedEncodingException e) {
                 throw new MockerException(MockerError.UNKNOWN_ERROR, e.getMessage());
             }
@@ -50,12 +53,16 @@ public class FixCharGenerator extends BaseCharGenerator {
     }
 
     @Override
-    public String generate(Integer minLength, Integer maxLength) {
-        return caseOption().convert(this.fixText);
+    protected String doGenerate(Integer minLength, Integer maxLength, CharsetType charsetType,
+            CharCaseOption caseOption,
+            boolean isUnicode) {
+        return caseOption.convert(this.fixText);
     }
 
     @Override
-    public Long count(Integer minLength, Integer maxLength) {
+    protected Long doCount(Integer minLength, Integer maxLength, CharsetType charsetType, CharCaseOption caseOption,
+            boolean isUnicode) {
         return 1L;
     }
+
 }
