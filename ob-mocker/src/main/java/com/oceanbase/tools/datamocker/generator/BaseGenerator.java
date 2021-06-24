@@ -2,7 +2,6 @@ package com.oceanbase.tools.datamocker.generator;
 
 import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
-import lombok.Getter;
 import lombok.Setter;
 
 /**
