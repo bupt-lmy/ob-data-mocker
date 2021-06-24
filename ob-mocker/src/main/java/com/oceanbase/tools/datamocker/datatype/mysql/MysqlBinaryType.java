@@ -54,7 +54,7 @@ public class MysqlBinaryType extends AbstractByteDataType {
     }
 
     @Override
-    public String toString(byte[] value) {
+    public String convertToSqlString(byte[] value) {
         if (value == null) {
             return "NULL";
         }

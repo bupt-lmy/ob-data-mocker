@@ -2,6 +2,7 @@ package com.oceanbase.tools.datamocker.datatype.mysql;
 
 import java.sql.Date;
 import java.text.SimpleDateFormat;
+import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
 import com.oceanbase.tools.datamocker.datatype.AbstractDateDataType;
@@ -75,11 +76,12 @@ public class MysqlYearType extends AbstractDateDataType<Date> {
     }
 
     @Override
-    public synchronized String toString(Date value) {
+    public synchronized String convertToSqlString(Date value, TimeZone timeZone) {
         if (value == null) {
             return "NULL";
         }
         SimpleDateFormat dateFormat = new SimpleDateFormat(JAVA_DATE_FORMAT);
         return dateFormat.format(value);
     }
+
 }

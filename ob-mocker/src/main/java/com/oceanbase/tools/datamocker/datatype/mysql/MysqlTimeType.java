@@ -2,6 +2,7 @@ package com.oceanbase.tools.datamocker.datatype.mysql;
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
 import com.oceanbase.tools.datamocker.datatype.AbstractDateDataType;
@@ -89,12 +90,12 @@ public class MysqlTimeType extends AbstractDateDataType<Timestamp> {
     }
 
     @Override
-    public synchronized String toString(Timestamp value) {
+    public synchronized String convertToSqlString(Timestamp value, TimeZone timeZone) {
         if (value == null) {
             return "NULL";
         }
         SimpleDateFormat dateFormat = new SimpleDateFormat(JAVA_DATE_FORMAT);
-        dateFormat.setTimeZone(timeZone());
+        dateFormat.setTimeZone(timeZone);
         if (this.scale != 0) {
             return String.format("'%s.%d'", dateFormat.format(value), value.getNanos());
         } else {

@@ -65,10 +65,6 @@ public abstract class AbstractDateDataType<T extends Comparable<? super T>> exte
         this.timeZone = timeZone;
     }
 
-    protected TimeZone timeZone() {
-        return this.timeZone;
-    }
-
     /**
      * The maximum number of unique digits that can be generated under the constraints of the type
      * itself (such as precision, number of significant digits)
@@ -110,6 +106,13 @@ public abstract class AbstractDateDataType<T extends Comparable<? super T>> exte
         }
         return value;
     }
+
+    @Override
+    public synchronized String convertToSqlString(T value) {
+        return convertToSqlString(value, timeZone);
+    }
+
+    abstract protected String convertToSqlString(T value, TimeZone timeZone);
 
     @Override
     public T toDigest(T value) {

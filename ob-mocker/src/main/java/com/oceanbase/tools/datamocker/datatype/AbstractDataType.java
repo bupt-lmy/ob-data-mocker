@@ -129,7 +129,7 @@ public abstract class AbstractDataType<T, V extends Comparable<? super V>> {
      * @param value Generic type
      * @return Returns the converted string type
      */
-    abstract public String toString(T value);
+    abstract public String convertToSqlString(T value);
 
     /**
      * Generate data summary, used to convert a large data into a data summary to reduce data storage

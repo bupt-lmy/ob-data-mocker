@@ -63,7 +63,7 @@ public class MockColumnData<T> {
      * @return column value string
      */
     public String getColumnValueString() {
-        return this.column.getKey().toString(getColumnValue());
+        return this.column.getKey().convertToSqlString(getColumnValue());
     }
 
     /**
@@ -91,6 +91,6 @@ public class MockColumnData<T> {
      * @return digest string
      */
     public String toDisgestString() {
-        return getColumnDataType().toString(toDigest());
+        return getColumnDataType().convertToSqlString(toDigest());
     }
 }

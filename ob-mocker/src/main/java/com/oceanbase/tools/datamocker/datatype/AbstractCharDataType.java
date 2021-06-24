@@ -178,7 +178,7 @@ public abstract class AbstractCharDataType extends AbstractDataType<String, Inte
      * @return String returned
      */
     @Override
-    public String toString(String value) {
+    public String convertToSqlString(String value) {
         if (value == null) {
             return "NULL";
         }

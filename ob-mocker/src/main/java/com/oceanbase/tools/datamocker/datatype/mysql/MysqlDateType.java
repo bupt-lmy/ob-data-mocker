@@ -71,12 +71,12 @@ public class MysqlDateType extends AbstractDateDataType<Date> {
     }
 
     @Override
-    public synchronized String toString(Date value) {
+    public synchronized String convertToSqlString(Date value, TimeZone timeZone) {
         if (value == null) {
             return "NULL";
         }
         SimpleDateFormat dateFormat = new SimpleDateFormat(JAVA_DATE_FORMAT);
-        dateFormat.setTimeZone(timeZone());
+        dateFormat.setTimeZone(timeZone);
         return String.format("'%s'", dateFormat.format(value));
     }
 }

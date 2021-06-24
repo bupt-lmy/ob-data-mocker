@@ -2,6 +2,7 @@ package com.oceanbase.tools.datamocker.datatype.oracle;
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
 import com.oceanbase.tools.datamocker.datatype.AbstractDateDataType;
@@ -107,12 +108,12 @@ public class OracleTimestampType extends AbstractDateDataType<Timestamp> {
     }
 
     @Override
-    public synchronized String toString(Timestamp value) {
+    public synchronized String convertToSqlString(Timestamp value, TimeZone timeZone) {
         if (value == null) {
             return "NULL";
         }
         SimpleDateFormat dateFormat = new SimpleDateFormat(JAVA_DATE_FORMAT);
-        dateFormat.setTimeZone(timeZone());
+        dateFormat.setTimeZone(timeZone);
         return String.format("to_timestamp('%s.%d', '%s')", dateFormat.format(value), value.getNanos(),
                 oracleDateFormate);
     }

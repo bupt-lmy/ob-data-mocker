@@ -79,7 +79,7 @@ public class OracleNumberType extends AbstractDigitDataType<BigDecimal> {
     }
 
     @Override
-    public String toString(BigDecimal value) {
+    public String convertToSqlString(BigDecimal value) {
         if (value == null) {
             return "NULL";
         }

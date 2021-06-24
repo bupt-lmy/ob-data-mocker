@@ -85,7 +85,7 @@ public class OracleIntervalYMType extends AbstractDataType<INTERVALYM, Integer> 
     }
 
     @Override
-    public String toString(INTERVALYM value) {
+    public String convertToSqlString(INTERVALYM value) {
         if (value == null) {
             return "NULL";
         }
