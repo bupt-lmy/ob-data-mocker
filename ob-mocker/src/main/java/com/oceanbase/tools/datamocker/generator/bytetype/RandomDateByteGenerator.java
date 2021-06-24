@@ -12,12 +12,10 @@ import com.oceanbase.tools.datamocker.model.enums.CharCaseOption;
  * @since OBMOCKER_snapshot_0.1.0
  */
 public class RandomDateByteGenerator extends BaseByteGenerator {
-
     private final RandomDateCharGenerator customGen;
 
     public RandomDateByteGenerator(CharCaseOption caseOption, long startTime, long endTime, String timezone) {
         customGen = new RandomDateCharGenerator(caseOption, startTime, endTime, timezone);
-
     }
 
     @Override

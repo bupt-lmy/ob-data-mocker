@@ -1,6 +1,7 @@
 package com.oceanbase.tools.datamocker.schedule;
 
 import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -56,19 +57,21 @@ public class MockContext {
      *
      * @param taskId Pass in a subtask id
      */
-    protected void removeContext(String taskId) {
+    protected List<TableTaskContext> removeContext(String taskId) {
         if (taskId == null) {
-            return;
+            return Collections.emptyList();
         }
+        List<TableTaskContext> returnVal = new LinkedList<>();
         synchronized (this.tables) {
             int length = this.tables.size();
             for (int i = 0; i < length; i++) {
                 if (taskId.equals(this.tables.get(i).getTableTaskId())) {
-                    this.tables.remove(i);
+                    returnVal.add(this.tables.remove(i));
                     length--;
                 }
             }
         }
+        return returnVal;
     }
 
     /**

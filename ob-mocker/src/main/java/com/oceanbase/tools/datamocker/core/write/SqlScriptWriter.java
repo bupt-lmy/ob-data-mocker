@@ -38,7 +38,7 @@ public class SqlScriptWriter extends AbstractMockWriter {
     /**
      * The dialect mode of OB, the default is oracle mode
      */
-    private ObModeType dialectType;
+    private final ObModeType dialectType;
     private final MockerFile manager;
     private final String groupId;
 
@@ -128,14 +128,14 @@ public class SqlScriptWriter extends AbstractMockWriter {
                 if (ObModeType.OB_ORACLE.equals(this.dialectType)) {
                     sqlBuffer.append(
                             String.format("\"%s\") values (", DbObjectNameUtil.doubleCharToEscape(columnName, '"')));
-                } else if (ObModeType.OB_MYSQL.equals(this.dialectType)) {
+                } else {
                     sqlBuffer.append(
                             String.format("`%s`) values (", DbObjectNameUtil.doubleCharToEscape(columnName, '`')));
                 }
             } else {
                 if (ObModeType.OB_ORACLE.equals(this.dialectType)) {
                     sqlBuffer.append(String.format("\"%s\", ", DbObjectNameUtil.doubleCharToEscape(columnName, '"')));
-                } else if (ObModeType.OB_MYSQL.equals(this.dialectType)) {
+                } else {
                     sqlBuffer.append(String.format("`%s`, ", DbObjectNameUtil.doubleCharToEscape(columnName, '`')));
                 }
             }

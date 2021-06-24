@@ -104,10 +104,9 @@ public class DefaultTableConfig extends AbstractTableConfig {
 
     @Override
     public ScriptType[] scriptType() {
-        ScriptType[] scriptTypes = new ScriptType[] {
+        return new ScriptType[] {
                 ScriptType.SQL
         };
-        return scriptTypes;
     }
 
     @Override

@@ -12,7 +12,6 @@ import com.oceanbase.tools.datamocker.model.enums.CharCaseOption;
  * @since OBMOCKER_snapshot_0.1.0
  */
 public class RandomNumByteGenerator extends BaseByteGenerator {
-
     private final RandomNumGenerator cutomGen;
 
     public RandomNumByteGenerator(CharCaseOption caseOption, Long start, Long end) {

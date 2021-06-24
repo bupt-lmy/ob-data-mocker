@@ -2,6 +2,8 @@ package com.oceanbase.tools.datamocker.generator;
 
 import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Base class data generation object interface, used to define the data generation method
@@ -10,25 +12,16 @@ import com.oceanbase.tools.datamocker.model.exception.MockerException;
  * @date 2020-12-11 21:16
  * @since OBMOCKER_snapshot_0.1.0
  */
+@Setter
 public abstract class BaseGenerator<T extends Comparable<? super T>, V> {
+    /**
+     * Default value for data generator
+     */
     private V defaultValue;
+    /**
+     * Whether allow null
+     */
     private Boolean allowNull = Boolean.FALSE;
-
-    public void setDefaultValue(V defaultValue) {
-        this.defaultValue = defaultValue;
-    }
-
-    public void setAllowNull(Boolean allowNull) {
-        this.allowNull = allowNull;
-    }
-
-    protected Boolean allowNull() {
-        return this.allowNull;
-    }
-
-    protected V defaultValue() {
-        return this.defaultValue;
-    }
 
     /**
      * Pre-checking step, used to check whether the generator can work normally according to the
@@ -73,10 +66,10 @@ public abstract class BaseGenerator<T extends Comparable<? super T>, V> {
         while (true) {
             V returnVal = generate(leftLimit, rightLimit);
             if (returnVal == null) {
-                if (allowNull()) {
+                if (this.allowNull) {
                     return null;
-                } else if (defaultValue() != null) {
-                    return defaultValue();
+                } else if (this.defaultValue != null) {
+                    return this.defaultValue;
                 }
                 if ((loopCount++) >= 100) {
                     throw new MockerException(MockerError.OPERATION_FAILURE, "Data generator get too much null data");

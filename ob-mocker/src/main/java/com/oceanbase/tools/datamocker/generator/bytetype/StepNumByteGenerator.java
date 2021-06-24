@@ -12,7 +12,6 @@ import com.oceanbase.tools.datamocker.model.enums.CharCaseOption;
  * @since OBMOCKER_snapshot_0.1.0
  */
 public class StepNumByteGenerator extends BaseByteGenerator {
-
     private final StepNumGenerator customGen;
 
     public StepNumByteGenerator(CharCaseOption caseOption, Long start, Long end, Long step, Boolean cycle) {

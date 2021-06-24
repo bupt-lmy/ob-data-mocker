@@ -4,6 +4,7 @@ import java.util.Map;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 /**
  * Database connection information configuration package object
@@ -14,6 +15,7 @@ import lombok.Setter;
  */
 @Getter
 @Setter
+@ToString(exclude = {"password"})
 public class DataBaseConfig {
     private String host;
     private Integer port;

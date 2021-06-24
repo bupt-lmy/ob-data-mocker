@@ -14,7 +14,6 @@ import com.oceanbase.tools.datamocker.model.exception.MockerException;
  * @since OBMOCKER_snapshot_0.1.0
  */
 public class FixNumGenerator extends BaseDigitalGenerator<BigDecimal> {
-
     private final BigDecimal fixNum;
 
     public FixNumGenerator(BigDecimal fixNum) {
