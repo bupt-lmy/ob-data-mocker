@@ -1,6 +1,7 @@
 package com.oceanbase.tools.datamocker.datatype.mysql;
 
 import java.sql.Date;
+import java.text.SimpleDateFormat;
 import java.util.concurrent.TimeUnit;
 
 import com.oceanbase.tools.datamocker.datatype.AbstractDateDataType;
@@ -62,14 +63,11 @@ public class MysqlYearType extends AbstractDateDataType<Date> {
         return new Date(5838019200000L);
     }
 
-    // @Override
-    // protected Date preProcessingBeforeOutput(Date value) {
-    // if (value == null) {
-    // return null;
-    // }
-    // SimpleDateFormat dateFormat = new SimpleDateFormat(JAVA_DATE_FORMAT);
-    // return dateFormat.format(value);
-    // }
+    @Override
+    public Object convertFromJavaObjectToJdbcObject(Date javaObject) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat(JAVA_DATE_FORMAT);
+        return dateFormat.format(javaObject);
+    }
 
     @Override
     public String toString() {
@@ -81,6 +79,7 @@ public class MysqlYearType extends AbstractDateDataType<Date> {
         if (value == null) {
             return "NULL";
         }
-        return value.toString();
+        SimpleDateFormat dateFormat = new SimpleDateFormat(JAVA_DATE_FORMAT);
+        return dateFormat.format(value);
     }
 }

@@ -68,7 +68,7 @@ public class UniqueConstraint extends AbstractConstraint {
         if (rows != null && rows.size() != 0) {
             this.judger = new DuplicatedJudger(rows.size() + count);
             for (MockRowData row : rows) {
-                String result = convert(row);
+                String result = convertFromRowDataToStringListData(row);
                 judger.add(result);
             }
         } else {
@@ -83,7 +83,7 @@ public class UniqueConstraint extends AbstractConstraint {
 
     @Override
     protected boolean doCheck(Map<String, Integer> columns, MockRowData value, Boolean markable) {
-        String checkValue = convert(value);
+        String checkValue = convertFromRowDataToStringListData(value);
         if (judger.contains(checkValue)) {
             // log.warn(String.format("value \"%s\" for columns \"%s\" can not pass the unique constraint, will
             // be droped", checkValue,
@@ -104,7 +104,7 @@ public class UniqueConstraint extends AbstractConstraint {
      * @param mockRowData row of data
      * @return string value for this row of data
      */
-    private String convert(MockRowData mockRowData) {
+    private String convertFromRowDataToStringListData(MockRowData mockRowData) {
         String columnList = String.join(",", sortedList);
         return sortedList.stream().map(s -> {
             MockColumnData<?> mockColumn = mockRowData.getMockColumn(s);
@@ -126,13 +126,9 @@ public class UniqueConstraint extends AbstractConstraint {
         if (map == null || map.isEmpty()) {
             return null;
         }
-        List<String> sortedList = new ArrayList<>();
         List<Map.Entry<String, Integer>> entryList = new ArrayList<>(map.entrySet());
         entryList.sort(Entry.comparingByValue());
-        for (Map.Entry<String, Integer> entry : entryList) {
-            sortedList.add(entry.getKey());
-        }
-        return sortedList;
+        return entryList.stream().map(Entry::getKey).collect(Collectors.toList());
     }
 
 }

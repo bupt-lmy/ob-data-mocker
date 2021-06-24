@@ -49,6 +49,15 @@ public class MockColumnData<T> {
     }
 
     /**
+     * Get object for jdbc operation
+     *
+     * @return jdbc object
+     */
+    public Object getJdbcColumnValue() {
+        return this.column.getKey().convertFromJavaObjectToJdbcObject(getColumnValue());
+    }
+
+    /**
      * Get Column Value string
      *
      * @return column value string
@@ -73,7 +82,7 @@ public class MockColumnData<T> {
      */
     public T toDigest() {
         AbstractDataType<T, ? extends Comparable<?>> dataType = getColumnDataType();
-        return dataType.toDigest(dataType.convert(getColumnValue()));
+        return dataType.toDigest(dataType.convertFromJdbcObjectToJavaObject(getColumnValue()));
     }
 
     /**

@@ -144,11 +144,24 @@ public abstract class AbstractDataType<T, V extends Comparable<? super V>> {
      * Type conversion method, used for data compatibility, converts a type of data into the default
      * corresponding type of the data type
      *
-     * @param value original value
+     * @param resultSetObject object value from jdbc, eg. resultSet.getObject(1);
      * @return converted value
      */
-    public T convert(Object value) {
-        return (T) value;
+    public T convertFromJdbcObjectToJavaObject(Object resultSetObject) {
+        return (T) resultSetObject;
+    }
+
+    /**
+     * Sometimes jdbc has different read type <code>getObject</code> and write type
+     * <code>setObject</code> for the same database type (eg. year) (eg. <code>getObject</code> of
+     * <code>year</code> type is <code>Date</code>, and write type <code>setObject</code> is short).
+     * This method is needed for conversion.
+     *
+     * @param javaObject object for java
+     * @return object for jdbc write
+     */
+    public Object convertFromJavaObjectToJdbcObject(T javaObject) {
+        return javaObject;
     }
 
     /**
@@ -271,12 +284,12 @@ public abstract class AbstractDataType<T, V extends Comparable<? super V>> {
      * Convert method to generate a mock column
      *
      * @param columnName column name
-     * @param value column value
+     * @param jdbcObject column value
      * @return mock column
      */
-    public MockColumnData<T> toMockColumn(String columnName, Object value) {
+    public MockColumnData<T> convertFromJdbcObjectToMockColumn(String columnName, Object jdbcObject) {
         Validate.notEmpty(columnName, "ColumnName can not be null for AbstractDataType#toMockColumn");
-        return new MockColumnData<>(columnName, this, this.convert(value));
+        return new MockColumnData<>(columnName, this, this.convertFromJdbcObjectToJavaObject(jdbcObject));
     }
 
 }

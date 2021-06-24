@@ -66,12 +66,8 @@ public class MockerBuffer {
 
     public MockerBuffer(Map<String, AbstractDataType<?, ? extends Comparable<?>>> tableSchema, Long batchSize,
             int concurrent) {
-        if (batchSize < 0 || concurrent < 0) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "Batch size or concurrent size can not be null");
-        }
-        if (tableSchema == null || tableSchema.size() == 0) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "Table schame can not be null or empty");
-        }
+        Validate.isTrue(batchSize > 0, "Batch size can not be negative for MockerBuffer");
+        Validate.notEmpty(tableSchema, "Table schame can not be empty for MockerBuffer");
         this.columnSet = tableSchema.keySet();
         this.rows = new ArrayList<>(batchSize.intValue() * 2);
         this.dataPipes = new ArrayList<>();
@@ -80,12 +76,8 @@ public class MockerBuffer {
     }
 
     public MockerBuffer(Map<String, AbstractDataType<?, ? extends Comparable<?>>> tableSchema, Long batchSize) {
-        if (batchSize < 0) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "Batch size can not be null");
-        }
-        if (tableSchema == null || tableSchema.size() == 0) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "Table schame can not be null or empty");
-        }
+        Validate.isTrue(batchSize > 0, "Batch size can not be negative for MockerBuffer");
+        Validate.notEmpty(tableSchema, "Table schame can not be empty for MockerBuffer");
         this.columnSet = tableSchema.keySet();
         this.rows = new ArrayList<>(batchSize.intValue() * 2);
         this.dataPipes = new ArrayList<>();
@@ -101,12 +93,9 @@ public class MockerBuffer {
      * @throws MockerException Setting a negative value or repeating the setting will cause errors
      */
     public synchronized void setConcurrent(int count) {
+        Validate.isTrue(count >= 0, "Concurrent can not be negative for MockBuffer#setConcurrent");
         if (this.hasSet) {
             throw new MockerException(MockerError.OPERATION_FAILURE, "Concurrent count can not be set repeatedly");
-        }
-        if (count < 0) {
-            throw new MockerException(MockerError.PARAMETER_ERROR,
-                    "Concurrent for mock buffer can not be smaller than zero");
         }
         this.synchronizer = new CyclicBarrier(count, null);
     }
@@ -189,16 +178,12 @@ public class MockerBuffer {
         Validate.notNull(column, "MockColumn can not be null for MockBuffer#writeToCurrentRow");
         String columName = column.getColumnName();
         if (!this.columnSet.contains(columName)) {
-            MockerException e = new MockerException(MockerError.UNKNOWN_COLUMN_NAME, String.format(
+            throw new MockerException(MockerError.UNKNOWN_COLUMN_NAME, String.format(
                     "Custom column \"%s\" is not in column set [%s]", columName, String.join(",", this.columnSet)));
-            log.error("Column error", e);
-            throw e;
         }
         if (this.currentRow.getMockColumn(columName) != null) {
-            MockerException e = new MockerException(MockerError.PARAMETER_ERROR,
+            throw new MockerException(MockerError.PARAMETER_ERROR,
                     String.format("Custom column \"%s\" is duplicate", columName));
-            log.error("Column error", e);
-            throw e;
         }
         this.currentRow.addMockColumn(column);
     }
@@ -213,10 +198,8 @@ public class MockerBuffer {
      */
     private void reload(long timeout, TimeUnit timeUnit) throws Exception {
         if (this.currentRow.columnNum() > this.columnSet.size()) {
-            MockerException e = new MockerException(MockerError.UNKNOWN_COLUMN_NAME,
+            throw new MockerException(MockerError.UNKNOWN_COLUMN_NAME,
                     String.format("There are unknown columns in current column [%s]", this.currentRow.columnNames()));
-            log.error("Column error", e);
-            throw e;
         } else if (this.currentRow.columnNum() == this.columnSet.size()) {
             this.rows.add(this.currentRow);
             if (this.rows.size() >= this.flushThreshold) {

@@ -189,7 +189,7 @@ public class DataBaseWriter extends AbstractMockWriter {
             Object[] innerParam = new Object[columnLength];
             for (int i = 0; i < columnLength; i++) {
                 String columnName = columnList.get(i);
-                innerParam[i] = row.getMockColumn(columnName).getColumnValue();
+                innerParam[i] = row.getMockColumn(columnName).getJdbcColumnValue();
             }
             params[j] = innerParam;
         }

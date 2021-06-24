@@ -432,6 +432,17 @@
           "dataType": null
         },
         {
+          "columnName": "col32",
+          "typeConfig": {
+            "name": "DATE",
+            "columnType": "OB_MYSQL_YEAR",
+            "generator": "RANDOM_DATE_GENERATOR"
+          },
+          "allowNull": false,
+          "defaultValue": null,
+          "dataType": null
+        },
+        {
           "columnName": "col33",
           "typeConfig": {
             "name": "CHAR",

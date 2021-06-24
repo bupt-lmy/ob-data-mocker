@@ -389,7 +389,7 @@ public abstract class ConstraintFactory {
                                     String.format("Data type for column \"%s.%s\" can not be null", table, columnName));
                         }
                         Object value = result.getObject(i + 1);
-                        mockRowData.addMockColumn(dataType.toMockColumn(columnName, value));
+                        mockRowData.addMockColumn(dataType.convertFromJdbcObjectToMockColumn(columnName, value));
                     }
                     constraint.check(mockRowData);
                     constraint.mark(mockRowData);

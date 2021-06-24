@@ -43,7 +43,7 @@ public class MysqlBigIntType extends AbstractDigitDataType<BigDecimal> {
      * @return converted value
      */
     @Override
-    public BigDecimal convert(Object value) {
+    public BigDecimal convertFromJdbcObjectToJavaObject(Object value) {
         if (value == null) {
             return null;
         }

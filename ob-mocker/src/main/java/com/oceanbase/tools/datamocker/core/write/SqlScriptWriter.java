@@ -38,7 +38,7 @@ public class SqlScriptWriter extends AbstractMockWriter {
     /**
      * The dialect mode of OB, the default is oracle mode
      */
-    private ObModeType dialectType = ObModeType.OB_ORACLE;
+    private ObModeType dialectType;
     private final MockerFile manager;
     private final String groupId;
 
