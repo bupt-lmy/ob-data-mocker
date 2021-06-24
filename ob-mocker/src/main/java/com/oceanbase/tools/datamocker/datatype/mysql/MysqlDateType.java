@@ -29,7 +29,7 @@ public class MysqlDateType extends AbstractDateDataType<Date> {
 
     public MysqlDateType(BaseDateGenerator<Date> generator, Date defaultValue, Boolean allowNull) {
         super(generator, ObModeType.OB_MYSQL, defaultValue, allowNull);
-        generator.setTimeUnit(TimeUnit.DAYS);
+        generator.setMinTimeUnit(TimeUnit.DAYS);
     }
 
     public MysqlDateType(TimeZone timeZone, Date defaultValue, Boolean allowNull) {
@@ -43,7 +43,7 @@ public class MysqlDateType extends AbstractDateDataType<Date> {
     @Override
     public void bind(BaseGenerator<Date, Date> generator) {
         super.bind(generator);
-        ((BaseDateGenerator<Date>) generator).setTimeUnit(TimeUnit.DAYS);
+        ((BaseDateGenerator<Date>) generator).setMinTimeUnit(TimeUnit.DAYS);
     }
 
     @Override

@@ -45,16 +45,22 @@ public class StepDateGenerator extends BaseDateGenerator<Date> {
     }
 
     @Override
-    public Boolean preCheck(Date startTime, Date endTime) {
+    protected Boolean doPreCheck(Date startTime, Date endTime, int scale, TimeUnit minTimeUnit) {
         return true;
     }
 
     @Override
-    public Date generate(Date startTime, Date endTime) {
+    protected Date doGenerate(Date startTime, Date endTime, int scale, TimeUnit minTimeUnit) {
         if (step < 0) {
             return new Date(minus(startTime.getTime(), endTime.getTime()));
         }
         return new Date(positive(startTime.getTime(), endTime.getTime()));
+    }
+
+    @Override
+    protected Long doCount(Date startTime, Date endTime, int scale, TimeUnit minTimeUnit) {
+        long interval = endTime.getTime() - startTime.getTime();
+        return interval / Math.abs(step);
     }
 
     /**
@@ -99,9 +105,4 @@ public class StepDateGenerator extends BaseDateGenerator<Date> {
         return timestamp;
     }
 
-    @Override
-    public Long count(Date startTime, Date endTime) {
-        long interval = endTime.getTime() - startTime.getTime();
-        return interval / Math.abs(step);
-    }
 }

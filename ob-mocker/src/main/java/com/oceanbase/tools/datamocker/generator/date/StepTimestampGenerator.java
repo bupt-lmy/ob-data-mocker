@@ -45,12 +45,12 @@ public class StepTimestampGenerator extends BaseDateGenerator<Timestamp> {
     }
 
     @Override
-    public Boolean preCheck(Timestamp startTime, Timestamp endTime) {
+    protected Boolean doPreCheck(Timestamp startTime, Timestamp endTime, int scale, TimeUnit minTimeUnit) {
         return true;
     }
 
     @Override
-    public Timestamp generate(Timestamp startTime, Timestamp endTime) {
+    protected Timestamp doGenerate(Timestamp startTime, Timestamp endTime, int scale, TimeUnit minTimeUnit) {
         Timestamp timestamp;
         if (step < 0) {
             timestamp = new Timestamp(minus(startTime.getTime(), endTime.getTime()));
@@ -59,6 +59,12 @@ public class StepTimestampGenerator extends BaseDateGenerator<Timestamp> {
         }
         timestamp.setNanos(0);
         return timestamp;
+    }
+
+    @Override
+    protected Long doCount(Timestamp startTime, Timestamp endTime, int scale, TimeUnit minTimeUnit) {
+        long interval = endTime.getTime() - startTime.getTime();
+        return interval / Math.abs(step);
     }
 
     /**
@@ -103,9 +109,4 @@ public class StepTimestampGenerator extends BaseDateGenerator<Timestamp> {
         return timestamp;
     }
 
-    @Override
-    public Long count(Timestamp startTime, Timestamp endTime) {
-        long interval = endTime.getTime() - startTime.getTime();
-        return interval / Math.abs(step);
-    }
 }

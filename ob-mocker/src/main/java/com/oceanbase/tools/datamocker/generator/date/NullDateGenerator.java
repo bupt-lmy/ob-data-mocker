@@ -1,6 +1,7 @@
 package com.oceanbase.tools.datamocker.generator.date;
 
 import java.sql.Date;
+import java.util.concurrent.TimeUnit;
 
 import com.oceanbase.tools.datamocker.generator.BaseDateGenerator;
 
@@ -13,17 +14,18 @@ import com.oceanbase.tools.datamocker.generator.BaseDateGenerator;
  */
 public class NullDateGenerator extends BaseDateGenerator<Date> {
     @Override
-    public Boolean preCheck(Date startTime, Date endTime) {
+    protected Boolean doPreCheck(Date startTime, Date endTime, int scale, TimeUnit timeUnit) {
         return true;
     }
 
     @Override
-    public Date generate(Date startTime, Date endTime) {
+    protected Date doGenerate(Date startTime, Date endTime, int scale, TimeUnit timeUnit) {
         return null;
     }
 
     @Override
-    public Long count(Date startTime, Date endTime) {
+    protected Long doCount(Date startTime, Date endTime, int scale, TimeUnit timeUnit) {
         return 1L;
     }
+
 }

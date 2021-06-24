@@ -33,7 +33,7 @@ public class OracleDateType extends AbstractDateDataType<Date> {
 
     public OracleDateType(BaseDateGenerator<Date> generator, Date defaultValue, Boolean allowNull) {
         super(generator, ObModeType.OB_ORACLE, defaultValue, allowNull);
-        generator.setTimeUnit(TimeUnit.SECONDS);
+        generator.setMinTimeUnit(TimeUnit.SECONDS);
     }
 
     public OracleDateType(TimeZone timeZone, Date defaultValue, Boolean allowNull) {
@@ -47,7 +47,7 @@ public class OracleDateType extends AbstractDateDataType<Date> {
     @Override
     public void bind(BaseGenerator<Date, Date> generator) {
         super.bind(generator);
-        ((BaseDateGenerator<Date>) generator).setTimeUnit(TimeUnit.SECONDS);
+        ((BaseDateGenerator<Date>) generator).setMinTimeUnit(TimeUnit.SECONDS);
     }
 
     @Override

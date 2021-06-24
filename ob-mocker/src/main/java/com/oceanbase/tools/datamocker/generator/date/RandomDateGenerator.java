@@ -15,19 +15,20 @@ import com.oceanbase.tools.datamocker.generator.BaseDateGenerator;
 public class RandomDateGenerator extends BaseDateGenerator<Date> {
 
     @Override
-    public Boolean preCheck(Date minValue, Date maxValue) {
+    protected Boolean doPreCheck(Date startTime, Date endTime, int scale, TimeUnit minTimeUnit) {
         return true;
     }
 
     @Override
-    public Date generate(Date minValue, Date maxValue) {
-        long timstamp = (long) (Math.random() * (maxValue.getTime() - minValue.getTime()) + minValue.getTime());
+    protected Date doGenerate(Date startTime, Date endTime, int scale, TimeUnit minTimeUnit) {
+        long timstamp = (long) (Math.random() * (endTime.getTime() - startTime.getTime()) + startTime.getTime());
         return new Date(timstamp);
     }
 
     @Override
-    public Long count(Date minValue, Date maxValue) {
-        long interval = maxValue.getTime() - minValue.getTime();
-        return timeUnit().convert(interval, TimeUnit.MILLISECONDS);
+    protected Long doCount(Date startTime, Date endTime, int scale, TimeUnit minTimeUnit) {
+        long interval = endTime.getTime() - startTime.getTime();
+        return minTimeUnit.convert(interval, TimeUnit.MILLISECONDS);
     }
+
 }

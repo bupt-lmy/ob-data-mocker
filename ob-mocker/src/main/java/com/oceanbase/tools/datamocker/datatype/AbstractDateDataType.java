@@ -6,6 +6,7 @@ import com.oceanbase.tools.datamocker.generator.BaseDateGenerator;
 import com.oceanbase.tools.datamocker.model.enums.ObModeType;
 import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
+import lombok.Setter;
 
 /**
  * Abstract date type, used to represent the date type in the database
@@ -18,6 +19,7 @@ public abstract class AbstractDateDataType<T extends Comparable<? super T>> exte
     /**
      * Time zone, the default is the current time zone
      */
+    @Setter
     private TimeZone timeZone = TimeZone.getDefault();
 
     /**
@@ -60,10 +62,6 @@ public abstract class AbstractDateDataType<T extends Comparable<? super T>> exte
      */
     protected AbstractDateDataType(ObModeType dialectType, TimeZone timeZone, T defaultValue, Boolean allowNull) {
         super(dialectType, defaultValue, allowNull);
-        this.timeZone = timeZone;
-    }
-
-    public void setTimeZone(TimeZone timeZone) {
         this.timeZone = timeZone;
     }
 

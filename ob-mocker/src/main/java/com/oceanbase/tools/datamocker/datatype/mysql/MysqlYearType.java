@@ -20,7 +20,7 @@ import com.oceanbase.tools.datamocker.model.enums.ObModeType;
  */
 public class MysqlYearType extends AbstractDateDataType<Date> {
     /**
-     * The precision of the timestamp type, the precision range is in the range of 0-6
+     * The precision of the year type, the precision range is in the range of 0-4
      */
     private final int scale;
     /**
@@ -31,7 +31,7 @@ public class MysqlYearType extends AbstractDateDataType<Date> {
     public MysqlYearType(BaseDateGenerator<Date> generator, int scale, Date defaultValue, Boolean allowNull) {
         super(generator, ObModeType.OB_MYSQL, defaultValue, allowNull);
         generator.setScale(scale);
-        generator.setTimeUnit(TimeUnit.DAYS);
+        generator.setMinTimeUnit(TimeUnit.DAYS);
         this.scale = scale;
     }
 
@@ -39,7 +39,7 @@ public class MysqlYearType extends AbstractDateDataType<Date> {
     public void bind(BaseGenerator<Date, Date> generator) {
         super.bind(generator);
         ((BaseDateGenerator<Date>) generator).setScale(scale);
-        ((BaseDateGenerator<Date>) generator).setTimeUnit(TimeUnit.DAYS);
+        ((BaseDateGenerator<Date>) generator).setMinTimeUnit(TimeUnit.DAYS);
     }
 
     @Override

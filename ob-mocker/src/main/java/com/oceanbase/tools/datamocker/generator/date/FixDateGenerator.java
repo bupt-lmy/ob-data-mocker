@@ -1,8 +1,10 @@
 package com.oceanbase.tools.datamocker.generator.date;
 
 import java.sql.Date;
+import java.util.concurrent.TimeUnit;
 
 import com.oceanbase.tools.datamocker.generator.BaseDateGenerator;
+import org.apache.commons.lang.Validate;
 
 /**
  * Fixed date data generator
@@ -18,21 +20,23 @@ public class FixDateGenerator extends BaseDateGenerator<Date> {
     private final long timestamp;
 
     public FixDateGenerator(long timestamp) {
+        Validate.isTrue(timestamp > 0, "Timestamp can not be negative for FixDateGenerator");
         this.timestamp = timestamp;
     }
 
     @Override
-    public Boolean preCheck(Date minValue, Date maxValue) {
-        return this.timestamp >= minValue.getTime() && this.timestamp <= maxValue.getTime();
+    protected Boolean doPreCheck(Date startTime, Date endTime, int scale, TimeUnit minTimeUnit) {
+        return this.timestamp >= startTime.getTime() && this.timestamp <= endTime.getTime();
     }
 
     @Override
-    public Date generate(Date minValue, Date maxValue) {
+    protected Date doGenerate(Date startTime, Date endTime, int scale, TimeUnit minTimeUnit) {
         return new Date(this.timestamp);
     }
 
     @Override
-    public Long count(Date minValue, Date maxValue) {
+    protected Long doCount(Date startTime, Date endTime, int scale, TimeUnit minTimeUnit) {
         return 1L;
     }
+
 }

@@ -1,6 +1,7 @@
 package com.oceanbase.tools.datamocker.generator.date;
 
 import java.sql.Timestamp;
+import java.util.concurrent.TimeUnit;
 
 import com.oceanbase.tools.datamocker.generator.BaseDateGenerator;
 
@@ -22,19 +23,19 @@ public class FixTimestampGenerator extends BaseDateGenerator<Timestamp> {
     }
 
     @Override
-    public Boolean preCheck(Timestamp minValue, Timestamp maxValue) {
-        return this.timestamp >= minValue.getTime() && this.timestamp <= maxValue.getTime();
+    protected Boolean doPreCheck(Timestamp startTime, Timestamp endTime, int scale, TimeUnit minTimeUnit) {
+        return this.timestamp >= startTime.getTime() && this.timestamp <= endTime.getTime();
     }
 
     @Override
-    public Timestamp generate(Timestamp minValue, Timestamp maxValue) {
+    protected Timestamp doGenerate(Timestamp startTime, Timestamp endTime, int scale, TimeUnit minTimeUnit) {
         Timestamp timestamp = new Timestamp(this.timestamp);
         timestamp.setNanos(0);
         return timestamp;
     }
 
     @Override
-    public Long count(Timestamp minValue, Timestamp maxValue) {
+    protected Long doCount(Timestamp startTime, Timestamp endTime, int scale, TimeUnit minTimeUnit) {
         return 1L;
     }
 

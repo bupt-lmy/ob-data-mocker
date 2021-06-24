@@ -41,9 +41,9 @@ public class MysqlDateTimeType extends AbstractDateDataType<Timestamp> {
         this.scale = scale;
         generator.setScale(scale);
         if (scale > 3) {
-            generator.setTimeUnit(TimeUnit.MILLISECONDS);
+            generator.setMinTimeUnit(TimeUnit.MILLISECONDS);
         } else {
-            generator.setTimeUnit(TimeUnit.SECONDS);
+            generator.setMinTimeUnit(TimeUnit.SECONDS);
         }
     }
 
@@ -51,7 +51,7 @@ public class MysqlDateTimeType extends AbstractDateDataType<Timestamp> {
         super(generator, ObModeType.OB_MYSQL, defaultValue, allowNull);
         this.scale = 3;
         generator.setScale(this.scale);
-        generator.setTimeUnit(TimeUnit.SECONDS);
+        generator.setMinTimeUnit(TimeUnit.SECONDS);
     }
 
     /**
@@ -64,9 +64,9 @@ public class MysqlDateTimeType extends AbstractDateDataType<Timestamp> {
         super.bind(generator);
         ((BaseDateGenerator<Timestamp>) generator).setScale(scale);
         if (scale > 3) {
-            ((BaseDateGenerator<Timestamp>) generator).setTimeUnit(TimeUnit.MILLISECONDS);
+            ((BaseDateGenerator<Timestamp>) generator).setMinTimeUnit(TimeUnit.MILLISECONDS);
         } else {
-            ((BaseDateGenerator<Timestamp>) generator).setTimeUnit(TimeUnit.SECONDS);
+            ((BaseDateGenerator<Timestamp>) generator).setMinTimeUnit(TimeUnit.SECONDS);
         }
     }
 
