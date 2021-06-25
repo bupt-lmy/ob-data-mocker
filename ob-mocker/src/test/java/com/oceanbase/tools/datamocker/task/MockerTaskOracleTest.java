@@ -34,6 +34,7 @@ import com.oceanbase.tools.datamocker.model.enums.MockTaskStatus;
 import com.oceanbase.tools.datamocker.model.enums.ObModeType;
 import com.oceanbase.tools.datamocker.model.enums.ScriptType;
 import com.oceanbase.tools.datamocker.schedule.MockContext;
+import com.oceanbase.tools.datamocker.util.PrintUtil;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -133,16 +134,17 @@ public class MockerTaskOracleTest extends MockerTestBase {
         Callable<Boolean> task = () -> {
             long start = System.currentTimeMillis();
             while (true) {
-                boolean flag = Boolean.TRUE;
+                boolean flag = true;
                 List<TableTaskContext> contexts = context.getTables();
                 if (contexts.size() == 0) {
                     flag = false;
                 }
                 for (TableTaskContext item : contexts) {
-                    String interval = (System.currentTimeMillis() - start) / 1000 + "s";
-                    System.out.printf("[\"%s\" - \"%s\"] : %s - %s%n", item.getTaskName(), item.getTableTaskId(),
-                            item.getStatus(),
-                            interval);
+                    long interval = System.currentTimeMillis() - start;
+                    System.out.printf("[\"%s\" - \"%s\"] : %s - %s - %.2f %%%n", item.getTaskName(),
+                            item.getTableTaskId(), item.getStatus(), PrintUtil.convertToReadableTimeString(interval,
+                                    TimeUnit.MILLISECONDS, TimeUnit.MINUTES, TimeUnit.SECONDS),
+                            context.getProgress());
                     if (MockTaskStatus.CANCELED.equals(item.getStatus())
                             || MockTaskStatus.FAILED.equals(item.getStatus())) {
                         return false;

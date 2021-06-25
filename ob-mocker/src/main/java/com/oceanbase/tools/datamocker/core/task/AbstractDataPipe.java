@@ -26,7 +26,7 @@ public abstract class AbstractDataPipe<T> {
      * Pipeline state, used to describe the current state of the pipeline. There are two states of on
      * and off, the default is on
      */
-    private Boolean closed = Boolean.FALSE;
+    private boolean closed = false;
     /**
      * The maximum retention amount means the maximum amount of data retained in the data pipeline
      */
@@ -43,10 +43,6 @@ public abstract class AbstractDataPipe<T> {
      * Data pipeline full empty condition control object
      */
     private final Condition notEmptyCondition;
-    /**
-     * Condition wait timeout
-     */
-    private final static long CONDITION_WAIT_TIMEOUTSEC = 5;
 
     public AbstractDataPipe(int maxRetained) {
         if (maxRetained > 0) {
@@ -76,11 +72,10 @@ public abstract class AbstractDataPipe<T> {
         }
         lock.lock();
         try {
-            long maxLoopCount = TimeUnit.SECONDS.convert(timeout, timeUnit) / CONDITION_WAIT_TIMEOUTSEC + 1;
-            while (size() >= maxRetained && (maxLoopCount--) > 0) {
-                notFullCondition.await(CONDITION_WAIT_TIMEOUTSEC, TimeUnit.SECONDS);
+            if (size() >= maxRetained) {
+                notFullCondition.await(timeout, timeUnit);
             }
-            if (maxLoopCount == -1) {
+            if (size() >= maxRetained) {
                 log.warn(
                         "Data pipeline write operation timed out and will return, currentSize={}, maxRetained={}, threadName={}",
                         size(), maxRetained, Thread.currentThread().getName());
@@ -145,11 +140,10 @@ public abstract class AbstractDataPipe<T> {
         }
         lock.lock();
         try {
-            long maxLoopCount = TimeUnit.SECONDS.convert(timeout, timeUnit) / CONDITION_WAIT_TIMEOUTSEC + 1;
-            while (size() <= 0 && (maxLoopCount--) > 0) {
-                notEmptyCondition.await(CONDITION_WAIT_TIMEOUTSEC, TimeUnit.SECONDS);
+            if (size() <= 0) {
+                notEmptyCondition.await(timeout, timeUnit);
             }
-            if (maxLoopCount == -1) {
+            if (size() <= 0) {
                 log.warn(
                         "Data pipeline read operation timed out and will return, currentSize={}, maxRetained={}, threadName={}",
                         size(), maxRetained, Thread.currentThread().getName());
@@ -193,7 +187,7 @@ public abstract class AbstractDataPipe<T> {
      *
      * @return Returns a boolean value of whether to close
      */
-    public Boolean isClosed() {
+    public boolean isClosed() {
         return this.closed;
     }
 
@@ -201,7 +195,7 @@ public abstract class AbstractDataPipe<T> {
      * Method to close the pipeline
      */
     public synchronized void close() {
-        this.closed = Boolean.TRUE;
+        this.closed = true;
     }
 
 }

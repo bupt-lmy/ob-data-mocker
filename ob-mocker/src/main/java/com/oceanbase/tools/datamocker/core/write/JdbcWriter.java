@@ -48,6 +48,10 @@ public class JdbcWriter extends AbstractMockWriter {
      */
     private ObModeType dialectType = ObModeType.OB_ORACLE;
     private final String groupId;
+    /**
+     * The flag bit that marks the existence of the database table
+     */
+    private volatile boolean ifCheck = false;
 
     /**
      * The constructor writes a data source, which is required
@@ -114,7 +118,7 @@ public class JdbcWriter extends AbstractMockWriter {
      *
      * @throws SQLException Throw a table or database does not exist exception
      */
-    private void preCheck() throws Throwable {
+    private void detectExistenceOfTables() throws Throwable {
         String descSql;
         if (ObModeType.OB_ORACLE.equals(this.dialectType)) {
             descSql = String.format("select count(*) from \"%s\".\"%s\"",
@@ -129,7 +133,9 @@ public class JdbcWriter extends AbstractMockWriter {
         }
         SqlUtil.executeQuery(dataSource, descSql, null, new AbstractCallBack<ResultSet>() {
             @Override
-            public void doOnSuccess(ResultSet result) {}
+            public void doOnSuccess(ResultSet result) {
+                ifCheck = true;
+            }
 
             @Override
             public void doOnFailure(ResultSet result, Throwable e) {
@@ -140,7 +146,9 @@ public class JdbcWriter extends AbstractMockWriter {
 
     @Override
     protected Long doWrite(List<MockRowData> rows) throws Throwable {
-        preCheck();
+        if (!ifCheck) {
+            detectExistenceOfTables();
+        }
         MockRowData firstRow = rows.get(0);
         Set<String> columnSet = firstRow.columnNames();
         List<String> columnList = new ArrayList<>(columnSet);

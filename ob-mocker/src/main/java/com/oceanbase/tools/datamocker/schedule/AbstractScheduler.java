@@ -20,6 +20,7 @@ import com.oceanbase.tools.datamocker.core.write.output.MockerFile;
 import com.oceanbase.tools.datamocker.model.enums.MockTaskStatus;
 import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
+import com.oceanbase.tools.datamocker.util.PrintUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.Validate;
 import org.slf4j.MDC;
@@ -217,7 +218,8 @@ public abstract class AbstractScheduler {
             }
             clearResource(dispatcher);
             log.info("Scheduled task execution completed, totalTaskExecuted={}, duration={}", totalCount,
-                    getDuration());
+                    PrintUtil.convertToReadableTimeString(interval(), TimeUnit.MILLISECONDS, TimeUnit.MINUTES,
+                            TimeUnit.SECONDS));
             MDC.clear();
             return totalCount;
         };
@@ -299,24 +301,6 @@ public abstract class AbstractScheduler {
      */
     private long interval() {
         return System.currentTimeMillis() - startTimestamp;
-    }
-
-    /**
-     * Get duration string value
-     *
-     * @return duration string value
-     */
-    private String getDuration() {
-        long minMillis = 60 * 1000L;
-        long hourMills = minMillis * 60;
-        long duration = interval();
-        if (duration < minMillis) {
-            return String.format("%.2f s", duration / 1000.0);
-        } else if (duration < hourMills) {
-            return String.format("%.2f min", duration / 1000.0 / 60);
-        } else {
-            return String.format("%.2f hrs", duration / 1000.0 / 60 / 60);
-        }
     }
 
     /**

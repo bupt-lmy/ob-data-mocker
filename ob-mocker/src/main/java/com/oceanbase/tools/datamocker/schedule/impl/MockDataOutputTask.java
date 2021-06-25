@@ -2,6 +2,7 @@ package com.oceanbase.tools.datamocker.schedule.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.oceanbase.tools.datamocker.core.task.TableTaskContext;
 import com.oceanbase.tools.datamocker.core.task.TableTaskMetaData;
@@ -48,7 +49,8 @@ public class MockDataOutputTask extends AbstractMockTask {
 
     @Override
     public void execute(TableTaskMetaData metaData, TableTaskContext context) throws Exception {
-        log.info("Start the data output task, threadName={}", Thread.currentThread().getName());
+        List<String> groupIds = this.writers.stream().map(AbstractMockWriter::groupId).collect(Collectors.toList());
+        log.info("Start the data output task, groupIds={},threadName={}", groupIds, Thread.currentThread().getName());
         int length = this.writerSymbols.size();
         Throwable exception = null;
         while (!Thread.currentThread().isInterrupted() && this.interval() <= metaData.getTimeoutMilliseconds()) {
