@@ -68,7 +68,9 @@ public class MockDataBeforeTask extends AbstractMockTask {
                             List<AbstractConstraint> customConstraint = factory.make(dataSource,
                                     metaData.getDialectType(), metaData.getSchema(), metaData.getTableName(),
                                     metaData.getTableSchema(), metaData.getTotalCount().intValue());
-                            context.getConstraints().addAll(customConstraint);
+                            if (customConstraint != null) {
+                                context.getConstraints().addAll(customConstraint);
+                            }
                         }
                         log.info("Reload constraint succeeded");
                     }
