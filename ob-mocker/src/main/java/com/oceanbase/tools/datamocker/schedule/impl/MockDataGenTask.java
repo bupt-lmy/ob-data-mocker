@@ -65,8 +65,11 @@ public class MockDataGenTask extends AbstractMockTask {
     @Override
     public void execute(TableTaskMetaData metaData, TableTaskContext context) throws Exception {
         List<String> columnNames = this.readers.stream().map(ColumnReader::getColumnName).collect(Collectors.toList());
-        log.info("Start the data generation task, threadName={},columnName={}", Thread.currentThread().getName(),
-                columnNames);
+        List<String> constraintNames =
+                this.constraints.stream().map(AbstractConstraint::name).collect(Collectors.toList());
+        log.info("Start the data generation task, threadName={},constraintName={},columnName={}",
+                Thread.currentThread().getName(),
+                constraintNames, columnNames);
         long counter = 0;
         // Cyclic idling counter, usually if idling exceeds totalCount and has not written any data, it is
         // considered that the write is abnormal

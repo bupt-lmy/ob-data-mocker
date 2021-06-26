@@ -6,6 +6,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import javax.sql.DataSource;
 
@@ -16,6 +17,7 @@ import com.oceanbase.tools.datamocker.model.exception.MockerException;
 import com.oceanbase.tools.datamocker.model.mock.MockRowData;
 import com.oceanbase.tools.datamocker.util.DbObjectNameUtil;
 import com.oceanbase.tools.datamocker.util.DigestUtil;
+import com.oceanbase.tools.datamocker.util.PrintUtil;
 import com.oceanbase.tools.datamocker.util.SqlUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.Validate;
@@ -202,14 +204,19 @@ public class JdbcWriter extends AbstractMockWriter {
             params[j] = innerParam;
         }
         List<Long> returnVal = new ArrayList<>();
+        long startTimestamp = System.currentTimeMillis();
         SqlUtil.executeBatch(dataSource, sqlBuffer.toString(), params, new AbstractCallBack<int[]>() {
             @Override
             public void doOnSuccess(int[] result) {
+                String elapsedTime = PrintUtil.convertToReadableTimeString(System.currentTimeMillis() - startTimestamp,
+                        TimeUnit.MILLISECONDS, TimeUnit.MINUTES, TimeUnit.MILLISECONDS);
                 if (result != null) {
-                    log.info("JDBC writer writes a batch successfully, effectRow={}", result.length);
+                    log.info("JDBC writer writes a batch successfully, effectRow={}, elapsedTime={}", result.length,
+                            elapsedTime);
                     returnVal.add((long) result.length);
                 } else {
-                    log.warn("JDBC writer has finished writing, but no data has been written");
+                    log.warn("JDBC writer has finished writing, but no data has been written, elapsedTime={}",
+                            elapsedTime);
                 }
             }
 
