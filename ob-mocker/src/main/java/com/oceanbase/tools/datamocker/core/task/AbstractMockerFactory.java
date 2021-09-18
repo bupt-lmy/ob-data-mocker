@@ -94,8 +94,7 @@ public abstract class AbstractMockerFactory {
         if (dbConfig == null) {
             return false;
         }
-        return !StringUtils.isBlank(dbConfig.getUser()) && !StringUtils.isBlank(dbConfig.getTenant())
-                && !StringUtils.isBlank(dbConfig.getHost());
+        return !StringUtils.isBlank(dbConfig.getUser()) && !StringUtils.isBlank(dbConfig.getHost());
     }
 
     /**
