@@ -269,6 +269,7 @@ public class SqlUtil {
                 }
             }
         } catch (Throwable e) {
+            connection.rollback();
             if (callBack != null) {
                 callBack.onFailure(null, e);
             }

@@ -14,10 +14,10 @@ import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
 import com.oceanbase.tools.datamocker.schedule.AbstractMockTask;
 import com.oceanbase.tools.datamocker.schedule.MockExecutorService;
+import com.oceanbase.tools.datamocker.schedule.impl.GenerateDataTask;
 import com.oceanbase.tools.datamocker.schedule.impl.MockDataAfterTask;
 import com.oceanbase.tools.datamocker.schedule.impl.MockDataBeforeTask;
-import com.oceanbase.tools.datamocker.schedule.impl.MockDataGenTask;
-import com.oceanbase.tools.datamocker.schedule.impl.MockDataOutputTask;
+import com.oceanbase.tools.datamocker.schedule.impl.OutputDataTask;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.Validate;
@@ -81,7 +81,7 @@ public class TableTask {
                     }
                 }
             }
-            MockDataGenTask genTask = new MockDataGenTask(taskBean.getMetaData(), this.context, taskBean.getBuffer(),
+            GenerateDataTask genTask = new GenerateDataTask(taskBean.getMetaData(), this.context, taskBean.getBuffer(),
                     tmpList, taskBean.getConstraints());
             businessTasks.add(genTask);
         }
@@ -102,7 +102,7 @@ public class TableTask {
                         "Task size can not be equal to or smaller than zero");
             }
             for (int i = 0; i < entry.getValue(); i++) {
-                MockDataOutputTask outputTask = new MockDataOutputTask(taskBean.getMetaData(), this.context, writers);
+                OutputDataTask outputTask = new OutputDataTask(taskBean.getMetaData(), this.context, writers);
                 businessTasks.add(outputTask);
             }
         }
@@ -129,8 +129,8 @@ public class TableTask {
                         "The Mock data preparation task has been completed, and the business task has begun to run, taskStatus={}",
                         MockTaskStatus.RUNNING);
                 for (AbstractMockTask task : thisTaskBean.businessTasks) {
-                    if (task instanceof MockDataGenTask) {
-                        ((MockDataGenTask) task).reloadConstraints(param.getConstraints());
+                    if (task instanceof GenerateDataTask) {
+                        ((GenerateDataTask) task).reloadConstraints(param.getConstraints());
                     }
                     if (!service.isShutdown() && !context.isShutdown()) {
                         service.submitCallable(task, param);
@@ -151,7 +151,7 @@ public class TableTask {
         });
 
         for (AbstractMockTask businessTask : businessTasks) {
-            if (businessTask instanceof MockDataGenTask) {
+            if (businessTask instanceof GenerateDataTask) {
                 businessTask.bind(new AbstractCallBack<TableTaskContext>() {
                     @Override
                     public void doOnSuccess(TableTaskContext param) throws Throwable {
@@ -166,7 +166,7 @@ public class TableTask {
                         startAfterTask(service, callBack);
                     }
                 });
-            } else if (businessTask instanceof MockDataOutputTask) {
+            } else if (businessTask instanceof OutputDataTask) {
                 businessTask.bind(new AbstractCallBack<TableTaskContext>() {
                     @Override
                     public void doOnSuccess(TableTaskContext param) throws Throwable {

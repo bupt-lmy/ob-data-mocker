@@ -36,7 +36,6 @@ import com.oceanbase.tools.datamocker.model.mock.MockRowData;
 import com.oceanbase.tools.datamocker.task.primitive.DataBasePrimitiveTest;
 import com.oceanbase.tools.datamocker.util.MockDataPipe;
 import com.oceanbase.tools.datamocker.util.MockerBuffer;
-import com.oceanbase.tools.datamocker.util.Pair;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.After;
 import org.junit.Before;
@@ -117,7 +116,7 @@ public class MockBufferTest extends MockerTestBase {
         return new ColumnReader<>(number, columnName, null);
     }
 
-    private void startDataGenerateTask(AbstractDataPipe<MockRowData> dataPipe, int batchSize, int maxCount) {
+    private void startDataGenerateTask(AbstractDataPipe<List<MockRowData>> dataPipe, int batchSize, int maxCount) {
         Map<String, AbstractDataType<?, ? extends Comparable<?>>> map = getTableSchma();
         MockerBuffer buffer = new MockerBuffer(map, (long) batchSize);
         buffer.setConcurrent(2);
@@ -178,7 +177,7 @@ public class MockBufferTest extends MockerTestBase {
 
     @Test
     public void testDataBasePrimitive() throws IOException, InterruptedException {
-        AbstractDataPipe<MockRowData> dataPipe = new MockDataPipe(1);
+        AbstractDataPipe<List<MockRowData>> dataPipe = new MockDataPipe(1);
         startDataGenerateTask(dataPipe, 256, 600);
         ObModeType dialectType = ObModeType.OB_ORACLE;
         DataBaseConfig config = getDBConfig(dialectType);
@@ -190,7 +189,7 @@ public class MockBufferTest extends MockerTestBase {
             Thread writeThread = new Thread(() -> {
                 try {
                     while (true) {
-                        if (primitive.write() == null) {
+                        if (primitive.write() == Long.MIN_VALUE) {
                             break;
                         }
                     }
@@ -208,7 +207,7 @@ public class MockBufferTest extends MockerTestBase {
 
     @Test
     public void testScriptPrimitive() throws InterruptedException {
-        AbstractDataPipe<MockRowData> dataPipe = new MockDataPipe(1);
+        AbstractDataPipe<List<MockRowData>> dataPipe = new MockDataPipe(1);
         startDataGenerateTask(dataPipe, 256, 123);
         SqlScriptWriter primitive = new SqlScriptWriter(manager, ObModeType.OB_ORACLE, "test", "emp");
         primitive.register(dataPipe);
@@ -217,7 +216,7 @@ public class MockBufferTest extends MockerTestBase {
             Thread writeThread = new Thread(() -> {
                 try {
                     while (true) {
-                        if (primitive.write() == null) {
+                        if (primitive.write() == Long.MIN_VALUE) {
                             break;
                         }
                     }

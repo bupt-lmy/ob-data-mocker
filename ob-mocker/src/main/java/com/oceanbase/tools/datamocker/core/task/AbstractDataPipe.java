@@ -1,7 +1,5 @@
 package com.oceanbase.tools.datamocker.core.task;
 
-import java.util.Collections;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
@@ -26,7 +24,7 @@ public abstract class AbstractDataPipe<T> {
      * Pipeline state, used to describe the current state of the pipeline. There are two states of on
      * and off, the default is on
      */
-    private boolean closed = false;
+    private volatile boolean closed = false;
     /**
      * The maximum retention amount means the maximum amount of data retained in the data pipeline
      */
@@ -34,23 +32,24 @@ public abstract class AbstractDataPipe<T> {
     /**
      * Lock object, used to control the number of retained
      */
-    private final Lock lock;
+    private final Lock writeLock = new ReentrantLock();
+    /**
+     * Lock object, used to control the number of retained
+     */
+    private final Lock readLock = new ReentrantLock();
     /**
      * Maximum number of conditional control objects
      */
-    private final Condition notFullCondition;
+    private final Condition notFullCondition = writeLock.newCondition();
     /**
      * Data pipeline full empty condition control object
      */
-    private final Condition notEmptyCondition;
+    private final Condition notEmptyCondition = readLock.newCondition();
 
     public AbstractDataPipe(int maxRetained) {
         if (maxRetained > 0) {
             this.maxRetained = maxRetained;
         }
-        lock = new ReentrantLock();
-        notFullCondition = lock.newCondition();
-        notEmptyCondition = lock.newCondition();
     }
 
     /**
@@ -58,51 +57,60 @@ public abstract class AbstractDataPipe<T> {
      *
      * @param timeout timeout for write operation
      * @param timeUnit unit for timeout
-     * @param row row of data
-     * @throws Exception exception will be thrown when fail to write data
+     * @param element element of data
+     * @throws InterruptedException exception will be thrown when fail to write data
      */
-    public void write(List<T> row, long timeout, TimeUnit timeUnit) throws Exception {
+    public void write(T element, long timeout, TimeUnit timeUnit) throws InterruptedException {
         Validate.isTrue(timeout >= 0, "Timeout for pipeline write can not be negative");
         Validate.notNull(timeUnit, "Timeout can not be null");
+        long methodStart = System.currentTimeMillis();
+        long timeoutMillSecs = TimeUnit.MILLISECONDS.convert(timeout, timeUnit);
         if (isClosed()) {
             throw new MockerException(MockerError.OPERATION_FAILURE, "Data pipe has been closed");
         }
-        if (row == null) {
-            return;
+        if (element == null) {
+            throw new NullPointerException("Input element can not be null");
         }
-        lock.lock();
+        writeLock.lock();
         try {
-            if (size() >= maxRetained) {
-                notFullCondition.await(timeout, timeUnit);
+            long remainingTimeout = timeoutMillSecs - (System.currentTimeMillis() - methodStart);
+            while (size() >= maxRetained && remainingTimeout > 0) {
+                log.debug("Start write waiting, currentSize={}, maxRetained={}, threadName={}", size(), maxRetained,
+                        Thread.currentThread().getName());
+                notFullCondition.await(remainingTimeout, TimeUnit.MILLISECONDS);
+                remainingTimeout = timeoutMillSecs - (System.currentTimeMillis() - methodStart);
+                log.debug("End write waiting, currentSize={}, maxRetained={}, threadName={}", size(), maxRetained,
+                        Thread.currentThread().getName());
             }
-            if (size() >= maxRetained) {
+            if (remainingTimeout <= 0) {
                 log.warn(
                         "Data pipeline write operation timed out and will return, currentSize={}, maxRetained={}, threadName={}",
                         size(), maxRetained, Thread.currentThread().getName());
                 return;
             }
         } finally {
-            lock.unlock();
+            writeLock.unlock();
         }
-        doWrite(row, timeout, timeUnit);
-        lock.lock();
+        long remainingTimeout = timeoutMillSecs - (System.currentTimeMillis() - methodStart);
+        doWrite(element, remainingTimeout, TimeUnit.MILLISECONDS);
+        readLock.lock();
         try {
             if (size() > 0) {
                 notEmptyCondition.signalAll();
             }
         } finally {
-            lock.unlock();
+            readLock.unlock();
         }
     }
 
     /**
      * The write method of the pipeline, by which a record is written to the pipeline
      *
-     * @param row row of data
-     * @exception Exception exception will be thrown when fail to write data
+     * @param element element of data
+     * @exception InterruptedException exception will be thrown when fail to write data
      */
-    public void write(List<T> row) throws Exception {
-        write(row, Long.MAX_VALUE, TimeUnit.SECONDS);
+    public void write(T element) throws InterruptedException {
+        write(element, Long.MAX_VALUE, TimeUnit.SECONDS);
     }
 
     /**
@@ -110,17 +118,17 @@ public abstract class AbstractDataPipe<T> {
      *
      * @param timeout timeout for write operation
      * @param timeUnit unit for timeout
-     * @param row row of data
-     * @throws Exception exception will be thrown when fail to write data
+     * @param element element of data
+     * @throws InterruptedException exception will be thrown when fail to write data
      */
-    abstract public void doWrite(List<T> row, long timeout, TimeUnit timeUnit) throws Exception;
+    abstract protected void doWrite(T element, long timeout, TimeUnit timeUnit) throws InterruptedException;
 
     /**
      * The read method of the pipeline, by which a record is read from the pipeline
      *
      * @return list of data
      */
-    public List<T> read() throws Exception {
+    public T read() throws InterruptedException {
         return read(Long.MAX_VALUE, TimeUnit.SECONDS);
     }
 
@@ -130,39 +138,44 @@ public abstract class AbstractDataPipe<T> {
      * @param timeout timeout for write operation
      * @param timeUnit unit for timeout
      * @return list of data
-     * @exception Exception exception will be thrown when fail to read
+     * @exception InterruptedException exception will be thrown when fail to read
      */
-    public List<T> read(long timeout, TimeUnit timeUnit) throws Exception {
-        Validate.isTrue(timeout >= 0, "Timeout for pipeline write can not be negative");
+    public T read(long timeout, TimeUnit timeUnit) throws InterruptedException {
+        Validate.isTrue(timeout >= 0, "Timeout for pipeline read can not be negative");
         Validate.notNull(timeUnit, "Timeout can not be null");
-        if (isClosed() && size() == 0) {
-            return null;
-        }
-        lock.lock();
+        long methodStart = System.currentTimeMillis();
+        long timeoutMillSecs = TimeUnit.MILLISECONDS.convert(timeout, timeUnit);
+        readLock.lock();
         try {
-            if (size() <= 0) {
-                notEmptyCondition.await(timeout, timeUnit);
+            long remainingTimeout = timeoutMillSecs - (System.currentTimeMillis() - methodStart);
+            while (size() <= 0 && remainingTimeout > 0) {
+                log.debug("Start read waiting, currentSize={}, maxRetained={}, threadName={}", size(), maxRetained,
+                        Thread.currentThread().getName());
+                notEmptyCondition.await(remainingTimeout, TimeUnit.MILLISECONDS);
+                remainingTimeout = timeoutMillSecs - (System.currentTimeMillis() - methodStart);
+                log.debug("End read waiting, currentSize={}, maxRetained={}, threadName={}", size(), maxRetained,
+                        Thread.currentThread().getName());
             }
-            if (size() <= 0) {
+            if (remainingTimeout <= 0) {
                 log.warn(
                         "Data pipeline read operation timed out and will return, currentSize={}, maxRetained={}, threadName={}",
                         size(), maxRetained, Thread.currentThread().getName());
-                return Collections.emptyList();
+                return null;
             }
         } finally {
-            lock.unlock();
+            readLock.unlock();
         }
-        List<T> returnVal = doRead(timeout, timeUnit);
-        lock.lock();
+        long remainingTimeout = timeoutMillSecs - (System.currentTimeMillis() - methodStart);
+        T returnVal = doRead(remainingTimeout, TimeUnit.MILLISECONDS);
+        writeLock.lock();
         try {
             if (size() < maxRetained) {
                 notFullCondition.signalAll();
             }
         } finally {
-            lock.unlock();
+            writeLock.unlock();
         }
         return returnVal;
-
     }
 
     /**
@@ -171,16 +184,16 @@ public abstract class AbstractDataPipe<T> {
      * @param timeout timeout for write operation
      * @param timeUnit unit for timeout
      * @return list of data
-     * @exception Exception exception will be thrown when fail to read
+     * @exception InterruptedException exception will be thrown when fail to read
      */
-    abstract public List<T> doRead(long timeout, TimeUnit timeUnit) throws Exception;
+    abstract protected T doRead(long timeout, TimeUnit timeUnit) throws InterruptedException;
 
     /**
      * Returns the amount of data in the pipeline
      *
      * @return size for data pipe
      */
-    abstract public Long size();
+    abstract public long size();
 
     /**
      * Whether the pipeline is closed

@@ -30,7 +30,7 @@ public class Pair<T, V> {
 
     @Override
     public String toString() {
-        return String.format("Pair(\"%s\", \"%s\")", this.key.toString(), this.value.toString());
+        return String.format("Pair(\"%s\", \"%s\")", this.key, this.value);
     }
 
     @Override

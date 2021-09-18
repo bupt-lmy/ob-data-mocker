@@ -147,7 +147,7 @@ public class JdbcWriter extends AbstractMockWriter {
     }
 
     @Override
-    protected Long doWrite(List<MockRowData> rows) throws Throwable {
+    protected long doWrite(List<MockRowData> rows) throws Throwable {
         if (!ifCheck) {
             detectExistenceOfTables();
         }

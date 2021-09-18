@@ -29,7 +29,7 @@ import org.apache.commons.lang.Validate;
  */
 @Slf4j
 public class MockerBuffer {
-    private Boolean isClose = Boolean.FALSE;
+    private volatile boolean isClose = false;
     /**
      * Thread synchronizer
      */
@@ -37,7 +37,7 @@ public class MockerBuffer {
     /**
      * Indicates whether the thread synchronizer has been set
      */
-    private Boolean hasSet = Boolean.FALSE;
+    private volatile boolean hasSet = false;
     /**
      * Data buffer, buffer a batch of data
      */
@@ -53,7 +53,7 @@ public class MockerBuffer {
     /**
      * Data pipeline collection through which data is sent out
      */
-    private final List<AbstractDataPipe<MockRowData>> dataPipes;
+    private final List<AbstractDataPipe<List<MockRowData>>> dataPipes;
     /**
      * The data flushing threshold, the data in the buffer reaches this value and the value pipeline
      * will be forced to refresh
@@ -115,7 +115,7 @@ public class MockerBuffer {
      *
      * @param dataPipe Data pipeline
      */
-    public void register(AbstractDataPipe<MockRowData> dataPipe) {
+    public void register(AbstractDataPipe<List<MockRowData>> dataPipe) {
         if (dataPipe == null) {
             return;
         }
@@ -135,10 +135,10 @@ public class MockerBuffer {
     public void write(MockRowData mockRowData, long timeout, TimeUnit timeUnit) throws Exception {
         Validate.notNull(timeUnit, "TimeUnit for buffer write can not be null");
         Validate.isTrue(timeout > 0, "Timeout for buffer write can not be negative");
-        if (isClosed()) {
+        if (this.isClose) {
             throw new MockerException(MockerError.OPERATION_FAILURE, "Buffer has been closed");
         }
-        this.hasSet = Boolean.TRUE;
+        this.hasSet = true;
         lock.lock();
         try {
             if (this.currentRow == null) {
@@ -217,19 +217,19 @@ public class MockerBuffer {
      * @throws InterruptedException Blocking methods may be interrupted
      */
     public void close(long timeout, TimeUnit timeUnit) throws Exception {
-        if (isClosed()) {
+        if (this.isClose) {
             return;
         }
         this.synchronizer.await();
         synchronized (this.dataPipes) {
-            if (!isClosed()) {
-                for (AbstractDataPipe<MockRowData> dataPipe : this.dataPipes) {
+            if (!this.isClose) {
+                for (AbstractDataPipe<List<MockRowData>> dataPipe : this.dataPipes) {
                     if (!dataPipe.isClosed()) {
                         dataPipe.write(this.rows, timeout, timeUnit);
                         dataPipe.close();
                     }
                 }
-                this.isClose = Boolean.TRUE;
+                this.isClose = true;
             }
         }
     }
@@ -239,7 +239,7 @@ public class MockerBuffer {
      *
      * @return Return whether to close
      */
-    public Boolean isClosed() {
+    public boolean isClosed() {
         return this.isClose;
     }
 
@@ -252,7 +252,7 @@ public class MockerBuffer {
      */
     public synchronized void flush(long timeout, TimeUnit timeUnit) throws Exception {
         if (dataPipes != null) {
-            for (AbstractDataPipe<MockRowData> dataPipe : dataPipes) {
+            for (AbstractDataPipe<List<MockRowData>> dataPipe : dataPipes) {
                 dataPipe.write(this.rows, timeout, timeUnit);
             }
         }

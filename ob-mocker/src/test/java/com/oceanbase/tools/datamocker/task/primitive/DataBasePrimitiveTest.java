@@ -11,9 +11,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 import java.util.Random;
 
@@ -24,15 +22,12 @@ import com.oceanbase.tools.datamocker.core.task.AbstractDataPipe;
 import com.oceanbase.tools.datamocker.core.write.AbstractMockWriter;
 import com.oceanbase.tools.datamocker.core.write.JdbcWriter;
 import com.oceanbase.tools.datamocker.core.write.output.MockerDataSource;
-import com.oceanbase.tools.datamocker.datatype.AbstractDataType;
 import com.oceanbase.tools.datamocker.datatype.oracle.OracleNumberType;
 import com.oceanbase.tools.datamocker.model.config.model.DataBaseConfig;
 import com.oceanbase.tools.datamocker.model.enums.ObModeType;
-import com.oceanbase.tools.datamocker.model.exception.MockerException;
 import com.oceanbase.tools.datamocker.model.mock.MockColumnData;
 import com.oceanbase.tools.datamocker.model.mock.MockRowData;
 import com.oceanbase.tools.datamocker.util.MockDataPipe;
-import com.oceanbase.tools.datamocker.util.Pair;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -179,7 +174,7 @@ public class DataBasePrimitiveTest extends MockerTestBase {
         assert config != null;
         JdbcWriter primitive =
                 new JdbcWriter(mysqlDataSource, dialectType, config.getDefaultSchame(), tableName);
-        AbstractDataPipe<MockRowData> pipe = new MockDataPipe(1);
+        AbstractDataPipe<List<MockRowData>> pipe = new MockDataPipe(1);
         primitive.register(pipe);
         pipe.write(rows);
         Long count = primitive.write();
@@ -194,7 +189,7 @@ public class DataBasePrimitiveTest extends MockerTestBase {
         assert config != null;
         JdbcWriter primitive =
                 new JdbcWriter(oracleDataSource, dialectType, config.getDefaultSchame(), tableName);
-        AbstractDataPipe<MockRowData> pipe = new MockDataPipe(1);
+        AbstractDataPipe<List<MockRowData>> pipe = new MockDataPipe(1);
         primitive.register(pipe);
         pipe.write(rows);
         Long count = primitive.write();

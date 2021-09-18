@@ -105,7 +105,9 @@ public class MockRowData {
      * @return Return size
      */
     public int columnNum() {
-        return this.rowWithMultiColumn.size();
+        synchronized (this.rowWithMultiColumn) {
+            return this.rowWithMultiColumn.size();
+        }
     }
 
     /**

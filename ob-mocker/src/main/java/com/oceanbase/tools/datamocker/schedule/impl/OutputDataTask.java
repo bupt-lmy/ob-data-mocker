@@ -22,7 +22,7 @@ import lombok.extern.slf4j.Slf4j;
  * @since OBMOCKER_snapshot_0.1.0
  */
 @Slf4j
-public class MockDataOutputTask extends AbstractMockTask {
+public class OutputDataTask extends AbstractMockTask {
     /**
      * Output primitive
      */
@@ -32,7 +32,7 @@ public class MockDataOutputTask extends AbstractMockTask {
      */
     private final List<Boolean> writerSymbols;
 
-    public MockDataOutputTask(TableTaskMetaData metaData, TableTaskContext context, List<AbstractMockWriter> writers) {
+    public OutputDataTask(TableTaskMetaData metaData, TableTaskContext context, List<AbstractMockWriter> writers) {
         super(metaData, context);
         if (writers == null || writers.size() == 0) {
             MockerException e =
@@ -59,8 +59,8 @@ public class MockDataOutputTask extends AbstractMockTask {
                 for (int i = 0; i < length; i++) {
                     if (this.writerSymbols.get(i)) {
                         AbstractMockWriter writer = this.writers.get(i);
-                        Long writeCounter = writer.write();
-                        if (writeCounter == null) {
+                        long writeCounter = writer.write();
+                        if (writeCounter == Long.MIN_VALUE) {
                             this.writerSymbols.set(i, Boolean.FALSE);
                         } else {
                             context.appendWriteInfo(new Pair<>(writer.groupId(), writeCounter));
@@ -82,7 +82,7 @@ public class MockDataOutputTask extends AbstractMockTask {
             }
         }
         if (exception != null) {
-            throw new Exception(exception);
+            throw new MockerException(exception);
         }
         if (this.interval() >= metaData.getTimeoutMilliseconds()) {
             log.warn("Data output task execution timed out, duration={}ms", interval());

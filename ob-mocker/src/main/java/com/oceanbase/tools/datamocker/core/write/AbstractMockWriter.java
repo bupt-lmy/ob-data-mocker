@@ -22,14 +22,14 @@ public abstract class AbstractMockWriter {
     /**
      * Data communication pipeline, obtain data through pipeline
      */
-    private AbstractDataPipe<MockRowData> dataPipe;
+    private AbstractDataPipe<List<MockRowData>> dataPipe;
 
     /**
      * Register a pipeline
      *
      * @param dataPipe Pipe object
      */
-    public void register(AbstractDataPipe<MockRowData> dataPipe) {
+    public void register(AbstractDataPipe<List<MockRowData>> dataPipe) {
         Validate.notNull(dataPipe, "DataPipe can not be null for AbstractMockWriter#register");
         this.dataPipe = dataPipe;
     }
@@ -39,21 +39,24 @@ public abstract class AbstractMockWriter {
      *
      * @return Returns the number of data items written
      */
-    public Long write() throws Throwable {
+    public long write() throws Throwable {
         if (this.dataPipe == null) {
             log.error("Fail to read any data from the data pipe because the data pipe is null");
             throw new MockerException(MockerError.PARAMETER_ERROR, "Data pipe can not be null");
         }
-        List<MockRowData> rows = this.dataPipe.read(10, TimeUnit.SECONDS);
-        if (rows == null) {
-            return null;
-        } else if (rows.size() == 0) {
-            return 0L;
+        if (this.dataPipe.isClosed() && this.dataPipe.size() == 0) {
+            return Long.MIN_VALUE;
         }
-        return doWrite(rows);
+        List<MockRowData> rowData = this.dataPipe.read(10, TimeUnit.SECONDS);
+        if (rowData == null || rowData.isEmpty()) {
+            return 0;
+        }
+        long writeCount = doWrite(rowData);
+        Validate.isTrue(writeCount >= 0, "Write count can not be negative for AbstractMockWriter#write");
+        return writeCount;
     }
 
-    abstract protected Long doWrite(List<MockRowData> rows) throws Throwable;
+    abstract protected long doWrite(List<MockRowData> rows) throws Throwable;
 
     /**
      * Mockwriter is used to output data to a database or script file. There are currently two output

@@ -302,9 +302,9 @@ public abstract class AbstractMockerFactory {
         JdbcWriter writer = new JdbcWriter(dataSource, this.taskConfig.obDialectType(),
                 tableConfig.schemaName(), tableConfig.tableName());
         dataWriters.add(writer);
-        Map<String, AbstractDataPipe<MockRowData>> groupId2DataPipe = new HashMap<>();
+        Map<String, AbstractDataPipe<List<MockRowData>>> groupId2DataPipe = new HashMap<>();
         for (AbstractMockWriter item : dataWriters) {
-            AbstractDataPipe<MockRowData> dataPipe = groupId2DataPipe.computeIfAbsent(item.groupId(),
+            AbstractDataPipe<List<MockRowData>> dataPipe = groupId2DataPipe.computeIfAbsent(item.groupId(),
                     s -> new MockDataPipe(tableConfig.maxRetainedCount()));
             item.register(dataPipe);
             buffer.register(dataPipe);

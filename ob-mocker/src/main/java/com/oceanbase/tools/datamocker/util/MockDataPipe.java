@@ -14,7 +14,7 @@ import com.oceanbase.tools.datamocker.model.mock.MockRowData;
  * @date 2021-01-14 19:38
  * @since OBMOCKER_snapshot_0.1.0
  */
-public class MockDataPipe extends AbstractDataPipe<MockRowData> {
+public class MockDataPipe extends AbstractDataPipe<List<MockRowData>> {
     /**
      * Use blocking queues as the underlying implementation of data pipelines
      */
@@ -25,23 +25,19 @@ public class MockDataPipe extends AbstractDataPipe<MockRowData> {
     }
 
     @Override
-    public void doWrite(List<MockRowData> row, long timout, TimeUnit timeUnit)
-            throws Exception {
+    public void doWrite(List<MockRowData> row, long timout, TimeUnit timeUnit) throws InterruptedException {
         queue.put(row);
     }
 
     @Override
-    public List<MockRowData> doRead(long timout, TimeUnit timeUnit) throws Exception {
-        if (timout >= 0) {
-            return queue.poll(timout, timeUnit);
-        }
-        return queue.take();
+    public List<MockRowData> doRead(long timout, TimeUnit timeUnit) throws InterruptedException {
+        return queue.poll();
     }
 
     @Override
-    public Long size() {
+    public long size() {
         synchronized (this.queue) {
-            return (long) this.queue.size();
+            return this.queue.size();
         }
     }
 }

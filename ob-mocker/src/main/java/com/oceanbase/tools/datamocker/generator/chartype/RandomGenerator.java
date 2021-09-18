@@ -27,6 +27,8 @@ public class RandomGenerator extends BaseCharGenerator {
             'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '{', '|', '}'
     };
 
+    private final Random randomObject = new Random();
+
     public RandomGenerator(CharCaseOption caseType) {
         super(caseType);
     }
@@ -50,10 +52,10 @@ public class RandomGenerator extends BaseCharGenerator {
     protected String doGenerate(Integer minLength, Integer maxLength, CharsetType charsetType,
             CharCaseOption caseOption,
             boolean isUnicode) {
-        int actualLength = minLength + new Random().nextInt((maxLength - minLength) + 1);
+        int actualLength = minLength + randomObject.nextInt((maxLength - minLength) + 1);
         char[] returnVal = new char[actualLength];
         for (int i = 0; i < actualLength; i++) {
-            int index = new Random().nextInt(PRINT_CHAR.length);
+            int index = randomObject.nextInt(PRINT_CHAR.length);
             returnVal[i] = PRINT_CHAR[index];
         }
         return caseOption.convert(new String(returnVal));

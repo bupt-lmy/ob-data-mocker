@@ -2,27 +2,21 @@ package com.oceanbase.tools.datamocker.task.primitive;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 
 import com.oceanbase.tools.datamocker.MockerTestBase;
 import com.oceanbase.tools.datamocker.core.task.AbstractDataPipe;
 import com.oceanbase.tools.datamocker.core.write.SqlScriptWriter;
 import com.oceanbase.tools.datamocker.core.write.output.MockerFile;
-import com.oceanbase.tools.datamocker.datatype.AbstractDataType;
 import com.oceanbase.tools.datamocker.datatype.oracle.OracleNumberType;
 import com.oceanbase.tools.datamocker.model.enums.ObModeType;
 import com.oceanbase.tools.datamocker.model.enums.ScriptType;
-import com.oceanbase.tools.datamocker.model.exception.MockerException;
 import com.oceanbase.tools.datamocker.model.mock.MockColumnData;
 import com.oceanbase.tools.datamocker.model.mock.MockRowData;
 import com.oceanbase.tools.datamocker.util.MockDataPipe;
-import com.oceanbase.tools.datamocker.util.Pair;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -64,7 +58,7 @@ public class SqlScriptPrimitiveTest extends MockerTestBase {
     public void testSqlPrimitive() throws Throwable {
         List<MockRowData> list = getRows(48);
         SqlScriptWriter primitive = new SqlScriptWriter(manager, ObModeType.OB_ORACLE, "test", "emp");
-        AbstractDataPipe<MockRowData> pipe = new MockDataPipe(1);
+        AbstractDataPipe<List<MockRowData>> pipe = new MockDataPipe(1);
         primitive.register(pipe);
         pipe.write(list);
         primitive.write();

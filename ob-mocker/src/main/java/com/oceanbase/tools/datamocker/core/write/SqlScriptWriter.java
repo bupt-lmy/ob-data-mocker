@@ -105,7 +105,7 @@ public class SqlScriptWriter extends AbstractMockWriter {
     }
 
     @Override
-    protected Long doWrite(List<MockRowData> rows) throws IOException {
+    protected long doWrite(List<MockRowData> rows) throws IOException {
         MockRowData firstRow = rows.get(0);
         Set<String> columnSet = firstRow.columnNames();
         List<String> columnList = new ArrayList<>(columnSet);
@@ -162,7 +162,7 @@ public class SqlScriptWriter extends AbstractMockWriter {
         }
         String result = String.join("", sqlList);
         this.manager.write(result.getBytes(), 0, result.getBytes().length, true);
-        return (long) rows.size();
+        return rows.size();
     }
 
     @Override
