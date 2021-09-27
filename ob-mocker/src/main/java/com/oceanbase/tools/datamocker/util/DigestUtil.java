@@ -5,7 +5,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 
 /**
- * 字符串摘要文本生成工具类
+ * String summary text generation tool class
  *
  * @author yh263208
  * @date 2021-01-14 17:06
@@ -13,10 +13,10 @@ import java.util.Base64;
  */
 public class DigestUtil {
     /**
-     * 获取token字符串，获取数据摘要
+     * Get the token string, get the data summary
      *
-     * @param info 输入字符串
-     * @return 返回摘要字符串
+     * @param info Input string
+     * @return Return summary string
      */
     public static String getToken(String info) throws NoSuchAlgorithmException {
         MessageDigest diggest = MessageDigest.getInstance("md5");
@@ -26,10 +26,10 @@ public class DigestUtil {
     }
 
     /**
-     * 获取token字节数组，获取数据摘要
+     * Get token byte array, get data summary
      *
-     * @param info 输入字节数组
-     * @return 返回摘要字节数组
+     * @param info Input byte array
+     * @return Return summary byte array
      */
     public static byte[] getToken(byte[] info) throws NoSuchAlgorithmException {
         MessageDigest diggest = MessageDigest.getInstance("md5");

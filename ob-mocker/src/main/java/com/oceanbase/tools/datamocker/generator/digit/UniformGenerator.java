@@ -3,22 +3,22 @@ package com.oceanbase.tools.datamocker.generator.digit;
 import java.math.BigDecimal;
 import java.util.concurrent.locks.ReentrantLock;
 
-import com.oceanbase.tools.datamocker.generator.DigitalGeneratorBase;
+import com.oceanbase.tools.datamocker.generator.BaseDigitalGenerator;
 
 /**
- * 服从均匀分布的数据生成器
+ * Obey a uniformly distributed data generator
  *
  * @author yh263208
  * @date 2020-12-10 17:58
  * @since OB_MOCK_snapshot_0.1.0
  */
-public class UniformGenerator extends DigitalGeneratorBase<BigDecimal> {
+public class UniformGenerator extends BaseDigitalGenerator<BigDecimal> {
     /**
-     * 乘数因子
+     * Multiplier factor
      */
     private volatile BigDecimal factor = null;
     /**
-     * 乘数因子的写锁
+     * Multiplier factor write lock
      */
     private final ReentrantLock factorWriteLock = new ReentrantLock();
 
@@ -29,12 +29,13 @@ public class UniformGenerator extends DigitalGeneratorBase<BigDecimal> {
     }
 
     /**
-     * 获取乘数因子，设计上乘数因子在一个生成对象中是一个固定的值因此设计了这个获取方法来提高获取效率
-     * 在一个实例内部，乘数因子是一个固定的值
+     * Get the multiplier factor. In design, the multiplier factor is a fixed value in a generated
+     * object. Therefore, this acquisition method is designed to improve the acquisition efficiency. In
+     * an instance, the multiplier factor is a fixed value.
      *
-     * @param maxValue 产生随机数的最大值
-     * @param minValue 产生随机数的最小值
-     * @return 返回乘数因子
+     * @param maxValue Generate the maximum value of a random number
+     * @param minValue Generate the minimum value of a random number
+     * @return Returns the multiplier factor
      */
     private BigDecimal getFactor(BigDecimal minValue, BigDecimal maxValue) {
         if (factor == null) {

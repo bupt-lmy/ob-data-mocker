@@ -1,7 +1,7 @@
 package com.oceanbase.tools.datamocker.util;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -10,16 +10,18 @@ import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.stream.Collectors;
 
 import com.oceanbase.tools.datamocker.core.task.AbstractDataPipe;
 import com.oceanbase.tools.datamocker.datatype.AbstractDataType;
 import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
+import com.oceanbase.tools.datamocker.model.mock.MockColumnData;
+import com.oceanbase.tools.datamocker.model.mock.MockRowData;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.Validate;
 
 /**
- * mock数据的缓冲区，用于缓冲产生出的临时数据
+ * Buffer of mock data, used to buffer temporary data generated
  *
  * @author yh263208
  * @date 2021-01-14 20:48
@@ -27,50 +29,45 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class MockerBuffer {
+    private volatile boolean isClose = false;
     /**
-     * s是否关闭
-     */
-    private Boolean isClose = Boolean.FALSE;
-    /**
-     * 线程同步器
+     * Thread synchronizer
      */
     private CyclicBarrier synchronizer;
     /**
-     * 表示是否已经设定过线程同步器
+     * Indicates whether the thread synchronizer has been set
      */
-    private Boolean hasSet = Boolean.FALSE;
+    private volatile boolean hasSet = false;
     /**
-     * 数据缓冲区，缓冲一个batch的数据
+     * Data buffer, buffer a batch of data
      */
-    private List<Map<String, Pair<AbstractDataType, Object>>> rows;
+    private List<MockRowData> rows;
     /**
-     * mock的表的列名集合
+     * Collection of column names of mock table
      */
-    private Set<String> columnSet;
+    private final Set<String> columnSet;
     /**
-     * 缓冲中的当前行
+     * The current line in the buffer
      */
-    private Map<String, Pair<AbstractDataType, Object>> currentRow;
+    private MockRowData currentRow;
     /**
-     * 数据管道集合，通过该管道集合向外发送数据
+     * Data pipeline collection through which data is sent out
      */
-    private final List<AbstractDataPipe> dataPipes;
+    private final List<AbstractDataPipe<List<MockRowData>>> dataPipes;
     /**
-     * 数据刷写阀值，缓冲中的数据达到该值则会强制刷新值管道
+     * The data flushing threshold, the data in the buffer reaches this value and the value pipeline
+     * will be forced to refresh
      */
     private final Long flushThreshold;
     /**
-     * 锁对象，用于保护currentRow对象
+     * Lock object, used to protect the currentRow object
      */
-    private Lock lock = new ReentrantLock();
+    private final Lock lock = new ReentrantLock();
 
-    public MockerBuffer(Map<String, AbstractDataType> tableSchema, Long batchSize, int concurrent) {
-        if (batchSize < 0 || concurrent < 0) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "batch size or concurrent size can not be null");
-        }
-        if (tableSchema == null || tableSchema.size() == 0) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "table schame can not be null or empty");
-        }
+    public MockerBuffer(Map<String, AbstractDataType<?, ? extends Comparable<?>>> tableSchema, Long batchSize,
+            int concurrent) {
+        Validate.isTrue(batchSize > 0, "Batch size can not be negative for MockerBuffer");
+        Validate.notEmpty(tableSchema, "Table schame can not be empty for MockerBuffer");
         this.columnSet = tableSchema.keySet();
         this.rows = new ArrayList<>(batchSize.intValue() * 2);
         this.dataPipes = new ArrayList<>();
@@ -78,13 +75,9 @@ public class MockerBuffer {
         this.synchronizer = new CyclicBarrier(concurrent, null);
     }
 
-    public MockerBuffer(Map<String, AbstractDataType> tableSchema, Long batchSize) {
-        if (batchSize < 0) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "batch size can not be null");
-        }
-        if (tableSchema == null || tableSchema.size() == 0) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "table schame can not be null or empty");
-        }
+    public MockerBuffer(Map<String, AbstractDataType<?, ? extends Comparable<?>>> tableSchema, Long batchSize) {
+        Validate.isTrue(batchSize > 0, "Batch size can not be negative for MockerBuffer");
+        Validate.notEmpty(tableSchema, "Table schame can not be empty for MockerBuffer");
         this.columnSet = tableSchema.keySet();
         this.rows = new ArrayList<>(batchSize.intValue() * 2);
         this.dataPipes = new ArrayList<>();
@@ -93,36 +86,36 @@ public class MockerBuffer {
     }
 
     /**
-     * 设定缓冲对象的并发数，注意：一旦调用过write方法写数据之后就不能在进行设定，否则会报错
+     * Set the concurrency number of the buffer object. Note: Once the write method is called to write
+     * data, it cannot be set, otherwise an error will be reported
      *
-     * @param count 并发数
-     * @throws MockerException 设定一个负值或者重复设定都会出错
+     * @param count Concurrency
+     * @throws MockerException Setting a negative value or repeating the setting will cause errors
      */
     public synchronized void setConcurrent(int count) {
+        Validate.isTrue(count >= 0, "Concurrent can not be negative for MockBuffer#setConcurrent");
         if (this.hasSet) {
-            throw new MockerException(MockerError.OPERATION_FAILURE, "concurrent count can not be set repeatedly");
-        }
-        if (count < 0) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "concurrent for mock buffer can not be smaller than zero");
+            throw new MockerException(MockerError.OPERATION_FAILURE, "Concurrent count can not be set repeatedly");
         }
         this.synchronizer = new CyclicBarrier(count, null);
     }
 
     /**
-     * 获取缓冲的并发数目
+     * Get the number of concurrent buffers
      *
-     * @return 返回并发数
+     * @return Return the number of concurrent
      */
     public int getParties() {
         return this.synchronizer.getParties();
     }
 
     /**
-     * 注册一个数据管道，该方法可以调用多次向缓冲中注册多个数据管道
+     * Register a data pipeline, this method can be called multiple times to register multiple data
+     * pipelines in the buffer
      *
-     * @param dataPipe 数据管道
+     * @param dataPipe Data pipeline
      */
-    public void register(AbstractDataPipe dataPipe) {
+    public void register(AbstractDataPipe<List<MockRowData>> dataPipe) {
         if (dataPipe == null) {
             return;
         }
@@ -132,26 +125,30 @@ public class MockerBuffer {
     }
 
     /**
-     * 向缓冲中写入列数据集合
+     * Write a row of data to the buffer
      *
-     * @param data 列数据集合
-     * @throws InterruptedException 可能会被中断
+     * @param mockRowData row data
+     * @param timeout Write timeout
+     * @param timeUnit time unit
+     * @throws InterruptedException May be interrupted
      */
-    public void write(Map<String, Pair<AbstractDataType, Object>> data) throws Exception {
-        if (isClosed()) {
-            throw new MockerException(MockerError.OPERATION_FAILURE, "buffer has been closed");
+    public void write(MockRowData mockRowData, long timeout, TimeUnit timeUnit) throws Exception {
+        Validate.notNull(timeUnit, "TimeUnit for buffer write can not be null");
+        Validate.isTrue(timeout > 0, "Timeout for buffer write can not be negative");
+        if (this.isClose) {
+            throw new MockerException(MockerError.OPERATION_FAILURE, "Buffer has been closed");
         }
-        this.hasSet = Boolean.TRUE;
+        this.hasSet = true;
         lock.lock();
         try {
             if (this.currentRow == null) {
-                this.currentRow = new HashMap<>();
+                this.currentRow = new MockRowData();
             }
-            Set<Map.Entry<String, Pair<AbstractDataType, Object>>> entrySet = data.entrySet();
-            for (Map.Entry<String, Pair<AbstractDataType, Object>> entry : entrySet) {
-                writeToCurrentRow(new Pair<>(entry.getKey(), entry.getValue()));
+            List<MockColumnData<?>> mockColumns = mockRowData.getMockColumns();
+            for (MockColumnData<?> mockColumn : mockColumns) {
+                writeToCurrentRow(mockColumn);
             }
-            reload();
+            reload(timeout, timeUnit);
         } finally {
             lock.unlock();
         }
@@ -159,104 +156,107 @@ public class MockerBuffer {
     }
 
     /**
-     * 向缓冲中写入一条列数据
+     * Write a column of data to the buffer
      *
-     * @param column 列数据
-     * @throws InterruptedException 可能会被中断
+     * @param mockColumn Column data
+     * @param timeout Write timeout
+     * @param timeUnit time unit
+     * @throws InterruptedException May be interrupted
      */
-    public void write(Pair<String, Pair<AbstractDataType, Object>> column) throws Exception {
-        Map<String, Pair<AbstractDataType, Object>> inputRow = new HashMap<>();
-        inputRow.putIfAbsent(column.getKey(), column.getValue());
-        write(inputRow);
+    public void write(MockColumnData<?> mockColumn, long timeout, TimeUnit timeUnit) throws Exception {
+        write(new MockRowData(Collections.singletonList(mockColumn)), timeout, timeUnit);
     }
 
     /**
-     * 向当前游标行中写入一列数据，要求该列数据的列名必须在表schema定义的列集合中，否则报错，且当前游标行中未写入该列数据
+     * To write a column of data to the current cursor row, the column name of the column data must be
+     * in the column set defined by the table schema, otherwise an error is reported, and the column
+     * data is not written in the current cursor row
      *
-     * @param column 列数据
+     * @param column Column data
      */
-    private void writeToCurrentRow(Pair<String, Pair<AbstractDataType, Object>> column) {
-        if (!this.columnSet.contains(column.getKey())) {
-            MockerException e = new MockerException(MockerError.UNKNOWN_COLUMN_NAME,
-                    String.format("custom column \"%s\" is not in column set [%s]", column,
-                            this.columnSet.stream().collect(Collectors.joining(","))));
-            log.error("column error", e);
-            throw e;
+    private void writeToCurrentRow(MockColumnData<?> column) {
+        Validate.notNull(column, "MockColumn can not be null for MockBuffer#writeToCurrentRow");
+        String columName = column.getColumnName();
+        if (!this.columnSet.contains(columName)) {
+            throw new MockerException(MockerError.UNKNOWN_COLUMN_NAME, String.format(
+                    "Custom column \"%s\" is not in column set [%s]", columName, String.join(",", this.columnSet)));
         }
-        if (this.currentRow.get(column.getKey()) != null) {
-            MockerException e = new MockerException(MockerError.PARAMETER_ERROR, String.format("custom column \"%s\" is duplicate",
-                    column.getKey()));
-            log.error("column error", e);
-            throw e;
+        if (this.currentRow.getMockColumn(columName) != null) {
+            throw new MockerException(MockerError.PARAMETER_ERROR,
+                    String.format("Custom column \"%s\" is duplicate", columName));
         }
-        this.currentRow.putIfAbsent(column.getKey(), column.getValue());
+        this.currentRow.addMockColumn(column);
     }
 
     /**
-     * 重加载游标行和行数据集合
+     * Reload the cursor row and row data collection
      *
-     * @throws InterruptedException 管道写入数据是一个阻塞操作，可能被中断
+     * @param timeout Write timeout
+     * @param timeUnit time unit
+     * @throws InterruptedException Writing data to the pipeline is a blocking operation and may be
+     *         interrupted
      */
-    private void reload() throws Exception {
-        if (this.currentRow.size() > this.columnSet.size()) {
-            MockerException e = new MockerException(MockerError.UNKNOWN_COLUMN_NAME,
-                    String.format("there are unknown columns in current column [%s]",
-                            this.currentRow.keySet().stream().collect(Collectors.joining(","))));
-            log.error("column error", e);
-            throw e;
-        } else if (this.currentRow.size() == this.columnSet.size()) {
+    private void reload(long timeout, TimeUnit timeUnit) throws Exception {
+        if (this.currentRow.columnNum() > this.columnSet.size()) {
+            throw new MockerException(MockerError.UNKNOWN_COLUMN_NAME,
+                    String.format("There are unknown columns in current column [%s]", this.currentRow.columnNames()));
+        } else if (this.currentRow.columnNum() == this.columnSet.size()) {
             this.rows.add(this.currentRow);
             if (this.rows.size() >= this.flushThreshold) {
-                this.flush();
+                this.flush(timeout, timeUnit);
             }
-            this.currentRow = new HashMap<>();
+            this.currentRow = new MockRowData();
         }
     }
 
     /**
-     * 关闭缓冲对象，该方法是一个阻塞方法如果有多个线程都在引用该缓冲则需要阻塞到最后一个线程调用才能正确关闭缓冲
+     * Close the buffer object, this method is a blocking method. If multiple threads are referencing
+     * the buffer, you need to block until the last thread call to properly close the buffer
      *
-     * @throws BrokenBarrierException 篱笆可能会被冲破
-     * @throws InterruptedException 阻塞方法可能会被中断
+     * @throws BrokenBarrierException The barrier may be broken
+     * @throws InterruptedException Blocking methods may be interrupted
      */
-    public void close() throws Exception {
-        if (isClosed()) {
+    public void close(long timeout, TimeUnit timeUnit) throws Exception {
+        if (this.isClose) {
             return;
         }
         this.synchronizer.await();
         synchronized (this.dataPipes) {
-            if (!isClosed()) {
-                for (AbstractDataPipe dataPipe : this.dataPipes) {
+            if (!this.isClose) {
+                for (AbstractDataPipe<List<MockRowData>> dataPipe : this.dataPipes) {
                     if (!dataPipe.isClosed()) {
-                        dataPipe.write(this.rows);
+                        dataPipe.write(this.rows, timeout, timeUnit);
                         dataPipe.close();
                     }
                 }
-                this.isClose = Boolean.TRUE;
+                this.isClose = true;
             }
         }
     }
 
     /**
-     * 缓冲区是否关闭
+     * Whether the buffer is closed
      *
-     * @return 返回是否关闭
+     * @return Return whether to close
      */
-    public Boolean isClosed() {
+    public boolean isClosed() {
         return this.isClose;
     }
 
     /**
-     * 强制刷新缓存，将行缓存中的数据全部刷新至管道中
+     * Forcibly refresh the cache, flush all the data in the row cache to the pipeline
      *
-     * @throws InterruptedException 管道写入操作是一个阻塞操作，可能被中断
+     * @param timeout Write timeout
+     * @param timeUnit time unit
+     * @throws InterruptedException Pipe write operation is a blocking operation and may be interrupted
      */
-    public synchronized void flush() throws Exception {
+    public synchronized void flush(long timeout, TimeUnit timeUnit) throws Exception {
         if (dataPipes != null) {
-            for (AbstractDataPipe dataPipe : dataPipes) {
-                dataPipe.write(this.rows);
+            for (AbstractDataPipe<List<MockRowData>> dataPipe : dataPipes) {
+                dataPipe.write(this.rows, timeout, timeUnit);
             }
         }
         this.rows = new ArrayList<>(this.flushThreshold.intValue() * 2);
     }
+
 }

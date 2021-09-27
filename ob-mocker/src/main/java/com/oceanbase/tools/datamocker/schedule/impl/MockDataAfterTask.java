@@ -2,90 +2,87 @@ package com.oceanbase.tools.datamocker.schedule.impl;
 
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.sql.DataSource;
 
+import com.oceanbase.tools.datamocker.core.task.AbstractCallBack;
+import com.oceanbase.tools.datamocker.core.task.TableTaskContext;
 import com.oceanbase.tools.datamocker.core.task.TableTaskMetaData;
-import com.oceanbase.tools.datamocker.model.enums.DialectType;
+import com.oceanbase.tools.datamocker.model.enums.ObModeType;
 import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
 import com.oceanbase.tools.datamocker.schedule.AbstractMockTask;
+import com.oceanbase.tools.datamocker.util.DbObjectNameUtil;
 import com.oceanbase.tools.datamocker.util.SqlUtil;
-import com.oceanbase.tools.datamocker.util.SqlUtil.CallBack;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * mock数据业务逻辑执行完毕后的收尾任务，主要是统计当前表的数据量
+ * The finishing task after the execution of mock data business logic is mainly to count the data
+ * volume of the current table
  *
  * @author yh263208
  * @date 2021-01-14 10:54
  * @since OBMOCKER_snapshot_0.1.0
  */
 @Slf4j
-public class MockDataAfterTask extends AbstractMockTask<Long> {
-    /**
-     * 任务执行结果
-     */
-    private Boolean result = false;
+public class MockDataAfterTask extends AbstractMockTask {
     /**
      * 数据源
      */
     private final DataSource dataSource;
 
-    public MockDataAfterTask(TableTaskMetaData metaData, DataSource dataSource) {
-        super(metaData);
+    public MockDataAfterTask(TableTaskMetaData metaData, TableTaskContext context, DataSource dataSource) {
+        super(metaData, context);
         if (dataSource == null) {
-            MockerException e = new MockerException(MockerError.PARAMETER_ERROR, "data source can not be null");
-            log.error("fail to init mock data after task, datasource can not be null", e);
+            MockerException e = new MockerException(MockerError.PARAMETER_ERROR, "Datasource can not be null");
+            log.error(
+                    "The initialization of the mock data destruction task failed because the data source could not be found",
+                    e);
             throw e;
         }
         this.dataSource = dataSource;
     }
 
     @Override
-    protected boolean isTaskSuccess() {
-        return this.result;
-    }
-
-    @Override
-    public Long execute(TableTaskMetaData metaData) {
-        log.info("begin execute mock after task");
+    public void execute(TableTaskMetaData metaData, TableTaskContext context) throws Throwable {
+        log.info("Start the mock data destruction task");
         String sql;
-        if (DialectType.OB_ORACLE.equals(metaData.getDialectType())) {
-            sql = String.format("select count(*) from %s.\"%s\"; ", metaData.getSchema(), metaData.getTableName());
-        } else if (DialectType.OB_MYSQL.equals(metaData.getDialectType())) {
-            sql = String.format("select count(*) from `%s`.`%s`; ", metaData.getSchema(), metaData.getTableName());
+        if (ObModeType.OB_ORACLE.equals(metaData.getDialectType())) {
+            sql = String.format("select count(*) from \"%s\".\"%s\"; ",
+                    DbObjectNameUtil.doubleCharToEscape(metaData.getSchema(), '"'),
+                    DbObjectNameUtil.doubleCharToEscape(metaData.getTableName(), '"'));
+        } else if (ObModeType.OB_MYSQL.equals(metaData.getDialectType())) {
+            sql = String.format("select count(*) from `%s`.`%s`; ",
+                    DbObjectNameUtil.doubleCharToEscape(metaData.getSchema(), '`'),
+                    DbObjectNameUtil.doubleCharToEscape(metaData.getTableName(), '`'));
         } else {
             MockerException e = new MockerException(MockerError.INVALID_OB_MODE);
-            log.error("fail to execute after task for mock", e);
-            this.result = false;
-            return null;
+            log.error("Fail to execute mock data destruction task because the ObModeType is illegal, obModeType={}",
+                    metaData.getDialectType(), e);
+            throw e;
         }
-        List<Long> returnVal = new ArrayList<>();
-        SqlUtil.executeQuery(this.dataSource, sql, null, new CallBack<ResultSet>() {
+        SqlUtil.executeQuery(this.dataSource, sql, null, new AbstractCallBack<ResultSet>() {
             @Override
-            public void onComplete(ResultSet resultSet) throws Exception {
+            public void doOnSuccess(ResultSet resultSet) throws Exception {
                 ResultSetMetaData md = resultSet.getMetaData();
                 if (md.getColumnCount() != 1) {
                     throw new MockerException(MockerError.ILLEGAL_RETURN_VALUE,
-                            String.format("column count for \"select count(*) from %s.\"%s\" is not equal to one, [%d!=1]",
+                            String.format(
+                                    "Column count for \"select count(*) from \"%s\".\"%s\" is not equal to one, [%d!=1]",
                                     metaData.getSchema(), metaData.getTableName(), md.getColumnCount()));
                 }
                 if (resultSet.next()) {
                     long rowCount = resultSet.getLong(1);
-                    returnVal.add(rowCount);
+                    context.setCurrentRecordNum(rowCount);
                 }
-                result = true;
             }
 
             @Override
-            public void onFailure(Throwable e) {
-                log.error("fail to execute after task for mock", e);
-                result = false;
+            public void doOnFailure(ResultSet resultSet, Throwable e) throws Throwable {
+                log.error("Fail to execute mock data destruction task", e);
+                throw e;
             }
         });
-        return returnVal.size() == 0 ? -1L : returnVal.get(0);
     }
+
 }

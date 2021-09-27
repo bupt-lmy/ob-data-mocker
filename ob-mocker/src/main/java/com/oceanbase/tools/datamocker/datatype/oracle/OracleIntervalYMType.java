@@ -5,12 +5,14 @@ import com.alipay.oceanbase.jdbc.extend.datatype.INTERVALYM;
 import com.oceanbase.tools.datamocker.datatype.AbstractDataType;
 import com.oceanbase.tools.datamocker.datatype.DataTypeFactory;
 import com.oceanbase.tools.datamocker.generator.BaseGenerator;
-import com.oceanbase.tools.datamocker.model.enums.DialectType;
+import com.oceanbase.tools.datamocker.model.config.model.DateDataTypeConfig;
+import com.oceanbase.tools.datamocker.model.enums.ObModeType;
 import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
 
 /**
- * oracle模式下INTERVAL YEAR TO MONTH数据类型，该数据类型只提供最基本的兼容，因此使用String作为基本的Java类型
+ * INTERVAL YEAR TO MONTH data type in oracle mode, this data type only provides the most basic
+ * compatibility, so use String as the basic Java type
  *
  * @author yh263208
  * @date 2021-02-04 12:01
@@ -18,35 +20,35 @@ import com.oceanbase.tools.datamocker.model.exception.MockerException;
  */
 public class OracleIntervalYMType extends AbstractDataType<INTERVALYM, Integer> {
     /**
-     * 类型精度，对于interval year to month来说最多到9，默认为2
+     * Type precision, up to 9 for interval year to month, the default is 2
      */
     private final Integer scale;
 
     /**
-     * interval year to month数据类型兼容java类型的构造函数
+     * The interval year to month data type is compatible with the java type constructor
      *
-     * @param generator    数据生成器
-     * @param defaultValue 默认值
-     * @param allowNull    是否允许为空
-     * @param scale        精度
-     * @throws MockerException 若精度值非法则抛出异常
+     * @param generator Data generator
+     * @param defaultValue default value for interval type
+     * @param allowNull Whether it is allowed to be empty
+     * @param scale scale for type
+     * @throws MockerException If the precision value is illegal, an exception will be thrown
      */
     public OracleIntervalYMType(BaseGenerator<Integer, INTERVALYM> generator, Integer scale, INTERVALYM defaultValue,
             Boolean allowNull) {
-        super(generator, DialectType.OB_ORACLE, defaultValue, allowNull);
+        super(generator, ObModeType.OB_ORACLE, defaultValue, allowNull);
         if (scale == null) {
             this.scale = 2;
         } else {
             if (scale > 9 || scale < 0) {
                 throw new MockerException(MockerError.PARAMETER_ERROR,
-                        "scale for inter year to month can not be larger than 9 or smaller than 0");
+                        "Scale for inter year to month can not be larger than 9 or smaller than 0");
             }
             this.scale = scale;
         }
     }
 
     @Override
-    public DataTypeFactory getFactory() {
+    public DataTypeFactory<OracleIntervalYMType, DateDataTypeConfig, BaseGenerator<Integer, INTERVALYM>> getFactory() {
         return DataTypeFactory.getInstance("OB_ORACLE_INTERVAL_YEAR_TO_MONTH");
     }
 
@@ -69,20 +71,21 @@ public class OracleIntervalYMType extends AbstractDataType<INTERVALYM, Integer> 
     }
 
     @Override
-    protected INTERVALYM preTreat(INTERVALYM value) {
+    protected INTERVALYM preProcessingBeforeOutput(INTERVALYM value) {
         if (value == null) {
             return null;
         }
         byte yearLen = value.getBytes()[value.getBytes().length - 1];
         if (yearLen > this.scale) {
             throw new MockerException(MockerError.VALUE_OUT_OFRANGE,
-                    String.format("scale for interval year(%d) to month is out of bound, [%d>%d]", this.scale, yearLen, this.scale));
+                    String.format("Scale for interval year(%d) to month is out of bound, [%d>%d]", this.scale, yearLen,
+                            this.scale));
         }
         return value;
     }
 
     @Override
-    public String toString(INTERVALYM value) {
+    public String convertToSqlString(INTERVALYM value) {
         if (value == null) {
             return "NULL";
         }

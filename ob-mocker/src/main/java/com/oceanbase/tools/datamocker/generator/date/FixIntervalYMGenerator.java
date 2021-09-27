@@ -10,7 +10,7 @@ import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
 
 /**
- * 固定interval year to month数据生成器
+ * Fixed interval year to month data generator
  *
  * @author yh263208
  * @date 2021-02-05 16:12
@@ -18,22 +18,23 @@ import com.oceanbase.tools.datamocker.model.exception.MockerException;
  */
 public class FixIntervalYMGenerator extends BaseGenerator<Integer, INTERVALYM> {
     /**
-     * 固定的interval字符串
+     * Fixed interval string
      */
     private final String fixText;
     /**
-     * 正则表达式，用于校验interval的写法是否正确
+     * Regular expression, used to verify whether the interval is written correctly
      */
     private static final Pattern PATTERN = Pattern.compile(
-            "interval '(\\d{1,9}(\\-\\d{1,2})?)' (year|month)(\\(\\d{1}\\))? (to (year|month))?", Pattern.CASE_INSENSITIVE);
+            "interval '(\\d{1,9}(\\-\\d{1,2})?)' (year|month)(\\(\\d{1}\\))? (to (year|month))?",
+            Pattern.CASE_INSENSITIVE);
     /**
-     * 用于插入的interval的字符串
+     * The string used to insert the interval
      */
     private String value;
 
     public FixIntervalYMGenerator(String fixText) {
         if (fixText == null) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "interval value for generator can not be null");
+            throw new MockerException(MockerError.PARAMETER_ERROR, "Interval value for generator can not be null");
         }
         this.fixText = fixText;
     }
@@ -44,17 +45,19 @@ public class FixIntervalYMGenerator extends BaseGenerator<Integer, INTERVALYM> {
         if (matcher.find()) {
             String intervalVal = matcher.group(1);
             if (intervalVal == null || intervalVal.length() == 0) {
-                throw new MockerException(MockerError.PARAMETER_ERROR, "interval value is illegal for INTERVALYM");
+                throw new MockerException(MockerError.PARAMETER_ERROR, "Interval value is illegal for INTERVALYM");
             }
             int yearLen = intervalVal.split("\\-")[0].length();
             if (yearLen < leftLimit || yearLen > rightLimit) {
                 throw new MockerException(MockerError.PARAMETER_ERROR,
-                        String.format("interval value \"%s\" is out of bound for limit [%d,%d]", intervalVal, leftLimit, rightLimit));
+                        String.format("Interval value \"%s\" is out of bound for limit [%d,%d]", intervalVal, leftLimit,
+                                rightLimit));
             }
             this.value = intervalVal;
         } else {
             throw new MockerException(MockerError.PARAMETER_ERROR,
-                    String.format("fix text \"%s\" for INTERVAL YEAR TO MONTH is illegal, value pattern is \"%s\"", this.fixText,
+                    String.format("Fix text \"%s\" for INTERVAL YEAR TO MONTH is illegal, value pattern is \"%s\"",
+                            this.fixText,
                             "INTERVAL 'integer [- integer]' {YEAR | MONTH} [(precision)][TO {YEAR | MONTH}]"));
         }
         return true;

@@ -1,81 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Configuration status="OFF">
-    <springProperty scope="context" name="logging.path" source="logging.path"/>
+<!-- log4j 自身的日志级别设置为 WARN，日志配置文件监视刷新的检查间隔设置为 30秒 -->
+<Configuration status="WARN" monitorInterval="30" shutdownHook="disable">
+    <!-- log4j2 配置参数 -->
+    <Properties>
+        <!-- 日志格式配置，注意 %class, %line 成本较高，可能会导致日志性能下降大约 80%，当日志数据规模较大时需优化。
+             如果每个类的 log 对象都基于当前类生成，%logger 可作为 %class 的替代。
+        -->
+        <Property name="LOG_PATTERN">
+            [%date{yyyy-MM-dd HH:mm:ss.SSS}][%thread][%level][%logger{1.}][%line]: %message%n
+        </Property>
+    </Properties>
+
     <Appenders>
+        <!-- 控制台输出 -->
         <Console name="ConsoleAppender" target="SYSTEM_OUT">
-            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} %-5level %logger{1.} - %msg%xEx%n"/>
+            <PatternLayout pattern="${LOG_PATTERN}"/>
         </Console>
-
-        <RollingFile name="MockerInfoAppender"
-                     fileName="./MOCKER/logs/info.log"
-                     filePattern="./MOCKER/logs/info.log.%d{yyyy-MM-dd}">
-            <PatternLayout>
-                <pattern>[%date{yyyy-MM-dd HH:mm:ss.SSS}][%thread][%level][%class][%line]:%message%n</pattern>
-            </PatternLayout>
-            <Filters>
-                <ThresholdFilter level="WARN" onMatch="DENY" onMismatch="NEUTRAL"/>
-                <ThresholdFilter level="INFO" onMatch="ACCEPT" onMismatch="DENY"/>
-            </Filters>
-            <Policies>
-                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
-            </Policies>
-            <DefaultRolloverStrategy max="7">
-                <Delete basePath="./MOCKER/logs/" maxDepth="2">
-                    <IfFileName glob="*.log.*"/>
-                    <IfLastModified age="7d"/>
-                </Delete>
-            </DefaultRolloverStrategy>
-        </RollingFile>
-
-        <RollingFile name="MockerWarnAppender"
-                     fileName="./MOCKER/logs/warn.log"
-                     filePattern="./MOCKER/logs/warn.log.%d{yyyy-MM-dd}">
-            <PatternLayout>
-                <pattern>[%date{yyyy-MM-dd HH:mm:ss.SSS}][%thread][%level][%class][%line]:%message%n</pattern>
-            </PatternLayout>
-            <Filters>
-                <ThresholdFilter level="ERROR" onMatch="DENY" onMismatch="NEUTRAL"/>
-                <ThresholdFilter level="WARN" onMatch="ACCEPT" onMismatch="DENY"/>
-            </Filters>
-            <Policies>
-                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
-            </Policies>
-            <DefaultRolloverStrategy max="7">
-                <Delete basePath="./MOCKER/logs/" maxDepth="2">
-                    <IfFileName glob="*.log.*"/>
-                    <IfLastModified age="7d"/>
-                </Delete>
-            </DefaultRolloverStrategy>
-        </RollingFile>
-
-        <RollingFile name="MockerErrorAppender"
-                     fileName="./MOCKER/logs/error.log"
-                     filePattern="./MOCKER/logs/error.log.%d{yyyy-MM-dd}">
-            <PatternLayout>
-                <pattern>[%date{yyyy-MM-dd HH:mm:ss.SSS}][%thread][%level][%class][%line]:%message%n</pattern>
-            </PatternLayout>
-            <Filters>
-                <ThresholdFilter level="ERROR" onMatch="ACCEPT" onMismatch="DENY"/>
-            </Filters>
-            <Policies>
-                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
-            </Policies>
-            <DefaultRolloverStrategy max="7">
-                <Delete basePath="./MOCKER/logs/" maxDepth="2">
-                    <IfFileName glob="*.log.*"/>
-                    <IfLastModified age="7d"/>
-                </Delete>
-            </DefaultRolloverStrategy>
-        </RollingFile>
     </Appenders>
     <Loggers>
-        <Logger name="com.oceanbase.tools.datamocker" additivity="false">
-            <AppenderRef ref="MockerInfoAppender"/>
-            <AppenderRef ref="MockerWarnAppender"/>
-            <AppenderRef ref="MockerErrorAppender"/>
-        </Logger>
-
-        <Root level="DEBUG" includeLocation="true">
+        <!-- 其它程序日志输出，输出级别 WARN -->
+        <Root level="INFO">
             <AppenderRef ref="ConsoleAppender"/>
         </Root>
     </Loggers>

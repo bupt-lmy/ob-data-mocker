@@ -1,7 +1,9 @@
 package com.oceanbase.tools.datamocker.model.exception;
 
+import lombok.Getter;
+
 /**
- * mock数据异常对象封装
+ * Mock data exception object encapsulation
  *
  * @author yh263208
  * @date 2020-12-10 16:53
@@ -9,18 +11,15 @@ package com.oceanbase.tools.datamocker.model.exception;
  */
 public class MockerException extends RuntimeException {
     /**
-     * 错误码
+     * error code
      */
-    private String errorCode;
-    /**
-     * 原始的错误
-     */
-    private Throwable originalThrowable;
+    @Getter
+    private final String errorCode;
 
     /**
-     * 异常构造函数
+     * Exception constructor
      *
-     * @param errorEnum 错误类型枚举
+     * @param errorEnum Error type enumeration
      */
     public MockerException(MockerError errorEnum) {
         super(errorEnum.getMessage());
@@ -28,10 +27,10 @@ public class MockerException extends RuntimeException {
     }
 
     /**
-     * 异常构造函数
+     * Exception constructor
      *
-     * @param errorEnum 错误类型枚举
-     * @param errorMsg  错误信息
+     * @param errorEnum Error type enumeration
+     * @param errorMsg Error message
      */
     public MockerException(MockerError errorEnum, String errorMsg) {
         super(errorMsg);
@@ -39,9 +38,9 @@ public class MockerException extends RuntimeException {
     }
 
     /**
-     * 异常构造函数
+     * Exception constructor
      *
-     * @param errMsg 错误信息
+     * @param errMsg Error message
      */
     public MockerException(String errMsg) {
         super(errMsg);
@@ -49,7 +48,7 @@ public class MockerException extends RuntimeException {
     }
 
     /**
-     * 默认构造函数
+     * Default Exception constructor
      */
     public MockerException() {
         super(MockerError.UNKNOWN_ERROR.getMessage());
@@ -57,29 +56,14 @@ public class MockerException extends RuntimeException {
     }
 
     /**
-     * mock数据异常构造函数
+     * Exception constructor
      *
-     * @param originalThrowable 原始的异常抛出类
+     * @param originalThrowable The original exception throwing class
      */
     public MockerException(Throwable originalThrowable) {
-        super(originalThrowable);
-        this.originalThrowable = originalThrowable;
+        super(originalThrowable.getMessage());
+        this.initCause(originalThrowable);
         this.errorCode = MockerError.UNKNOWN_ERROR.name();
     }
 
-    /**
-     * 获取原始的异常对象
-     *
-     * @return 返回原始的异常对象
-     */
-    public Throwable getOriginalThrowable() {
-        return this.originalThrowable;
-    }
-
-    /**
-     * 获取错误码
-     */
-    public String getErrorCode() {
-        return this.errorCode;
-    }
 }

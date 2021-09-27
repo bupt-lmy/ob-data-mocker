@@ -3,12 +3,13 @@ package com.oceanbase.tools.datamocker.core.task;
 import java.util.Map;
 
 import com.oceanbase.tools.datamocker.datatype.AbstractDataType;
-import com.oceanbase.tools.datamocker.model.enums.DialectType;
-import com.oceanbase.tools.datamocker.model.enums.DuplicateStrategy;
+import com.oceanbase.tools.datamocker.model.config.AbstractTableConfig;
+import com.oceanbase.tools.datamocker.model.enums.ObModeType;
 import lombok.Getter;
+import org.apache.commons.lang.Validate;
 
 /**
- * 表生成任务元数据信息
+ * Table generation task metadata information
  *
  * @author yh263208
  * @date 2021-01-13 17:35
@@ -16,61 +17,41 @@ import lombok.Getter;
  */
 @Getter
 public class TableTaskMetaData {
+    private final String tableTaskId;
     /**
-     * 任务ID
-     */
-    private final String taskId;
-    /**
-     * 表生成任务的最大数量，当生成一张表时totalCount代表要生成数据的最大条目数
+     * The maximum number of table generation tasks, when a table is generated, totalCount represents
+     * the maximum number of entries of data to be generated
      */
     private final Long totalCount;
     /**
-     * 方言类型
+     * Table structure definition, used to describe the structure of the table, including the mapping
+     * relationship between field names and types key：Column name value：Data type corresponding to
+     * column name
      */
-    private final DialectType dialectType;
-    /**
-     * 表结构定义，用于描述表的结构，包括各字段名和类型的映射关系
-     *
-     * key：列名
-     * value：列名对应的数据类型
-     */
-    private final Map<String, AbstractDataType> tableSchema;
-    /**
-     * 表名
-     */
+    private final Map<String, AbstractDataType<?, ? extends Comparable<?>>> tableSchema;
     private final String tableName;
-    /**
-     * 表所在的schema
-     */
     private final String schema;
-    /**
-     * 是否清空表
-     */
     private final Boolean shouldTruncate;
-    /**
-     * 超时时间
-     */
-    private final Long timeout;
-    /**
-     * 批处理大小
-     */
+    private final Long timeoutMilliseconds;
     private final Long batchSize;
-    /**
-     * 数据冲突时的策略
-     */
-    private final DuplicateStrategy strategy;
+    private final ObModeType dialectType;
+    private final String taskId;
 
-    public TableTaskMetaData(Map<String, AbstractDataType> tableSchema, String tableName, String schema, Boolean truncate, Long timeout,
-            Long batchSize, DuplicateStrategy strategy, DialectType dialectType, Long totalCount, String taskId) {
+    public TableTaskMetaData(Map<String, AbstractDataType<?, ? extends Comparable<?>>> tableSchema,
+            AbstractTableConfig tableConfig, ObModeType obModeType, String taskId, int columnIndex, int rowIndex) {
+        Validate.notNull(tableSchema, "TableSchema can not be null for TableTaskMetaData");
+        Validate.notNull(tableConfig, "TableConfig can not be null for TableTaskMetaData");
+        Validate.notNull(obModeType, "ObModeType can not be null for TableTaskMetaData");
+        Validate.notNull(taskId, "TaskId can not be null for TableTaskMetaData");
         this.tableSchema = tableSchema;
-        this.tableName = tableName;
-        this.schema = schema;
-        this.shouldTruncate = truncate;
-        this.timeout = timeout;
-        this.batchSize = batchSize;
-        this.strategy = strategy;
-        this.dialectType = dialectType;
-        this.totalCount = totalCount;
+        this.tableName = tableConfig.tableName();
+        this.schema = tableConfig.schemaName();
+        this.shouldTruncate = tableConfig.truncated();
+        this.timeoutMilliseconds = tableConfig.timeoutMilliseconds();
+        this.batchSize = tableConfig.maxBatchSize();
+        this.totalCount = tableConfig.maxCount();
+        this.tableTaskId = taskId + "-[" + columnIndex + "," + rowIndex + "]";
+        this.dialectType = obModeType;
         this.taskId = taskId;
     }
 }

@@ -25,7 +25,7 @@ import com.oceanbase.tools.datamocker.constraint.ConstraintFactory;
 import com.oceanbase.tools.datamocker.core.Dispatcher;
 import com.oceanbase.tools.datamocker.core.read.ColumnReader;
 import com.oceanbase.tools.datamocker.core.write.AbstractMockWriter;
-import com.oceanbase.tools.datamocker.core.write.DataBaseWriter;
+import com.oceanbase.tools.datamocker.core.write.JdbcWriter;
 import com.oceanbase.tools.datamocker.core.write.SqlScriptWriter;
 import com.oceanbase.tools.datamocker.core.write.output.MockerDataSource;
 import com.oceanbase.tools.datamocker.core.write.output.MockerFile;
@@ -34,21 +34,24 @@ import com.oceanbase.tools.datamocker.model.config.AbstractColumnConfig;
 import com.oceanbase.tools.datamocker.model.config.AbstractTableConfig;
 import com.oceanbase.tools.datamocker.model.config.AbstractTaskConfig;
 import com.oceanbase.tools.datamocker.model.config.model.DataBaseConfig;
-import com.oceanbase.tools.datamocker.model.enums.DialectType;
+import com.oceanbase.tools.datamocker.model.enums.ObModeType;
 import com.oceanbase.tools.datamocker.model.enums.ScriptType;
 import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
+import com.oceanbase.tools.datamocker.model.mock.MockRowData;
 import com.oceanbase.tools.datamocker.schedule.AbstractScheduler;
 import com.oceanbase.tools.datamocker.schedule.impl.DefaultScheduler;
+import com.oceanbase.tools.datamocker.util.DbObjectNameUtil;
 import com.oceanbase.tools.datamocker.util.MockDataPipe;
 import com.oceanbase.tools.datamocker.util.MockerBuffer;
 import com.oceanbase.tools.datamocker.util.SqlUtil;
-import com.oceanbase.tools.datamocker.util.SqlUtil.CallBack;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.Validate;
+import org.slf4j.MDC;
 
 /**
- * 抽象数据模拟器，用于new一个数据模拟器出来
+ * Abstract data simulator, used to create a new data simulator
  *
  * @author yh263208
  * @date 2021-02-03 20:10
@@ -57,127 +60,129 @@ import org.apache.commons.lang.StringUtils;
 @Slf4j
 public abstract class AbstractMockerFactory {
     /**
-     * 抽象任务配置
+     * Abstract task configuration
      */
-    private AbstractTaskConfig taskConfig;
+    private final AbstractTaskConfig taskConfig;
     /**
-     * 工厂类型的内部数据源，使用该数据源进行表存在性校验，约束等信息的校验
+     * The internal data source of the factory type, which is used to verify the existence of tables,
+     * check constraints and other information
      */
-    private MockerDataSource innerDatasource;
+    private MockerDataSource innerDatasource = null;
     /**
-     * 该数据源是业务数据源
+     * The data source is a business data source
      */
-    private Map<String, DataSource> taskId2DataSource;
+    private final Map<String, DataSource> taskId2DataSource;
     /**
-     * mock数据文件管理器集合
+     * Mock data file manager collection
      */
-    private Map<String, List<MockerFile>> taskId2MockerFiles;
+    private final Map<String, List<MockerFile>> taskId2MockerFiles;
 
-    public AbstractMockerFactory(AbstractTaskConfig taskConfig) throws SQLException {
+    public AbstractMockerFactory(AbstractTaskConfig taskConfig) {
+        Validate.notNull(taskConfig, "TaskConfig can not be null for AbstractMockerFactory");
         this.taskConfig = taskConfig;
-        if (taskConfig == null) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "input task config can not be null");
-        }
-        if (validateDbConfig(taskConfig.dbConfig())) {
-            this.innerDatasource = new MockerDataSource(taskConfig.dbConfig(), 3, 5, 3, null);
-        }
         this.taskId2DataSource = new HashMap<>();
         this.taskId2MockerFiles = new HashMap<>();
     }
 
     /**
-     * 验证数据库配置对象封装体的有效性
+     * Verify the validity of the database configuration object package
      *
-     * @param dbConfig 数据库配置
-     * @return 返回验证结果
+     * @param dbConfig configuration for database
+     * @return verify result
      */
     private boolean validateDbConfig(DataBaseConfig dbConfig) {
         if (dbConfig == null) {
             return false;
         }
-        if (StringUtils.isBlank(dbConfig.getUser()) || StringUtils.isBlank(dbConfig.getTenant()) || StringUtils.isBlank(
-                dbConfig.getHost())) {
-            return false;
-        }
-        return true;
+        return !StringUtils.isBlank(dbConfig.getUser()) && !StringUtils.isBlank(dbConfig.getHost());
     }
 
     /**
-     * 获取模拟数据对象
-     *
-     * @throws Exception 可能会抛出异常
+     * Get simulated data object
      */
-    public ObDataMocker create() throws Exception {
+    public ObDataMocker create() {
         return create(new DefaultScheduler(this.taskConfig.maxConnection()));
     }
 
     /**
-     * 获取模拟数据对象
+     * Get Mock data object
      *
-     * @param scheduler 调度器对象，用于线程资源的调度
-     * @throws Exception 生成mocker对象可能会抛出异常
+     * @param scheduler Scheduler object, used for thread resource scheduling
      */
-    public ObDataMocker create(AbstractScheduler scheduler) throws Exception {
-        if (scheduler == null) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "scheduler for mocker factory can not be null");
+    public ObDataMocker create(AbstractScheduler scheduler) {
+        Validate.notNull(scheduler, "Scheduler can not be null for AbstractMockerFactory#create");
+        try {
+            String taskId = UUID.randomUUID().toString().toUpperCase();
+            MDC.put("mocktask.workspace", taskId);
+            if (validateDbConfig(taskConfig.dbConfig())) {
+                if (this.innerDatasource == null) {
+                    this.innerDatasource = new MockerDataSource(taskConfig.dbConfig(), 3, 5, 3, null);
+                }
+            }
+            for (AbstractTableConfig tableConfig : this.taskConfig.tasks()) {
+                validateTableByJdbc(tableConfig.schemaName(), tableConfig.tableName());
+            }
+            Dispatcher<TableTaskInfo> dispatcher = generate(this.taskConfig, taskId);
+            this.innerDatasource.clear();
+            return new ObDataMocker(dispatcher, scheduler);
+        } catch (Throwable e) {
+            throw new MockerException(e);
         }
-        for (AbstractTableConfig tableConfig : this.taskConfig.tasks()) {
-            validateTableFromDB(tableConfig.schemaName(), tableConfig.tableName());
-        }
-        Dispatcher<TableTaskInfo> dispatcher = generate(this.taskConfig);
-        this.innerDatasource.clear();
-        return new ObDataMocker(dispatcher, scheduler);
     }
 
     /**
-     * 实现者自己定义分发器对象的逻辑
+     * The implementer himself defines the logic of the dispatcher object
      *
-     * @param task 任务配置读喜庆封装体
-     * @return 返回分发器对象
+     * @param task Task configuration
+     * @param taskId Task Id
+     * @return Returns the dispatcher object
      */
-    abstract protected Dispatcher<TableTaskInfo> generate(AbstractTaskConfig task) throws Exception;
+    abstract protected Dispatcher<TableTaskInfo> generate(AbstractTaskConfig task, String taskId) throws Throwable;
 
     /**
-     * 验证表的存在性
+     * Verify the existence of the table
      *
-     * @param table  表名
-     * @param schema 所在数据库或者schema
-     * @throws MockerException 表存在性校验失败时抛出异常
+     * @param table table name
+     * @param schema The database or schema
+     * @throws MockerException Throw an exception when the table existence check fails
      */
-    protected void validateTableFromDB(String schema, String table) {
+    protected void validateTableByJdbc(String schema, String table) throws Throwable {
         if (this.innerDatasource == null) {
             return;
         }
         String sql;
-        if (DialectType.OB_ORACLE.equals(this.taskConfig.obDialectType())) {
-            sql = String.format("select count(*) from %s.\"%s\"", schema, table);
-        } else if (DialectType.OB_MYSQL.equals(this.taskConfig.obDialectType())) {
-            sql = String.format("select count(*) from `%s`.`%s`", schema, table);
+        if (ObModeType.OB_ORACLE.equals(this.taskConfig.obDialectType())) {
+            sql = String.format("select count(*) from \"%s\".\"%s\"", DbObjectNameUtil.doubleCharToEscape(schema, '"'),
+                    DbObjectNameUtil.doubleCharToEscape(table, '"'));
+        } else if (ObModeType.OB_MYSQL.equals(this.taskConfig.obDialectType())) {
+            sql = String.format("select count(*) from `%s`.`%s`", DbObjectNameUtil.doubleCharToEscape(schema, '`'),
+                    DbObjectNameUtil.doubleCharToEscape(table, '`'));
         } else {
             throw new MockerException(MockerError.INVALID_OB_MODE);
         }
-        SqlUtil.executeQuery(this.innerDatasource, sql, null, new CallBack<ResultSet>() {
+        SqlUtil.executeQuery(this.innerDatasource, sql, null, new AbstractCallBack<ResultSet>() {
             @Override
-            public void onComplete(ResultSet result) throws Exception {
-                log.info(String.format("validate table %s.\"%s\" successfully", schema, table));
+            public void doOnSuccess(ResultSet result) {
+                log.info("Verify the existence of the database table successfully, schema={}, table={}", schema, table);
             }
 
             @Override
-            public void onFailure(Throwable e) {
-                log.error(String.format("fail to validate %s.\"%s\"", schema, table), e);
+            public void doOnFailure(ResultSet result, Throwable e) {
+                log.error("Fail to verify the existence of database table, schema={}, table={}", schema, table, e);
                 throw new MockerException(MockerError.OPERATION_FAILURE, e.getMessage());
             }
         });
     }
 
     /**
-     * 获取表结构
+     * Get the table structure
      *
-     * @param tableConfig 表配置信息
-     * @return 返回表结构
+     * @param tableConfig table configuration
+     * @return schema for a certain table
      */
-    protected Map<String, AbstractDataType> getTableSchema(AbstractTableConfig tableConfig) {
-        Map<String, AbstractDataType> columnName2DataType = new HashMap<>();
+    protected Map<String, AbstractDataType<?, ? extends Comparable<?>>> getTableSchema(
+            AbstractTableConfig tableConfig) {
+        Map<String, AbstractDataType<?, ? extends Comparable<?>>> columnName2DataType = new HashMap<>();
         for (AbstractColumnConfig columnConfig : tableConfig.columns()) {
             columnName2DataType.putIfAbsent(columnConfig.columnName(), columnConfig.columnType());
         }
@@ -185,23 +190,25 @@ public abstract class AbstractMockerFactory {
     }
 
     /**
-     * 获取表相关的约束对象
+     * Get the constraint object related to the table
      *
-     * @param tableConfig 表定义
-     * @return 返回约束集合
+     * @param tableConfig table configuration
+     * @return list of constraint
      */
-    protected List<AbstractConstraint> getConstraints(AbstractTableConfig tableConfig, DialectType dialectType) {
+    protected List<AbstractConstraint> getConstraints(AbstractTableConfig tableConfig, ObModeType dialectType)
+            throws Throwable {
         if (tableConfig.constraints() != null) {
             return tableConfig.constraints();
         } else if (this.innerDatasource == null) {
             return Collections.emptyList();
         }
-        Map<String, AbstractDataType> columnName2DataType = getTableSchema(tableConfig);
+        Map<String, AbstractDataType<?, ? extends Comparable<?>>> columnName2DataType = getTableSchema(tableConfig);
         List<ConstraintFactory> factories = ConstraintFactory.listInstances();
         List<AbstractConstraint> returnVal = new ArrayList<>();
         for (ConstraintFactory factory : factories) {
-            List<AbstractConstraint> customConstraint = factory.make(this.innerDatasource, dialectType, tableConfig.schemaName(),
-                    tableConfig.tableName(), columnName2DataType, tableConfig.maxCount().intValue());
+            List<AbstractConstraint> customConstraint =
+                    factory.make(this.innerDatasource, dialectType, tableConfig.schemaName(), tableConfig.tableName(),
+                            columnName2DataType, tableConfig.maxCount().intValue());
             if (customConstraint != null) {
                 returnVal.addAll(customConstraint);
             }
@@ -210,9 +217,11 @@ public abstract class AbstractMockerFactory {
     }
 
     /**
-     * 获取数据源
+     * Get data source
      *
-     * @return 返回数据源
+     * @param tableTaskId table task Id
+     * @return data source
+     * @exception SQLException An exception is thrown if the connection establishment fails
      */
     protected synchronized DataSource getDataSource(String tableTaskId) throws SQLException {
         if (tableTaskId == null) {
@@ -229,7 +238,7 @@ public abstract class AbstractMockerFactory {
         realParam.put("autoReconnect", "true");
         realParam.put("rewriteBatchedStatements", "true");
         realParam.put("emulateUnsupportedPstmts", "false");
-        //realParam.put("useServerPrepStmts", "true");
+        // realParam.put("useServerPrepStmts", "true");
         Map<String, String> param = this.taskConfig.dbConfig().getConnectParam();
         if (param != null) {
             Set<Entry<String, String>> entries = param.entrySet();
@@ -237,50 +246,65 @@ public abstract class AbstractMockerFactory {
                 realParam.putIfAbsent(entry.getKey(), entry.getValue());
             }
         }
-        dataSource = new MockerDataSource(this.taskConfig.dbConfig(), taskConfig.minConnection(), taskConfig.maxConnection(),
-                taskConfig.connectionIncreasementStep(), realParam);
+        dataSource = new MockerDataSource(this.taskConfig.dbConfig(), taskConfig.minConnection(),
+                taskConfig.maxConnection(), taskConfig.connectionIncreasementStep(), realParam);
         this.taskId2DataSource.putIfAbsent(tableTaskId, dataSource);
         return dataSource;
     }
 
     /**
-     * 获取文件管理器集合
+     * Get file manager collection
      *
-     * @return 返回数据源
+     * @param tableTaskId table task id
+     * @param tableConfig config for table task
+     * @return list of file manager
+     * @exception IOException Throw an exception when the file operation fails
      */
-    protected synchronized List<MockerFile> getFileManager(String tableTaskId) {
-        return this.taskId2MockerFiles.get(tableTaskId);
+    protected synchronized List<MockerFile> getFileManager(String tableTaskId, AbstractTableConfig tableConfig)
+            throws IOException {
+        Validate.notEmpty(tableTaskId, "Table task id can not be null");
+        Validate.notNull(tableConfig, "Table config can not be null");
+        List<MockerFile> returnVal = taskId2MockerFiles.get(tableTaskId);
+        if (returnVal == null) {
+            returnVal = new LinkedList<>();
+            taskId2MockerFiles.put(tableTaskId, returnVal);
+            for (ScriptType scriptType : tableConfig.scriptType()) {
+                String location = tableConfig.dataWriteLocation(scriptType);
+                MockerFile fileManager = new MockerFile(location, scriptType, true);
+                returnVal.add(fileManager);
+            }
+        }
+        return returnVal;
     }
 
     /**
-     * 获取数据库写入原语
+     * Get data writer
      *
-     * @param tableConfig 表生成任务封装体
-     * @return 返回原语集合
+     * @param tableConfig table task config
+     * @param buffer buffer which is bound to writer
+     * @param managers list of file managers
+     * @param dataSource datasource
+     * @return list of mock writer
      */
-    protected List<AbstractMockWriter> getDataWriter(AbstractTableConfig tableConfig, MockerBuffer buffer)
-            throws IOException, SQLException {
-        List<AbstractMockWriter> dataWriters = new ArrayList<>();
-        for (ScriptType scriptType : tableConfig.scriptType()) {
-            String location = tableConfig.dataWriteLocation(scriptType);
-            MockerFile fileManager = new MockerFile(location, true);
-            List<MockerFile> managers = this.taskId2MockerFiles.getOrDefault(tableConfig.tableTaskId(), new LinkedList<>());
-            managers.add(fileManager);
-            this.taskId2MockerFiles.put(tableConfig.tableTaskId(), managers);
-            SqlScriptWriter writer = new SqlScriptWriter(fileManager, this.taskConfig.obDialectType(), tableConfig.schemaName(),
-                    tableConfig.tableName());
+    protected List<AbstractMockWriter> getDataWriter(AbstractTableConfig tableConfig, MockerBuffer buffer,
+            List<MockerFile> managers, DataSource dataSource) {
+        Validate.notNull(managers, "Mocker file manager list can not be null");
+        List<AbstractMockWriter> dataWriters = new LinkedList<>();
+        for (MockerFile manager : managers) {
+            SqlScriptWriter writer = new SqlScriptWriter(manager, this.taskConfig.obDialectType(),
+                    tableConfig.schemaName(), tableConfig.tableName());
             dataWriters.add(writer);
         }
-        DataSource ds = getDataSource(tableConfig.tableTaskId());
-        if (ds == null) {
+        if (dataSource == null) {
             return dataWriters;
         }
-        DataBaseWriter writer = new DataBaseWriter(ds, this.taskConfig.obDialectType(), tableConfig.schemaName(),
-                tableConfig.tableName());
+        JdbcWriter writer = new JdbcWriter(dataSource, this.taskConfig.obDialectType(),
+                tableConfig.schemaName(), tableConfig.tableName());
         dataWriters.add(writer);
-        Map<String, AbstractDataPipe> map = new HashMap<>();
+        Map<String, AbstractDataPipe<List<MockRowData>>> groupId2DataPipe = new HashMap<>();
         for (AbstractMockWriter item : dataWriters) {
-            AbstractDataPipe dataPipe = map.getOrDefault(item.groupId(), new MockDataPipe());
+            AbstractDataPipe<List<MockRowData>> dataPipe = groupId2DataPipe.computeIfAbsent(item.groupId(),
+                    s -> new MockDataPipe(tableConfig.maxRetainedCount()));
             item.register(dataPipe);
             buffer.register(dataPipe);
         }
@@ -288,13 +312,14 @@ public abstract class AbstractMockerFactory {
     }
 
     /**
-     * 获取一个表生成任务的全部列数据原语
+     * Get all column data reader of a table generation task
      *
-     * @param tableConfig 表生成任务
-     * @param constraints 约束集合
-     * @return 返回原语列表
+     * @param tableConfig table task config
+     * @param constraints constraint list
+     * @return list of column reader
      */
-    protected List<ColumnReader> getColumnReader(AbstractTableConfig tableConfig, List<AbstractConstraint> constraints) {
+    protected List<ColumnReader<?>> getColumnReader(AbstractTableConfig tableConfig,
+            List<AbstractConstraint> constraints) {
         List<? extends AbstractColumnConfig> columnConfigs = tableConfig.columns();
         List<Set<String>> colGroupList = new ArrayList<>();
         for (AbstractConstraint constraint : constraints) {
@@ -319,32 +344,27 @@ public abstract class AbstractMockerFactory {
         for (Set<String> colSet : colGroupList) {
             groupMap.put(UUID.randomUUID().toString(), colSet);
         }
-        List<ColumnReader> returnValue = new ArrayList<>();
+        List<ColumnReader<?>> returnValue = new LinkedList<>();
         for (AbstractColumnConfig columnConfig : columnConfigs) {
-            AbstractDataType dataType = columnConfig.columnType();
+            AbstractDataType<?, ? extends Comparable<?>> dataType = columnConfig.columnType();
             String columnName = columnConfig.columnName();
             Set<Map.Entry<String, Set<String>>> entrySet = groupMap.entrySet();
-            ColumnReader reader = null;
+            ColumnReader<?> reader = null;
             for (Map.Entry<String, Set<String>> item : entrySet) {
                 String groupId = item.getKey();
                 if (item.getValue().contains(columnName)) {
-                    reader = new ColumnReader(dataType, columnName, groupId);
+                    reader = new ColumnReader<>(dataType, columnName, groupId);
                     break;
                 }
             }
             if (reader == null) {
-                reader = new ColumnReader(dataType, columnName, UUID.randomUUID().toString());
+                reader = new ColumnReader<>(dataType, columnName, UUID.randomUUID().toString());
             }
             returnValue.add(reader);
         }
         return returnValue;
     }
 
-    /**
-     * 获取任务名称
-     *
-     * @return 返回任务名称
-     */
     protected String getTaskName() {
         TimeZone timeZone = TimeZone.getDefault();
         Date date = new Date();
@@ -352,4 +372,5 @@ public abstract class AbstractMockerFactory {
         dateFormat.setTimeZone(timeZone);
         return "datamock_" + dateFormat.format(date);
     }
+
 }

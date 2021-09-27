@@ -1,48 +1,53 @@
 package com.oceanbase.tools.datamocker.generator.chartype;
 
-import com.oceanbase.tools.datamocker.generator.CharGeneratorBase;
+import com.oceanbase.tools.datamocker.generator.BaseCharGenerator;
 import com.oceanbase.tools.datamocker.model.enums.CharCaseOption;
+import com.oceanbase.tools.datamocker.model.enums.CharsetType;
 import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
 
 /**
- * 随机数字数据生成器
+ * Random number data generator
  *
  * @author yh263208
  * @date 2020-12-16 11:11
  * @since OBMOCKER_snapshot_0.1.0
  */
-public class RandomNumGenerator extends CharGeneratorBase {
+public class RandomNumGenerator extends BaseCharGenerator {
     /**
-     * 随机数据开始值
+     * Random data start value
      */
     private Long start;
     /**
-     * 随机数据结束值
+     * Random data end value
      */
     private Long end;
 
     public RandomNumGenerator(CharCaseOption caseOption, Long start, Long end) {
         super(caseOption);
         if (start == null || end == null) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "start or end for random number generator can not be null");
+            throw new MockerException(MockerError.PARAMETER_ERROR,
+                    "Start or end for random number generator can not be null");
         }
         if (start.compareTo(end) >= 0) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "start for random number generator can not be bigger than end");
+            throw new MockerException(MockerError.PARAMETER_ERROR,
+                    "Start for random number generator can not be bigger than end");
         }
         this.start = start;
         this.end = end;
     }
 
     @Override
-    public Boolean preCheck(Integer minLength, Integer maxLength) {
+    protected Boolean doPreCheck(Integer minLength, Integer maxLength, CharsetType charsetType,
+            CharCaseOption caseOption,
+            boolean isUnicode) {
         int min = this.start.toString().length();
         int max = this.end.toString().length();
         if (min > maxLength) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "start number is illegal");
+            throw new MockerException(MockerError.PARAMETER_ERROR, "Start number is illegal");
         }
         if (max < minLength) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "end number is illegal");
+            throw new MockerException(MockerError.PARAMETER_ERROR, "End number is illegal");
         }
         if (min < minLength) {
             this.start = new Double(Math.pow(10, minLength - 1)).longValue();
@@ -54,17 +59,20 @@ public class RandomNumGenerator extends CharGeneratorBase {
     }
 
     @Override
-    public String generate(Integer minLength, Integer maxLength) {
-        Long interval = end - start;
-        Long result = new Double(Math.random() * interval + start).longValue();
-        if (result.toString().length() < minLength || result.toString().length() > maxLength) {
-            throw new MockerException("number result for random number generator is illegal");
+    protected String doGenerate(Integer minLength, Integer maxLength, CharsetType charsetType,
+            CharCaseOption caseOption,
+            boolean isUnicode) {
+        long interval = end - start;
+        long result = new Double(Math.random() * interval + start).longValue();
+        if (Long.toString(result).length() < minLength || Long.toString(result).length() > maxLength) {
+            throw new MockerException("Number result for random number generator is illegal");
         }
-        return result.toString();
+        return Long.toString(result);
     }
 
     @Override
-    public Long count(Integer minLength, Integer maxLength) {
+    protected Long doCount(Integer minLength, Integer maxLength, CharsetType charsetType, CharCaseOption caseOption,
+            boolean isUnicode) {
         int min = this.start.toString().length();
         int max = this.end.toString().length();
         if (min < minLength) {
@@ -75,4 +83,5 @@ public class RandomNumGenerator extends CharGeneratorBase {
         }
         return this.end - this.start;
     }
+
 }

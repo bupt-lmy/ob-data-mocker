@@ -1,29 +1,31 @@
 package com.oceanbase.tools.datamocker.generator.date;
 
 import java.sql.Date;
+import java.util.concurrent.TimeUnit;
 
-import com.oceanbase.tools.datamocker.generator.DateGeneratorBase;
+import com.oceanbase.tools.datamocker.generator.BaseDateGenerator;
 
 /**
- * date类型的空数据生成器
+ * Null data generator of date type
  *
  * @author yh263208
  * @date 2021-01-26 14:42
  * @since OBMOCKER_snapshot_0.1.0
  */
-public class NullDateGenerator extends DateGeneratorBase<Date> {
+public class NullDateGenerator extends BaseDateGenerator<Date> {
     @Override
-    public Boolean preCheck(Date startTime, Date endTime) {
+    protected Boolean doPreCheck(Date startTime, Date endTime, int scale, TimeUnit timeUnit) {
         return true;
     }
 
     @Override
-    public Date generate(Date startTime, Date endTime) {
+    protected Date doGenerate(Date startTime, Date endTime, int scale, TimeUnit timeUnit) {
         return null;
     }
 
     @Override
-    public Long count(Date startTime, Date endTime) {
+    protected Long doCount(Date startTime, Date endTime, int scale, TimeUnit timeUnit) {
         return 1L;
     }
+
 }

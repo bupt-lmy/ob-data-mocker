@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import com.oceanbase.tools.datamocker.constraint.AbstractConstraint;
 import com.oceanbase.tools.datamocker.core.read.ColumnReader;
 import com.oceanbase.tools.datamocker.core.write.AbstractMockWriter;
 import com.oceanbase.tools.datamocker.model.enums.MockTaskStatus;
@@ -15,16 +14,16 @@ import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
 import com.oceanbase.tools.datamocker.schedule.AbstractMockTask;
 import com.oceanbase.tools.datamocker.schedule.MockExecutorService;
+import com.oceanbase.tools.datamocker.schedule.impl.GenerateDataTask;
 import com.oceanbase.tools.datamocker.schedule.impl.MockDataAfterTask;
 import com.oceanbase.tools.datamocker.schedule.impl.MockDataBeforeTask;
-import com.oceanbase.tools.datamocker.schedule.impl.MockDataGenTask;
-import com.oceanbase.tools.datamocker.schedule.impl.MockDataOutputTask;
-import com.oceanbase.tools.datamocker.util.Pair;
+import com.oceanbase.tools.datamocker.schedule.impl.OutputDataTask;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.Validate;
 
 /**
- * mock数据的任务封装对象
+ * Task encapsulation object of mock data
  *
  * @author yh263208
  * @date 2021-01-17 22:52
@@ -33,76 +32,57 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class TableTask {
     /**
-     * 在一切任务执行前需要执行的任务，通常用来初始化测试环境
+     * Tasks that need to be executed before all tasks are executed, usually used to initialize the test
+     * environment
      */
     @Getter
-    private AbstractMockTask beforeTask;
+    private final AbstractMockTask beforeTask;
     /**
-     * 在一切任务执行后需要执行的任务，通常用于清理环境
+     * Tasks that need to be executed after all tasks are executed, usually used to clean up the
+     * environment
      */
-    private AbstractMockTask afterTask;
+    private final AbstractMockTask afterTask;
     /**
-     * 实际的任务
+     * List of Business Tasks
      */
-    private List<AbstractMockTask> businessTasks;
+    private final List<AbstractMockTask> businessTasks;
     /**
-     * 唯一的任务Id
+     * table task id
      */
     @Getter
-    private final String taskId;
+    private final String tableTaskId;
     @Getter
     private final TableTaskContext context;
     /**
-     * 计数器，用于标定当前执行完成的任务数量
+     * Counter, used to calibrate the number of tasks currently executed
      */
     private final AtomicInteger counter = new AtomicInteger(0);
 
     /**
-     * 构造函数，已过时不要使用
+     * Constructor for TableTask
      *
-     * @param beforeTask    TaskBean的先遣任务
-     * @param afterTask     TaskBean的收尾任务
-     * @param businessTasks TaskBean的正常测试任务
-     * @param context       mock数据的任务上下文
+     * @param taskBean Bean package object of table generation task
+     * @param columnGroups Column generation primitive grouping information
+     * @param dataGroups Data write out primitive grouping information
+     * @param index Used to indicate which task queue of the TaskBean data, the queue index of the task
+     *        queue in the Dispatcher
      */
-    @Deprecated
-    public TableTask(MockDataBeforeTask beforeTask, MockDataAfterTask afterTask, List<AbstractMockTask> businessTasks,
-            TableTaskContext context, String taskId) {
-        if (beforeTask == null || afterTask == null || businessTasks == null) {
-            throw new RuntimeException("mock before task, after task or business tasks can not be null");
-        }
-        this.beforeTask = beforeTask;
-        this.afterTask = afterTask;
-        this.businessTasks = businessTasks;
-        this.context = context;
-        this.taskId = taskId;
-    }
-
-    /**
-     * taskbean的构造方法
-     *
-     * @param taskBean     表生成任务的bean封装对象
-     * @param columnGroups 列生成原语分组信息
-     * @param dataGroups   数据写出原语分组信息
-     * @param index        用于表明该TaskBean数据哪一个任务队列，任务队列在Dispatcher中的队列索引
-     */
-    public TableTask(TableTaskInfo taskBean, Set<Set<String>> columnGroups, Map<Set<String>, Integer> dataGroups, String taskName,
-            String taskId, int index) {
-        if (taskId == null) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "task id can not be null");
-        }
-        this.taskId = taskId;
+    public TableTask(TableTaskInfo taskBean, Set<Set<String>> columnGroups, Map<Set<String>, Integer> dataGroups,
+            String taskName, int index) {
+        this.tableTaskId = taskBean.getMetaData().getTableTaskId();
+        this.context = new TableTaskContext(taskBean, taskName, index);
         this.businessTasks = new ArrayList<>();
         for (Set<String> groupSet : columnGroups) {
-            List<ColumnReader> tmpList = new LinkedList<>();
+            List<ColumnReader<?>> tmpList = new LinkedList<>();
             for (String item : groupSet) {
-                for (ColumnReader reader : taskBean.getColumnReaders()) {
+                for (ColumnReader<?> reader : taskBean.getColumnReaders()) {
                     if (item.equals(reader.groupId())) {
                         tmpList.add(reader);
                     }
                 }
             }
-            MockDataGenTask genTask = new MockDataGenTask(taskBean.getMetaData(), taskBean.getBuffer(), tmpList, taskBean.getConstraints());
+            GenerateDataTask genTask = new GenerateDataTask(taskBean.getMetaData(), this.context, taskBean.getBuffer(),
+                    tmpList, taskBean.getConstraints());
             businessTasks.add(genTask);
         }
         taskBean.getBuffer().setConcurrent(businessTasks.size());
@@ -118,137 +98,132 @@ public class TableTask {
                 }
             }
             if (entry.getValue() <= 0) {
-                throw new MockerException(MockerError.PARAMETER_ERROR, "task size can not be equal to or smaller than zero");
+                throw new MockerException(MockerError.PARAMETER_ERROR,
+                        "Task size can not be equal to or smaller than zero");
             }
             for (int i = 0; i < entry.getValue(); i++) {
-                MockDataOutputTask outputTask = new MockDataOutputTask(taskBean.getMetaData(), writers);
+                OutputDataTask outputTask = new OutputDataTask(taskBean.getMetaData(), this.context, writers);
                 businessTasks.add(outputTask);
             }
         }
-        this.beforeTask = new MockDataBeforeTask(taskBean.getMetaData(), taskBean.getDataSource());
-        this.afterTask = new MockDataAfterTask(taskBean.getMetaData(), taskBean.getDataSource());
-        TableTaskMetaData metaData = taskBean.getMetaData();
-        this.context = new TableTaskContext(this.taskId, taskName, metaData.getBatchSize(), metaData.getTotalCount(),
-                metaData.getDialectType(),
-                metaData.getTableSchema(), metaData.getTableName(), metaData.getSchema(), metaData.getShouldTruncate(),
-                metaData.getTimeout(),
-                metaData.getStrategy(), taskBean.getDataSource(), taskBean.getFileManagers(), index);
+        this.beforeTask = new MockDataBeforeTask(taskBean.getMetaData(), this.context, taskBean.getDataSource());
+        this.afterTask = new MockDataAfterTask(taskBean.getMetaData(), this.context, taskBean.getDataSource());
+
     }
 
     /**
-     * 初始化TaskBean
+     * Initialize TableTask
      *
-     * @param service  传入线程池封装对象
-     * @param callBack 回掉函数，TaskBean执行完毕后调用
-     * @throws MockerException 参数校验不通过抛出异常
+     * @param service Incoming thread pool package object
+     * @param callBack Callback function, called after TaskBean is executed
+     * @throws MockerException Parameter verification fails and throws an exception
      */
-    public void init(MockExecutorService service, CallBackMethod<TableTaskContext> callBack) {
-        if (callBack == null || service == null) {
-            throw new MockerException(MockerError.PARAMETER_ERROR,
-                    "call back method or executor service can not be null for mock task bean");
-        }
+    public void init(MockExecutorService service, AbstractCallBack<TableTaskContext> callBack) {
+        Validate.notNull(callBack, "CallBack can not be null for TableTask#init");
+        Validate.notNull(service, "ExecutorService can not be null for TableTask#init");
         TableTask thisTaskBean = this;
-        beforeTask.bind((CallBackMethod<Pair<Boolean, List<AbstractConstraint>>>) result -> {
-            if (result.getKey()) {
-                log.info("mock before has been executed, task's status is {}, begin to execute business tasks",
-                        MockTaskStatus.RUNNING.name());
-                for (AbstractMockTask task : this.businessTasks) {
-                    if (task instanceof MockDataGenTask) {
-                        ((MockDataGenTask) task).setConstraints(result.getValue());
+        beforeTask.bind(new AbstractCallBack<TableTaskContext>() {
+            @Override
+            public void doOnSuccess(TableTaskContext param) throws Throwable {
+                log.info(
+                        "The Mock data preparation task has been completed, and the business task has begun to run, taskStatus={}",
+                        MockTaskStatus.RUNNING);
+                for (AbstractMockTask task : thisTaskBean.businessTasks) {
+                    if (task instanceof GenerateDataTask) {
+                        ((GenerateDataTask) task).reloadConstraints(param.getConstraints());
                     }
-                    if (!service.isShutdown()) {
-                        service.submitCallable(task, this.context);
+                    if (!service.isShutdown() && !context.isShutdown()) {
+                        service.submitCallable(task, param);
                     } else {
-                        log.warn("thread pool has been shut down, mock task will be exited");
-                        callBack.execute(this.context);
+                        log.warn("The thread pool has been closed, and the mock data task will exit");
+                        callBack.onFailure(param, new MockerException("Thread pool has been shutdown"));
                     }
                 }
-            } else {
-                if (!MockTaskStatus.CANCELED.equals(thisTaskBean.getStatus())) {
-                    thisTaskBean.setStatus(MockTaskStatus.FAILED);
-                }
-                log.error("fail to execute mock before task, task status is {}, mock business tasks will not be droped",
-                        this.getStatus().name());
-                callBack.execute(thisTaskBean.context);
+            }
+
+            @Override
+            public void doOnFailure(TableTaskContext param, Throwable e) throws Throwable {
+                log.error(
+                        "The mock data preparation task fails to execute, and the business task will not be executed, taskStatus={}",
+                        param.getStatus(), e);
+                callBack.onFailure(param, e);
             }
         });
+
         for (AbstractMockTask businessTask : businessTasks) {
-            if (businessTask instanceof MockDataGenTask) {
-                businessTask.bind((CallBackMethod<Pair<Boolean, Long>>) result -> {
-                    if (result.getKey()) {
-                        this.context.appendDataGenInfo(result.getValue());
-                        log.info("data generate business task has been executed completely, generate {} items totally, task status is {}",
-                                result.getValue(), this.getStatus().name());
-                    } else {
-                        if (!MockTaskStatus.CANCELED.equals(thisTaskBean.getStatus())) {
-                            thisTaskBean.setStatus(MockTaskStatus.FAILED);
-                        }
-                        log.error("fail to execute data generate business task, task status is {}", this.getStatus().name());
+            if (businessTask instanceof GenerateDataTask) {
+                businessTask.bind(new AbstractCallBack<TableTaskContext>() {
+                    @Override
+                    public void doOnSuccess(TableTaskContext param) throws Throwable {
+                        log.info("Data generation task completed, numberOfDataGeneration={}, taskStatus={}",
+                                param.getTotalDataGenerateCount(), param.getStatus());
+                        startAfterTask(service, callBack);
                     }
-                    startAfterTask(service, callBack);
+
+                    @Override
+                    public void doOnFailure(TableTaskContext param, Throwable e) throws Throwable {
+                        log.error("Data generation task execution failed, taskStatus={}", param.getStatus(), e);
+                        startAfterTask(service, callBack);
+                    }
                 });
-            } else if (businessTask instanceof MockDataOutputTask) {
-                businessTask.bind((CallBackMethod<Pair<Boolean, Map<String, Long>>>) result -> {
-                    Map<String, Long> resultValue = result.getValue();
-                    StringBuilder builder = new StringBuilder();
-                    for (Map.Entry<String, Long> item : resultValue.entrySet()) {
-                        this.context.appendWriteInfo(new Pair<>(item.getKey(), item.getValue()));
-                        builder.append("{\"" + item.getKey() + "\" : " + item.getValue() + "} ");
-                    }
-                    if (result.getKey()) {
-                        log.info("data write business task has been executed completely, generate {}items totally, task status is {}",
-                                builder.toString(), this.getStatus().name());
-                    } else {
-                        if (!MockTaskStatus.CANCELED.equals(thisTaskBean.getStatus())) {
-                            thisTaskBean.setStatus(MockTaskStatus.FAILED);
+            } else if (businessTask instanceof OutputDataTask) {
+                businessTask.bind(new AbstractCallBack<TableTaskContext>() {
+                    @Override
+                    public void doOnSuccess(TableTaskContext param) throws Throwable {
+                        StringBuilder builder = new StringBuilder();
+                        for (Map.Entry<String, Long> item : param.getWriterName2writeCount().entrySet()) {
+                            builder.append("{\"")
+                                    .append(item.getKey())
+                                    .append("\" : ")
+                                    .append(item.getValue())
+                                    .append("} ");
                         }
-                        log.error("fail to execute data write business task, task status is {}", this.getStatus().name());
+                        log.info("Data writing task is completed, taskStatus={}, writingInfo={}", param.getStatus(),
+                                builder.toString());
+                        startAfterTask(service, callBack);
                     }
-                    startAfterTask(service, callBack);
+
+                    @Override
+                    public void doOnFailure(TableTaskContext param, Throwable e) throws Throwable {
+                        log.error("Fail to execute data writing task, taskStatus={}", param.getStatus(), e);
+                        startAfterTask(service, callBack);
+                    }
                 });
             } else {
-                throw new MockerException(MockerError.PARAMETER_ERROR, "unknown business task type");
+                throw new MockerException(MockerError.PARAMETER_ERROR, "Unknown business task type");
             }
         }
-        afterTask.bind((CallBackMethod<Pair<Boolean, Long>>) result -> {
-            if (result.getKey()) {
+        afterTask.bind(new AbstractCallBack<TableTaskContext>() {
+            @Override
+            public void doOnSuccess(TableTaskContext param) throws Throwable {
                 if (!MockTaskStatus.FAILED.equals(thisTaskBean.getStatus()) && !MockTaskStatus.CANCELED.equals(
                         thisTaskBean.getStatus())) {
-                    thisTaskBean.setStatus(MockTaskStatus.SUCCESS);
+                    param.setStatus(MockTaskStatus.SUCCESS);
                 }
-                this.context.setCurrentRecordNum(result.getValue());
-                log.info("mock after task has been executed successfully, current record size is {}, task status is {}", result.getValue(),
-                        this.getStatus().name());
-            } else {
-                if (!MockTaskStatus.CANCELED.equals(thisTaskBean.getStatus())) {
-                    thisTaskBean.setStatus(MockTaskStatus.FAILED);
-                }
-                log.error("fail to execute mock after task, task status is {}", this.getStatus().name());
+                log.info("The mock data destruction task is executed successfully, currentRecordNum={}, taskStatus={}",
+                        param.getCurrentRecordNum(), param.getStatus());
+                callBack.onSuccess(param);
             }
-            callBack.execute(this.context);
+
+            @Override
+            public void doOnFailure(TableTaskContext param, Throwable e) throws Throwable {
+                log.error("Failed to execute simulation data destruction task, taskStatus={}", param.getStatus(), e);
+                callBack.onFailure(param, e);
+            }
         });
     }
 
-    /**
-     * 启动after任务
-     *
-     * @param service  线程service对象
-     * @param callBack 回调方法
-     */
-    private void startAfterTask(MockExecutorService service, CallBackMethod callBack) {
+    private void startAfterTask(MockExecutorService service, AbstractCallBack<TableTaskContext> callBack)
+            throws Throwable {
         if (counter.incrementAndGet() == this.businessTasks.size()) {
-            log.info("all mock business tasks has been executed, mock after task will begin");
-            if (!service.isShutdown()) {
+            log.info("All mock data business tasks are completed, and the destructuring task is started");
+            if (!service.isShutdown() && !context.isShutdown()) {
                 service.submitCallable(this.afterTask, this.context);
             } else {
-                log.warn("thread pool has been shut down, mock task will be exited");
-                callBack.execute(this.context);
+                log.warn("The thread pool has been closed, and the mock data task will exit");
+                callBack.onFailure(this.context, new MockerException("Thread pool has been shutdown"));
             }
         }
-    }
-
-    public void setStatus(MockTaskStatus status) {
-        this.context.setStatus(status);
     }
 
     public MockTaskStatus getStatus() {
@@ -264,11 +239,11 @@ public class TableTask {
             return false;
         }
         TableTask that = (TableTask) o;
-        return this.taskId.equals(that.taskId);
+        return this.tableTaskId.equals(that.tableTaskId);
     }
 
     @Override
     public int hashCode() {
-        return this.taskId.hashCode();
+        return this.tableTaskId.hashCode();
     }
 }

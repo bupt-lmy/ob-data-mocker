@@ -7,14 +7,15 @@ import java.util.concurrent.TimeUnit;
 
 import com.oceanbase.tools.datamocker.datatype.AbstractDateDataType;
 import com.oceanbase.tools.datamocker.datatype.DataTypeFactory;
+import com.oceanbase.tools.datamocker.generator.BaseDateGenerator;
 import com.oceanbase.tools.datamocker.generator.BaseGenerator;
-import com.oceanbase.tools.datamocker.generator.DateGeneratorBase;
-import com.oceanbase.tools.datamocker.model.enums.DialectType;
+import com.oceanbase.tools.datamocker.model.config.model.DateDataTypeConfig;
+import com.oceanbase.tools.datamocker.model.enums.ObModeType;
 import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
 
 /**
- * mysql模式下的date类型，精确到天
+ * Date type in mysql mode, accurate to the day
  *
  * @author yh263208
  * @date 2020-12-16 11:17
@@ -22,49 +23,40 @@ import com.oceanbase.tools.datamocker.model.exception.MockerException;
  */
 public class MysqlDateType extends AbstractDateDataType<Date> {
     /**
-     * java应用程序中的日期格式化字符串
+     * Date format string in java application
      */
     private static final String JAVA_DATE_FORMAT = "yyyy-MM-dd";
-    /**
-     * 日期格式化器
-     */
-    private final SimpleDateFormat dateFormat = new SimpleDateFormat(JAVA_DATE_FORMAT);
 
-    public MysqlDateType(DateGeneratorBase<Date> generator, Date defaultValue, Boolean allowNull) {
-        super(generator, DialectType.OB_MYSQL, defaultValue, allowNull);
-        generator.setTimeUnit(TimeUnit.DAYS);
+    public MysqlDateType(BaseDateGenerator<Date> generator, Date defaultValue, Boolean allowNull) {
+        super(generator, ObModeType.OB_MYSQL, defaultValue, allowNull);
+        generator.setMinTimeUnit(TimeUnit.DAYS);
     }
 
     public MysqlDateType(TimeZone timeZone, Date defaultValue, Boolean allowNull) {
-        super(DialectType.OB_MYSQL, timeZone, defaultValue, allowNull);
+        super(ObModeType.OB_MYSQL, timeZone, defaultValue, allowNull);
     }
 
     public MysqlDateType(Date defaultValue, Boolean allowNull) {
-        super(DialectType.OB_MYSQL, defaultValue, allowNull);
+        super(ObModeType.OB_MYSQL, defaultValue, allowNull);
     }
 
-    /**
-     * 绑定数据生成器方法
-     *
-     * @param generator 数据生成器
-     */
     @Override
     public void bind(BaseGenerator<Date, Date> generator) {
         super.bind(generator);
-        ((DateGeneratorBase) generator).setTimeUnit(TimeUnit.DAYS);
+        ((BaseDateGenerator<Date>) generator).setMinTimeUnit(TimeUnit.DAYS);
     }
 
     @Override
     protected Long limitForType(Date minDate, Date maxDate) {
         long interval = maxDate.getTime() - minDate.getTime();
         if (interval < 0) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "time interval can not be smaller than zero");
+            throw new MockerException(MockerError.PARAMETER_ERROR, "Time interval can not be smaller than zero");
         }
         return interval / 86400000;
     }
 
     @Override
-    public DataTypeFactory getFactory() {
+    public DataTypeFactory<MysqlDateType, DateDataTypeConfig, BaseDateGenerator<Date>> getFactory() {
         return DataTypeFactory.getInstance("OB_MYSQL_DATE");
     }
 
@@ -79,11 +71,12 @@ public class MysqlDateType extends AbstractDateDataType<Date> {
     }
 
     @Override
-    public synchronized String toString(Date value) {
+    public synchronized String convertToSqlString(Date value, TimeZone timeZone) {
         if (value == null) {
             return "NULL";
         }
-        dateFormat.setTimeZone(timeZone());
+        SimpleDateFormat dateFormat = new SimpleDateFormat(JAVA_DATE_FORMAT);
+        dateFormat.setTimeZone(timeZone);
         return String.format("'%s'", dateFormat.format(value));
     }
 }

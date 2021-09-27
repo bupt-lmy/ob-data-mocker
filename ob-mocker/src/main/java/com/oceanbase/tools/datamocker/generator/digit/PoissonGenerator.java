@@ -2,27 +2,27 @@ package com.oceanbase.tools.datamocker.generator.digit;
 
 import java.math.BigDecimal;
 
-import com.oceanbase.tools.datamocker.generator.DigitalGeneratorBase;
+import com.oceanbase.tools.datamocker.generator.BaseDigitalGenerator;
 import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
 
 /**
- * 泊松分布随机数生成器
+ * Poisson Distribution Random Number Generator
  *
  * @author yh263208
  * @date 2020-12-09 13:51
  * @since ODCMOCKER_snapshot_0.1.0
  */
-public class PoissonGenerator extends DigitalGeneratorBase<BigDecimal> {
+public class PoissonGenerator extends BaseDigitalGenerator<BigDecimal> {
     /**
-     * 泊松分布的均值
+     * Mean of Poisson distribution
      */
     private final double lambda;
 
     /**
-     * 构造函数
+     * Constructor
      *
-     * @param lambda 传入一个平均值
+     * @param lambda Pass in an average
      */
     public PoissonGenerator(double lambda) {
         this.lambda = lambda;
@@ -32,11 +32,11 @@ public class PoissonGenerator extends DigitalGeneratorBase<BigDecimal> {
     public Boolean preCheck(BigDecimal minValue, BigDecimal maxValue) {
         BigDecimal lambdaValue = new BigDecimal(Double.toString(lambda));
         if (lambdaValue.compareTo(minValue) < 0) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "lambda is smaller than min value");
+            throw new MockerException(MockerError.PARAMETER_ERROR, "Lambda is smaller than min value");
         } else if (lambdaValue.compareTo(maxValue) >= 0) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "lambda is bigger than max value");
+            throw new MockerException(MockerError.PARAMETER_ERROR, "Lambda is bigger than max value");
         } else if (minValue.compareTo(BigDecimal.ZERO) != 0) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "lmin value is not equal to zero");
+            throw new MockerException(MockerError.PARAMETER_ERROR, "Min value is not equal to zero");
         }
         return true;
     }

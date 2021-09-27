@@ -30,17 +30,18 @@ import com.oceanbase.tools.datamocker.model.config.AbstractTableConfig;
 import com.oceanbase.tools.datamocker.model.config.AbstractTaskConfig;
 import com.oceanbase.tools.datamocker.model.config.impl.DefaultTaskConfig;
 import com.oceanbase.tools.datamocker.model.config.model.DataBaseConfig;
-import com.oceanbase.tools.datamocker.model.enums.DialectType;
 import com.oceanbase.tools.datamocker.model.enums.MockTaskStatus;
+import com.oceanbase.tools.datamocker.model.enums.ObModeType;
 import com.oceanbase.tools.datamocker.model.enums.ScriptType;
 import com.oceanbase.tools.datamocker.schedule.MockContext;
+import com.oceanbase.tools.datamocker.util.PrintUtil;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 /**
- * mock数据任务测试类，用于测试mock数据的任务模块
+ * Mock data task test class, used to test the task module of mock data
  *
  * @author yh263208
  * @date 2021-01-17 16:14
@@ -49,48 +50,33 @@ import org.junit.Test;
 public class MockerTaskOracleTest extends MockerTestBase {
     private final ThreadPoolExecutor executor = new ThreadPoolExecutor(3, 5, 0, TimeUnit.MILLISECONDS,
             new LinkedBlockingQueue<>(), new ThreadPoolExecutor.CallerRunsPolicy());
-    /**
-     * 任务配置文件目录
-     */
     private final String configFile = "task/config-oracle.json";
-    /**
-     * mysql数据库连接配置文件所在地
-     */
     private final String mysqlEnv = "db/mysql-env.properties";
-    /**
-     * oracle数据库连接配置文件所在地
-     */
     private final String oracleEnv = "db/oracle-env.properties";
     private final String[] ddls = new String[] {
             "CREATE TABLE \"EMP\" (\n"
-            + "  \"COL\" NUMBER(5,2) NOT NULL,\n"
-            + "  \"COL2\" VARCHAR(64) NOT NULL,\n"
-            + "  \"COL3\" VARCHAR2(128) NOT NULL,\n"
-            + "  \"COL4\" CHAR(128) NOT NULL,\n"
-            + "  \"COL5\" NVARCHAR2(128) NOT NULL,\n"
-            + "  \"COL6\" date,\n"
-            + "  \"COL7\" interval year(5) to month,\n"
-            + "  \"COL8\" interval day(2) to second(6),\n"
-            + "  PRIMARY KEY (\"COL\", \"COL4\"),\n"
-            + "  UNIQUE (\"COL2\", \"COL3\"),\n"
-            + "  UNIQUE (\"COL5\")\n"
-            + ");"
+                    + "  \"COL\" NUMBER(5,2) NOT NULL,\n"
+                    + "  \"COL2\" VARCHAR(64) NOT NULL,\n"
+                    + "  \"COL3\" VARCHAR2(128) NOT NULL,\n"
+                    + "  \"COL4\" CHAR(128) NOT NULL,\n"
+                    + "  \"COL5\" NVARCHAR2(128) NOT NULL,\n"
+                    + "  \"COL6\" date,\n"
+                    + "  \"COL7\" interval year(5) to month,\n"
+                    + "  \"COL8\" interval day(2) to second(6),\n"
+                    + "  PRIMARY KEY (\"COL\", \"COL4\"),\n"
+                    + "  UNIQUE (\"COL2\", \"COL3\"),\n"
+                    + "  UNIQUE (\"COL5\")\n"
+                    + ");"
     };
     private DataSource oracleDatasource = null;
 
-    /**
-     * 获取测试数据库连接配置信息
-     *
-     * @param dialectType 方言类型
-     * @throws IOException 文件读取操作可能会抛出异常
-     */
-    private DataBaseConfig getDBConfig(DialectType dialectType) throws IOException {
+    private DataBaseConfig getDBConfig(ObModeType dialectType) throws IOException {
         DataBaseConfig config = new DataBaseConfig();
         Properties properties = new Properties();
         URL url = null;
-        if (DialectType.OB_MYSQL.equals(dialectType)) {
+        if (ObModeType.OB_MYSQL.equals(dialectType)) {
             url = this.getClass().getClassLoader().getResource(mysqlEnv);
-        } else if (DialectType.OB_ORACLE.equals(dialectType)) {
+        } else if (ObModeType.OB_ORACLE.equals(dialectType)) {
             url = this.getClass().getClassLoader().getResource(oracleEnv);
         } else {
             return null;
@@ -106,12 +92,6 @@ public class MockerTaskOracleTest extends MockerTestBase {
         return config;
     }
 
-    /**
-     * 从配置文件中读取任务配置封装成一个任务配置对象
-     *
-     * @return 返回任务对象
-     * @throws IOException 可能找不到文件
-     */
     private AbstractTaskConfig getTask() throws IOException {
         URL url = this.getClass().getClassLoader().getResource(this.configFile);
         FileReader reader = new FileReader(url.getPath());
@@ -131,7 +111,7 @@ public class MockerTaskOracleTest extends MockerTestBase {
     @Before
     public void initEnv() throws IOException, SQLException {
         if (oracleDatasource == null) {
-            DataBaseConfig config = getDBConfig(DialectType.OB_ORACLE);
+            DataBaseConfig config = getDBConfig(ObModeType.OB_ORACLE);
             oracleDatasource = new MockerDataSource(config, 3, 5, 2, null);
         }
         try (Connection connection = oracleDatasource.getConnection()) {
@@ -139,13 +119,14 @@ public class MockerTaskOracleTest extends MockerTestBase {
                 for (String ddl : ddls) {
                     statement.execute(ddl);
                 }
-                statement.execute("insert into emp(col,col2,col3,col4,col5) values(12.1,'12.44','11.67','23.44', 'hello,world');");
+                statement.execute(
+                        "insert into emp(col,col2,col3,col4,col5) values(12.1,'12.44','11.67','23.44', 'hello,world');");
             }
         }
     }
 
     @Test
-    public void testMockTask() throws Exception {
+    public void testMockTask() throws Throwable {
         AbstractTaskConfig config = getTask();
         AbstractMockerFactory factory = new ObMockerFactory(config);
         ObDataMocker mocker = factory.create();
@@ -153,17 +134,19 @@ public class MockerTaskOracleTest extends MockerTestBase {
         Callable<Boolean> task = () -> {
             long start = System.currentTimeMillis();
             while (true) {
-                Boolean flag = Boolean.TRUE;
+                boolean flag = true;
                 List<TableTaskContext> contexts = context.getTables();
                 if (contexts.size() == 0) {
                     flag = false;
                 }
                 for (TableTaskContext item : contexts) {
-                    String interval = (System.currentTimeMillis() - start) / 1000 + "s";
-                    System.out.println(
-                            String.format("[\"%s\" - \"%s\"] : %s - %s", item.getTaskName(), item.getTaskId(), item.getStatus(),
-                                    interval));
-                    if (MockTaskStatus.CANCELED.equals(item.getStatus()) || MockTaskStatus.FAILED.equals(item.getStatus())) {
+                    long interval = System.currentTimeMillis() - start;
+                    System.out.printf("[\"%s\" - \"%s\"] : %s - %s - %.2f %%%n", item.getTaskName(),
+                            item.getTableTaskId(), item.getStatus(), PrintUtil.convertToReadableTimeString(interval,
+                                    TimeUnit.MILLISECONDS, TimeUnit.MINUTES, TimeUnit.SECONDS),
+                            context.getProgress());
+                    if (MockTaskStatus.CANCELED.equals(item.getStatus())
+                            || MockTaskStatus.FAILED.equals(item.getStatus())) {
                         return false;
                     }
                     flag &= MockTaskStatus.SUCCESS.equals(item.getStatus());

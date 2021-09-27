@@ -6,7 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * 该注解用于读取数据库时做序列化或反序列化时使用
+ * This annotation is used for serialization or deserialization when reading the database
  *
  * @author yh263208@antgroup.com
  * @date 2020-12-02 15:19
@@ -16,12 +16,12 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Column {
     /**
-     * 默认的序列化或反序列化字段名，必填字段
+     * Default serialized or deserialized field name, required field
      */
     String value();
 
     /**
-     * 该字段是否忽略配置，默认为false
+     * Whether this field ignores the configuration, the default is false
      */
     boolean ignore() default false;
 }

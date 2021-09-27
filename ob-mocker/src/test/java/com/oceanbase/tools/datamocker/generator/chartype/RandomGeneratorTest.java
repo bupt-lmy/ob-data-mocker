@@ -11,16 +11,14 @@ import org.junit.Assert;
 import org.junit.Test;
 
 /**
- * 随机字符串生成器测试类
+ * Random string generator test class
  *
  * @author yh263208
  * @date 2020-12-16 16:37
  * @since OBMOCKER_snapshot_0.1.0
  */
 public class RandomGeneratorTest extends MockerTestBase {
-    /**
-     * 正向逻辑，测试随机字符串生成器生成的字符串是否在长度范围内符合均匀分布
-     */
+
     @Test
     public void testRandomGenerator() {
         RandomGenerator generator = new RandomGenerator(CharCaseOption.DEFAULT);

@@ -455,6 +455,7 @@
           "dataType": null
         }
       ],
+      "maxRetainedCount": 1,
       "totalCount": 100,
       "strategy": "IGNORE",
       "batchSize": 240,

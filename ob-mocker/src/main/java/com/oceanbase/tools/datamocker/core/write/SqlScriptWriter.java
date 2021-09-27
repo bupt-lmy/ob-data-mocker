@@ -4,21 +4,21 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import com.oceanbase.tools.datamocker.core.write.output.MockerFile;
-import com.oceanbase.tools.datamocker.datatype.AbstractDataType;
-import com.oceanbase.tools.datamocker.model.enums.DialectType;
+import com.oceanbase.tools.datamocker.model.enums.ObModeType;
 import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
+import com.oceanbase.tools.datamocker.model.mock.MockColumnData;
+import com.oceanbase.tools.datamocker.model.mock.MockRowData;
+import com.oceanbase.tools.datamocker.util.DbObjectNameUtil;
 import com.oceanbase.tools.datamocker.util.DigestUtil;
-import com.oceanbase.tools.datamocker.util.Pair;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.Validate;
 
 /**
- * sql文本生成原语
+ * SQL text generation primitive
  *
  * @author yh263208
  * @date 2021-01-05 20:47
@@ -27,40 +27,36 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class SqlScriptWriter extends AbstractMockWriter {
     /**
-     * 写入的目标库，如果建连接的时候指定了目标库该值也可以不填写
+     * The written target library, if the target library is specified when the connection is
+     * established, this value can also be left blank
      */
-    private String database;
+    private final String database;
     /**
-     * 写入的目标表，该参数必传，指定传入的目标表
+     * The target table to be written, this parameter must be passed, specify the incoming target table
      */
-    private String tableName;
+    private final String tableName;
     /**
-     * OB的方言模式，默认为oracle模式
+     * The dialect mode of OB, the default is oracle mode
      */
-    private DialectType dialectType = DialectType.OB_ORACLE;
-    /**
-     * 文件管理器
-     */
-    private MockerFile manager = null;
-    /**
-     * 该原语的分组ID
-     */
-    private String groupId = null;
+    private final ObModeType dialectType;
+    private final MockerFile manager;
+    private final String groupId;
 
     /**
-     * 构造函数写入一个数据源，该数据源是必须的
+     * The constructor writes a mock file, which is required
      *
-     * @param manager     文件管理器对象
-     * @param dialectType 方言类型
-     * @param database    数据库名
-     * @param tableName   表名
+     * @param manager mock file object
+     * @param dialectType dialect type
+     * @param database schema or database name
+     * @param tableName table name
      */
-    public SqlScriptWriter(MockerFile manager, DialectType dialectType, String database,
+    public SqlScriptWriter(MockerFile manager, ObModeType dialectType, String database,
             String tableName) {
         validateParam(manager, dialectType, database, tableName);
         this.database = database;
         this.tableName = tableName;
         this.manager = manager;
+        this.dialectType = dialectType;
         try {
             this.groupId = DigestUtil.getToken(manager.getFile().getAbsolutePath());
         } catch (NoSuchAlgorithmException e) {
@@ -69,99 +65,92 @@ public class SqlScriptWriter extends AbstractMockWriter {
     }
 
     /**
-     * 构造函数写入一个数据源，该数据源是必须的
+     * The constructor writes a mock file, which is required
      *
-     * @param manager     文件管理器对象
-     * @param dialectType 方言类型
-     * @param database    数据库名
-     * @param tableName   表名
-     * @param groupId     分组ID
+     * @param manager mock file object
+     * @param dialectType dialect type
+     * @param database schema or database name
+     * @param tableName table name
+     * @param groupId group id
      */
-    public SqlScriptWriter(MockerFile manager, DialectType dialectType, String database,
-            String tableName, String groupId) {
+    public SqlScriptWriter(MockerFile manager, ObModeType dialectType, String database, String tableName,
+            String groupId) {
         validateParam(manager, dialectType, database, tableName);
         this.database = database;
         this.tableName = tableName;
         this.manager = manager;
+        this.dialectType = dialectType;
         if (groupId == null) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "group id can not be null");
+            throw new MockerException(MockerError.PARAMETER_ERROR, "Group id can not be null");
         }
         this.groupId = groupId;
     }
 
     /**
-     * 验证原语的输入参数
+     * Validation primitive input parameters
      *
-     * @param manager     文件管理器
-     * @param dialectType 方言类型
-     * @param database    数据库名或schema名
-     * @param tableName   表名
-     * @throws MockerException 验证失败抛出异常
+     * @param manager mock file
+     * @param dialectType dialect type
+     * @param database database or schema name
+     * @param tableName table name
+     * @throws MockerException An exception is thrown when verification fails
      */
-    private void validateParam(MockerFile manager, DialectType dialectType, String database,
-            String tableName) {
-        if (manager == null) {
-            MockerException e = new MockerException(MockerError.PARAMETER_ERROR, "file manager can not be null");
-            log.error("file manager for sql script writer is necessary", e);
-            throw e;
-        }
-        if (database == null) {
-            MockerException e = new MockerException(MockerError.PARAMETER_ERROR, "database can not be null");
-            log.error("database for sql script writer is necessary", e);
-            throw e;
-        }
-        if (tableName == null) {
-            MockerException e = new MockerException(MockerError.PARAMETER_ERROR, "table name can not be null");
-            log.error("table name for sql script writer is necessary", e);
-            throw e;
-        }
-        if (dialectType != null) {
-            if (!DialectType.OB_ORACLE.equals(dialectType) && !DialectType.OB_MYSQL.equals(dialectType)) {
-                throw new MockerException(MockerError.INVALID_OB_MODE);
-            }
-            this.dialectType = dialectType;
+    private void validateParam(MockerFile manager, ObModeType dialectType, String database, String tableName) {
+        Validate.notNull(manager, "File manager can not be null for SqlScriptWriter#validateParam");
+        Validate.notNull(database, "DataBase can not be null for SqlScriptWriter#validateParam");
+        Validate.notNull(tableName, "TableName can not be null for SqlScriptWriter#validateParam");
+        if (!ObModeType.OB_ORACLE.equals(dialectType) && !ObModeType.OB_MYSQL.equals(dialectType)) {
+            throw new MockerException(MockerError.INVALID_OB_MODE);
         }
     }
 
     @Override
-    protected Long doWrite(List<Map<String, Pair<AbstractDataType, Object>>> rows) throws IOException {
-        Map<String, ?> firstRow = rows.get(0);
-        Set<String> columnSet = firstRow.keySet();
+    protected long doWrite(List<MockRowData> rows) throws IOException {
+        MockRowData firstRow = rows.get(0);
+        Set<String> columnSet = firstRow.columnNames();
         List<String> columnList = new ArrayList<>(columnSet);
-        StringBuffer sqlBuffer = null;
-        if (DialectType.OB_ORACLE.equals(this.dialectType)) {
-            sqlBuffer = new StringBuffer(String.format("insert into %s.\"%s\"(", database, tableName));
-        } else if (DialectType.OB_MYSQL.equals(this.dialectType)) {
-            sqlBuffer = new StringBuffer(String.format("insert into `%s`.`%s`(", database, tableName));
+        StringBuffer sqlBuffer;
+        if (ObModeType.OB_ORACLE.equals(this.dialectType)) {
+            sqlBuffer = new StringBuffer(
+                    String.format("insert into \"%s\".\"%s\"(", DbObjectNameUtil.doubleCharToEscape(database, '"'),
+                            DbObjectNameUtil.doubleCharToEscape(tableName, '"')));
+        } else if (ObModeType.OB_MYSQL.equals(this.dialectType)) {
+            sqlBuffer = new StringBuffer(
+                    String.format("insert into `%s`.`%s`(", DbObjectNameUtil.doubleCharToEscape(database, '`'),
+                            DbObjectNameUtil.doubleCharToEscape(tableName, '`')));
+        } else {
+            throw new MockerException(MockerError.INVALID_OB_MODE);
         }
         int columnLength = columnList.size();
         for (int i = 0; i < columnLength; i++) {
             String columnName = columnList.get(i);
             if (i == columnLength - 1) {
-                if (DialectType.OB_ORACLE.equals(this.dialectType)) {
-                    sqlBuffer.append(String.format("\"%s\") values (", columnName));
-                } else if (DialectType.OB_MYSQL.equals(this.dialectType)) {
-                    sqlBuffer.append(String.format("`%s`) values (", columnName));
+                if (ObModeType.OB_ORACLE.equals(this.dialectType)) {
+                    sqlBuffer.append(
+                            String.format("\"%s\") values (", DbObjectNameUtil.doubleCharToEscape(columnName, '"')));
+                } else {
+                    sqlBuffer.append(
+                            String.format("`%s`) values (", DbObjectNameUtil.doubleCharToEscape(columnName, '`')));
                 }
             } else {
-                if (DialectType.OB_ORACLE.equals(this.dialectType)) {
-                    sqlBuffer.append(String.format("\"%s\", ", columnName));
-                } else if (DialectType.OB_MYSQL.equals(this.dialectType)) {
-                    sqlBuffer.append(String.format("`%s`, ", columnName));
+                if (ObModeType.OB_ORACLE.equals(this.dialectType)) {
+                    sqlBuffer.append(String.format("\"%s\", ", DbObjectNameUtil.doubleCharToEscape(columnName, '"')));
+                } else {
+                    sqlBuffer.append(String.format("`%s`, ", DbObjectNameUtil.doubleCharToEscape(columnName, '`')));
                 }
             }
         }
         String prefix = sqlBuffer.toString();
         List<String> sqlList = new ArrayList<>();
-        for (Map<String, Pair<AbstractDataType, Object>> row : rows) {
-            StringBuffer buffer = new StringBuffer(prefix);
+        for (MockRowData row : rows) {
+            StringBuilder buffer = new StringBuilder(prefix);
             for (int i = 0; i < columnLength; i++) {
                 String columnName = columnList.get(i);
-                Pair<AbstractDataType, Object> pair = row.get(columnName);
-                String value = pair.getKey().toString(pair.getValue());
+                MockColumnData<?> mockColumn = row.getMockColumn(columnName);
+                String value = mockColumn.getColumnValueString();
                 if (value == null) {
                     throw new MockerException(MockerError.ILLEGAL_RETURN_VALUE,
-                            String.format("value for column \"%s\" is null", columnName));
+                            String.format("Value for column \"%s\" is null", columnName));
                 }
                 if (i == columnLength - 1) {
                     buffer.append(String.format("%s); ", value));
@@ -171,13 +160,14 @@ public class SqlScriptWriter extends AbstractMockWriter {
             }
             sqlList.add(buffer.append("\n").toString());
         }
-        String result = sqlList.stream().collect(Collectors.joining());
+        String result = String.join("", sqlList);
         this.manager.write(result.getBytes(), 0, result.getBytes().length, true);
-        return (long) rows.size();
+        return rows.size();
     }
 
     @Override
     public String groupId() {
         return this.groupId;
     }
+
 }

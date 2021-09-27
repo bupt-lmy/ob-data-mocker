@@ -14,7 +14,8 @@ import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
 
 /**
- * mock数据线程池执行serivce对象，用于封装线程池的调用和执行
+ * The mock data thread pool executes the serivce object, used to encapsulate the call and execution
+ * of the thread pool
  *
  * @author yh263208
  * @date 2021-01-18 11:24
@@ -22,22 +23,23 @@ import com.oceanbase.tools.datamocker.model.exception.MockerException;
  */
 public class MockExecutorService {
     /**
-     * 线程池，该类需要接受一个外界传入的线程池
+     * Thread pool, this class needs to accept an incoming thread pool
      */
     private final ThreadPoolExecutor executor;
 
     public MockExecutorService(ThreadPoolExecutor executor) {
         if (executor == null) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "executor for mock executor service can not be null");
+            throw new MockerException(MockerError.PARAMETER_ERROR,
+                    "Executor for mock executor service can not be null");
         }
         this.executor = executor;
     }
 
     /**
-     * 返回新的FutureTask
+     * Return a new FutureTask
      *
-     * @param task 需要执行的任务
-     * @return FustureTask对象
+     * @param task Tasks to be performed
+     * @return FustureTask object
      */
     private <V> RunnableFuture<V> newTaskFor(Callable<V> task) {
         return new FutureTask<>(task);
@@ -48,41 +50,45 @@ public class MockExecutorService {
     }
 
     /**
-     * 提交一个TaskBean执行
+     * Submit a TaskBean for execution
      *
-     * @param taskBean 提交的TaskBean
+     * @param taskBean Submitted TaskBean
      */
     public synchronized TableTaskContext submit(TableTask taskBean) {
         if (taskBean == null) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "task bean for executor service can not be null");
+            throw new MockerException(MockerError.PARAMETER_ERROR, "Task bean for executor service can not be null");
         }
-        taskBean.setStatus(MockTaskStatus.RUNNING);
+        taskBean.getContext().setStatus(MockTaskStatus.RUNNING);
         submitCallable(taskBean.getBeforeTask(), taskBean.getContext());
         return taskBean.getContext();
     }
 
     /**
-     * 提交一个具体的callable任务进行执行，正常的调用中不需要这个方法
+     * Submit a specific callable task for execution, this method is not needed in normal calls
      *
-     * @param task    任务
-     * @param context mock数据子任务的上下文对象
+     * @param task Task to be performed
+     * @param context Context object for mock data subtask
      */
     public synchronized <V> void submitCallable(Callable<V> task, TableTaskContext context) {
         if (task == null || context == null) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "callable or context for executor service can not be null");
+            throw new MockerException(MockerError.PARAMETER_ERROR,
+                    "Callable or context for executor service can not be null");
         }
-        Future future = executor.submit(newTaskFor(task));
-        context.appendHandle(future);
+        if (!context.isShutdown() && !isShutdown()) {
+            Future<?> future = executor.submit(newTaskFor(task));
+            context.appendHandle(future);
+        }
     }
 
     /**
-     * 提交一个具体的callable任务进行执行，正常的调用中不需要这个方法
+     * Submit a specific callable task for execution, this method is not needed in normal calls
      *
-     * @param task 任务
+     * @param task Task to be performed
      */
     public synchronized <V> void submitCallable(Callable<V> task) {
         if (task == null) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "callable or context for executor service can not be null");
+            throw new MockerException(MockerError.PARAMETER_ERROR,
+                    "Callable or context for executor service can not be null");
         }
         executor.submit(newTaskFor(task));
     }
@@ -90,10 +96,10 @@ public class MockExecutorService {
     @Deprecated
     public synchronized <V> void submit(Runnable task, V result, TableTaskContext context) {
         if (task == null) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "callable for executor service can not be null");
+            throw new MockerException(MockerError.PARAMETER_ERROR, "Callable for executor service can not be null");
         }
         RunnableFuture<V> f = newTaskFor(task, result);
-        Future future = executor.submit(f);
+        Future<?> future = executor.submit(f);
         context.appendHandle(future);
     }
 

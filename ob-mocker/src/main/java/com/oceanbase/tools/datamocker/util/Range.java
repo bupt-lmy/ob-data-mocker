@@ -3,53 +3,53 @@ package com.oceanbase.tools.datamocker.util;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
 
 /**
- * 表示一个数字区间，是一个左闭右闭区间
+ * Represents a numeric interval, which is a left-closed right-closed interval
  *
  * @author yh263208
  * @date 2020-12-11 20：55
  * @since OBMOCKER_snapshot_0.1.0
  */
-public class Range<T extends Comparable> {
+public class Range<T extends Comparable<? super T>> {
     /**
-     * 区间的左范围
+     * Left range of interval
      */
     private final T min;
     /**
-     * 区间的右范围
+     * Right range of interval
      */
     private final T max;
 
     public Range(T min, T max) {
         if (min.compareTo(max) > 0) {
-            throw new MockerException("min value can not be bigger than max value");
+            throw new MockerException("Min value can not be bigger than max value");
         }
         this.min = min;
         this.max = max;
     }
 
     /**
-     * 用于判断一个值是否在区间内，这是一个左闭右闭区间
+     * Used to judge whether a value is in the interval, this is a left-closed right-closed interval
      *
-     * @param value 用于判断的值
-     * @return 返回布尔型结果
+     * @param value Value used for judgment
+     * @return Return boolean result
      */
     public boolean contain(T value) {
         return min.compareTo(value) <= 0 && max.compareTo(value) >= 0;
     }
 
     /**
-     * 获取左边界
+     * Get the left margin
      *
-     * @return 返回左边界值
+     * @return Returns the left boundary value
      */
     public T getMin() {
         return this.min;
     }
 
     /**
-     * 获取右边界值
+     * Get the right boundary value
      *
-     * @return 返回右边界值
+     * @return Returns the right boundary value
      */
     public T getMax() {
         return this.max;
@@ -63,7 +63,7 @@ public class Range<T extends Comparable> {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        Range that = (Range) o;
+        Range<T> that = (Range<T>) o;
         return this.min.compareTo(that.min) == 0 && this.max.compareTo(that.max) == 0;
     }
 

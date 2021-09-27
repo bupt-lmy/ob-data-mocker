@@ -2,44 +2,50 @@ package com.oceanbase.tools.datamocker.datatype.oracle;
 
 import com.oceanbase.tools.datamocker.datatype.AbstractByteDataType;
 import com.oceanbase.tools.datamocker.datatype.DataTypeFactory;
-import com.oceanbase.tools.datamocker.generator.ByteGeneratorBase;
-import com.oceanbase.tools.datamocker.model.enums.DialectType;
+import com.oceanbase.tools.datamocker.generator.BaseByteGenerator;
+import com.oceanbase.tools.datamocker.model.config.model.CharDataTypeConfig;
+import com.oceanbase.tools.datamocker.model.enums.ObModeType;
 
 /**
- * oracle模式下的raw类型
+ * Raw type in oracle mode
  *
  * @author yh263208
  * @date 2021-01-31 10:46
  * @since OBMOCKER_snapshot_0.1.0
  */
 public class OracleRawType extends AbstractByteDataType {
+    /**
+     * Raw width, eg. the width of raw(128) is 128
+     */
     private final Integer width;
 
     /**
-     * 构造函数
+     * Constructor
      *
-     * @param generator 字符类型绑定的数据生成器
-     * @param width     宽度
-     * @param allowNull 是否允许空值
+     * @param defaultValue default value for raw
+     * @param generator Character type binding data generator
+     * @param width width of data type
+     * @param allowNull Whether to allow null values
      */
-    public OracleRawType(byte[] defaultValue, Boolean allowNull, Integer width, ByteGeneratorBase generator) {
-        super(generator, DialectType.OB_ORACLE, defaultValue, allowNull);
+    public OracleRawType(byte[] defaultValue, Boolean allowNull, Integer width, BaseByteGenerator generator) {
+        super(generator, ObModeType.OB_ORACLE, defaultValue, allowNull);
         this.width = width;
     }
 
     /**
-     * 构造函数
+     * Constructor
      *
-     * @param allowNull 是否允许空值
-     * @param width     宽度
+     * @param defaultValue default value for raw
+     * @param width width of data type
+     * @param allowNull Whether to allow null values
      */
     public OracleRawType(byte[] defaultValue, Boolean allowNull, Integer width) {
-        super(DialectType.OB_ORACLE, defaultValue, allowNull);
+        super(ObModeType.OB_ORACLE, defaultValue, allowNull);
         this.width = width;
     }
 
     @Override
-    public DataTypeFactory getFactory() {
+    public DataTypeFactory<OracleRawType, CharDataTypeConfig, BaseByteGenerator> getFactory() {
         return DataTypeFactory.getInstance("OB_ORACLE_RAW");
     }
 
@@ -49,7 +55,7 @@ public class OracleRawType extends AbstractByteDataType {
     }
 
     @Override
-    public String toString(byte[] value) {
+    public String convertToSqlString(byte[] value) {
         if (value == null) {
             return "NULL";
         }

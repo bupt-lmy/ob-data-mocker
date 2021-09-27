@@ -7,7 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * 表列数据封装对象
+ * Table column data package object
  *
  * @author yh263208
  * @date 2021-01-11 21:59

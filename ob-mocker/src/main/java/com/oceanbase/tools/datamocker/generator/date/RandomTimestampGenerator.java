@@ -3,35 +3,36 @@ package com.oceanbase.tools.datamocker.generator.date;
 import java.sql.Timestamp;
 import java.util.concurrent.TimeUnit;
 
-import com.oceanbase.tools.datamocker.generator.DateGeneratorBase;
+import com.oceanbase.tools.datamocker.generator.BaseDateGenerator;
 
 /**
- * 随机时间戳数据生成器
+ * Random timestamp data generator
  *
  * @author yh263208
  * @date 2020-12-16 19:55
  * @since OBMOCKER_snapshot_0.1.0
  */
-public class RandomTimestampGenerator extends DateGeneratorBase<Timestamp> {
+public class RandomTimestampGenerator extends BaseDateGenerator<Timestamp> {
 
     @Override
-    public Boolean preCheck(Timestamp minValue, Timestamp maxValue) {
+    protected Boolean doPreCheck(Timestamp startTime, Timestamp endTime, int scale, TimeUnit minTimeUnit) {
         return true;
     }
 
     @Override
-    public Timestamp generate(Timestamp minValue, Timestamp maxValue) {
-        long timstamp = (long) (Math.random() * (maxValue.getTime() - minValue.getTime()) + minValue.getTime());
-        Timestamp timestamp = new Timestamp(timstamp);
-        if (!minValue.equals(maxValue)) {
-            timestamp.setNanos(getnano());
+    protected Timestamp doGenerate(Timestamp startTime, Timestamp endTime, int scale, TimeUnit minTimeUnit) {
+        long timestamp = (long) (Math.random() * (endTime.getTime() - startTime.getTime()) + startTime.getTime());
+        Timestamp returnTimestamp = new Timestamp(timestamp);
+        if (!startTime.equals(endTime)) {
+            returnTimestamp.setNanos(getNanoSeconds(scale));
         }
-        return timestamp;
+        return returnTimestamp;
     }
 
     @Override
-    public Long count(Timestamp minValue, Timestamp maxValue) {
-        long interval = maxValue.getTime() - minValue.getTime();
-        return timeUnit().convert(interval, TimeUnit.MILLISECONDS);
+    protected Long doCount(Timestamp startTime, Timestamp endTime, int scale, TimeUnit minTimeUnit) {
+        long interval = endTime.getTime() - startTime.getTime();
+        return minTimeUnit.convert(interval, TimeUnit.MILLISECONDS);
     }
+
 }

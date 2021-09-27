@@ -4,13 +4,14 @@ import java.math.BigDecimal;
 
 import com.oceanbase.tools.datamocker.datatype.AbstractDigitDataType;
 import com.oceanbase.tools.datamocker.datatype.DataTypeFactory;
-import com.oceanbase.tools.datamocker.generator.DigitalGeneratorBase;
-import com.oceanbase.tools.datamocker.model.enums.DialectType;
+import com.oceanbase.tools.datamocker.generator.BaseDigitalGenerator;
+import com.oceanbase.tools.datamocker.model.config.model.DigitDataTypeConfig;
+import com.oceanbase.tools.datamocker.model.enums.ObModeType;
 import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
 
 /**
- * mysql模式下的decimal类型
+ * Decimal type in mysql mode
  *
  * @author yh263208
  * @date 2021-01-29 11:49
@@ -18,42 +19,46 @@ import com.oceanbase.tools.datamocker.model.exception.MockerException;
  */
 public class MysqlDecimalType extends AbstractDigitDataType<BigDecimal> {
     /**
-     * 有效数字位数，在mysql中该值为0～65
+     * The number of significant digits, the value in mysql is 0～65
      */
     private final int precision;
     /**
-     * 精度，在mysql中精度范围为0～30
+     * Scale, the scale range in mysql is 0～30
      */
     private final int scale;
 
-    public MysqlDecimalType(int precision, int scale, DigitalGeneratorBase<BigDecimal> generator, BigDecimal defaultValue,
+    public MysqlDecimalType(int precision, int scale, BaseDigitalGenerator<BigDecimal> generator,
+            BigDecimal defaultValue,
             Boolean allowNull, Boolean signed) {
-        super(generator, DialectType.OB_MYSQL, defaultValue, allowNull, signed);
+        super(generator, ObModeType.OB_MYSQL, defaultValue, allowNull, signed);
         validate(precision, scale);
         this.precision = precision;
         this.scale = scale;
     }
 
-    public MysqlDecimalType(DigitalGeneratorBase<BigDecimal> generator, BigDecimal defaultValue, Boolean allowNull, Boolean signed) {
-        super(generator, DialectType.OB_MYSQL, defaultValue, allowNull, signed);
+    public MysqlDecimalType(BaseDigitalGenerator<BigDecimal> generator, BigDecimal defaultValue, Boolean allowNull,
+            Boolean signed) {
+        super(generator, ObModeType.OB_MYSQL, defaultValue, allowNull, signed);
         this.precision = 10;
         this.scale = 0;
     }
 
     /**
-     * 验证decimal类型的有效位数和精度是否合法
+     * Verify that the effective digits and precision of the decimal type are legal
      *
-     * @param precision 有效位数
-     * @param scale     精度
-     * @throws MockerException 校验未通过抛出异常
+     * @param precision Effective digits
+     * @param scale Floating point precision
+     * @throws MockerException Validation fails and throws an exception
      */
     private void validate(int precision, int scale) {
         if (precision <= 0 || precision > 65) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "precision for decaimal can not larger than 65 or smaller than 0");
+            throw new MockerException(MockerError.PARAMETER_ERROR,
+                    "Precision for decaimal can not larger than 65 or smaller than 0");
         } else if (scale < 0 || scale > 30) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "scale for decimal can not larger than 30 or smaller than 0");
+            throw new MockerException(MockerError.PARAMETER_ERROR,
+                    "Scale for decimal can not larger than 30 or smaller than 0");
         } else if (precision < scale) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "scale can not be bigger than precision");
+            throw new MockerException(MockerError.PARAMETER_ERROR, "Scale can not be bigger than precision");
         }
     }
 
@@ -79,7 +84,7 @@ public class MysqlDecimalType extends AbstractDigitDataType<BigDecimal> {
     }
 
     @Override
-    protected BigDecimal preTreat(BigDecimal value) {
+    protected BigDecimal preProcessingBeforeOutput(BigDecimal value) {
         if (value == null) {
             return null;
         }
@@ -87,7 +92,7 @@ public class MysqlDecimalType extends AbstractDigitDataType<BigDecimal> {
     }
 
     @Override
-    public String toString(BigDecimal value) {
+    public String convertToSqlString(BigDecimal value) {
         if (value == null) {
             return "NULL";
         }
@@ -100,10 +105,14 @@ public class MysqlDecimalType extends AbstractDigitDataType<BigDecimal> {
     }
 
     /**
-     * mysql模式下的decimal数据类型中有有效数字和精度的要求，因此需要知道在指定精度和有效数字的约束下该数据类型的最大最小值
+     * The decimal data type in mysql mode has significant digits and precision requirements, so you
+     * need to know the maximum and minimum values of the data type under the constraints of the
+     * specified precision and significant digits
      *
-     * @return 返回最大最小值的绝对值，如果是最大值则直接使用返回值就可以了，如果是最小值则取负值
-     * @throws MockerException 有效数字位数和精度有大小范围的要求，超过范围可能会抛错
+     * @return Return the absolute value of the maximum and minimum values, if it is the maximum value,
+     *         just use the return value directly, if it is the minimum value, take a negative value
+     * @throws MockerException The number of significant digits and precision are required for the size
+     *         range, and an error may be thrown if it exceeds the range
      */
     private BigDecimal maxOrMinForNumber() {
         validate(precision, scale);
@@ -134,10 +143,10 @@ public class MysqlDecimalType extends AbstractDigitDataType<BigDecimal> {
     }
 
     @Override
-    public DataTypeFactory getFactory() {
+    public DataTypeFactory<MysqlDecimalType, DigitDataTypeConfig, BaseDigitalGenerator<BigDecimal>> getFactory() {
         if (signed()) {
-            return DataTypeFactory.getInstance("OB_ORACLE_DECIMAL");
+            return DataTypeFactory.getInstance("OB_MYSQL_DECIMAL");
         }
-        return DataTypeFactory.getInstance("OB_ORACLE_DECIMAL_UNSIGNED");
+        return DataTypeFactory.getInstance("OB_MYSQL_DECIMAL_UNSIGNED");
     }
 }

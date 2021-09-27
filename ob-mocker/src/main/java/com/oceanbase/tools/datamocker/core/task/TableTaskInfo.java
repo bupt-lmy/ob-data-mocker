@@ -12,9 +12,10 @@ import com.oceanbase.tools.datamocker.core.write.AbstractMockWriter;
 import com.oceanbase.tools.datamocker.core.write.output.MockerFile;
 import com.oceanbase.tools.datamocker.util.MockerBuffer;
 import lombok.Getter;
+import org.apache.commons.lang.Validate;
 
 /**
- * 表生成任务对象，用于封装一个表的生成任务相关的所有对象
+ * Table generation task object, used to encapsulate all objects related to a table generation task
  *
  * @author yh263208
  * @date 2021-01-09 19:33
@@ -23,44 +24,40 @@ import lombok.Getter;
 @Getter
 public class TableTaskInfo {
     /**
-     * 表生成任务的元数据信息
+     * Metadata information of the table generation task
      */
-    private TableTaskMetaData metaData;
+    private final TableTaskMetaData metaData;
     /**
-     * mock数据缓冲对象
+     * Mock data buffer object
      */
-    private MockerBuffer buffer;
-    /**
-     * 列数据生成原语集合对象
-     */
-    private List<ColumnReader> columnReaders;
-    /**
-     * 数据写出原语，用于向数据库中写入数据
-     */
-    private List<AbstractMockWriter> dataWriters;
-    /**
-     * 约束集合，用于描述该表中的约束信息
-     */
-    private List<AbstractConstraint> constraints;
-    /**
-     * 数据源头
-     */
-    private DataSource dataSource;
-    /**
-     * 文件管理器
-     */
-    private List<MockerFile> fileManagers;
+    private final MockerBuffer buffer;
+    private final List<ColumnReader<?>> columnReaders;
+    private final List<AbstractMockWriter> dataWriters;
+    private final List<AbstractConstraint> constraints;
+    private final DataSource dataSource;
+    private final List<MockerFile> fileManagers;
 
     /**
-     * 构造方法，用于构造出一个表任务bean对象
+     * Construction method, used to construct a table task bean object
      *
-     * @param columnReaders 列数据生成原语
-     * @param dataWriters   数据写入生成原语
-     * @param constraints   表约束对象集合
+     * @param columnReaders list of column reader
+     * @param dataWriters list of writers
+     * @param constraints list of constraint
+     * @param buffer buffer object
+     * @param dataSource datasource
+     * @param fileManagers list file manager
+     * @param metaData meta data for table task
      */
-    public TableTaskInfo(List<ColumnReader> columnReaders, List<AbstractMockWriter> dataWriters,
-            List<AbstractConstraint> constraints, MockerBuffer buffer, DataSource dataSource, List<MockerFile> fileManagers,
-            TableTaskMetaData metaData) {
+    public TableTaskInfo(List<ColumnReader<?>> columnReaders, List<AbstractMockWriter> dataWriters,
+            List<AbstractConstraint> constraints, MockerBuffer buffer, DataSource dataSource,
+            List<MockerFile> fileManagers, TableTaskMetaData metaData) {
+        Validate.notNull(columnReaders, "ColumnReaders can not be null for TableTaskInfo");
+        Validate.notNull(dataWriters, "DataWriters can not be null for TableTaskInfo");
+        Validate.notNull(constraints, "Constraints can not be null for TableTaskInfo");
+        Validate.notNull(metaData, "TaskMetaData can not be null for TableTaskInfo");
+        Validate.notNull(buffer, "MockBuffer can not be null for TableTaskInfo");
+        Validate.notNull(dataSource, "DataSource can not be null for TableTaskInfo");
+        Validate.notNull(fileManagers, "FileManagers can not be null for TableTaskInfo");
         this.columnReaders = columnReaders;
         this.dataWriters = dataWriters;
         this.constraints = constraints;
@@ -71,22 +68,22 @@ public class TableTaskInfo {
     }
 
     /**
-     * 获取列分组集合
+     * Get column grouping collection
      *
-     * @return 返回列分组集合
+     * @return Returns the column grouping collection
      */
     public Set<String> columnGroups() {
         Set<String> returnVal = new HashSet<>();
-        for (ColumnReader reader : this.columnReaders) {
+        for (ColumnReader<?> reader : this.columnReaders) {
             returnVal.add(reader.groupId());
         }
         return returnVal;
     }
 
     /**
-     * 获取数据写出原语的分组集合
+     * Get data and write out a grouping set of primitives
      *
-     * @return 返回分组集合
+     * @return Return to grouped collection
      */
     public Set<String> dataWriteGroups() {
         Set<String> returnVal = new HashSet<>();

@@ -1,7 +1,7 @@
 package com.oceanbase.tools.datamocker.model.enums;
 
 /**
- * 脚本类型枚举，目前仅支持sql脚本模式
+ * Script type enumeration, currently only supports sql script mode
  *
  * @author yh263208
  * @date 2021-01-12 22:25
@@ -9,7 +9,7 @@ package com.oceanbase.tools.datamocker.model.enums;
  */
 public enum ScriptType {
     /**
-     * sql脚本类型枚举
+     * sql script type enumeration
      */
     SQL;
 }

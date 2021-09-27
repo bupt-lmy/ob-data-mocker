@@ -3,37 +3,37 @@ package com.oceanbase.tools.datamocker.generator.date;
 import java.sql.Timestamp;
 import java.util.concurrent.TimeUnit;
 
-import com.oceanbase.tools.datamocker.generator.DateGeneratorBase;
+import com.oceanbase.tools.datamocker.generator.BaseDateGenerator;
 import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
 
 /**
- * 顺序时间戳数据生成器
+ * Sequential Timestamp Data Generator
  *
  * @author yh263208
  * @date 2020-12-16 16:44
  * @since OBMOCKER_snapshot_0.1.0
  */
-public class StepTimestampGenerator extends DateGeneratorBase<Timestamp> {
+public class StepTimestampGenerator extends BaseDateGenerator<Timestamp> {
     /**
-     * 日期步长
+     * Date step
      */
     private final long step;
     /**
-     * 是否循环
+     * Whether to loop
      */
     private final Boolean cycle;
     /**
-     * 当前生成的数
+     * Number currently generated
      */
     private Long timestamp = null;
 
     /**
-     * 构造方法
+     * Constructor
      *
-     * @param timeUnit 时间单位
-     * @param cycle    是否轮转
-     * @param step     时间步长
+     * @param timeUnit time unit
+     * @param cycle Whether to rotate
+     * @param step Time Step
      */
     public StepTimestampGenerator(long step, TimeUnit timeUnit, Boolean cycle) {
         this.cycle = cycle;
@@ -45,12 +45,12 @@ public class StepTimestampGenerator extends DateGeneratorBase<Timestamp> {
     }
 
     @Override
-    public Boolean preCheck(Timestamp startTime, Timestamp endTime) {
+    protected Boolean doPreCheck(Timestamp startTime, Timestamp endTime, int scale, TimeUnit minTimeUnit) {
         return true;
     }
 
     @Override
-    public Timestamp generate(Timestamp startTime, Timestamp endTime) {
+    protected Timestamp doGenerate(Timestamp startTime, Timestamp endTime, int scale, TimeUnit minTimeUnit) {
         Timestamp timestamp;
         if (step < 0) {
             timestamp = new Timestamp(minus(startTime.getTime(), endTime.getTime()));
@@ -61,10 +61,16 @@ public class StepTimestampGenerator extends DateGeneratorBase<Timestamp> {
         return timestamp;
     }
 
+    @Override
+    protected Long doCount(Timestamp startTime, Timestamp endTime, int scale, TimeUnit minTimeUnit) {
+        long interval = endTime.getTime() - startTime.getTime();
+        return interval / Math.abs(step);
+    }
+
     /**
-     * 步长为负数时的随机数生成逻辑
+     * Random number generation logic when the step size is negative
      *
-     * @return 返回生成的随机日期
+     * @return Returns the generated random date
      */
     private long minus(long startTime, long endTime) {
         if (timestamp == null) {
@@ -76,16 +82,16 @@ public class StepTimestampGenerator extends DateGeneratorBase<Timestamp> {
             if (cycle) {
                 timestamp = endTime;
             } else {
-                throw new MockerException(MockerError.OPERATION_FAILURE, "can not generate more unique date");
+                throw new MockerException(MockerError.OPERATION_FAILURE, "Can not generate more unique date");
             }
         }
         return timestamp;
     }
 
     /**
-     * 步长为正数时的随机数生成逻辑
+     * Random number generation logic when the step size is positive
      *
-     * @return 返回生成的随机日期
+     * @return Returns the generated random date
      */
     private long positive(long startTime, long endTime) {
         if (timestamp == null) {
@@ -97,15 +103,10 @@ public class StepTimestampGenerator extends DateGeneratorBase<Timestamp> {
             if (cycle) {
                 timestamp = startTime;
             } else {
-                throw new MockerException(MockerError.OPERATION_FAILURE, "can not generate more unique date");
+                throw new MockerException(MockerError.OPERATION_FAILURE, "Can not generate more unique date");
             }
         }
         return timestamp;
     }
 
-    @Override
-    public Long count(Timestamp startTime, Timestamp endTime) {
-        long interval = endTime.getTime() - startTime.getTime();
-        return interval / Math.abs(step);
-    }
 }

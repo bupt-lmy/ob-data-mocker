@@ -1,176 +1,187 @@
 package com.oceanbase.tools.datamocker.datatype;
 
 import com.oceanbase.tools.datamocker.generator.BaseGenerator;
-import com.oceanbase.tools.datamocker.model.enums.DialectType;
+import com.oceanbase.tools.datamocker.model.config.model.DataTypeConfig;
+import com.oceanbase.tools.datamocker.model.enums.ObModeType;
 import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
+import com.oceanbase.tools.datamocker.model.mock.MockColumnData;
+import lombok.Getter;
+import org.apache.commons.lang.Validate;
 
 /**
- * 抽象数据类型类，用于封装一些基础的数据类型逻辑
+ * Abstract data type class, used to encapsulate some basic data type logic
  *
  * @author yh263208
  * @date 2020-12-10 15:42
  * @since OBMOCKER_snapshot_0.1.0
  */
-public abstract class AbstractDataType<T, V extends Comparable> {
+public abstract class AbstractDataType<T, V extends Comparable<? super V>> {
     /**
-     * 默认值
-     */
-    private final T defaultValue;
-    /**
-     * 是否允许空值
-     */
-    private Boolean allowNull;
-    /**
-     * 预检查结果缓存
+     * Pre-check result cache
      */
     private Boolean preCheck = null;
+    @Getter
+    private final T defaultValue;
+    @Getter
+    private final Boolean allowNull;
     /**
-     * 该数据类型在数据库中的对应类型所能达到的最小值，该值可以人为指定，若不指定则为该数据类型对应能表示的最小值
+     * The minimum value that the corresponding type of the data type can reach in the database. The
+     * value can be specified manually. If not specified, it is the minimum value that the data type can
+     * represent.
      */
     protected V lowValue = null;
     /**
-     * 该数据类型在数据库中的对应类型所能达到的最大值，该值可以人为指定，若不指定则为该数据类型对应能表示的最大值
+     * The maximum value that the corresponding type of the data type can reach in the database. The
+     * value can be specified manually. If not specified, it is the maximum value that the data type can
+     * represent.
      */
     protected V highValue = null;
     /**
-     * 默认绑定一个数据生成器
+     * A data generator is bound by default
      */
     protected BaseGenerator<V, T> generator;
     /**
-     * 该数据类型对应的OB模式
+     * OB mode corresponding to this data type
      */
-    private final DialectType dialectType;
+    @Getter
+    private final ObModeType dialectType;
 
     /**
-     * 抽象基类的构造函数，在这里需要传入这个数据类型绑定的随机数据生成器，并且指明该数据类型对应的OB模式以及该模式下的数据库类型
+     * The constructor of the abstract base class, where you need to pass in the random data generator
+     * bound to this data type, and specify the OB mode corresponding to the data type and the database
+     * type in this mode
      *
-     * @param dialectType OB模式
+     * @param obModeType dialect type
+     * @param defaultValue default value for type
+     * @param allowNull Whether it is allowed to be empty
      */
-    protected AbstractDataType(DialectType dialectType, T defaultValue, Boolean allowNull) {
-        this.dialectType = dialectType;
+    protected AbstractDataType(ObModeType obModeType, T defaultValue, Boolean allowNull) {
+        Validate.notNull(obModeType, "ObModeType can not be null for AbstractDataType");
+        Validate.notNull(allowNull, "AllowNull config can not be null for AbstractDataType");
+        this.dialectType = obModeType;
         this.allowNull = allowNull;
         this.defaultValue = defaultValue;
     }
 
     /**
-     * 抽象基类的构造函数，在这里需要传入这个数据类型绑定的随机数据生成器，并且指明该数据类型对应的OB模式以及该模式下的数据库类型
+     * The constructor of the abstract base class, where you need to pass in the random data generator
+     * bound to this data type, and specify the OB mode corresponding to the data type and the database
+     * type in this mode
      *
-     * @param dialectType OB模式
+     * @param generator data generator
+     * @param obModeType dialect type
+     * @param defaultValue default value for type
+     * @param allowNull Whether it is allowed to be empty
      */
-    protected AbstractDataType(BaseGenerator<V, T> generator, DialectType dialectType, T defaultValue, Boolean allowNull) {
-        this.dialectType = dialectType;
+    protected AbstractDataType(BaseGenerator<V, T> generator, ObModeType obModeType, T defaultValue,
+            Boolean allowNull) {
+        Validate.notNull(obModeType, "ObModeType can not be null for AbstractDataType");
+        this.dialectType = obModeType;
         this.allowNull = allowNull;
         this.defaultValue = defaultValue;
         this.bind(generator);
     }
 
     /**
-     * 获取类型的工厂实例
+     * Get the type of factory instance
      *
-     * @return 返回工厂实例
+     * @return Return to factory instance
      */
-    abstract public DataTypeFactory getFactory();
+    abstract public DataTypeFactory<? extends AbstractDataType<T, V>, ? extends DataTypeConfig, ? extends BaseGenerator<V, T>> getFactory();
 
     /**
-     * 该类型在数据库中对应类型所能表示的数值上限
+     * The lower limit of the value that the corresponding type can represent in the database
      *
-     * @return 返回最大值
+     * @return Return minimum
      */
     abstract protected V minValueForType();
 
     /**
-     * 该类型在数据库中对应类型所能表示的数值下限
+     * The upper limit of the value that the corresponding type can represent in the database
      *
-     * @return 返回最小值
+     * @return Returns the maximum value
      */
     abstract protected V maxValueForType();
 
     /**
-     * 该类型在指定数据生成器约束下最多能生成的不重复数据量，这个值由两个指标决定，第一个指标是数据生成器本身能生成的不重复数据量
-     * 另一个指标就是该数据类型在精度约束下能产生的最多的不重复数据量，二者取小的
+     * The maximum amount of unique data that this type can generate under the constraints of the
+     * specified data generator. This value is determined by two indicators. The first indicator is the
+     * amount of unique data that the data generator itself can generate. The other indicator is that
+     * the data type is in The maximum amount of non-repetitive data that can be generated under
+     * precision constraints, whichever is smaller
      *
-     * @return 返回具体的数值
+     * @return Return specific value
      */
     abstract public Long distinctLimit();
 
     /**
-     * 数据生成器生成值预处理方法
+     * Data generator generated value preprocessing method
      *
-     * @param value 传入用于预处理的值
-     * @return 返回处理后的值
+     * @param value Pass in the value used for preprocessing
+     * @return Return the processed value
      */
-    abstract protected T preTreat(T value);
+    abstract protected T preProcessingBeforeOutput(T value);
 
     /**
-     * 转字符串方法，用于将一个泛型类型转化为一个字符串类型
+     * To string method, used to convert a generic type into a string type
      *
-     * @param value 泛型类型
-     * @return 返回转化的字符串类型
+     * @param value Generic type
+     * @return Returns the converted string type
      */
-    abstract public String toString(T value);
+    abstract public String convertToSqlString(T value);
 
     /**
-     * 生成数据摘要，用于将一个很大的数据转化为一个数据摘要减少数据存储成本
+     * Generate data summary, used to convert a large data into a data summary to reduce data storage
+     * costs
      *
-     * @param value 数据的内容
-     * @return 返回摘要
+     * @param value The content of the data
+     * @return Back to summary
      */
     abstract public T toDigest(T value);
 
     /**
-     * 类型转换方法，用于数据兼容，将一个类型的数据转换成数据类型默认的对应类型
+     * Type conversion method, used for data compatibility, converts a type of data into the default
+     * corresponding type of the data type
      *
-     * @param value 输入值
-     * @return 转换值
+     * @param resultSetObject object value from jdbc, eg. resultSet.getObject(1);
+     * @return converted value
      */
-    public T convert(Object value) {
-        return (T) value;
+    public T convertFromJdbcObjectToJavaObject(Object resultSetObject) {
+        return (T) resultSetObject;
     }
 
     /**
-     * 数据生成器对象绑定方法，之所以是一个public类型的方法是因为数据生成器可以绑定一个新的
+     * Sometimes jdbc has different read type <code>getObject</code> and write type
+     * <code>setObject</code> for the same database type (eg. year) (eg. <code>getObject</code> of
+     * <code>year</code> type is <code>Date</code>, and write type <code>setObject</code> is short).
+     * This method is needed for conversion.
      *
-     * @param generator 数据生成器
+     * @param javaObject object for java
+     * @return object for jdbc write
+     */
+    public Object convertFromJavaObjectToJdbcObject(T javaObject) {
+        return javaObject;
+    }
+
+    /**
+     * The data generator object binding method, the reason why it is a public type method is because
+     * the data generator can bind a new
+     *
+     * @param generator data generator
      */
     public void bind(BaseGenerator<V, T> generator) {
+        Validate.notNull(generator, "DataGenerator can not be null for AbstractDataType#bind");
         this.generator = generator;
-        this.generator.setAllowNull(allowNull());
-        this.generator.setDefaultValue(defaultValue());
+        this.generator.setAllowNull(getAllowNull());
+        this.generator.setDefaultValue(getDefaultValue());
         this.preCheck = null;
     }
 
     /**
-     * 返回是否允许空值
+     * Check whether the boundary value is legal
      *
-     * @return 返回结果
-     */
-    public Boolean allowNull() {
-        return this.allowNull;
-    }
-
-    /**
-     * 获取默认值
-     *
-     * @return 返回默认值
-     */
-    public T defaultValue() {
-        return this.defaultValue;
-    }
-
-    /**
-     * 获取类型的方言模式
-     *
-     * @return 返回方言模式
-     */
-    public DialectType getDialectType() {
-        return dialectType;
-    }
-
-    /**
-     * 检查边界值是否合法
-     *
-     * @param value 要设定的边界值
+     * @param value Boundary value to be set
      */
     protected void validateValue(V value) {
         if (value == null) {
@@ -180,69 +191,64 @@ public abstract class AbstractDataType<T, V extends Comparable> {
         V highValue = maxValueForType();
         if (lowValue == null || highValue == null) {
             throw new MockerException(MockerError.ILLEGAL_RETURN_VALUE,
-                    "lowest or highest value can not be null for data type " + toString());
+                    "Lowest or highest value can not be null for data type " + toString());
         }
         if (value.compareTo(lowValue) < 0 || value.compareTo(highValue) > 0) {
             throw new MockerException(MockerError.VALUE_OUT_OFRANGE,
-                    String.format("max or min value %s for data type %s is out of range [%s,%s]",
-                            value.toString(), toString(), lowValue.toString(), highValue.toString()));
+                    String.format("Max or min value %s for data type %s is out of range [%s,%s]", value.toString(),
+                            toString(), lowValue.toString(), highValue.toString()));
         }
     }
 
     /**
-     * 设定数据类型的低值
+     * Set the low value of the data type
      *
-     * @param value 低值
+     * @param value low value
      */
     public void setLowValue(V value) {
         validateValue(value);
         if (value.compareTo(highValue()) > 0) {
             throw new MockerException(MockerError.VALUE_OUT_OFRANGE,
-                    String.format("min value can not be bigger than max value \"%s\" for data type %s", highValue().toString(),
-                            toString()));
+                    String.format("Min value can not be bigger than max value \"%s\" for data type %s",
+                            highValue().toString(), toString()));
         }
         this.lowValue = value;
     }
 
     /**
-     * 设定数据类型的高值
+     * Set the high value of the data type
      *
-     * @param value 高值
+     * @param value high value
      */
     public void setHighValue(V value) {
         validateValue(value);
         if (value.compareTo(lowValue()) < 0) {
             throw new MockerException(MockerError.VALUE_OUT_OFRANGE,
-                    String.format("max value can not be smaller than min value \"%s\" for data type %s", lowValue().toString(),
-                            toString()));
+                    String.format("Max value can not be smaller than min value \"%s\" for data type %s",
+                            lowValue().toString(), toString()));
         }
         this.highValue = value;
     }
 
     /**
-     * 数据生成方法，调用该方法生成一个符合分布的数据
+     * Data generation method, call this method to generate a data that conforms to the distribution
      *
-     * @return 返回生成的数据
+     * @return Return the generated data
      */
     public T acquire() {
         if (generator == null) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "generator can not be null");
+            throw new MockerException(MockerError.OPERATION_FAILURE, "Generator can not be null");
         }
         if (this.preCheck == null) {
             this.preCheck = generator.preCheck(lowValue(), highValue());
         }
         if (this.preCheck == null || !this.preCheck) {
             throw new MockerException(MockerError.PARAMETER_ERROR,
-                    String.format("data check of column \"%s\" for generator is not passed", this));
+                    String.format("Data check of column \"%s\" for generator is not passed", this));
         }
-        return preTreat(generator.next(lowValue(), highValue()));
+        return preProcessingBeforeOutput(generator.next(lowValue(), highValue()));
     }
 
-    /**
-     * 获取该数据类型在约束下的最小值
-     *
-     * @return 返回最小值
-     */
     public V lowValue() {
         if (this.lowValue == null) {
             this.lowValue = minValueForType();
@@ -250,11 +256,6 @@ public abstract class AbstractDataType<T, V extends Comparable> {
         return this.lowValue;
     }
 
-    /**
-     * 返回该数据类型在约束下的最大值
-     *
-     * @return 返回最大值
-     */
     public V highValue() {
         if (this.highValue == null) {
             this.highValue = maxValueForType();
@@ -276,9 +277,19 @@ public abstract class AbstractDataType<T, V extends Comparable> {
 
     @Override
     public int hashCode() {
-        StringBuffer buffer = new StringBuffer(getFactory().toString());
-        buffer.append(this.dialectType.name());
-        return buffer.toString().hashCode();
+        return (getFactory().toString() + this.dialectType.name()).hashCode();
+    }
+
+    /**
+     * Convert method to generate a mock column
+     *
+     * @param columnName column name
+     * @param jdbcObject column value
+     * @return mock column
+     */
+    public MockColumnData<T> convertFromJdbcObjectToMockColumn(String columnName, Object jdbcObject) {
+        Validate.notEmpty(columnName, "ColumnName can not be null for AbstractDataType#toMockColumn");
+        return new MockColumnData<>(columnName, this, this.convertFromJdbcObjectToJavaObject(jdbcObject));
     }
 
 }

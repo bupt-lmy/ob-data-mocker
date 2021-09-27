@@ -26,7 +26,7 @@ import javax.sql.DataSource;
 import com.oceanbase.tools.datamocker.MockerTestBase;
 import com.oceanbase.tools.datamocker.core.write.output.MockerDataSource;
 import com.oceanbase.tools.datamocker.model.config.model.DataBaseConfig;
-import com.oceanbase.tools.datamocker.model.enums.DialectType;
+import com.oceanbase.tools.datamocker.model.enums.ObModeType;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Assert;
@@ -36,7 +36,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 /**
- * 数据库连接池的测试对象
+ * Test object for database connection pool
  *
  * @author yh263208
  * @date 2021-01-04 20:55
@@ -44,13 +44,7 @@ import org.junit.rules.ExpectedException;
  */
 @Slf4j
 public class DataSourceTest extends MockerTestBase {
-    /**
-     * mysql数据库连接配置文件所在地
-     */
     private final String mysqlEnv = "db/mysql-env.properties";
-    /**
-     * oracle数据库连接配置文件所在地
-     */
     private final String oracleEnv = "db/oracle-env.properties";
     @Rule
     public ExpectedException expect = ExpectedException.none();
@@ -61,19 +55,13 @@ public class DataSourceTest extends MockerTestBase {
         params.put("socketTimeout", "8000");
     }
 
-    /**
-     * 获取测试数据库连接配置信息
-     *
-     * @param dialectType 方言类型
-     * @throws IOException 文件读取操作可能会抛出异常
-     */
-    private DataBaseConfig getDBConfig(DialectType dialectType) throws IOException {
+    private DataBaseConfig getDBConfig(ObModeType dialectType) throws IOException {
         DataBaseConfig config = new DataBaseConfig();
         Properties properties = new Properties();
         URL url = null;
-        if (DialectType.OB_MYSQL.equals(dialectType)) {
+        if (ObModeType.OB_MYSQL.equals(dialectType)) {
             url = this.getClass().getClassLoader().getResource(mysqlEnv);
-        } else if (DialectType.OB_ORACLE.equals(dialectType)) {
+        } else if (ObModeType.OB_ORACLE.equals(dialectType)) {
             url = this.getClass().getClassLoader().getResource(oracleEnv);
         } else {
             return null;
@@ -89,12 +77,6 @@ public class DataSourceTest extends MockerTestBase {
         return config;
     }
 
-    /**
-     * 测试数据源
-     *
-     * @param dataSource 数据源
-     * @param sql        测试sql
-     */
     private void testDataSource(DataSource dataSource, String sql) throws SQLException {
         Connection connection = null;
         PreparedStatement statement = null;
@@ -110,7 +92,7 @@ public class DataSourceTest extends MockerTestBase {
 
     @Test
     public void testDataSourceForMysql() throws SQLException, IOException {
-        DataBaseConfig config = getDBConfig(DialectType.OB_MYSQL);
+        DataBaseConfig config = getDBConfig(ObModeType.OB_MYSQL);
         DataSource dataSource = new MockerDataSource(config, 3, 5, 2, params);
         dataSource.setLoginTimeout(10);
         Assert.assertEquals(10, dataSource.getLoginTimeout());
@@ -119,7 +101,7 @@ public class DataSourceTest extends MockerTestBase {
 
     @Test
     public void testDataSourceForOracle() throws IOException, SQLException {
-        DataBaseConfig config = getDBConfig(DialectType.OB_ORACLE);
+        DataBaseConfig config = getDBConfig(ObModeType.OB_ORACLE);
         DataSource dataSource = new MockerDataSource(config, params);
         dataSource.setLoginTimeout(5);
         Assert.assertEquals(5, dataSource.getLoginTimeout());
@@ -128,33 +110,35 @@ public class DataSourceTest extends MockerTestBase {
 
     @Test
     public void testDataSourceWithIllegalParam() throws IOException, SQLException {
-        DataBaseConfig config = getDBConfig(DialectType.OB_MYSQL);
+        DataBaseConfig config = getDBConfig(ObModeType.OB_MYSQL);
+        assert config != null;
         config.setHost(null);
-        expect.expectMessage("database's config is illegal");
-        expect.expect(MockerException.class);
+        expect.expectMessage("Host can not be blank for MockerDataSource#validate");
+        expect.expect(IllegalArgumentException.class);
         DataSource dataSource = new MockerDataSource(config, 3, 5, 2, params);
     }
 
     @Test
     public void testDataSourceWithIllegalPoolSize() throws IOException, SQLException {
-        DataBaseConfig config = getDBConfig(DialectType.OB_MYSQL);
-        expect.expectMessage("min pool size, max pool size or increase step can not be equal to or less than zero");
+        DataBaseConfig config = getDBConfig(ObModeType.OB_MYSQL);
+        expect.expectMessage("Min pool size, max pool size or increase step can not be equal to or less than zero");
         expect.expect(MockerException.class);
         DataSource dataSource = new MockerDataSource(config, -3, -5, -4, params);
     }
 
     @Test
     public void testDataSourceWithIllegalPoolSize2() throws IOException, SQLException {
-        DataBaseConfig config = getDBConfig(DialectType.OB_MYSQL);
-        expect.expectMessage("min pool size can not be bigger than max pool size");
+        DataBaseConfig config = getDBConfig(ObModeType.OB_MYSQL);
+        expect.expectMessage("Min pool size can not be bigger than max pool size");
         expect.expect(MockerException.class);
         DataSource dataSource = new MockerDataSource(config, 10, 5, 4, params);
     }
 
     @Test
-    public void testDataSourceWithMultiThread() throws IOException, SQLException, InterruptedException, TimeoutException,
-                                                       ExecutionException {
-        DataBaseConfig config = getDBConfig(DialectType.OB_ORACLE);
+    public void testDataSourceWithMultiThread()
+            throws IOException, SQLException, InterruptedException, TimeoutException,
+            ExecutionException {
+        DataBaseConfig config = getDBConfig(ObModeType.OB_ORACLE);
         DataSource dataSource = new MockerDataSource(config, 3, 5, 2, params);
         dataSource.setLoginTimeout(5);
         Assert.assertEquals(5, dataSource.getLoginTimeout());
@@ -195,20 +179,14 @@ public class DataSourceTest extends MockerTestBase {
 
     @Test
     public void testDataSourceWithDirectConnection() throws IOException, SQLException {
-        DataBaseConfig config = getDBConfig(DialectType.OB_ORACLE);
+        DataBaseConfig config = getDBConfig(ObModeType.OB_ORACLE);
         DataSource dataSource = new MockerDataSource(config, 3, 5, 2, params);
-        Connection connection = dataSource.getConnection(config.getUser() + "@" + config.getTenant(), config.getPassword());
+        Connection connection =
+                dataSource.getConnection(config.getUser() + "@" + config.getTenant(), config.getPassword());
         Assert.assertNotNull(connection);
         connection.close();
     }
 
-    /**
-     * 关闭数据库资源
-     *
-     * @param connection 数据库连接
-     * @param statement  数据库操作句柄
-     * @param resultSet  结果集
-     */
     private void close(Connection connection, Statement statement, ResultSet resultSet) {
         if (resultSet != null) {
             try {

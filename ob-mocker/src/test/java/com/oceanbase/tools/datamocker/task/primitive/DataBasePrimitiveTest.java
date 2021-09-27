@@ -2,6 +2,7 @@ package com.oceanbase.tools.datamocker.task.primitive;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.net.URL;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -10,9 +11,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 import java.util.Random;
 
@@ -21,15 +20,14 @@ import javax.sql.DataSource;
 import com.oceanbase.tools.datamocker.MockerTestBase;
 import com.oceanbase.tools.datamocker.core.task.AbstractDataPipe;
 import com.oceanbase.tools.datamocker.core.write.AbstractMockWriter;
-import com.oceanbase.tools.datamocker.core.write.DataBaseWriter;
+import com.oceanbase.tools.datamocker.core.write.JdbcWriter;
 import com.oceanbase.tools.datamocker.core.write.output.MockerDataSource;
-import com.oceanbase.tools.datamocker.datatype.AbstractDataType;
 import com.oceanbase.tools.datamocker.datatype.oracle.OracleNumberType;
 import com.oceanbase.tools.datamocker.model.config.model.DataBaseConfig;
-import com.oceanbase.tools.datamocker.model.enums.DialectType;
-import com.oceanbase.tools.datamocker.model.exception.MockerException;
+import com.oceanbase.tools.datamocker.model.enums.ObModeType;
+import com.oceanbase.tools.datamocker.model.mock.MockColumnData;
+import com.oceanbase.tools.datamocker.model.mock.MockRowData;
 import com.oceanbase.tools.datamocker.util.MockDataPipe;
-import com.oceanbase.tools.datamocker.util.Pair;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -39,7 +37,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 /**
- * JDBC操作原语测试类
+ * JDBC operation primitive test class
  *
  * @author yh263208
  * @date 2021-01-04
@@ -47,41 +45,27 @@ import org.junit.rules.ExpectedException;
  */
 @Slf4j
 public class DataBasePrimitiveTest extends MockerTestBase {
-    /**
-     * mysql数据库连接配置文件所在地
-     */
     private final static String mysqlEnv = "db/mysql-env.properties";
-    /**
-     * oracle数据库连接配置文件所在地
-     */
     private final static String oracleEnv = "db/oracle-env.properties";
     @Rule
     public ExpectedException expect = ExpectedException.none();
     private final static String tableName = "TEST_EMP";
-    /**
-     * 列信息
-     */
     private final static List<String> columnList = Arrays.asList("COL1", "COL2", "COL3");
     private static DataSource oracleDataSource;
     private static DataSource mysqlDataSource;
 
-    /**
-     * 获取测试数据库连接配置信息
-     *
-     * @param dialectType 方言类型
-     * @throws IOException 文件读取操作可能会抛出异常
-     */
-    private static DataBaseConfig getDBConfig(DialectType dialectType) throws IOException {
+    private static DataBaseConfig getDBConfig(ObModeType dialectType) throws IOException {
         DataBaseConfig config = new DataBaseConfig();
         Properties properties = new Properties();
         URL url = null;
-        if (DialectType.OB_MYSQL.equals(dialectType)) {
+        if (ObModeType.OB_MYSQL.equals(dialectType)) {
             url = DataBasePrimitiveTest.class.getClassLoader().getResource(mysqlEnv);
-        } else if (DialectType.OB_ORACLE.equals(dialectType)) {
+        } else if (ObModeType.OB_ORACLE.equals(dialectType)) {
             url = DataBasePrimitiveTest.class.getClassLoader().getResource(oracleEnv);
         } else {
             return null;
         }
+        assert url != null;
         properties.load(new FileInputStream(url.getPath()));
         config.setDefaultSchame(properties.getProperty("schema"));
         config.setPassword(properties.getProperty("passwd"));
@@ -93,13 +77,10 @@ public class DataBasePrimitiveTest extends MockerTestBase {
         return config;
     }
 
-    /**
-     * 初始化环境，创建一个目标表
-     *
-     * @param connection 一个数据连接
-     */
     private static void initEnv(Connection connection) throws SQLException {
-        String sql = String.format("create table %s (%s varchar(20) not null, %s varchar(20) not null, %s varchar(20) not null)", tableName,
+        String sql = String.format(
+                "create table %s (%s varchar(20) not null, %s varchar(20) not null, %s varchar(20) not null)",
+                tableName,
                 columnList.get(0), columnList.get(1), columnList.get(2));
         PreparedStatement statement = null;
         ResultSet resultSet = null;
@@ -113,31 +94,19 @@ public class DataBasePrimitiveTest extends MockerTestBase {
         }
     }
 
-    /**
-     * 获取一个测试用的随机数据块
-     *
-     * @param size 数据行数
-     * @return 返回数据
-     */
-    private List<Map<String, Pair<AbstractDataType, Object>>> getRows(int size) {
-        List<Map<String, Pair<AbstractDataType, Object>>> list = new ArrayList<>();
+    private List<MockRowData> getRows(int size) {
+        List<MockRowData> list = new ArrayList<>();
         for (int i = 0; i < size; i++) {
-            Map<String, Pair<AbstractDataType, Object>> row = new HashMap<>();
+            MockRowData mockRowData = new MockRowData(size);
             for (String column : columnList) {
-                row.put(column, new Pair<>(new OracleNumberType(8, 5, null, false), String.valueOf(new Random().nextInt(1000))));
+                mockRowData.addMockColumn(new MockColumnData<>(column, new OracleNumberType(8, 5, null, false),
+                        new BigDecimal(new Random().nextInt(1000))));
             }
-            list.add(row);
+            list.add(mockRowData);
         }
         return list;
     }
 
-    /**
-     * 关闭数据库资源
-     *
-     * @param connection 数据库连接
-     * @param statement  数据库操作句柄
-     * @param resultSet  结果集
-     */
     private static void close(Connection connection, Statement statement, ResultSet resultSet) {
         if (resultSet != null) {
             try {
@@ -164,9 +133,9 @@ public class DataBasePrimitiveTest extends MockerTestBase {
 
     @BeforeClass
     public static void initEnv() throws IOException, SQLException {
-        DataBaseConfig mysqlConfig = getDBConfig(DialectType.OB_MYSQL);
+        DataBaseConfig mysqlConfig = getDBConfig(ObModeType.OB_MYSQL);
         mysqlDataSource = new MockerDataSource(mysqlConfig, 3, 5, 2, null);
-        DataBaseConfig oracleConfig = getDBConfig(DialectType.OB_ORACLE);
+        DataBaseConfig oracleConfig = getDBConfig(ObModeType.OB_ORACLE);
         oracleDataSource = new MockerDataSource(oracleConfig, 3, 5, 2, null);
         initEnv(oracleDataSource.getConnection());
         initEnv(mysqlDataSource.getConnection());
@@ -174,34 +143,38 @@ public class DataBasePrimitiveTest extends MockerTestBase {
 
     @Test
     public void testPrimitiveWithoutDataSource() {
-        expect.expectMessage("data source can not be null");
-        expect.expect(MockerException.class);
-        AbstractMockWriter primitive = new DataBaseWriter(null, null, null, null);
+        expect.expectMessage("DataSource can not be null for JdbcWriter#validate");
+        expect.expect(IllegalArgumentException.class);
+        AbstractMockWriter primitive = new JdbcWriter(null, null, null, null);
     }
 
     @Test
     public void testPrimitiveWithoutDatabase() {
-        expect.expectMessage("database can not be null");
-        expect.expect(MockerException.class);
-        AbstractMockWriter primitive = new DataBaseWriter(oracleDataSource, DialectType.OB_ORACLE, null, null);
+        expect.expectMessage("Database can not be null for JdbcWriter#validate");
+        expect.expect(IllegalArgumentException.class);
+        AbstractMockWriter primitive = new JdbcWriter(oracleDataSource, ObModeType.OB_ORACLE, null, null);
     }
 
     @Test
     public void testPrimitiveWithouttable() throws IOException {
-        expect.expectMessage("table name can not be null");
-        expect.expect(MockerException.class);
-        DialectType dialectType = DialectType.OB_ORACLE;
+        expect.expectMessage("TableName can not be null for JdbcWriter#validate");
+        expect.expect(IllegalArgumentException.class);
+        ObModeType dialectType = ObModeType.OB_ORACLE;
         DataBaseConfig config = getDBConfig(dialectType);
-        AbstractMockWriter primitive = new DataBaseWriter(oracleDataSource, dialectType, config.getDefaultSchame(), null);
+        assert config != null;
+        AbstractMockWriter primitive =
+                new JdbcWriter(oracleDataSource, dialectType, config.getDefaultSchame(), null);
     }
 
     @Test
-    public void testInsertDataForMysql() throws Exception {
-        List<Map<String, Pair<AbstractDataType, Object>>> rows = getRows(24);
-        DialectType dialectType = DialectType.OB_MYSQL;
+    public void testInsertDataForMysql() throws Throwable {
+        List<MockRowData> rows = getRows(24);
+        ObModeType dialectType = ObModeType.OB_MYSQL;
         DataBaseConfig config = getDBConfig(dialectType);
-        DataBaseWriter primitive = new DataBaseWriter(mysqlDataSource, dialectType, config.getDefaultSchame(), tableName);
-        AbstractDataPipe pipe = new MockDataPipe();
+        assert config != null;
+        JdbcWriter primitive =
+                new JdbcWriter(mysqlDataSource, dialectType, config.getDefaultSchame(), tableName);
+        AbstractDataPipe<List<MockRowData>> pipe = new MockDataPipe(1);
         primitive.register(pipe);
         pipe.write(rows);
         Long count = primitive.write();
@@ -209,23 +182,20 @@ public class DataBasePrimitiveTest extends MockerTestBase {
     }
 
     @Test
-    public void testInsertDataForOracle() throws Exception {
-        List<Map<String, Pair<AbstractDataType, Object>>> rows = getRows(24);
-        DialectType dialectType = DialectType.OB_ORACLE;
+    public void testInsertDataForOracle() throws Throwable {
+        List<MockRowData> rows = getRows(24);
+        ObModeType dialectType = ObModeType.OB_ORACLE;
         DataBaseConfig config = getDBConfig(dialectType);
-        DataBaseWriter primitive = new DataBaseWriter(oracleDataSource, dialectType, config.getDefaultSchame(), tableName);
-        AbstractDataPipe pipe = new MockDataPipe();
+        assert config != null;
+        JdbcWriter primitive =
+                new JdbcWriter(oracleDataSource, dialectType, config.getDefaultSchame(), tableName);
+        AbstractDataPipe<List<MockRowData>> pipe = new MockDataPipe(1);
         primitive.register(pipe);
         pipe.write(rows);
         Long count = primitive.write();
         Assert.assertEquals(rows.size(), count.intValue());
     }
 
-    /**
-     * 关闭环境，创建一个目标表
-     *
-     * @param connection 一个数据连接
-     */
     private static void closeEnv(Connection connection) throws SQLException {
         String sql = String.format("drop table %s", tableName);
         PreparedStatement statement = null;

@@ -2,18 +2,20 @@ package com.oceanbase.tools.datamocker.datatype.oracle;
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
 import com.oceanbase.tools.datamocker.datatype.AbstractDateDataType;
 import com.oceanbase.tools.datamocker.datatype.DataTypeFactory;
+import com.oceanbase.tools.datamocker.generator.BaseDateGenerator;
 import com.oceanbase.tools.datamocker.generator.BaseGenerator;
-import com.oceanbase.tools.datamocker.generator.DateGeneratorBase;
-import com.oceanbase.tools.datamocker.model.enums.DialectType;
+import com.oceanbase.tools.datamocker.model.config.model.DateDataTypeConfig;
+import com.oceanbase.tools.datamocker.model.enums.ObModeType;
 import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
 
 /**
- * oracle模式下的时间戳类型
+ * Timestamp type in oracle mode
  *
  * @author yh263208
  * @date 2020-12-16 17:50
@@ -21,33 +23,31 @@ import com.oceanbase.tools.datamocker.model.exception.MockerException;
  */
 public class OracleTimestampType extends AbstractDateDataType<Timestamp> {
     /**
-     * oracle模式下数据库中的日期格式化字符串
+     * Date format string in the database in oracle mode
      */
     private final String oracleDateFormate;
     /**
-     * java应用程序中的日期格式化字符串
+     * Date format string in java application
      */
     private static final String JAVA_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
     /**
-     * 日期格式化器
-     */
-    private final SimpleDateFormat dateFormat = new SimpleDateFormat(JAVA_DATE_FORMAT);
-    /**
-     * 时间戳类型的精度，该精度范围在0-9范围内
+     * The precision of the timestamp type, the precision range is 0-9
      */
     private final int scale;
 
-    public OracleTimestampType(DateGeneratorBase<Timestamp> generator, int scale, Timestamp defaultValue, Boolean allowNull) {
-        super(generator, DialectType.OB_ORACLE, defaultValue, allowNull);
+    public OracleTimestampType(BaseDateGenerator<Timestamp> generator, int scale, Timestamp defaultValue,
+            Boolean allowNull) {
+        super(generator, ObModeType.OB_ORACLE, defaultValue, allowNull);
         if (scale < 0 || scale > 9) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "scale for timestamp can not smaller than zero or bigger than nine");
+            throw new MockerException(MockerError.PARAMETER_ERROR,
+                    "Scale for timestamp can not smaller than zero or bigger than nine");
         }
         this.scale = scale;
         generator.setScale(scale);
         if (scale > 3) {
-            generator.setTimeUnit(TimeUnit.MILLISECONDS);
+            generator.setMinTimeUnit(TimeUnit.MILLISECONDS);
         } else {
-            generator.setTimeUnit(TimeUnit.SECONDS);
+            generator.setMinTimeUnit(TimeUnit.SECONDS);
         }
         if (scale == 0) {
             oracleDateFormate = "YYYY-MM-DD HH24:MI:SS.FF";
@@ -56,31 +56,22 @@ public class OracleTimestampType extends AbstractDateDataType<Timestamp> {
         }
     }
 
-    public OracleTimestampType(DateGeneratorBase<Timestamp> generator, Timestamp defaultValue, Boolean allowNull) {
-        super(generator, DialectType.OB_ORACLE, defaultValue, allowNull);
+    public OracleTimestampType(BaseDateGenerator<Timestamp> generator, Timestamp defaultValue, Boolean allowNull) {
+        super(generator, ObModeType.OB_ORACLE, defaultValue, allowNull);
         this.scale = 3;
         generator.setScale(this.scale);
-        if (scale > 3) {
-            generator.setTimeUnit(TimeUnit.MILLISECONDS);
-        } else {
-            generator.setTimeUnit(TimeUnit.SECONDS);
-        }
+        generator.setMinTimeUnit(TimeUnit.SECONDS);
         oracleDateFormate = String.format("YYYY-MM-DD HH24:MI:SS.FF%d", scale);
     }
 
-    /**
-     * 绑定数据生成器方法
-     *
-     * @param generator 数据生成器
-     */
     @Override
     public void bind(BaseGenerator<Timestamp, Timestamp> generator) {
         super.bind(generator);
-        ((DateGeneratorBase) generator).setScale(scale);
+        ((BaseDateGenerator<Timestamp>) generator).setScale(scale);
         if (scale > 3) {
-            ((DateGeneratorBase) generator).setTimeUnit(TimeUnit.MILLISECONDS);
+            ((BaseDateGenerator<Timestamp>) generator).setMinTimeUnit(TimeUnit.MILLISECONDS);
         } else {
-            ((DateGeneratorBase) generator).setTimeUnit(TimeUnit.SECONDS);
+            ((BaseDateGenerator<Timestamp>) generator).setMinTimeUnit(TimeUnit.SECONDS);
         }
     }
 
@@ -88,7 +79,7 @@ public class OracleTimestampType extends AbstractDateDataType<Timestamp> {
     protected Long limitForType(Timestamp minDate, Timestamp maxDate) {
         long interval = maxDate.getTime() - minDate.getTime();
         if (interval < 0) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "time interval can not be smaller than zero");
+            throw new MockerException(MockerError.PARAMETER_ERROR, "Time interval can not be smaller than zero");
         }
         if (scale > 3) {
             return interval;
@@ -97,7 +88,7 @@ public class OracleTimestampType extends AbstractDateDataType<Timestamp> {
     }
 
     @Override
-    public DataTypeFactory getFactory() {
+    public DataTypeFactory<OracleTimestampType, DateDataTypeConfig, BaseDateGenerator<Timestamp>> getFactory() {
         return DataTypeFactory.getInstance("OB_ORACLE_TIMESTAMP");
     }
 
@@ -117,11 +108,13 @@ public class OracleTimestampType extends AbstractDateDataType<Timestamp> {
     }
 
     @Override
-    public synchronized String toString(Timestamp value) {
+    public synchronized String convertToSqlString(Timestamp value, TimeZone timeZone) {
         if (value == null) {
             return "NULL";
         }
-        dateFormat.setTimeZone(timeZone());
-        return String.format("to_timestamp('%s.%d', '%s')", dateFormat.format(value), value.getNanos(), oracleDateFormate);
+        SimpleDateFormat dateFormat = new SimpleDateFormat(JAVA_DATE_FORMAT);
+        dateFormat.setTimeZone(timeZone);
+        return String.format("to_timestamp('%s.%d', '%s')", dateFormat.format(value), value.getNanos(),
+                oracleDateFormate);
     }
 }

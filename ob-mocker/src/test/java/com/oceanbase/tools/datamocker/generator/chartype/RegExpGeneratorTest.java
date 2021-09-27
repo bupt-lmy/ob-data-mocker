@@ -7,7 +7,7 @@ import dk.brics.automaton.State;
 import org.junit.Test;
 
 /**
- * 正则表达式数据生成器测试类
+ * Regular expression data generator test class
  *
  * @author yh263208
  * @date 2021-01-22 15:57

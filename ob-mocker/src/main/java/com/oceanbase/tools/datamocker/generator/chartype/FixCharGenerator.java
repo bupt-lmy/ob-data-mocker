@@ -2,29 +2,30 @@ package com.oceanbase.tools.datamocker.generator.chartype;
 
 import java.io.UnsupportedEncodingException;
 
-import com.oceanbase.tools.datamocker.generator.CharGeneratorBase;
+import com.oceanbase.tools.datamocker.generator.BaseCharGenerator;
 import com.oceanbase.tools.datamocker.model.enums.CharCaseOption;
+import com.oceanbase.tools.datamocker.model.enums.CharsetType;
 import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
 
 /**
- * 定值文本数据生成器
+ * Fixed value text data generator
  *
  * @author yh263208
  * @date 2020-12-16 23:13
  * @since OBMOCKER_snapshot_0.1.0
  */
-public class FixCharGenerator extends CharGeneratorBase {
+public class FixCharGenerator extends BaseCharGenerator {
     /**
-     * 定值文本
+     * Fixed value text
      */
     private final String fixText;
 
     /**
-     * 构造方法
+     * Constructor
      *
-     * @param caseType 字符大小写控制配置
-     * @param fixText  定值文本
+     * @param caseType Character case control configuration
+     * @param fixText Fixed value text
      */
     public FixCharGenerator(CharCaseOption caseType, String fixText) {
         super(caseType);
@@ -32,32 +33,36 @@ public class FixCharGenerator extends CharGeneratorBase {
     }
 
     @Override
-    public Boolean preCheck(Integer minLength, Integer maxLength) {
-        int realLength = -1;
-        if (unicode()) {
+    protected Boolean doPreCheck(Integer minLength, Integer maxLength, CharsetType charsetType,
+            CharCaseOption caseOption,
+            boolean isUnicode) {
+        int realLength;
+        if (isUnicode) {
             realLength = this.fixText.length();
         } else {
             try {
-                realLength = this.fixText.getBytes(this.charset().getCharSet()).length;
+                realLength = this.fixText.getBytes(charsetType.getCharSet()).length;
             } catch (UnsupportedEncodingException e) {
                 throw new MockerException(MockerError.UNKNOWN_ERROR, e.getMessage());
             }
         }
         if (realLength >= minLength) {
-            if (realLength <= maxLength) {
-                return true;
-            }
+            return realLength <= maxLength;
         }
         return false;
     }
 
     @Override
-    public String generate(Integer minLength, Integer maxLength) {
-        return caseOption().convert(this.fixText);
+    protected String doGenerate(Integer minLength, Integer maxLength, CharsetType charsetType,
+            CharCaseOption caseOption,
+            boolean isUnicode) {
+        return caseOption.convert(this.fixText);
     }
 
     @Override
-    public Long count(Integer minLength, Integer maxLength) {
+    protected Long doCount(Integer minLength, Integer maxLength, CharsetType charsetType, CharCaseOption caseOption,
+            boolean isUnicode) {
         return 1L;
     }
+
 }

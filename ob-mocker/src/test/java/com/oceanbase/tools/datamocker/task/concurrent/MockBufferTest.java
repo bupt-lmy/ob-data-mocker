@@ -14,13 +14,14 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 
 import javax.sql.DataSource;
 
 import com.oceanbase.tools.datamocker.MockerTestBase;
 import com.oceanbase.tools.datamocker.core.read.ColumnReader;
 import com.oceanbase.tools.datamocker.core.task.AbstractDataPipe;
-import com.oceanbase.tools.datamocker.core.write.DataBaseWriter;
+import com.oceanbase.tools.datamocker.core.write.JdbcWriter;
 import com.oceanbase.tools.datamocker.core.write.SqlScriptWriter;
 import com.oceanbase.tools.datamocker.core.write.output.MockerDataSource;
 import com.oceanbase.tools.datamocker.core.write.output.MockerFile;
@@ -28,18 +29,20 @@ import com.oceanbase.tools.datamocker.datatype.AbstractDataType;
 import com.oceanbase.tools.datamocker.datatype.oracle.OracleNumberType;
 import com.oceanbase.tools.datamocker.generator.digit.NormalGenerator;
 import com.oceanbase.tools.datamocker.model.config.model.DataBaseConfig;
-import com.oceanbase.tools.datamocker.model.enums.DialectType;
+import com.oceanbase.tools.datamocker.model.enums.ObModeType;
+import com.oceanbase.tools.datamocker.model.enums.ScriptType;
+import com.oceanbase.tools.datamocker.model.mock.MockColumnData;
+import com.oceanbase.tools.datamocker.model.mock.MockRowData;
 import com.oceanbase.tools.datamocker.task.primitive.DataBasePrimitiveTest;
 import com.oceanbase.tools.datamocker.util.MockDataPipe;
 import com.oceanbase.tools.datamocker.util.MockerBuffer;
-import com.oceanbase.tools.datamocker.util.Pair;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 /**
- * mock数据缓冲对象测试类
+ * mock data buffer object test class
  *
  * @author yh263208
  * @date 2021-01-16 17:28
@@ -47,45 +50,28 @@ import org.junit.Test;
  */
 @Slf4j
 public class MockBufferTest extends MockerTestBase {
-    /**
-     * mysql数据库连接配置文件所在地
-     */
     private final static String mysqlEnv = "db/mysql-env.properties";
-    /**
-     * oracle数据库连接配置文件所在地
-     */
     private final static String oracleEnv = "db/oracle-env.properties";
-    /**
-     * 列信息
-     */
     private final String ddl = "CREATE TABLE \"EMP\" (\n"
-                               + "  \"COL1\" NUMBER(5,2) NOT NULL,\n"
-                               + "  \"COL2\" NUMBER(5,2) NOT NULL,\n"
-                               + "  \"COL3\" NUMBER(5,3) NOT NULL\n"
-                               + "); ";
+            + "  \"COL1\" NUMBER(5,2) NOT NULL,\n"
+            + "  \"COL2\" NUMBER(5,2) NOT NULL,\n"
+            + "  \"COL3\" NUMBER(5,3) NOT NULL\n"
+            + "); ";
     private DataSource dataSource;
-    /**
-     * mock数据文件管理器
-     */
     private MockerFile manager;
 
-    /**
-     * 获取测试数据库连接配置信息
-     *
-     * @param dialectType 方言类型
-     * @throws IOException 文件读取操作可能会抛出异常
-     */
-    private DataBaseConfig getDBConfig(DialectType dialectType) throws IOException {
+    private DataBaseConfig getDBConfig(ObModeType dialectType) throws IOException {
         DataBaseConfig config = new DataBaseConfig();
         Properties properties = new Properties();
         URL url = null;
-        if (DialectType.OB_MYSQL.equals(dialectType)) {
+        if (ObModeType.OB_MYSQL.equals(dialectType)) {
             url = DataBasePrimitiveTest.class.getClassLoader().getResource(mysqlEnv);
-        } else if (DialectType.OB_ORACLE.equals(dialectType)) {
+        } else if (ObModeType.OB_ORACLE.equals(dialectType)) {
             url = DataBasePrimitiveTest.class.getClassLoader().getResource(oracleEnv);
         } else {
             return null;
         }
+        assert url != null;
         properties.load(new FileInputStream(url.getPath()));
         config.setDefaultSchame(properties.getProperty("schema"));
         config.setPassword(properties.getProperty("passwd"));
@@ -97,11 +83,6 @@ public class MockBufferTest extends MockerTestBase {
         return config;
     }
 
-    /**
-     * 初始化环境，创建一个目标表
-     *
-     * @param dataSource 数据库连接池
-     */
     private void initEnv(DataSource dataSource) throws SQLException {
         try (Connection connection = dataSource.getConnection()) {
             try (PreparedStatement statement = connection.prepareStatement(this.ddl)) {
@@ -112,32 +93,21 @@ public class MockBufferTest extends MockerTestBase {
 
     @Before
     public void initFileManager() throws IOException, SQLException {
-        DataBaseConfig oracleConfig = getDBConfig(DialectType.OB_ORACLE);
+        DataBaseConfig oracleConfig = getDBConfig(ObModeType.OB_ORACLE);
         dataSource = new MockerDataSource(oracleConfig, 15, 25, 2, null);
         initEnv(dataSource);
-        manager = new MockerFile("test/mock/mock.sql");
+        manager = new MockerFile("test/mock/mock.sql", ScriptType.SQL);
     }
 
-    /**
-     * 获取生成表的结构映射表
-     *
-     * @return 返回映射表集合
-     */
-    private Map<String, AbstractDataType> getTableSchma() {
+    private Map<String, AbstractDataType<?, ? extends Comparable<?>>> getTableSchma() {
         List<String> columns = Arrays.asList("COL1", "COL2", "COL3");
-        Map<String, AbstractDataType> map = new HashMap<>();
+        Map<String, AbstractDataType<?, ? extends Comparable<?>>> map = new HashMap<>();
         for (String column : columns) {
             map.putIfAbsent(column, new OracleNumberType(5, 2, null, false));
         }
         return map;
     }
 
-    /**
-     * 获取列生成原语
-     *
-     * @param columnName 列原语的列名
-     * @return 返回列原语集合
-     */
     private ColumnReader<BigDecimal> getPrimitive(String columnName) {
         OracleNumberType number = new OracleNumberType(5, 2, null, false);
         BigDecimal expectAvg = new BigDecimal("12");
@@ -146,18 +116,13 @@ public class MockBufferTest extends MockerTestBase {
         return new ColumnReader<>(number, columnName, null);
     }
 
-    /**
-     * 开始数据生成任务
-     *
-     * @param dataPipe 数据通信管道
-     */
-    private void startDataGenerateTask(AbstractDataPipe dataPipe, int batchSize, int maxCount) {
-        Map<String, AbstractDataType> map = getTableSchma();
+    private void startDataGenerateTask(AbstractDataPipe<List<MockRowData>> dataPipe, int batchSize, int maxCount) {
+        Map<String, AbstractDataType<?, ? extends Comparable<?>>> map = getTableSchma();
         MockerBuffer buffer = new MockerBuffer(map, (long) batchSize);
         buffer.setConcurrent(2);
         buffer.register(dataPipe);
-        List<ColumnReader> first = new ArrayList<>();
-        List<ColumnReader> second = new ArrayList<>();
+        List<ColumnReader<BigDecimal>> first = new ArrayList<>();
+        List<ColumnReader<BigDecimal>> second = new ArrayList<>();
         List<String> keySet = new ArrayList<>(map.keySet());
         for (int i = 0; i < keySet.size(); i++) {
             if ((i + 1) % 2 == 0) {
@@ -170,18 +135,18 @@ public class MockBufferTest extends MockerTestBase {
             try {
                 for (int i = 0; i < maxCount; i++) {
                     if (first.size() == 1) {
-                        ColumnReader primitive = first.get(0);
-                        buffer.write(primitive.read());
+                        ColumnReader<BigDecimal> primitive = first.get(0);
+                        buffer.write(primitive.read(), Long.MAX_VALUE, TimeUnit.SECONDS);
                     } else {
-                        Map<String, Pair<AbstractDataType, Object>> data = new HashMap<>(first.size());
-                        for (ColumnReader primitive : first) {
-                            Pair<String, Pair<AbstractDataType, Object>> pair = primitive.read();
-                            data.put(pair.getKey(), pair.getValue());
+                        MockRowData mockRowData = new MockRowData(first.size());
+                        for (ColumnReader<BigDecimal> primitive : first) {
+                            MockColumnData<BigDecimal> mockColumn = primitive.read();
+                            mockRowData.addMockColumn(mockColumn);
                         }
-                        buffer.write(data);
+                        buffer.write(mockRowData, Long.MAX_VALUE, TimeUnit.SECONDS);
                     }
                 }
-                buffer.close();
+                buffer.close(0, TimeUnit.SECONDS);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -191,18 +156,18 @@ public class MockBufferTest extends MockerTestBase {
             try {
                 for (int i = 0; i < maxCount; i++) {
                     if (second.size() == 1) {
-                        ColumnReader primitive = second.get(0);
-                        buffer.write(primitive.read());
+                        ColumnReader<BigDecimal> primitive = second.get(0);
+                        buffer.write(primitive.read(), Long.MAX_VALUE, TimeUnit.SECONDS);
                     } else {
-                        Map<String, Pair<AbstractDataType, Object>> data = new HashMap<>(first.size());
-                        for (ColumnReader primitive : second) {
-                            Pair<String, Pair<AbstractDataType, Object>> pair = primitive.read();
-                            data.put(pair.getKey(), pair.getValue());
+                        MockRowData mockRowData = new MockRowData(first.size());
+                        for (ColumnReader<BigDecimal> primitive : second) {
+                            MockColumnData<BigDecimal> mockColumn = primitive.read();
+                            mockRowData.addMockColumn(mockColumn);
                         }
-                        buffer.write(data);
+                        buffer.write(mockRowData, Long.MAX_VALUE, TimeUnit.SECONDS);
                     }
                 }
-                buffer.close();
+                buffer.close(0, TimeUnit.SECONDS);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -212,22 +177,23 @@ public class MockBufferTest extends MockerTestBase {
 
     @Test
     public void testDataBasePrimitive() throws IOException, InterruptedException {
-        AbstractDataPipe dataPipe = new MockDataPipe();
+        AbstractDataPipe<List<MockRowData>> dataPipe = new MockDataPipe(1);
         startDataGenerateTask(dataPipe, 256, 600);
-        DialectType dialectType = DialectType.OB_ORACLE;
+        ObModeType dialectType = ObModeType.OB_ORACLE;
         DataBaseConfig config = getDBConfig(dialectType);
-        DataBaseWriter primitive = new DataBaseWriter(dataSource, dialectType, config.getDefaultSchame(), "EMP");
+        assert config != null;
+        JdbcWriter primitive = new JdbcWriter(dataSource, dialectType, config.getDefaultSchame(), "EMP");
         primitive.register(dataPipe);
         List<Thread> threads = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
             Thread writeThread = new Thread(() -> {
                 try {
                     while (true) {
-                        if (primitive.write() == null) {
+                        if (primitive.write() == Long.MIN_VALUE) {
                             break;
                         }
                     }
-                } catch (Exception e) {
+                } catch (Throwable e) {
                     e.printStackTrace();
                 }
             });
@@ -241,20 +207,20 @@ public class MockBufferTest extends MockerTestBase {
 
     @Test
     public void testScriptPrimitive() throws InterruptedException {
-        AbstractDataPipe dataPipe = new MockDataPipe();
+        AbstractDataPipe<List<MockRowData>> dataPipe = new MockDataPipe(1);
         startDataGenerateTask(dataPipe, 256, 123);
-        SqlScriptWriter primitive = new SqlScriptWriter(manager, DialectType.OB_ORACLE, "test", "emp");
+        SqlScriptWriter primitive = new SqlScriptWriter(manager, ObModeType.OB_ORACLE, "test", "emp");
         primitive.register(dataPipe);
         List<Thread> list = new LinkedList<>();
         for (int i = 0; i < 10; i++) {
             Thread writeThread = new Thread(() -> {
                 try {
                     while (true) {
-                        if (primitive.write() == null) {
+                        if (primitive.write() == Long.MIN_VALUE) {
                             break;
                         }
                     }
-                } catch (Exception e) {
+                } catch (Throwable e) {
                     e.printStackTrace();
                 }
             });
@@ -266,11 +232,6 @@ public class MockBufferTest extends MockerTestBase {
         }
     }
 
-    /**
-     * 关闭环境，创建一个目标表
-     *
-     * @param dataSource 一个数据连接
-     */
     private void closeEnv(DataSource dataSource) throws SQLException {
         String sql = "drop table emp";
         try (Connection connection = dataSource.getConnection()) {
@@ -281,8 +242,12 @@ public class MockBufferTest extends MockerTestBase {
     }
 
     @After
-    public void clear() throws IOException, SQLException {
-        manager.clear();
+    public void clear() throws SQLException {
+        try {
+            manager.clear();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         closeEnv(dataSource);
     }
 }

@@ -28,8 +28,8 @@ import com.oceanbase.tools.datamocker.model.config.impl.DefaultTaskConfig;
 import com.oceanbase.tools.datamocker.model.config.model.DataBaseConfig;
 import com.oceanbase.tools.datamocker.model.config.model.DataTypeConfig;
 import com.oceanbase.tools.datamocker.model.config.model.DigitDataTypeConfig;
-import com.oceanbase.tools.datamocker.model.enums.DialectType;
 import com.oceanbase.tools.datamocker.model.enums.DuplicateStrategy;
+import com.oceanbase.tools.datamocker.model.enums.ObModeType;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
 import org.junit.After;
 import org.junit.Assert;
@@ -37,53 +37,42 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * 分发器工厂类的测试类
+ * Test class for dispatcher factory class
  *
  * @author yh263208
  * @date 2021-01-11 21:50
  * @since OBMOCKER_snaoshot_0.1.0
  */
 public class DispatcherFactoryTest extends MockerTestBase {
-    /**
-     * mysql数据库连接配置文件所在地
-     */
     private final String mysqlEnv = "db/mysql-env.properties";
-    /**
-     * oracle数据库连接配置文件所在地
-     */
     private final String oracleEnv = "db/oracle-env.properties";
     private final String ddlOracle = "CREATE TABLE \"EMP\" (\n"
-                                     + "  \"COL\" NUMBER(5,2) NOT NULL,\n"
-                                     + "  \"COL2\" NUMBER(5,2) NOT NULL,\n"
-                                     + "  \"COL3\" NUMBER(4,2) NOT NULL,\n"
-                                     + "  CONSTRAINT \"EMP_OBPK_1610357443362979\" PRIMARY KEY (\"COL\"),\n"
-                                     + "  CONSTRAINT \"EMP_OBUNIQUE_1610357443363981\" UNIQUE (\"COL2\", "
-                                     + "\"COL3\")\n"
-                                     + ") ";
+            + "  \"COL\" NUMBER(5,2) NOT NULL,\n"
+            + "  \"COL2\" NUMBER(5,2) NOT NULL,\n"
+            + "  \"COL3\" NUMBER(4,2) NOT NULL,\n"
+            + "  CONSTRAINT \"EMP_OBPK_1610357443362979\" PRIMARY KEY (\"COL\"),\n"
+            + "  CONSTRAINT \"EMP_OBUNIQUE_1610357443363981\" UNIQUE (\"COL2\", "
+            + "\"COL3\")\n"
+            + ") ";
     private final String ddlWithVirtualColumnOracle = "CREATE TABLE \"EMP1\" (\n"
-                                                      + "  \"COL\" NUMBER(5,2) NOT NULL,\n"
-                                                      + "  \"COL2\" NUMBER(5,2) NOT NULL,\n"
-                                                      + "  \"COL3\" NUMBER(4,2) NOT NULL,\n"
-                                                      + "  \"COL4\" NUMBER(5,3) GENERATED ALWAYS AS ((\"COL2\" + \"COL3\")) "
-                                                      + "VIRTUAL,\n"
-                                                      + "  CONSTRAINT \"EMP_OBPK\" PRIMARY KEY (\"COL\"),\n"
-                                                      + "  CONSTRAINT \"EMP_OBUNIQUE_1231\" UNIQUE (\"COL2\", \"COL3\"),\n"
-                                                      + "  CONSTRAINT \"EMP_OBUNIQUE_12343\" UNIQUE (\"COL4\")\n,"
-                                                      + "CONSTRAINT \"EMP1_OBFK_1610454320318209\" FOREIGN KEY (\"COL2\") "
-                                                      + "REFERENCES "
-                                                      + "\"SYS\".\"EMP\"(\"COL\")\n"
-                                                      + ");";
+            + "  \"COL\" NUMBER(5,2) NOT NULL,\n"
+            + "  \"COL2\" NUMBER(5,2) NOT NULL,\n"
+            + "  \"COL3\" NUMBER(4,2) NOT NULL,\n"
+            + "  \"COL4\" NUMBER(5,3) GENERATED ALWAYS AS ((\"COL2\" + \"COL3\")) "
+            + "VIRTUAL,\n"
+            + "  CONSTRAINT \"EMP_OBPK\" PRIMARY KEY (\"COL\"),\n"
+            + "  CONSTRAINT \"EMP_OBUNIQUE_1231\" UNIQUE (\"COL2\", \"COL3\"),\n"
+            + "  CONSTRAINT \"EMP_OBUNIQUE_12343\" UNIQUE (\"COL4\")\n,"
+            + "CONSTRAINT \"EMP1_OBFK_1610454320318209\" FOREIGN KEY (\"COL2\") "
+            + "REFERENCES "
+            + "\"SYS\".\"EMP\"(\"COL\")\n"
+            + ");";
     private DataSource oracleDatasource = null;
-    /**
-     * 表任务有关的参数
-     */
     private final Long maxBatchsize = 1024L;
     private final Long maxGenerateCount = 9800L;
 
-    /**
-     * 初始化一个数字类型的数据生成器配置
-     */
-    private DataTypeConfig initDigitGen(Map<String, Double> builderParams, String typeName, BigDecimal lowValue, BigDecimal highValue,
+    private DataTypeConfig initDigitGen(Map<String, Object> builderParams, String typeName, BigDecimal lowValue,
+            BigDecimal highValue,
             String genName, Integer precision, Integer scale) {
         DigitDataTypeConfig digit = new DigitDataTypeConfig();
         digit.setColumnType(typeName);
@@ -99,7 +88,7 @@ public class DispatcherFactoryTest extends MockerTestBase {
     private List<DefaultColumnConfig> initColumnConfig(String tableName) {
         List<DefaultColumnConfig> configList = new ArrayList<>();
         if ("EMP".equals(tableName)) {
-            Map<String, Double> builderParams = new HashMap<>();
+            Map<String, Object> builderParams = new HashMap<>();
             builderParams.put("average", 50.21);
             builderParams.put("variance", 16.43);
 
@@ -130,7 +119,7 @@ public class DispatcherFactoryTest extends MockerTestBase {
                     "NORMAL_GENERATOR", 4, 2));
             configList.add(col3);
         } else if ("EMP1".equals(tableName)) {
-            Map<String, Double> builderParams = new HashMap<>();
+            Map<String, Object> builderParams = new HashMap<>();
             builderParams.put("average", 50.21);
             builderParams.put("variance", 16.43);
 
@@ -187,19 +176,13 @@ public class DispatcherFactoryTest extends MockerTestBase {
         return tableConfig;
     }
 
-    /**
-     * 获取测试数据库连接配置信息
-     *
-     * @param dialectType 方言类型
-     * @throws IOException 文件读取操作可能会抛出异常
-     */
-    private DataBaseConfig getDBConfig(DialectType dialectType) throws IOException {
+    private DataBaseConfig getDBConfig(ObModeType dialectType) throws IOException {
         DataBaseConfig config = new DataBaseConfig();
         Properties properties = new Properties();
         URL url = null;
-        if (DialectType.OB_MYSQL.equals(dialectType)) {
+        if (ObModeType.OB_MYSQL.equals(dialectType)) {
             url = this.getClass().getClassLoader().getResource(mysqlEnv);
-        } else if (DialectType.OB_ORACLE.equals(dialectType)) {
+        } else if (ObModeType.OB_ORACLE.equals(dialectType)) {
             url = this.getClass().getClassLoader().getResource(oracleEnv);
         } else {
             return null;
@@ -216,12 +199,12 @@ public class DispatcherFactoryTest extends MockerTestBase {
     }
 
     private AbstractTaskConfig getTask(String tableName) throws IOException {
-        DataBaseConfig config = getDBConfig(DialectType.OB_ORACLE);
+        DataBaseConfig config = getDBConfig(ObModeType.OB_ORACLE);
         DefaultTaskConfig taskConfig = new DefaultTaskConfig();
         DefaultTableConfig tableConfig = initTableConfig(tableName, config.getDefaultSchame());
         taskConfig.setTables(Arrays.asList(tableConfig));
         taskConfig.setDbConfig(config);
-        taskConfig.setDialectType(DialectType.OB_ORACLE);
+        taskConfig.setDialectType(ObModeType.OB_ORACLE);
         taskConfig.setConnectionIncreasementStep(2);
         taskConfig.setMaxConnectionSize(15);
         taskConfig.setMinConnectionSize(5);
@@ -231,7 +214,7 @@ public class DispatcherFactoryTest extends MockerTestBase {
     @Before
     public void initEnv() throws IOException, SQLException {
         if (oracleDatasource == null) {
-            DataBaseConfig config = getDBConfig(DialectType.OB_ORACLE);
+            DataBaseConfig config = getDBConfig(ObModeType.OB_ORACLE);
             oracleDatasource = new MockerDataSource(config, 3, 5, 2, null);
         }
         try (Connection connection = oracleDatasource.getConnection()) {
@@ -245,7 +228,7 @@ public class DispatcherFactoryTest extends MockerTestBase {
     }
 
     @Test
-    public void testDispatcher() throws Exception {
+    public void testDispatcher() throws Throwable {
         AbstractTaskConfig config = getTask("EMP");
         AbstractMockerFactory factory = new ObMockerFactory(config);
         ObDataMocker mocker = factory.create();
@@ -253,17 +236,17 @@ public class DispatcherFactoryTest extends MockerTestBase {
     }
 
     @Test
-    public void testDispatcherWithVirtualColumn() throws Exception {
+    public void testDispatcherWithVirtualColumn() throws Throwable {
         AbstractTaskConfig config = getTask("EMP1");
         AbstractMockerFactory factory = new ObMockerFactory(config);
-        thrown.expectMessage("virtual column \"EMP1.COL4\" for constraint is not support yet");
+        thrown.expectMessage("Virtual column \"EMP1.COL4\" for constraint is not support yet");
         thrown.expect(MockerException.class);
         ObDataMocker mocker = factory.create();
         Assert.assertEquals(1, mocker.size());
     }
 
     @Test
-    public void testDispatcherWithNullTable() throws Exception {
+    public void testDispatcherWithNullTable() throws Throwable {
         AbstractTaskConfig config = getTask("EMP2");
         AbstractMockerFactory factory = new ObMockerFactory(config);
         thrown.expectMessage("ORA-00942: table or view 'SYS.EMP2' does not exist");

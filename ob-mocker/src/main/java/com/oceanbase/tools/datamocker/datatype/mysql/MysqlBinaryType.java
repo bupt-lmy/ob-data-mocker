@@ -2,11 +2,12 @@ package com.oceanbase.tools.datamocker.datatype.mysql;
 
 import com.oceanbase.tools.datamocker.datatype.AbstractByteDataType;
 import com.oceanbase.tools.datamocker.datatype.DataTypeFactory;
-import com.oceanbase.tools.datamocker.generator.ByteGeneratorBase;
-import com.oceanbase.tools.datamocker.model.enums.DialectType;
+import com.oceanbase.tools.datamocker.generator.BaseByteGenerator;
+import com.oceanbase.tools.datamocker.model.config.model.CharDataTypeConfig;
+import com.oceanbase.tools.datamocker.model.enums.ObModeType;
 
 /**
- * mysql模式下的binary类型，包括binary和varbinary
+ * The binary type in mysql mode, including binary and varbinary
  *
  * @author yh263208
  * @date 2020-12-16 10:47
@@ -14,35 +15,36 @@ import com.oceanbase.tools.datamocker.model.enums.DialectType;
  */
 public class MysqlBinaryType extends AbstractByteDataType {
     /**
-     * 宽度
+     * Binary width, eg. the width of varbinary(128) is 128
      */
     private final Integer width;
 
     /**
-     * 构造函数
+     * Constructor
      *
-     * @param generator 字符类型绑定的数据生成器
-     * @param width     宽度
-     * @param allowNull 是否允许空值
+     * @param generator Character type binding data generator
+     * @param width width of data type
+     * @param allowNull Whether to allow null values
      */
-    public MysqlBinaryType(byte[] defaultValue, Boolean allowNull, Integer width, ByteGeneratorBase generator) {
-        super(generator, DialectType.OB_MYSQL, defaultValue, allowNull);
+    public MysqlBinaryType(byte[] defaultValue, Boolean allowNull, Integer width, BaseByteGenerator generator) {
+        super(generator, ObModeType.OB_MYSQL, defaultValue, allowNull);
         this.width = width;
     }
 
     /**
-     * 构造函数
+     * Constructor
      *
-     * @param allowNull 是否允许空值
-     * @param width     宽度
+     * @param defaultValue default value for byte type
+     * @param allowNull Whether to allow null values
+     * @param width width of data type
      */
     public MysqlBinaryType(byte[] defaultValue, Boolean allowNull, Integer width) {
-        super(DialectType.OB_MYSQL, defaultValue, allowNull);
+        super(ObModeType.OB_MYSQL, defaultValue, allowNull);
         this.width = width;
     }
 
     @Override
-    public DataTypeFactory getFactory() {
+    public DataTypeFactory<MysqlBinaryType, CharDataTypeConfig, BaseByteGenerator> getFactory() {
         return DataTypeFactory.getInstance("OB_MYSQL_BINARY");
     }
 
@@ -52,7 +54,7 @@ public class MysqlBinaryType extends AbstractByteDataType {
     }
 
     @Override
-    public String toString(byte[] value) {
+    public String convertToSqlString(byte[] value) {
         if (value == null) {
             return "NULL";
         }

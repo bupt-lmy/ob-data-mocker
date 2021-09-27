@@ -2,13 +2,15 @@ package com.oceanbase.tools.datamocker.model.config.impl;
 
 import com.oceanbase.tools.datamocker.datatype.AbstractDataType;
 import com.oceanbase.tools.datamocker.datatype.DataTypeFactory;
+import com.oceanbase.tools.datamocker.generator.BaseGenerator;
 import com.oceanbase.tools.datamocker.model.config.AbstractColumnConfig;
 import com.oceanbase.tools.datamocker.model.config.model.DataTypeConfig;
 import lombok.Getter;
 import lombok.Setter;
 
 /**
- * 列任务配置对象，用于标明列生成任务的配置信息
+ * Column task configuration object, used to indicate the configuration information of the column
+ * generation task
  *
  * @author yh263208
  * @date 2020-12-27 20:57
@@ -17,26 +19,23 @@ import lombok.Setter;
 @Getter
 @Setter
 public class DefaultColumnConfig extends AbstractColumnConfig {
-    /**
-     * 一列的列名
-     */
     private String columnName;
     /**
-     * 列生成任务的详细配置
+     * Detailed configuration of column generation tasks
      */
     private DataTypeConfig typeConfig;
     /**
-     * 是否允许空值，默认为真
+     * Whether to allow null values, the default is true
      */
     private Boolean allowNull = true;
     /**
-     * 列的默认值
+     * The default value of the column
      */
     private Object defaultValue;
     /**
-     * 类型信息
+     * Type information
      */
-    private AbstractDataType dataType = null;
+    private AbstractDataType<?, ? extends Comparable<?>> dataType = null;
 
     @Override
     public String columnName() {
@@ -44,14 +43,15 @@ public class DefaultColumnConfig extends AbstractColumnConfig {
     }
 
     @Override
-    public synchronized AbstractDataType columnType() {
+    public synchronized AbstractDataType<?, ? extends Comparable<?>> columnType() {
         if (dataType != null) {
             return dataType;
         }
-        DataTypeFactory factory = DataTypeFactory.getInstance(typeConfig.getColumnType());
+        DataTypeFactory<? extends AbstractDataType<?, ? extends Comparable<?>>, DataTypeConfig, ? extends BaseGenerator<? extends Comparable<?>, ?>> dataTypeFactory =
+                DataTypeFactory.getInstance(typeConfig.getColumnType());
         typeConfig.setAllowNull(allowNull());
         typeConfig.setDefaultValue(defaultValue());
-        this.dataType = factory.make(typeConfig);
+        this.dataType = dataTypeFactory.make(typeConfig);
         return this.dataType;
     }
 

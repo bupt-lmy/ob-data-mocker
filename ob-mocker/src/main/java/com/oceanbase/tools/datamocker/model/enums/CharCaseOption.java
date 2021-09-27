@@ -3,7 +3,7 @@ package com.oceanbase.tools.datamocker.model.enums;
 import org.apache.commons.lang.StringUtils;
 
 /**
- * 字符大小写设定枚举
+ * Character case setting enumeration
  *
  * @author yh263208
  * @date 2020-12-16 22:52
@@ -11,7 +11,7 @@ import org.apache.commons.lang.StringUtils;
  */
 public enum CharCaseOption {
     /**
-     * 全部转为大写
+     * Convert all to uppercase
      */
     ALL_UPPER_CASE {
         @Override
@@ -23,7 +23,7 @@ public enum CharCaseOption {
         }
     },
     /**
-     * 全部转为小写
+     * All lowercase
      */
     ALL_LOWER_CASE {
         @Override
@@ -35,7 +35,7 @@ public enum CharCaseOption {
         }
     },
     /**
-     * 默认值
+     * Defaults
      */
     DEFAULT {
         @Override

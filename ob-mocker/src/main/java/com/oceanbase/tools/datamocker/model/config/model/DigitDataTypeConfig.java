@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * 数字类型的类型信息封装
+ * Type information encapsulation for digital types
  *
  * @author yh263208
  * @date 2020-12-24 20:52
@@ -14,11 +14,11 @@ import lombok.Setter;
 @Setter
 public class DigitDataTypeConfig extends DataTypeConfig {
     /**
-     * 数据的精度，代表有效位数
+     * The precision of the data, representing the effective number of digits
      */
     private Integer precision;
     /**
-     * 数字类型的精度，代表小数点后的位数
+     * The precision of the number type, representing the number of digits after the decimal point
      */
     private Integer scale;
 }

@@ -2,14 +2,15 @@ package com.oceanbase.tools.datamocker.datatype.mysql;
 
 import com.oceanbase.tools.datamocker.datatype.AbstractCharDataType;
 import com.oceanbase.tools.datamocker.datatype.DataTypeFactory;
-import com.oceanbase.tools.datamocker.generator.CharGeneratorBase;
+import com.oceanbase.tools.datamocker.generator.BaseCharGenerator;
+import com.oceanbase.tools.datamocker.model.config.model.CharDataTypeConfig;
 import com.oceanbase.tools.datamocker.model.enums.CharsetType;
-import com.oceanbase.tools.datamocker.model.enums.DialectType;
+import com.oceanbase.tools.datamocker.model.enums.ObModeType;
 import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
 
 /**
- * mysql模式下可变字符串类型
+ * Variable string type in mysql mode
  *
  * @author yh263208
  * @date 2020-12-16 18:48
@@ -17,39 +18,45 @@ import com.oceanbase.tools.datamocker.model.exception.MockerException;
  */
 public class MysqlVarCharType extends AbstractCharDataType {
     /**
-     * 构造函数
+     * Constructor
      *
-     * @param length      字符类型的长度
-     * @param charsetType 字符类型的编码格式
-     * @param generator   字符类型绑定的数据生成器
-     * @param allowNull   是否允许空值
+     * @param length Length of character type
+     * @param charsetType Character type encoding format
+     * @param generator Character type binding data generator
+     * @param allowNull Whether to allow null values
+     * @param isUnicode Is it a unicode string
+     * @param defaultValue default value for string type
      */
-    public MysqlVarCharType(Integer length, String defaultValue, Boolean allowNull, CharsetType charsetType, CharGeneratorBase generator,
+    public MysqlVarCharType(Integer length, String defaultValue, Boolean allowNull, CharsetType charsetType,
+            BaseCharGenerator generator,
             Boolean isUnicode) {
-        super(generator, DialectType.OB_MYSQL, charsetType, length, defaultValue, allowNull, isUnicode);
+        super(generator, ObModeType.OB_MYSQL, charsetType, length, defaultValue, allowNull, isUnicode);
         if (length > 65535 || length <= 0) {
             throw new MockerException(MockerError.PARAMETER_ERROR,
-                    "length for char type of mysql can not be larger than 65535 or smaller than 0");
+                    "Length for char type of mysql can not be larger than 65535 or smaller than 0");
         }
     }
 
     /**
-     * 构造函数
+     * Constructor
      *
-     * @param length      字符类型的长度
-     * @param charsetType 字符类型的编码格式
-     * @param allowNull   是否允许空值
+     * @param length Length of character type
+     * @param charsetType Character type encoding format
+     * @param allowNull Whether to allow null values
+     * @param isUnicode Is it a unicode string
+     * @param defaultValue default value for string type
      */
-    public MysqlVarCharType(Integer length, String defaultValue, Boolean allowNull, CharsetType charsetType, Boolean isUnicode) {
-        super(DialectType.OB_MYSQL, charsetType, length, defaultValue, allowNull, isUnicode);
+    public MysqlVarCharType(Integer length, String defaultValue, Boolean allowNull, CharsetType charsetType,
+            Boolean isUnicode) {
+        super(ObModeType.OB_MYSQL, charsetType, length, defaultValue, allowNull, isUnicode);
         if (length > 65535 || length <= 0) {
             throw new MockerException(MockerError.PARAMETER_ERROR,
-                    "length for char type of mysql can not be larger than 65535 or smaller than 0");
+                    "Length for char type of mysql can not be larger than 65535 or smaller than 0");
         }
     }
 
     @Override
-    public DataTypeFactory getFactory() {
+    public DataTypeFactory<MysqlVarCharType, CharDataTypeConfig, BaseCharGenerator> getFactory() {
         return DataTypeFactory.getInstance("OB_MYSQL_VARCHAR");
     }
 

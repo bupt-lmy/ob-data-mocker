@@ -3,14 +3,15 @@ package com.oceanbase.tools.datamocker.datatype;
 import java.io.UnsupportedEncodingException;
 
 import com.oceanbase.tools.datamocker.generator.BaseGenerator;
-import com.oceanbase.tools.datamocker.generator.CharGeneratorBase;
+import com.oceanbase.tools.datamocker.generator.BaseCharGenerator;
 import com.oceanbase.tools.datamocker.model.enums.CharsetType;
-import com.oceanbase.tools.datamocker.model.enums.DialectType;
+import com.oceanbase.tools.datamocker.model.enums.ObModeType;
 import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
+import lombok.Getter;
 
 /**
- * 抽象字符类型，用于描述数据库中字符串类型的数据类型
+ * Abstract character type, used to describe the data type of the string type in the database
  *
  * @author yh263208
  * @date 2020-12-11 20:16
@@ -18,32 +19,37 @@ import com.oceanbase.tools.datamocker.model.exception.MockerException;
  */
 public abstract class AbstractCharDataType extends AbstractDataType<String, Integer> {
     /**
-     * s是否存储为unicode字符串
+     * Whether to store as a unicode string
      */
-    private final Boolean isUnicode;
+    @Getter
+    private final boolean isUnicode;
     /**
-     * 数据库的字符串编码格式
+     * String encoding format of the database
      */
+    @Getter
     private final CharsetType charsetType;
     /**
-     * 字段的长度
+     * Field length
      */
     private final Integer length;
 
     /**
-     * 抽象基类的构造函数，在这里需要传入这个数据类型绑定的随机数据生成器，并且指明该数据类型对应的OB模式以及该模式下的数据库类型
+     * The constructor of the abstract base class, where you need to pass in the random data generator
+     * bound to this data type, and specify the OB mode corresponding to the data type and the database
+     * type in this mode
      *
-     * @param generator   随机数据生成器
-     * @param charsetType 字符编码格式
-     * @param dialectType OB模式
-     * @param length      类型长度
-     * @param allowNull   是否允许空值
+     * @param generator Character type data generator
+     * @param charsetType Character encoding format
+     * @param dialectType ob mode
+     * @param length Type length
+     * @param allowNull Whether to allow null values
      */
-    public AbstractCharDataType(CharGeneratorBase generator, DialectType dialectType, CharsetType charsetType, Integer length,
+    public AbstractCharDataType(BaseCharGenerator generator, ObModeType dialectType, CharsetType charsetType,
+            Integer length,
             String defaultValue, Boolean allowNull, Boolean isUnicode) {
         super(generator, dialectType, defaultValue, allowNull);
         validateParam(charsetType, length);
-        generator.setCharset(charsetType);
+        generator.setCharsetType(charsetType);
         generator.setUnicode(isUnicode);
         this.charsetType = charsetType;
         this.length = length;
@@ -51,14 +57,17 @@ public abstract class AbstractCharDataType extends AbstractDataType<String, Inte
     }
 
     /**
-     * 抽象基类的构造函数，在这里需要传入这个数据类型绑定的随机数据生成器，并且指明该数据类型对应的OB模式以及该模式下的数据库类型
+     * The constructor of the abstract base class, where you need to pass in the random data generator
+     * bound to this data type, and specify the OB mode corresponding to the data type and the database
+     * type in this mode
      *
-     * @param charsetType 字符编码格式
-     * @param dialectType OB模式
-     * @param length      类型长度
-     * @param allowNull   是否允许空值
+     * @param charsetType Character encoding format
+     * @param dialectType ob mode
+     * @param length Type length
+     * @param allowNull Whether to allow null values
      */
-    protected AbstractCharDataType(DialectType dialectType, CharsetType charsetType, Integer length, String defaultValue, Boolean allowNull,
+    protected AbstractCharDataType(ObModeType dialectType, CharsetType charsetType, Integer length, String defaultValue,
+            Boolean allowNull,
             Boolean isUnicode) {
         super(dialectType, defaultValue, allowNull);
         validateParam(charsetType, length);
@@ -68,25 +77,26 @@ public abstract class AbstractCharDataType extends AbstractDataType<String, Inte
     }
 
     /**
-     * 验证构造方法中的参数是否合法
+     * Verify that the parameters in the construction method are legal
      *
-     * @param charsetType 字符集类型
-     * @param length      字符长度
-     * @throws MockerException 验证失败抛出异常
+     * @param charsetType Character set type
+     * @param length Character length
+     * @throws MockerException An exception is thrown when verification fails
      */
     public void validateParam(CharsetType charsetType, Integer length) {
         if (charsetType == null) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "char set for data type can not be null");
+            throw new MockerException(MockerError.PARAMETER_ERROR, "Char set for data type can not be null");
         }
         if (length == null || length <= 0) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "data type length can not be null or smaller than zero");
+            throw new MockerException(MockerError.PARAMETER_ERROR,
+                    "Datatype length can not be null or smaller than zero");
         }
     }
 
     /**
-     * 字符类型的最小字节长度， 默认为0
+     * The minimum byte length of the character type, default is 1
      *
-     * @return 返回长度
+     * @return Return length
      */
     @Override
     protected Integer minValueForType() {
@@ -94,9 +104,10 @@ public abstract class AbstractCharDataType extends AbstractDataType<String, Inte
     }
 
     /**
-     * 字符类型的默认最大长度，为构造函数传入的长度，不能小于，零
+     * The default maximum length of the character type is the length passed in by the constructor and
+     * cannot be less than zero
      *
-     * @return 返回长度
+     * @return Return length
      */
     @Override
     protected Integer maxValueForType() {
@@ -104,39 +115,23 @@ public abstract class AbstractCharDataType extends AbstractDataType<String, Inte
     }
 
     /**
-     * 数据生成器对象绑定方法，之所以是一个public类型的方法是因为数据生成器可以绑定一个新的
+     * The data generator object binding method, the reason why it is a public type method is because
+     * the data generator can bind a new
      *
-     * @param generator 数据生成器
+     * @param generator Data generator
      */
     @Override
     public void bind(BaseGenerator<Integer, String> generator) {
         super.bind(generator);
-        ((CharGeneratorBase) generator).setCharset(charset());
-        ((CharGeneratorBase) generator).setUnicode(isUnicode());
+        ((BaseCharGenerator) generator).setCharsetType(getCharsetType());
+        ((BaseCharGenerator) generator).setUnicode(isUnicode());
     }
 
     /**
-     * 获取字符串类型的字符编码格式
+     * The maximum amount of unique data that this type can generate under the constraints of the
+     * specified data generator
      *
-     * @return 返回字符编码格式
-     */
-    public CharsetType charset() {
-        return this.charsetType;
-    }
-
-    /**
-     * 返回是否为存储Unicode字符串
-     *
-     * @return 返回结果
-     */
-    public Boolean isUnicode() {
-        return this.isUnicode;
-    }
-
-    /**
-     * 该类型在指定数据生成器约束下最多能生成的不重复数据量
-     *
-     * @return 返回具体的数值
+     * @return Return specific value
      */
     @Override
     public Long distinctLimit() {
@@ -147,14 +142,14 @@ public abstract class AbstractCharDataType extends AbstractDataType<String, Inte
     }
 
     /**
-     * 预检查方法，用于校验数据生成器生成的数据是否合法
+     * Pre-check method, used to verify whether the data generated by the data generator is legal
      *
-     * @param value 待插入的数据
-     * @return 返回校验后的数据
-     * @throws MockerException 校验失败则抛出异常
+     * @param value Data to be inserted
+     * @return Return the verified data
+     * @throws MockerException An exception is thrown if verification fails
      */
     @Override
-    protected String preTreat(String value) {
+    protected String preProcessingBeforeOutput(String value) {
         if (value == null) {
             return null;
         }
@@ -164,26 +159,26 @@ public abstract class AbstractCharDataType extends AbstractDataType<String, Inte
             if (isUnicode()) {
                 realLength = value.length();
             } else {
-                realLength = value.getBytes(charset().getCharSet()).length;
+                realLength = value.getBytes(getCharsetType().getCharSet()).length;
             }
         } catch (UnsupportedEncodingException e) {
             throw new MockerException(MockerError.UNKNOWN_ERROR, e.getMessage());
         }
         if (realLength > maxLength) {
             throw new MockerException(MockerError.VALUE_OUT_OFRANGE,
-                    String.format("the length of then generator's value is bigger than bound [0,%d]", maxLength));
+                    String.format("The length of then generator's value is bigger than bound [0,%d]", maxLength));
         }
         return value;
     }
 
     /**
-     * 返回字符串
+     * Return string
      *
-     * @param value 参数传入的字符串
-     * @return 返回的字符串
+     * @param value String passed in as parameter
+     * @return String returned
      */
     @Override
-    public String toString(String value) {
+    public String convertToSqlString(String value) {
         if (value == null) {
             return "NULL";
         }
@@ -191,10 +186,10 @@ public abstract class AbstractCharDataType extends AbstractDataType<String, Inte
     }
 
     /**
-     * 返回数据摘要，数字类型的数据摘要就是其本身
+     * Returns the data summary, the number type data summary is itself
      *
-     * @param value 值
-     * @return 返回摘要
+     * @param value original value
+     * @return Back to summary
      */
     @Override
     public String toDigest(String value) {

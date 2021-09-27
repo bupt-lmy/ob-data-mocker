@@ -4,7 +4,7 @@ import org.junit.Rule;
 import org.junit.rules.ExpectedException;
 
 /**
- * 测试基类，用于引入一些配置项
+ * Test base class, used to introduce some configuration items
  *
  * @author yh263208
  * @date 2020-12-08 15:32

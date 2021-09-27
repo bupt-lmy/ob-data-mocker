@@ -1,7 +1,7 @@
 package com.oceanbase.tools.datamocker.model.enums;
 
 /**
- * 重复数据的处理方式
+ * How to deal with duplicate data
  *
  * @author yh263208
  * @date 2020-12-22 21:48
@@ -9,15 +9,15 @@ package com.oceanbase.tools.datamocker.model.enums;
  */
 public enum DuplicateStrategy {
     /**
-     * 忽略冲突
+     * Ignore the conflict
      */
     IGNORE,
     /**
-     * 覆盖冲突
+     * Coverage conflict
      */
     OVERWRITE,
     /**
-     * 终止写入
+     * Terminate write
      */
     TERMINATE
 }

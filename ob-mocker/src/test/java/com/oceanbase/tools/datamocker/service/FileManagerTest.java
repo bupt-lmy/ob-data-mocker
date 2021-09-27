@@ -6,6 +6,7 @@ import java.util.Random;
 
 import com.oceanbase.tools.datamocker.MockerTestBase;
 import com.oceanbase.tools.datamocker.core.write.output.MockerFile;
+import com.oceanbase.tools.datamocker.model.enums.ScriptType;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.After;
 import org.junit.Assert;
@@ -13,7 +14,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * 文件管理器测试类
+ * File manager test class
  *
  * @author yh263208
  * @date 2021-01-07 21:35
@@ -26,7 +27,7 @@ public class FileManagerTest extends MockerTestBase {
 
     @Before
     public void initFileManager() throws IOException {
-        manager = new MockerFile("test/mock/test.txt", true);
+        manager = new MockerFile("test/mock/test.txt", ScriptType.SQL, true);
     }
 
     @Test

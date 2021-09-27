@@ -10,7 +10,12 @@ import com.oceanbase.tools.datamocker.MockerTestBase;
 import com.oceanbase.tools.datamocker.datatype.AbstractDataType;
 import com.oceanbase.tools.datamocker.datatype.oracle.OracleCharType;
 import com.oceanbase.tools.datamocker.datatype.oracle.OracleNumberType;
+import com.oceanbase.tools.datamocker.generator.BaseCharGenerator;
+import com.oceanbase.tools.datamocker.generator.BaseDigitalGenerator;
+import com.oceanbase.tools.datamocker.generator.BaseGenerator;
 import com.oceanbase.tools.datamocker.generator.GeneratorFactory;
+import com.oceanbase.tools.datamocker.generator.chartype.RandomGenerator;
+import com.oceanbase.tools.datamocker.generator.digit.UniformGenerator;
 import com.oceanbase.tools.datamocker.model.config.impl.DefaultColumnConfig;
 import com.oceanbase.tools.datamocker.model.config.model.CharDataTypeConfig;
 import com.oceanbase.tools.datamocker.model.config.model.DigitDataTypeConfig;
@@ -21,44 +26,37 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * 列生成任务的配置对象的测试类
+ * The test class of the configuration object of the column generation task
  *
  * @author yh263208
  * @date 2020-12-25 17:36
  * @since OBMOCKER-snapshot-0.1.0
  */
 public class ColumnConfigTest extends MockerTestBase {
-    private Integer precision = 5;
-    private Integer scale = 2;
-    private Boolean allowNull = false;
-    private String columnName = "SALARY";
-    private Object defaultValue = "123.55";
-    private String genName = "NORMAL_GENERATOR";
-    private String typeName = "OB_ORACLE_NUMBER";
-    private BigDecimal lowValue = BigDecimal.ZERO;
-    private BigDecimal highValue = BigDecimal.TEN.multiply(BigDecimal.TEN);
-    private Map<String, Double> builderParams = new HashMap<>();
+    private final Integer precision = 5;
+    private final Integer scale = 2;
+    private final String columnName = "SALARY";
+    private final Object defaultValue = "123.55";
+    private final BigDecimal lowValue = BigDecimal.ZERO;
+    private final BigDecimal highValue = BigDecimal.TEN.multiply(BigDecimal.TEN);
+    private final Map<String, Object> builderParams = new HashMap<>();
     private DefaultColumnConfig config = null;
-    private int length = 128;
+    private final int length = 128;
 
-    /**
-     * 初始化一个数字类型的数据生成器配置
-     */
     private DigitDataTypeConfig initDigitConfig() {
         DigitDataTypeConfig digit = new DigitDataTypeConfig();
+        String typeName = "OB_ORACLE_NUMBER";
         digit.setColumnType(typeName);
         digit.setLowValue(lowValue);
         digit.setHighValue(highValue);
         digit.setGenParams(builderParams);
+        String genName = "NORMAL_GENERATOR";
         digit.setGenerator(genName);
         digit.setPrecision(precision);
         digit.setScale(scale);
         return digit;
     }
 
-    /**
-     * 初始化一个字符类型的数据生成器配置
-     */
     private CharDataTypeConfig initCharConfig() {
         CharDataTypeConfig charConfig = new CharDataTypeConfig();
         charConfig.setColumnType("OB_ORACLE_CHAR");
@@ -76,6 +74,7 @@ public class ColumnConfigTest extends MockerTestBase {
         builderParams.put("variance", 16.43);
         config = new DefaultColumnConfig();
         config.setDefaultValue(defaultValue);
+        Boolean allowNull = false;
         config.setAllowNull(allowNull);
         config.setColumnName(columnName);
     }
@@ -88,8 +87,8 @@ public class ColumnConfigTest extends MockerTestBase {
         Assert.assertFalse(config.allowNull());
         Assert.assertEquals(defaultValue, config.defaultValue());
         OracleNumberType expect = new OracleNumberType(precision, scale, null, false);
-        expect.bind(GeneratorFactory.getInstance("RANDOM_GENERATOR").make(null));
-        AbstractDataType real = config.columnType();
+        expect.bind((UniformGenerator) GeneratorFactory.getInstance("UNIFORM_GENERATOR").make(null));
+        AbstractDataType<?, ? extends Comparable<?>> real = config.columnType();
         Assert.assertEquals(expect, real);
         BigDecimal result = new BigDecimal("0");
         int totalCount = 1000;
@@ -109,8 +108,8 @@ public class ColumnConfigTest extends MockerTestBase {
         Assert.assertFalse(config.allowNull());
         Assert.assertEquals(defaultValue, config.defaultValue());
         OracleCharType expect = new OracleCharType(length, null, false, CharsetType.UTF_8, false);
-        expect.bind(GeneratorFactory.getInstance("RANDOM_GENERATOR").make(builderParams));
-        AbstractDataType real = config.columnType();
+        expect.bind((RandomGenerator) GeneratorFactory.getInstance("RANDOM_GENERATOR").make(builderParams));
+        AbstractDataType<?, ? extends Comparable<?>> real = config.columnType();
         Assert.assertEquals(expect, real);
         Map<Integer, Integer> result = new HashMap<>();
         int totalCount = 10000;

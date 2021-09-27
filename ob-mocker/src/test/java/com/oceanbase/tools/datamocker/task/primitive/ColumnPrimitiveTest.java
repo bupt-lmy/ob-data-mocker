@@ -8,23 +8,26 @@ import com.oceanbase.tools.datamocker.datatype.AbstractDataType;
 import com.oceanbase.tools.datamocker.datatype.oracle.OracleNumberType;
 import com.oceanbase.tools.datamocker.generator.digit.NormalGenerator;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
+import com.oceanbase.tools.datamocker.model.mock.MockColumnData;
 import com.oceanbase.tools.datamocker.util.Pair;
 import org.junit.Assert;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 /**
- * 列生成原语测试
+ * Column generation primitive test
  *
  * @author yh263208
  * @date 2020-12-31 20:11
  * @since OBMOCKER_snaoshot_0.1.0
  */
 public class ColumnPrimitiveTest extends MockerTestBase {
-    /**
-     * 正向逻辑，使用列生成原语生成制定数量的正态分布随机数
-     */
+    @Rule
+    public ExpectedException expect = ExpectedException.none();
+
     @Test
-    public void testColumnPrimitive() throws Exception {
+    public void testColumnPrimitive() {
         OracleNumberType number = new OracleNumberType(5, 2, null, false);
         BigDecimal expectAvg = new BigDecimal("12");
         NormalGenerator generator = new NormalGenerator(expectAvg.doubleValue(), 3);
@@ -34,20 +37,19 @@ public class ColumnPrimitiveTest extends MockerTestBase {
         ColumnReader<BigDecimal> primitive = new ColumnReader<>(number, "SALARY", null);
         BigDecimal result = BigDecimal.ZERO;
         while ((--count) > 0) {
-            Pair<String, Pair<AbstractDataType, BigDecimal>> entry = primitive.read();
-            Pair<AbstractDataType, BigDecimal> value = entry.getValue();
-            result = result.add(value.getValue());
+            MockColumnData<BigDecimal> entry = primitive.read();
+            BigDecimal value = entry.getColumnValue();
+            result = result.add(value);
         }
         Assert.assertEquals(Long.valueOf(0), count);
         BigDecimal avg = result.divide(BigDecimal.valueOf(Double.parseDouble(tmp.toString())), BigDecimal.ROUND_DOWN);
         Assert.assertTrue(avg.subtract(expectAvg).abs().doubleValue() < 0.5);
     }
 
-    /**
-     * 构造函数参数任意为null时应该抛出异常
-     */
-    @Test(expected = MockerException.class)
+    @Test
     public void testColumnPrimitiveWithoutType() {
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("DataType can not be null for ColumnReader");
         ColumnReader primitive = new ColumnReader(null, null, null);
     }
 

@@ -13,75 +13,59 @@ import com.oceanbase.tools.datamocker.model.config.impl.DefaultTaskConfig;
 import com.oceanbase.tools.datamocker.model.config.model.DataBaseConfig;
 import com.oceanbase.tools.datamocker.model.config.model.DataTypeConfig;
 import com.oceanbase.tools.datamocker.model.config.model.DigitDataTypeConfig;
-import com.oceanbase.tools.datamocker.model.enums.DialectType;
 import com.oceanbase.tools.datamocker.model.enums.DuplicateStrategy;
+import com.oceanbase.tools.datamocker.model.enums.ObModeType;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 /**
- * 总的生成任务配置
+ * Overall build task configuration
  *
  * @author yh263208
  * @date 2020-12-27 20:45
  * @since OBMOCKER-snapshot-0.1.0
  */
 public class TaskConfigTest extends MockerTestBase {
-    /**
-     * 列任务有关的参数
-     */
-    private final Integer precision = 5;
-    private final Integer scale = 2;
-    private final Boolean allowNull = false;
-    private final String columnName = "SALARY";
     private final Object defaultValue = "DEFAULT_VALUE";
-    private final String genName = "NORMAL_GENERATOR";
-    private final String typeName = "OB_ORACLE_NUMBER";
     private final BigDecimal lowValue = BigDecimal.ZERO;
     private final BigDecimal highValue = BigDecimal.TEN.multiply(BigDecimal.TEN);
-    private final Map<String, Double> builderParams = new HashMap<>();
+    private final Map<String, Object> builderParams = new HashMap<>();
     /**
-     * 表任务有关的参数
+     * Table task-related parameters
      */
     private final int configListSize = 3;
-    private final Long maxBatchsize = 1024L;
-    private final Long maxGenerateCount = 1000000L;
-    private final String tableName = "test_table";
-    private final String schemaName = "schema_name";
-    /**
-     * 总体任务有关的参数
-     */
-    private final Integer port = 3306;
-    private final String host = "xxx.xxx.xxx.xxx";
-    private final String user = "test_user";
-    private final String tenant = "test_tenant";
-    private final String cluster = "test_cluster";
-    private final String passwd = "test_passwd";
-    private final String defaultSchema = "defaule_schame";
     private DefaultTaskConfig taskConfig = null;
     private DataBaseConfig dbConfig = null;
 
     /**
-     * 初始化一个数字类型的数据生成器配置
+     * Initialize a numeric data generator configuration
      */
     private DataTypeConfig initDigitGen() {
         DigitDataTypeConfig digit = new DigitDataTypeConfig();
+        String typeName = "OB_ORACLE_NUMBER";
         digit.setColumnType(typeName);
         digit.setLowValue(lowValue);
         digit.setHighValue(highValue);
         digit.setGenParams(builderParams);
+        String genName = "NORMAL_GENERATOR";
         digit.setGenerator(genName);
+        /**
+         * List task-related parameters
+         */
+        Integer precision = 5;
         digit.setPrecision(precision);
+        Integer scale = 2;
         digit.setScale(scale);
         return digit;
     }
 
     /**
-     * 初始化列任务配置对象
+     * Initialize the column task configuration object
      *
-     * @param size 列任务大小
-     * @return 返回列任务集合
+     * @param size Column task size
+     * @return Return to the list of tasks
      */
     private List<DefaultColumnConfig> initColumnConfig(int size) {
         builderParams.put("average", 50.21);
@@ -89,7 +73,9 @@ public class TaskConfigTest extends MockerTestBase {
         List<DefaultColumnConfig> configList = new ArrayList<>();
         for (int i = 0; i < size; i++) {
             DefaultColumnConfig config = new DefaultColumnConfig();
+            String columnName = "SALARY";
             config.setColumnName(columnName);
+            Boolean allowNull = false;
             config.setAllowNull(allowNull);
             config.setDefaultValue(defaultValue);
             config.setTypeConfig(initDigitGen());
@@ -98,53 +84,58 @@ public class TaskConfigTest extends MockerTestBase {
         return configList;
     }
 
-    /**
-     * 初始化表任务配置对象
-     *
-     * @param size 表任务大小
-     * @return 返回表任务集合
-     */
     private List<DefaultTableConfig> initTableConfig(int size) {
         List<DefaultTableConfig> list = new ArrayList<>();
         for (int i = 0; i < size; i++) {
             DefaultTableConfig tableConfig = new DefaultTableConfig();
             tableConfig.setColumns(initColumnConfig(size));
+            Long maxGenerateCount = 1000000L;
             tableConfig.setTotalCount(maxGenerateCount);
             tableConfig.setStrategy(DuplicateStrategy.IGNORE);
+            Long maxBatchsize = 1024L;
             tableConfig.setBatchSize(maxBatchsize);
             tableConfig.setWhetherTruncate(true);
+            String tableName = "test_table";
             tableConfig.setTableName(tableName);
+            String schemaName = "schema_name";
             tableConfig.setSchemaName(schemaName);
             list.add(tableConfig);
         }
         return list;
     }
 
-    /**
-     * 初始化环境，包括数据库配置
-     */
     @Before
     public void initEnv() {
         dbConfig = new DataBaseConfig();
+        String host = "xxx.xxx.xxx.xxx";
         dbConfig.setHost(host);
+        String cluster = "test_cluster";
         dbConfig.setCluster(cluster);
+        String defaultSchema = "defaule_schame";
         dbConfig.setDefaultSchame(defaultSchema);
+        String passwd = "test_passwd";
         dbConfig.setPassword(passwd);
+        /**
+         * Parameters related to the overall task
+         */
+        Integer port = 3306;
         dbConfig.setPort(port);
         dbConfig.setDefaultSchame(defaultSchema);
+        String user = "test_user";
         dbConfig.setUser(user);
+        String tenant = "test_tenant";
         dbConfig.setTenant(tenant);
 
         taskConfig = new DefaultTaskConfig();
         taskConfig.setTables(initTableConfig(configListSize));
         taskConfig.setDbConfig(dbConfig);
-        taskConfig.setDialectType(DialectType.OB_ORACLE);
+        taskConfig.setDialectType(ObModeType.OB_ORACLE);
     }
 
     @Test
     public void testTaskConfig() {
         Assert.assertEquals(dbConfig, taskConfig.dbConfig());
-        Assert.assertEquals(DialectType.OB_ORACLE, taskConfig.obDialectType());
+        Assert.assertEquals(ObModeType.OB_ORACLE, taskConfig.obDialectType());
         Assert.assertNotNull(taskConfig.tasks());
         Assert.assertEquals(configListSize, taskConfig.tasks().size());
         Assert.assertNull(taskConfig.taskName());

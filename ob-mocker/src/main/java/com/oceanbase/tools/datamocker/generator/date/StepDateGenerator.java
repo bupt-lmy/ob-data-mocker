@@ -3,37 +3,37 @@ package com.oceanbase.tools.datamocker.generator.date;
 import java.sql.Date;
 import java.util.concurrent.TimeUnit;
 
-import com.oceanbase.tools.datamocker.generator.DateGeneratorBase;
+import com.oceanbase.tools.datamocker.generator.BaseDateGenerator;
 import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
 
 /**
- * 顺序日期数据生成器
+ * Sequential date data generator
  *
  * @author yh263208
  * @date 2020-12-16 16:44
  * @since OBMOCKER_snapshot_0.1.0
  */
-public class StepDateGenerator extends DateGeneratorBase<Date> {
+public class StepDateGenerator extends BaseDateGenerator<Date> {
     /**
-     * 日期步长
+     * Date step
      */
     private final long step;
     /**
-     * 是否循环
+     * Whether to loop
      */
     private final Boolean cycle;
     /**
-     * 当前生成的数
+     * Number currently generated
      */
     private Long timestamp = null;
 
     /**
-     * 构造方法
+     * Constructor
      *
-     * @param timeUnit 时间单位
-     * @param cycle    是否轮转
-     * @param step     时间步长
+     * @param timeUnit time unit
+     * @param cycle Whether to rotate
+     * @param step Time Step
      */
     public StepDateGenerator(long step, TimeUnit timeUnit, Boolean cycle) {
         this.cycle = cycle;
@@ -45,22 +45,28 @@ public class StepDateGenerator extends DateGeneratorBase<Date> {
     }
 
     @Override
-    public Boolean preCheck(Date startTime, Date endTime) {
+    protected Boolean doPreCheck(Date startTime, Date endTime, int scale, TimeUnit minTimeUnit) {
         return true;
     }
 
     @Override
-    public Date generate(Date startTime, Date endTime) {
+    protected Date doGenerate(Date startTime, Date endTime, int scale, TimeUnit minTimeUnit) {
         if (step < 0) {
             return new Date(minus(startTime.getTime(), endTime.getTime()));
         }
         return new Date(positive(startTime.getTime(), endTime.getTime()));
     }
 
+    @Override
+    protected Long doCount(Date startTime, Date endTime, int scale, TimeUnit minTimeUnit) {
+        long interval = endTime.getTime() - startTime.getTime();
+        return interval / Math.abs(step);
+    }
+
     /**
-     * 步长为负数时的随机数生成逻辑
+     * Random number generation logic when the step size is negative
      *
-     * @return 返回生成的随机日期
+     * @return Returns the generated random date
      */
     private long minus(long startTime, long endTime) {
         if (timestamp == null) {
@@ -72,16 +78,16 @@ public class StepDateGenerator extends DateGeneratorBase<Date> {
             if (cycle) {
                 timestamp = endTime;
             } else {
-                throw new MockerException(MockerError.OPERATION_FAILURE, "can not generate more unique date");
+                throw new MockerException(MockerError.OPERATION_FAILURE, "Can not generate more unique date");
             }
         }
         return timestamp;
     }
 
     /**
-     * 步长为正数时的随机数生成逻辑
+     * Random number generation logic when the step size is positive
      *
-     * @return 返回生成的随机日期
+     * @return Returns the generated random date
      */
     private long positive(long startTime, long endTime) {
         if (timestamp == null) {
@@ -93,15 +99,10 @@ public class StepDateGenerator extends DateGeneratorBase<Date> {
             if (cycle) {
                 timestamp = startTime;
             } else {
-                throw new MockerException(MockerError.OPERATION_FAILURE, "can not generate more unique date");
+                throw new MockerException(MockerError.OPERATION_FAILURE, "Can not generate more unique date");
             }
         }
         return timestamp;
     }
 
-    @Override
-    public Long count(Date startTime, Date endTime) {
-        long interval = endTime.getTime() - startTime.getTime();
-        return interval / Math.abs(step);
-    }
 }

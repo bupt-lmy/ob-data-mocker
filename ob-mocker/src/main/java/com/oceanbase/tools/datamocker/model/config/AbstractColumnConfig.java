@@ -3,7 +3,7 @@ package com.oceanbase.tools.datamocker.model.config;
 import com.oceanbase.tools.datamocker.datatype.AbstractDataType;
 
 /**
- * 针对具体的一列的生成任务的配置对象
+ * Configuration object for specific column generation tasks
  *
  * @author yh263208
  * @date 2020-12-22 22:07
@@ -11,28 +11,28 @@ import com.oceanbase.tools.datamocker.datatype.AbstractDataType;
  */
 public abstract class AbstractColumnConfig {
     /**
-     * 返回该列的列名
+     * Returns the column name of the column
      */
     abstract public String columnName();
 
     /**
-     * 获取数据类型封装对象，在其中加入了约束的封装逻辑
+     * Get the data type encapsulation object, in which the encapsulation logic of constraints is added
      *
-     * @return 返回数据类型封装对象
+     * @return Return data type package object
      */
-    abstract public AbstractDataType columnType();
+    abstract public AbstractDataType<?, ? extends Comparable<?>> columnType();
 
     /**
-     * 是否允许为空，若为真则有可能往其中插入null值
+     * Whether it is allowed to be empty, if it is true, it is possible to insert a null value into it
      *
-     * @return 返回是否为空的结果
+     * @return Return whether the result is empty
      */
     abstract public Boolean allowNull();
 
     /**
-     * 该列的默认值
+     * The default value of the column
      *
-     * @return 返回该默认值
+     * @return Return to the default value
      */
     abstract public Object defaultValue();
 

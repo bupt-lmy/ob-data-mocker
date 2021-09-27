@@ -1,7 +1,7 @@
 package com.oceanbase.tools.datamocker.model.exception;
 
 /**
- * mock数据异常情况枚举
+ * Mock data exception enumeration
  *
  * @author yh263208
  * @date 2020-12-10 17:21
@@ -9,57 +9,57 @@ package com.oceanbase.tools.datamocker.model.exception;
  */
 public enum MockerError {
     /**
-     * 未知错误
+     * unknown mistake
      */
     UNKNOWN_ERROR("unknown error"),
     /**
-     * 参数错误
+     * Parameter error
      */
     PARAMETER_ERROR("input parameter is illegal"),
     /**
-     * 输入的值超出范围
+     * The entered value is out of range
      */
     VALUE_OUT_OFRANGE("input value is out of range"),
     /**
-     * 非法的返回值
+     * Illegal return value
      */
     ILLEGAL_RETURN_VALUE("return value is illegal"),
     /**
-     * 非法的OB模式，目前只支持mysql模式以及oracle模式
+     * Illegal OB mode, currently only supports mysql mode and oracle mode
      */
     INVALID_OB_MODE("ob dialect type in illegal"),
     /**
-     * 操作错误，表示一些操作性质的代码，例如创建文件，目录失败
+     * Operation error, indicating some operational codes, such as file creation, directory failure
      */
     OPERATION_FAILURE("fail to execute some operations"),
     /**
-     * 特性不支持错误枚举
+     * Feature does not support error enumeration
      */
     NOT_SUPPORT_FEATURE("this feature is not support yet"),
     /**
-     * 未知列异常，意义为未知的列名
+     * Unknown column exception, meaning unknown column name
      */
     UNKNOWN_COLUMN_NAME("this column is unknown"),
     /**
-     * 未知数据生成器异常
+     * Unknown data generator exception
      */
     UNKNOWN_DATA_GENERATOR("target data generator is unknown"),
     /**
-     * 未知数据类型异常
+     * Unknown data type exception
      */
     UNKNOWN_DATA_TYPE("target data type is unknown"),
     /**
-     * 未知约束异常
+     * Unknown constraint exception
      */
     UNKNOWN_CONSTRAINT("target constraint is unkown"),
     /**
-     * 执行sql失败
+     * SQL execution failed
      */
     FAIL_TO_EXECUTE_SQL("fail to execute a sql");
     /**
-     * 错误信息
+     * Error message
      */
-    private String msg;
+    private final String msg;
 
     MockerError(String msg) {
         this.msg = msg;

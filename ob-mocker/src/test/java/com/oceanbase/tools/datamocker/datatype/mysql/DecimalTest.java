@@ -12,7 +12,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 /**
- * mysql模式下decimal类型的测试类
+ * Decimal type test class in mysql mode
  *
  * @author yh263208
  * @date 2020-12-16 15:19
@@ -20,7 +20,8 @@ import org.junit.Test;
  */
 public class DecimalTest extends MockerTestBase {
     /**
-     * 测试正向逻辑，测试针对decimal对象给定精度以及有效位数时返回的结果是否符合预期
+     * Test the forward logic, test whether the result returned when the precision and effective digits
+     * are given for the decimal object meets expectations
      */
     @Test
     public void testMinAndMaxValueForDecimal() {
@@ -35,9 +36,6 @@ public class DecimalTest extends MockerTestBase {
         Assert.assertEquals(new BigDecimal(maxValue), decimal.highValue());
     }
 
-    /**
-     * 测试正向逻辑，测试针对decimal对象给定精度以及有效位数在数据生成器生成数据的情况下是否生成的数据符合范围
-     */
     @Test
     public void testNormalGeneratorForDecimal() {
         MysqlDecimalType number = new MysqlDecimalType(5, 3, new NormalGenerator(), null, false, true);
@@ -55,9 +53,6 @@ public class DecimalTest extends MockerTestBase {
         }
     }
 
-    /**
-     * 测试正向逻辑，测试针对decimal对象给定精度以及有效位数在数据生成器生成数据的情况下是否生成的数据符合范围
-     */
     @Test
     public void testNormalPoissonForDecimal() {
         MysqlDecimalType number = new MysqlDecimalType(5, 3, new PoissonGenerator(15), null, false, true);
@@ -75,9 +70,6 @@ public class DecimalTest extends MockerTestBase {
         }
     }
 
-    /**
-     * 测试正向逻辑，测试针对decimal对象给定精度以及有效位数在数据生成器生成数据的情况下是否生成的数据符合范围
-     */
     @Test
     public void testNormalStepForDecimal() {
         MysqlDecimalType number = new MysqlDecimalType(5, 3, new StepGenerator(1.3, true), null, false, true);
@@ -100,10 +92,10 @@ public class DecimalTest extends MockerTestBase {
         MysqlDecimalType decimal = new MysqlDecimalType(5, 3, new UniformGenerator(), null, false, false);
         Assert.assertEquals(0, decimal.lowValue().compareTo(new BigDecimal("0")));
         Assert.assertEquals(0, decimal.highValue().compareTo(new BigDecimal("99.9995")));
-        Assert.assertTrue(decimal.distinctLimit() == 99999L);
+        Assert.assertEquals(99999L, (long) decimal.distinctLimit());
         int minValue = -10;
         int maxValue = 20;
-        thrown.expectMessage("max or min value -10 for data type decimal(5, 3) is out of range [0,99.99950]");
+        thrown.expectMessage("Max or min value -10 for data type decimal(5, 3) is out of range [0,99.99950]");
         thrown.expect(MockerException.class);
         decimal.setLowValue(new BigDecimal(minValue));
         decimal.setHighValue(new BigDecimal(maxValue));
@@ -111,21 +103,21 @@ public class DecimalTest extends MockerTestBase {
 
     @Test
     public void testUnsignedDecimalWithErrInput() {
-        thrown.expectMessage("precision for decaimal can not larger than 65 or smaller than 0");
+        thrown.expectMessage("Precision for decaimal can not larger than 65 or smaller than 0");
         thrown.expect(MockerException.class);
         new MysqlDecimalType(-1, 3, new UniformGenerator(), null, false, false);
     }
 
     @Test
     public void testUnsignedDecimalWithErrInput1() {
-        thrown.expectMessage("scale for decimal can not larger than 30 or smaller than 0");
+        thrown.expectMessage("Scale for decimal can not larger than 30 or smaller than 0");
         thrown.expect(MockerException.class);
         new MysqlDecimalType(1, -3, new UniformGenerator(), null, false, false);
     }
 
     @Test
     public void testUnsignedDecimalWithErrInput2() {
-        thrown.expectMessage("scale can not be bigger than precision");
+        thrown.expectMessage("Scale can not be bigger than precision");
         thrown.expect(MockerException.class);
         new MysqlDecimalType(5, 8, new UniformGenerator(), null, false, false);
     }

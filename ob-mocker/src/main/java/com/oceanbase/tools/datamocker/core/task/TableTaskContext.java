@@ -1,6 +1,8 @@
 package com.oceanbase.tools.datamocker.core.task;
 
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -8,19 +10,20 @@ import java.util.concurrent.Future;
 
 import javax.sql.DataSource;
 
+import com.oceanbase.tools.datamocker.constraint.AbstractConstraint;
 import com.oceanbase.tools.datamocker.core.write.output.MockerFile;
 import com.oceanbase.tools.datamocker.datatype.AbstractDataType;
-import com.oceanbase.tools.datamocker.model.enums.DialectType;
-import com.oceanbase.tools.datamocker.model.enums.DuplicateStrategy;
 import com.oceanbase.tools.datamocker.model.enums.MockTaskStatus;
+import com.oceanbase.tools.datamocker.model.enums.ObModeType;
 import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
 import com.oceanbase.tools.datamocker.util.Pair;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.lang.Validate;
 
 /**
- * mock数据的上下文，也是操作mock数据任务的句柄
+ * The context of mock data is also the handle of the task of operating mock data
  *
  * @author yh263208
  * @date 2021-01-18 11:14
@@ -28,132 +31,125 @@ import lombok.Setter;
  */
 public class TableTaskContext {
     /**
-     * 任务名称
+     * Task name
      */
     @Getter
     private final String taskName;
     /**
-     * 任务ID
+     * Table task ID
      */
     @Getter
-    private final String taskId;
+    private final String tableTaskId;
     /**
-     * 批处理大小
+     * Batch size
      */
     @Getter
     private final Long batchSize;
     /**
-     * mock数据当前的任务状态
+     * The current task status of mock data
      */
     @Getter
-    @Setter
-    private MockTaskStatus status;
+    private volatile MockTaskStatus status;
     /**
-     * 一共要生成的数据量
+     * Total amount of data to be generated
      */
     @Getter
     private final Long totalCount;
     /**
-     * 方言类型
+     * Table structure definition, used to describe the structure of the table, including the mapping
+     * relationship between field names and types
      */
     @Getter
-    private final DialectType dialectType;
+    private final Map<String, AbstractDataType<?, ? extends Comparable<?>>> tableSchema;
     /**
-     * 表结构定义，用于描述表的结构，包括各字段名和类型的映射关系
-     */
-    @Getter
-    private final Map<String, AbstractDataType> tableSchema;
-    /**
-     * 表名
+     * table name
      */
     @Getter
     private final String tableName;
     /**
-     * 表所在的schema
+     * The schema where the table is located
      */
     @Getter
     private final String schema;
     /**
-     * 是否清空表
+     * Whether to empty the table
      */
     @Getter
     private final Boolean truncate;
     /**
-     * 超时时间
+     * overtime time
      */
     @Getter
-    private final Long timeoutSeconds;
+    private final Long timeoutMilliseconds;
     /**
-     * 数据冲突时的策略
+     * Handle collection, used to control thread tasks
+     */
+    private final List<Future<?>> handlers;
+    /**
+     * Data write statistics. The Key here represents the names of different output sources: for
+     * example, the name of the output source for writing DB and the name of the output source for
+     * writing files. Value here represents the amount of data written by the output source.
      */
     @Getter
-    private final DuplicateStrategy strategy;
+    private final Map<String, Long> writerName2writeCount;
     /**
-     * 句柄集合，用于控制线程任务
-     */
-    private List<Future> handlers;
-    /**
-     * 数据写出统计信息
-     * 这里的Key代表的是不同的输出源的名称：例如写DB的输出元名称和写文件的输出源名称
-     * 这里的Value代表输出源写出的数据量
-     */
-    @Getter
-    private Map<String, Long> writerName2writeCount;
-    /**
-     * 数据生成统计信息
+     * Data generation statistics
      */
     @Getter
     private Long totalDataGenerateCount = null;
     /**
-     * 当前数据库表中的记录数目
+     * The number of records in the current database table
      */
     @Getter
     @Setter
     private Long currentRecordNum;
     /**
-     * 数据源头
+     * data source
      */
     @Getter
     private final DataSource dataSource;
     /**
-     * 文件管理器
+     * file manager
      */
     @Getter
     private final List<MockerFile> fileManagers;
+    @Getter
+    private final ObModeType dialectType;
     /**
-     * 顶部指针索引
+     * Top pointer index
      */
     @Getter
     private final int topIndex;
+    @Getter
+    private volatile boolean shutdown;
+    /**
+     * Constraint collection, used to carry a collection of constraint objects
+     */
+    @Getter
+    private final List<AbstractConstraint> constraints = new LinkedList<>();
 
-    public TableTaskContext(String taskId, String taskName, Long batchSize, Long totalNum, DialectType dialectType,
-            Map<String, AbstractDataType> tableSchema, String tableName, String schema, Boolean truncate, Long timeout,
-            DuplicateStrategy strategy, DataSource dataSource, List<MockerFile> fileManagers, int index) {
-        this.taskId = taskId;
+    public TableTaskContext(TableTaskInfo taskInfo, String taskName, int index) {
+        Validate.notNull(taskInfo, "TaskInfo can not be null for TableTaskContext");
+        TableTaskMetaData metaData = taskInfo.getMetaData();
+        this.tableTaskId = metaData.getTableTaskId();
         this.taskName = taskName;
-        this.batchSize = batchSize;
-        this.totalCount = totalNum;
-        this.dialectType = dialectType;
-        this.tableSchema = tableSchema;
-        this.tableName = tableName;
-        this.schema = schema;
-        this.truncate = truncate;
-        this.timeoutSeconds = timeout;
-        this.strategy = strategy;
+        this.batchSize = metaData.getBatchSize();
+        this.totalCount = metaData.getTotalCount();
+        this.tableSchema = metaData.getTableSchema();
+        this.tableName = metaData.getTableName();
+        this.schema = metaData.getSchema();
+        this.truncate = metaData.getShouldTruncate();
+        this.timeoutMilliseconds = metaData.getTimeoutMilliseconds();
         this.status = MockTaskStatus.CREATED;
         this.handlers = new LinkedList<>();
         this.writerName2writeCount = new HashMap<>();
-        this.dataSource = dataSource;
-        this.fileManagers = fileManagers;
+        this.dataSource = taskInfo.getDataSource();
+        this.fileManagers = taskInfo.getFileManagers();
+        this.dialectType = metaData.getDialectType();
         this.topIndex = index;
     }
 
-    /**
-     * 增加一个句柄
-     *
-     * @param handle 具体的句柄对象
-     */
-    public void appendHandle(Future handle) {
+    public void appendHandle(Future<?> handle) {
         if (handle == null) {
             return;
         }
@@ -162,15 +158,15 @@ public class TableTaskContext {
         }
     }
 
-    /**
-     * 终止任务的执行
-     *
-     * @return 返回关闭的结果
-     */
-    public Boolean shutdown() {
-        Boolean returnVal = Boolean.TRUE;
+    public boolean shutdown() {
         this.status = MockTaskStatus.CANCELED;
-        for (Future task : this.handlers) {
+        return terminate();
+    }
+
+    public synchronized boolean terminate() {
+        shutdown = true;
+        boolean returnVal = Boolean.TRUE;
+        for (Future<?> task : this.handlers) {
             if (!task.isCancelled() && !task.isDone()) {
                 returnVal &= task.cancel(true);
             }
@@ -179,9 +175,9 @@ public class TableTaskContext {
     }
 
     /**
-     * 追加一条写原语的统计信息
+     * Add a writer's statistical information
      *
-     * @param result 统计结果
+     * @param result statistical results
      */
     public synchronized void appendWriteInfo(Pair<String, Long> result) {
         if (result == null || result.getKey() == null || result.getValue() == null) {
@@ -192,10 +188,11 @@ public class TableTaskContext {
     }
 
     /**
-     * 追加一条数据生成原语的统计信息
+     * Append a piece of statistical information for data generation primitives
      *
-     * @param result 统计结果
-     * @throws MockerException 所有的数据生成原语都必须产生相同数量的数据，如果违反则报错
+     * @param result statistical results
+     * @throws MockerException All data generation primitives must generate the same amount of data. If
+     *         violated, an error will be reported
      */
     public synchronized void appendDataGenInfo(Long result) {
         if (result == null) {
@@ -205,8 +202,32 @@ public class TableTaskContext {
             this.totalDataGenerateCount = result;
         } else {
             if (!this.totalDataGenerateCount.equals(result)) {
-                throw new MockerException(MockerError.OPERATION_FAILURE, "all column readers have to generate same number of data");
+                throw new MockerException(MockerError.OPERATION_FAILURE,
+                        "All column readers have to generate same number of data");
             }
         }
+    }
+
+    public synchronized void setStatus(MockTaskStatus status) {
+        this.status = status;
+    }
+
+    /**
+     * get table task progress
+     *
+     * @return progress of task
+     */
+    public double getProgress() {
+        if (totalCount != 0 && writerName2writeCount.size() != 0) {
+            Collection<Long> values = writerName2writeCount.values();
+            Iterator<Long> iter = values.iterator();
+            double totalProgress = 0.0;
+            while (iter.hasNext()) {
+                Long value = iter.next();
+                totalProgress += value.doubleValue() / totalCount;
+            }
+            return totalProgress / writerName2writeCount.size();
+        }
+        return 0.0;
     }
 }

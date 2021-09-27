@@ -12,7 +12,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 /**
- * 位图对象的测试类
+ * Test class for bitmap objects
  *
  * @author yh263208
  * @date 2021-01-09 20:56
@@ -22,12 +22,6 @@ public class BitMapTest extends MockerTestBase {
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 
-    /**
-     * 获取随机字符串
-     *
-     * @param size 随机字符串数组的大小
-     * @return 返回随机字符串数组
-     */
     private String[] getRandomString(int size) {
         String[] strs = new String[size];
         for (int i = 0; i < size; i++) {
@@ -84,7 +78,7 @@ public class BitMapTest extends MockerTestBase {
 
     @Test
     public void testBitMapWithIllegalCount() {
-        thrown.expectMessage("the capacity of the bitmap can not be equal to or smaller than zero");
+        thrown.expectMessage("Capacity of the bitmap can not be equal to or smaller than zero");
         thrown.expect(MockerException.class);
         BitMap bitMap = new BitMap(0);
     }

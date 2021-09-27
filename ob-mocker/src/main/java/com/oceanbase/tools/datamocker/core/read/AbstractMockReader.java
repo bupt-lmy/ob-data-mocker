@@ -1,10 +1,9 @@
 package com.oceanbase.tools.datamocker.core.read;
 
-import com.oceanbase.tools.datamocker.datatype.AbstractDataType;
-import com.oceanbase.tools.datamocker.util.Pair;
+import com.oceanbase.tools.datamocker.model.mock.MockColumnData;
 
 /**
- * 数据的读取器，通过该接口读取出一条数据
+ * Data reader, you can read data from this reader
  *
  * @author yh263208
  * @date 20201-01-14 14:14
@@ -12,17 +11,18 @@ import com.oceanbase.tools.datamocker.util.Pair;
  */
 public abstract class AbstractMockReader<T> {
     /**
-     * 读出方法，通过调用该方法读出一条数据
+     * Read method, you can read data from this method
      *
-     * @return 返回产生的一条数据
-     * @throws Exception 产生数据时可能会抛出异常
+     * @return data which is read
+     * @throws Exception exception will be thrown when error occured
      */
-    abstract public Pair<String, Pair<AbstractDataType, T>> read() throws Exception;
+    abstract public MockColumnData<T> read() throws Exception;
 
     /**
-     * 获取原语的groupId，原语是一个整体操作的原子组成部分，因此需要一个groupId来标定哪些原语是属于同一个整体操作
+     * Get the groupId of the primitive. The primitive is an atomic part of an overall operation, so a
+     * groupId is needed to identify which primitives belong to the same overall operation
      *
-     * @return 返回groupId字符串
+     * @return group id string value
      */
     abstract public String groupId();
 }
