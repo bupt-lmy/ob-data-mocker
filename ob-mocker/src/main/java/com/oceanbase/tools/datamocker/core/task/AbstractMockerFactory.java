@@ -116,7 +116,8 @@ public abstract class AbstractMockerFactory {
             MDC.put("mocktask.workspace", taskId);
             if (validateDbConfig(taskConfig.dbConfig())) {
                 if (this.innerDatasource == null) {
-                    this.innerDatasource = new MockerDataSource(taskConfig.dbConfig(), 3, 5, 3, null);
+                    this.innerDatasource = new MockerDataSource(taskConfig.dbConfig(), 3, 5, 3,
+                            taskConfig.dbConfig().getConnectParam());
                 }
             }
             for (AbstractTableConfig tableConfig : this.taskConfig.tasks()) {

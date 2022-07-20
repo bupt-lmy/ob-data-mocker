@@ -246,7 +246,7 @@ public class MockerDataSource implements DataSource {
         Validate.notNull(config, "DataBase config can not be null for MockerDataSource#validate");
         Validate.notEmpty(config.getHost(), "Host can not be blank for MockerDataSource#validate");
         Validate.notEmpty(config.getUser(), "User can not be blank for MockerDataSource#validate");
-        Validate.notEmpty(config.getPassword(), "Password can not be blank for MockerDataSource#validate");
+        Validate.notNull(config.getPassword(), "Password can not be null for MockerDataSource#validate");
         Validate.notEmpty(config.getDefaultSchame(),
                 "DefaultSchemaName can not be blank for MockerDataSource#validate");
         Validate.notNull(config.getPort(), "Port can not be blank for MockerDataSource#validate");

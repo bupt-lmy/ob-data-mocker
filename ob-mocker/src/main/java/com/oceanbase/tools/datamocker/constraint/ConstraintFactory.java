@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import javax.sql.DataSource;
@@ -43,7 +45,7 @@ public abstract class ConstraintFactory {
      * Sql to query unique constraint for oracle mode
      */
     private static final String ORACLE_UNIQUE_CONSTRAINT_SQL = "select o.* from (select * from all_constraints where "
-            + "constraint_type='U') s left join all_cons_columns o on s"
+            + "constraint_type='U') s inner join all_cons_columns o on s"
             + ".OWNER=o.OWNER and s.CONSTRAINT_NAME=o.CONSTRAINT_NAME and "
             + "s.TABLE_NAME=o.TABLE_NAME where s.OWNER=? and s"
             + ".TABLE_NAME=?;";
@@ -59,7 +61,7 @@ public abstract class ConstraintFactory {
      * Sql to query primary constraint for oracle mode
      */
     private static final String ORACLE_PRIMARY_CONSTRAINT_SQL = "select o.* from (select * from all_constraints where "
-            + "constraint_type='P') s left join all_cons_columns o on s"
+            + "constraint_type='P') s inner join all_cons_columns o on s"
             + ".OWNER=o.OWNER and s.CONSTRAINT_NAME=o.CONSTRAINT_NAME and "
             + "s.TABLE_NAME=o.TABLE_NAME where s.OWNER=? and s"
             + ".TABLE_NAME=?;";
@@ -74,19 +76,21 @@ public abstract class ConstraintFactory {
     /**
      * Sql to query check constraint for oracle mode
      */
-    private static final String ORACLE_CHECK_CONSTRAINT_SQL = "select o.* from (select * from all_constraints where "
-            + "constraint_type='C') s left join all_cons_columns o on s"
-            + ".OWNER=o.OWNER and s.CONSTRAINT_NAME=o.CONSTRAINT_NAME and "
-            + "s.TABLE_NAME=o.TABLE_NAME where s.OWNER=? and s"
-            + ".TABLE_NAME=?;";
+    private static final String ORACLE_CHECK_CONSTRAINT_SQL =
+            "select s.search_condition as search_condition, o.* from (select * from all_constraints where "
+                    + "constraint_type='C') s inner join all_cons_columns o on s"
+                    + ".OWNER=o.OWNER and s.CONSTRAINT_NAME=o.CONSTRAINT_NAME and "
+                    + "s.TABLE_NAME=o.TABLE_NAME where s.OWNER=? and s"
+                    + ".TABLE_NAME=?;";
     /**
      * Sql to query foreign constraint for mysql mode
      */
     private static final String ORACLE_FOREIGN_CONSTRAINT_SQL = "select o.* from (select * from all_constraints where "
-            + "constraint_type='R') s left join all_cons_columns o on s"
+            + "constraint_type='R') s inner join all_cons_columns o on s"
             + ".OWNER=o.OWNER and s.CONSTRAINT_NAME=o.CONSTRAINT_NAME and "
             + "s.TABLE_NAME=o.TABLE_NAME where s.OWNER=? and s"
             + ".TABLE_NAME=?;";
+    private static final Pattern NOT_NULL_PATTERN = Pattern.compile(".+ is not null", Pattern.CASE_INSENSITIVE);
     /**
      * Map between constraint factory name and constraint factory object
      */
@@ -152,9 +156,12 @@ public abstract class ConstraintFactory {
                             @Override
                             public void doOnSuccess(ResultSet result) throws Throwable {
                                 List<ConstraintColumn> cols = SerializeUtil.getList(result, ConstraintColumn.class);
-                                if (cols.size() != 0) {
-                                    throw new MockerException(MockerError.NOT_SUPPORT_FEATURE,
-                                            "Check constraint is not support yet");
+                                for (ConstraintColumn column : cols) {
+                                    Matcher matcher = NOT_NULL_PATTERN.matcher(column.getSearchCondition());
+                                    if (!matcher.matches()) {
+                                        throw new MockerException(MockerError.NOT_SUPPORT_FEATURE,
+                                                "Check constraint is not support yet, " + column.getSearchCondition());
+                                    }
                                 }
                             }
 

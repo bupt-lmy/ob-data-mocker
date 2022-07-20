@@ -24,4 +24,6 @@ public class ConstraintColumn {
     private String columnName;
     @Column("POSITION")
     private Object position;
+    @Column("SEARCH_CONDITION")
+    private String searchCondition;
 }
