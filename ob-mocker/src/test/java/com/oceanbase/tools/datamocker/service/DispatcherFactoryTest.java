@@ -1,9 +1,7 @@
 package com.oceanbase.tools.datamocker.service;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.net.URL;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -12,7 +10,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
 import javax.sql.DataSource;
 
@@ -44,8 +41,7 @@ import org.junit.Test;
  * @since OBMOCKER_snaoshot_0.1.0
  */
 public class DispatcherFactoryTest extends MockerTestBase {
-    private final String mysqlEnv = "db/mysql-env.properties";
-    private final String oracleEnv = "db/oracle-env.properties";
+
     private final String ddlOracle = "CREATE TABLE \"EMP\" (\n"
             + "  \"COL\" NUMBER(5,2) NOT NULL,\n"
             + "  \"COL2\" NUMBER(5,2) NOT NULL,\n"
@@ -176,29 +172,11 @@ public class DispatcherFactoryTest extends MockerTestBase {
         return tableConfig;
     }
 
-    private DataBaseConfig getDBConfig(ObModeType dialectType) throws IOException {
-        DataBaseConfig config = new DataBaseConfig();
-        Properties properties = new Properties();
-        URL url = null;
-        if (ObModeType.OB_MYSQL.equals(dialectType)) {
-            url = this.getClass().getClassLoader().getResource(mysqlEnv);
-        } else if (ObModeType.OB_ORACLE.equals(dialectType)) {
-            url = this.getClass().getClassLoader().getResource(oracleEnv);
-        } else {
-            return null;
-        }
-        properties.load(new FileInputStream(url.getPath()));
-        config.setDefaultSchame(properties.getProperty("schema"));
-        config.setPassword(properties.getProperty("passwd"));
-        config.setUser(properties.getProperty("user"));
-        config.setCluster(properties.getProperty("cluster"));
-        config.setTenant(properties.getProperty("tenant"));
-        config.setPort(Integer.valueOf(properties.getProperty("port")));
-        config.setHost(properties.getProperty("host"));
-        return config;
+    private DataBaseConfig getDBConfig(ObModeType dialectType) {
+        return dialectType == ObModeType.OB_MYSQL ? getMySqlConfig() : getOracleConfig();
     }
 
-    private AbstractTaskConfig getTask(String tableName) throws IOException {
+    private AbstractTaskConfig getTask(String tableName) {
         DataBaseConfig config = getDBConfig(ObModeType.OB_ORACLE);
         DefaultTaskConfig taskConfig = new DefaultTaskConfig();
         DefaultTableConfig tableConfig = initTableConfig(tableName, config.getDefaultSchame());

@@ -1,15 +1,12 @@
 package com.oceanbase.tools.datamocker.service;
 
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.net.URL;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
 import javax.sql.DataSource;
 
@@ -35,14 +32,7 @@ import org.junit.Test;
  * @since OBMOCKER-snapshot-0.1.0
  */
 public class ConstraintFactoryTest extends MockerTestBase {
-    /**
-     * The location of the mysql database connection configuration file
-     */
-    private final String mysqlEnv = "db/mysql-env.properties";
-    /**
-     * The location of the oracle database connection configuration file
-     */
-    private final String oracleEnv = "db/oracle-env.properties";
+
     private final String ddlMysql = "CREATE TABLE `emp` (\n"
             + "  `col` decimal(10,0) NOT NULL,\n"
             + "  `col1` decimal(10,0) DEFAULT NULL,\n"
@@ -108,27 +98,8 @@ public class ConstraintFactoryTest extends MockerTestBase {
         }
     }
 
-    private DataBaseConfig getDBConfig(ObModeType dialectType) throws IOException {
-        DataBaseConfig config = new DataBaseConfig();
-        Properties properties = new Properties();
-        URL url;
-        if (ObModeType.OB_MYSQL.equals(dialectType)) {
-            url = this.getClass().getClassLoader().getResource(mysqlEnv);
-        } else if (ObModeType.OB_ORACLE.equals(dialectType)) {
-            url = this.getClass().getClassLoader().getResource(oracleEnv);
-        } else {
-            return null;
-        }
-        assert url != null;
-        properties.load(new FileInputStream(url.getPath()));
-        config.setDefaultSchame(properties.getProperty("schema"));
-        config.setPassword(properties.getProperty("passwd"));
-        config.setUser(properties.getProperty("user"));
-        config.setCluster(properties.getProperty("cluster"));
-        config.setTenant(properties.getProperty("tenant"));
-        config.setPort(Integer.valueOf(properties.getProperty("port")));
-        config.setHost(properties.getProperty("host"));
-        return config;
+    private DataBaseConfig getDBConfig(ObModeType dialectType) {
+        return dialectType == ObModeType.OB_MYSQL ? getMySqlConfig() : getOracleConfig();
     }
 
     private Map<String, AbstractDataType<?, ? extends Comparable<?>>> getSchema() {
