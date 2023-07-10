@@ -1,9 +1,7 @@
 package com.oceanbase.tools.datamocker.task.concurrent;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.net.URL;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -13,7 +11,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
 import javax.sql.DataSource;
@@ -33,7 +30,6 @@ import com.oceanbase.tools.datamocker.model.enums.ObModeType;
 import com.oceanbase.tools.datamocker.model.enums.ScriptType;
 import com.oceanbase.tools.datamocker.model.mock.MockColumnData;
 import com.oceanbase.tools.datamocker.model.mock.MockRowData;
-import com.oceanbase.tools.datamocker.task.primitive.DataBasePrimitiveTest;
 import com.oceanbase.tools.datamocker.util.MockDataPipe;
 import com.oceanbase.tools.datamocker.util.MockerBuffer;
 import lombok.extern.slf4j.Slf4j;
@@ -50,8 +46,7 @@ import org.junit.Test;
  */
 @Slf4j
 public class MockBufferTest extends MockerTestBase {
-    private final static String mysqlEnv = "db/mysql-env.properties";
-    private final static String oracleEnv = "db/oracle-env.properties";
+
     private final String ddl = "CREATE TABLE \"EMP\" (\n"
             + "  \"COL1\" NUMBER(5,2) NOT NULL,\n"
             + "  \"COL2\" NUMBER(5,2) NOT NULL,\n"
@@ -60,27 +55,8 @@ public class MockBufferTest extends MockerTestBase {
     private DataSource dataSource;
     private MockerFile manager;
 
-    private DataBaseConfig getDBConfig(ObModeType dialectType) throws IOException {
-        DataBaseConfig config = new DataBaseConfig();
-        Properties properties = new Properties();
-        URL url = null;
-        if (ObModeType.OB_MYSQL.equals(dialectType)) {
-            url = DataBasePrimitiveTest.class.getClassLoader().getResource(mysqlEnv);
-        } else if (ObModeType.OB_ORACLE.equals(dialectType)) {
-            url = DataBasePrimitiveTest.class.getClassLoader().getResource(oracleEnv);
-        } else {
-            return null;
-        }
-        assert url != null;
-        properties.load(new FileInputStream(url.getPath()));
-        config.setDefaultSchame(properties.getProperty("schema"));
-        config.setPassword(properties.getProperty("passwd"));
-        config.setUser(properties.getProperty("user"));
-        config.setCluster(properties.getProperty("cluster"));
-        config.setTenant(properties.getProperty("tenant"));
-        config.setPort(Integer.valueOf(properties.getProperty("port")));
-        config.setHost(properties.getProperty("host"));
-        return config;
+    private DataBaseConfig getDBConfig(ObModeType dialectType) {
+        return dialectType == ObModeType.OB_MYSQL ? getMySqlConfig() : getOracleConfig();
     }
 
     private void initEnv(DataSource dataSource) throws SQLException {

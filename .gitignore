@@ -15,3 +15,4 @@ app.jar
 *.tar.gz
 _build
 logs
+.env

@@ -1,7 +1,6 @@
 package com.oceanbase.tools.datamocker.task;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.StringWriter;
@@ -10,7 +9,6 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
-import java.util.Properties;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -31,7 +29,6 @@ import com.oceanbase.tools.datamocker.model.config.AbstractTaskConfig;
 import com.oceanbase.tools.datamocker.model.config.impl.DefaultTaskConfig;
 import com.oceanbase.tools.datamocker.model.config.model.DataBaseConfig;
 import com.oceanbase.tools.datamocker.model.enums.MockTaskStatus;
-import com.oceanbase.tools.datamocker.model.enums.ObModeType;
 import com.oceanbase.tools.datamocker.model.enums.ScriptType;
 import com.oceanbase.tools.datamocker.schedule.MockContext;
 import com.oceanbase.tools.datamocker.util.PrintUtil;
@@ -51,8 +48,6 @@ public class MockerTaskOracleTest extends MockerTestBase {
     private final ThreadPoolExecutor executor = new ThreadPoolExecutor(3, 5, 0, TimeUnit.MILLISECONDS,
             new LinkedBlockingQueue<>(), new ThreadPoolExecutor.CallerRunsPolicy());
     private final String configFile = "task/config-oracle.json";
-    private final String mysqlEnv = "db/mysql-env.properties";
-    private final String oracleEnv = "db/oracle-env.properties";
     private final String[] ddls = new String[] {
             "CREATE TABLE \"EMP\" (\n"
                     + "  \"COL\" NUMBER(5,2) NOT NULL,\n"
@@ -70,28 +65,6 @@ public class MockerTaskOracleTest extends MockerTestBase {
     };
     private DataSource oracleDatasource = null;
 
-    private DataBaseConfig getDBConfig(ObModeType dialectType) throws IOException {
-        DataBaseConfig config = new DataBaseConfig();
-        Properties properties = new Properties();
-        URL url = null;
-        if (ObModeType.OB_MYSQL.equals(dialectType)) {
-            url = this.getClass().getClassLoader().getResource(mysqlEnv);
-        } else if (ObModeType.OB_ORACLE.equals(dialectType)) {
-            url = this.getClass().getClassLoader().getResource(oracleEnv);
-        } else {
-            return null;
-        }
-        properties.load(new FileInputStream(url.getPath()));
-        config.setDefaultSchame(properties.getProperty("schema"));
-        config.setPassword(properties.getProperty("passwd"));
-        config.setUser(properties.getProperty("user"));
-        config.setCluster(properties.getProperty("cluster"));
-        config.setTenant(properties.getProperty("tenant"));
-        config.setPort(Integer.valueOf(properties.getProperty("port")));
-        config.setHost(properties.getProperty("host"));
-        return config;
-    }
-
     private AbstractTaskConfig getTask() throws IOException {
         URL url = this.getClass().getClassLoader().getResource(this.configFile);
         FileReader reader = new FileReader(url.getPath());
@@ -105,13 +78,15 @@ public class MockerTaskOracleTest extends MockerTestBase {
         reader.close();
         writer.close();
         ObjectMapper mapper = new ObjectMapper();
-        return mapper.readValue(writer.toString(), DefaultTaskConfig.class);
+        DefaultTaskConfig config = mapper.readValue(writer.toString(), DefaultTaskConfig.class);
+        config.setDbConfig(getOracleConfig());
+        return config;
     }
 
     @Before
-    public void initEnv() throws IOException, SQLException {
+    public void initEnv() throws SQLException {
         if (oracleDatasource == null) {
-            DataBaseConfig config = getDBConfig(ObModeType.OB_ORACLE);
+            DataBaseConfig config = getOracleConfig();
             oracleDatasource = new MockerDataSource(config, 3, 5, 2, null);
         }
         try (Connection connection = oracleDatasource.getConnection()) {

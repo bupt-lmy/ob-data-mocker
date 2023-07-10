@@ -1,8 +1,6 @@
 package com.oceanbase.tools.datamocker.service;
 
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.net.URL;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -12,7 +10,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -44,8 +41,7 @@ import org.junit.rules.ExpectedException;
  */
 @Slf4j
 public class DataSourceTest extends MockerTestBase {
-    private final String mysqlEnv = "db/mysql-env.properties";
-    private final String oracleEnv = "db/oracle-env.properties";
+
     @Rule
     public ExpectedException expect = ExpectedException.none();
     private static final Map<String, String> params = new HashMap<>();
@@ -55,26 +51,8 @@ public class DataSourceTest extends MockerTestBase {
         params.put("socketTimeout", "8000");
     }
 
-    private DataBaseConfig getDBConfig(ObModeType dialectType) throws IOException {
-        DataBaseConfig config = new DataBaseConfig();
-        Properties properties = new Properties();
-        URL url = null;
-        if (ObModeType.OB_MYSQL.equals(dialectType)) {
-            url = this.getClass().getClassLoader().getResource(mysqlEnv);
-        } else if (ObModeType.OB_ORACLE.equals(dialectType)) {
-            url = this.getClass().getClassLoader().getResource(oracleEnv);
-        } else {
-            return null;
-        }
-        properties.load(new FileInputStream(url.getPath()));
-        config.setDefaultSchame(properties.getProperty("schema"));
-        config.setPassword(properties.getProperty("passwd"));
-        config.setUser(properties.getProperty("user"));
-        config.setCluster(properties.getProperty("cluster"));
-        config.setTenant(properties.getProperty("tenant"));
-        config.setPort(Integer.valueOf(properties.getProperty("port")));
-        config.setHost(properties.getProperty("host"));
-        return config;
+    private DataBaseConfig getDBConfig(ObModeType dialectType) {
+        return dialectType == ObModeType.OB_MYSQL ? getMySqlConfig() : getOracleConfig();
     }
 
     private void testDataSource(DataSource dataSource, String sql) throws SQLException {
@@ -91,7 +69,7 @@ public class DataSourceTest extends MockerTestBase {
     }
 
     @Test
-    public void testDataSourceForMysql() throws SQLException, IOException {
+    public void testDataSourceForMysql() throws SQLException {
         DataBaseConfig config = getDBConfig(ObModeType.OB_MYSQL);
         DataSource dataSource = new MockerDataSource(config, 3, 5, 2, params);
         dataSource.setLoginTimeout(10);
@@ -178,11 +156,14 @@ public class DataSourceTest extends MockerTestBase {
     }
 
     @Test
-    public void testDataSourceWithDirectConnection() throws IOException, SQLException {
+    public void testDataSourceWithDirectConnection() throws SQLException {
         DataBaseConfig config = getDBConfig(ObModeType.OB_ORACLE);
         DataSource dataSource = new MockerDataSource(config, 3, 5, 2, params);
-        Connection connection =
-                dataSource.getConnection(config.getUser() + "@" + config.getTenant(), config.getPassword());
+        String username = config.getUser() + "@" + config.getTenant();
+        if (config.getCluster() != null) {
+            username += "#" + config.getCluster();
+        }
+        Connection connection = dataSource.getConnection(username, config.getPassword());
         Assert.assertNotNull(connection);
         connection.close();
     }

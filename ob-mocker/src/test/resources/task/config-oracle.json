@@ -124,15 +124,6 @@
     }
   ],
   "dialectType": "OB_ORACLE",
-  "dbConfig": {
-    "host": "100.81.152.93",
-    "port": 2881,
-    "user": "SYS",
-    "tenant": "oracle",
-    "cluster": null,
-    "password": "Mac8.6Mac8.6",
-    "defaultSchame": "SYS"
-  },
   "taskName": null,
   "minConnectionSize": 4,
   "maxConnectionSize": 6,

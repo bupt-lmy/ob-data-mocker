@@ -467,15 +467,6 @@
     }
   ],
   "dialectType": "OB_MYSQL",
-  "dbConfig": {
-    "host": "100.81.152.93",
-    "port": 2881,
-    "user": "root",
-    "tenant": "mysql",
-    "cluster": null,
-    "password": "Mac8.6Mac8.6",
-    "defaultSchame": "test"
-  },
   "taskName": null,
   "minConnectionSize": 8,
   "maxConnectionSize": 10,
