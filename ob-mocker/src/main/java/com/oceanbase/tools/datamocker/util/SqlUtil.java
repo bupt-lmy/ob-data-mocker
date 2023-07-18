@@ -7,10 +7,8 @@ import java.sql.SQLException;
 
 import javax.sql.DataSource;
 
-import com.alipay.oceanbase.jdbc.ServerPreparedStatement;
-import com.alipay.oceanbase.jdbc.extend.datatype.INTERVALDS;
-import com.alipay.oceanbase.jdbc.extend.datatype.INTERVALYM;
-
+import com.oceanbase.jdbc.extend.datatype.INTERVALDS;
+import com.oceanbase.jdbc.extend.datatype.INTERVALYM;
 import com.oceanbase.tools.datamocker.core.task.AbstractCallBack;
 import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
@@ -56,15 +54,8 @@ public class SqlUtil {
                 int length = params.length;
                 for (int i = 0; i < length; i++) {
                     if (params[i] instanceof INTERVALYM || params[i] instanceof INTERVALDS) {
-                        if (!(statement instanceof ServerPreparedStatement)) {
-                            throw new MockerException(MockerError.NOT_SUPPORT_FEATURE,
-                                    "OceanBase have to support PS protocol for INTERVALYM or INTERVALDS");
-                        }
-                        if (params[i] instanceof INTERVALYM) {
-                            ((ServerPreparedStatement) statement).setINTERVALYM(i + 1, (INTERVALYM) params[i]);
-                        } else {
-                            ((ServerPreparedStatement) statement).setINTERVALDS(i + 1, (INTERVALDS) params[i]);
-                        }
+                        throw new MockerException(MockerError.NOT_SUPPORT_FEATURE,
+                                "OceanBase have to support PS protocol for INTERVALYM or INTERVALDS");
                     } else {
                         statement.setObject(i + 1, params[i]);
                     }
@@ -145,15 +136,8 @@ public class SqlUtil {
                 int length = params.length;
                 for (int i = 0; i < length; i++) {
                     if (params[i] instanceof INTERVALYM || params[i] instanceof INTERVALDS) {
-                        if (!(statement instanceof ServerPreparedStatement)) {
-                            throw new MockerException(MockerError.NOT_SUPPORT_FEATURE,
-                                    "OceanBase have to support ps protocol for INTERVALYM or INTERVALDS");
-                        }
-                        if (params[i] instanceof INTERVALYM) {
-                            ((ServerPreparedStatement) statement).setINTERVALYM(i + 1, (INTERVALYM) params[i]);
-                        } else {
-                            ((ServerPreparedStatement) statement).setINTERVALDS(i + 1, (INTERVALDS) params[i]);
-                        }
+                        throw new MockerException(MockerError.NOT_SUPPORT_FEATURE,
+                                "OceanBase have to support ps protocol for INTERVALYM or INTERVALDS");
                     } else {
                         statement.setObject(i + 1, params[i]);
                     }
@@ -241,15 +225,8 @@ public class SqlUtil {
                 int innerLength = innerParams.length;
                 for (int j = 0; j < innerLength; j++) {
                     if (innerParams[j] instanceof INTERVALYM || innerParams[j] instanceof INTERVALDS) {
-                        if (!(statement instanceof ServerPreparedStatement)) {
-                            throw new MockerException(MockerError.NOT_SUPPORT_FEATURE,
-                                    "OceanBase have to support PS protocol for INTERVALYM or INTERVALDS");
-                        }
-                        if (innerParams[j] instanceof INTERVALYM) {
-                            ((ServerPreparedStatement) statement).setINTERVALYM(j + 1, (INTERVALYM) innerParams[j]);
-                        } else {
-                            ((ServerPreparedStatement) statement).setINTERVALDS(j + 1, (INTERVALDS) innerParams[j]);
-                        }
+                        throw new MockerException(MockerError.NOT_SUPPORT_FEATURE,
+                                "OceanBase have to support PS protocol for INTERVALYM or INTERVALDS");
                     } else {
                         statement.setObject(j + 1, innerParams[j]);
                     }

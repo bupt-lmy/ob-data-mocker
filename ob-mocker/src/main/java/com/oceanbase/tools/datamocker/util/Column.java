@@ -8,7 +8,7 @@ import java.lang.annotation.Target;
 /**
  * This annotation is used for serialization or deserialization when reading the database
  *
- * @author yh263208@antgroup.com
+ * @author yh263208
  * @date 2020-12-02 15:19
  * @since OBMOCKER-0.1.0-snapshot
  */

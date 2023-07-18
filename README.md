@@ -24,7 +24,7 @@ Mock数据即模拟数据工具用于批量产生测试数据，该工具研发�
 <dependency>
   <groupId>com.oceanbase</groupId>
   <artifactId>ob-mocker</artifactId>
-  <version>0.1.0-SNAPSHOT</version>
+  <version>0.1.3-SNAPSHOT</version>
 </dependency>
 ```
 
@@ -210,5 +210,3 @@ public class App {
     }
 }
 ```
-
-了解更多详见语雀文档：[https://yuque.antfin-inc.com/ob/platform/nrd23c](https://yuque.antfin-inc.com/ob/platform/nrd23c)

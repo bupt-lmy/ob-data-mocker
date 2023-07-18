@@ -1,6 +1,6 @@
 package com.oceanbase.tools.datamocker.generator.date;
 
-import com.alipay.oceanbase.jdbc.extend.datatype.INTERVALYM;
+import com.oceanbase.jdbc.extend.datatype.INTERVALYM;
 
 import com.oceanbase.tools.datamocker.generator.BaseGenerator;
 

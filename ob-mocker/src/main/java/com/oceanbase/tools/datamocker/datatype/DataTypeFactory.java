@@ -12,8 +12,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 
-import com.alipay.oceanbase.jdbc.extend.datatype.INTERVALYM;
-
+import com.oceanbase.jdbc.extend.datatype.INTERVALYM;
 import com.oceanbase.tools.datamocker.datatype.mysql.MysqlBigIntType;
 import com.oceanbase.tools.datamocker.datatype.mysql.MysqlBinaryType;
 import com.oceanbase.tools.datamocker.datatype.mysql.MysqlBlobType;
