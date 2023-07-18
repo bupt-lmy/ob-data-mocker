@@ -3,7 +3,7 @@ package com.oceanbase.tools.datamocker.generator.date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.alipay.oceanbase.jdbc.extend.datatype.INTERVALYM;
+import com.oceanbase.jdbc.extend.datatype.INTERVALYM;
 
 import com.oceanbase.tools.datamocker.generator.BaseGenerator;
 import com.oceanbase.tools.datamocker.model.exception.MockerError;

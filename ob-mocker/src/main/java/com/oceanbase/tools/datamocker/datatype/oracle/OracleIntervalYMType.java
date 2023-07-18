@@ -1,7 +1,6 @@
 package com.oceanbase.tools.datamocker.datatype.oracle;
 
-import com.alipay.oceanbase.jdbc.extend.datatype.INTERVALYM;
-
+import com.oceanbase.jdbc.extend.datatype.INTERVALYM;
 import com.oceanbase.tools.datamocker.datatype.AbstractDataType;
 import com.oceanbase.tools.datamocker.datatype.DataTypeFactory;
 import com.oceanbase.tools.datamocker.generator.BaseGenerator;
