@@ -5,26 +5,24 @@
     <id>jar-without-dependencies</id>
     <includeBaseDirectory>false</includeBaseDirectory>
     <formats>
-        <format>tar.gz</format>
+        <format>jar</format>
     </formats>
     <files>
         <file>
             <source>../README.md</source>
-            <outputDirectory></outputDirectory>
+            <outputDirectory/>
             <filtered>true</filtered>
         </file>
         <file>
             <source>../LEGAL.md</source>
-            <outputDirectory></outputDirectory>
+            <outputDirectory/>
             <filtered>true</filtered>
         </file>
     </files>
-    <dependencySets>
-        <dependencySet>
-            <unpack>false</unpack>
-            <scope>runtime</scope>
-            <outputDirectory>lib</outputDirectory>
-            <useProjectArtifact>true</useProjectArtifact>
-        </dependencySet>
-    </dependencySets>
+    <fileSets>
+        <fileSet>
+            <directory>${project.build.directory}/classes</directory>
+            <outputDirectory>/</outputDirectory>
+        </fileSet>
+    </fileSets>
 </assembly>

@@ -11,6 +11,29 @@
     <url>http://maven.apache.org</url>
     <version>0.1.4-SNAPSHOT</version>
 
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <name>Hang Yang</name>
+            <url>https://github.com/yhilmare</url>
+            <organization>OceanBase</organization>
+            <timezone>8</timezone>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:git:https://github.com/oceanbase/odc-server.git</connection>
+        <developerConnection>scm:git:https://github.com/oceanbase/odc-server.git</developerConnection>
+        <url>https://github.com/oceanbase/odc-server</url>
+        <tag>HEAD</tag>
+    </scm>
+
     <modules>
         <module>ob-mocker</module>
     </modules>
@@ -46,7 +69,7 @@
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-databind</artifactId>
-                <version>2.9.10.4</version>
+                <version>2.9.10.8</version>
             </dependency>
             <dependency>
                 <groupId>commons-lang</groupId>
@@ -133,6 +156,16 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.9.1</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>2.2.1</version>
             </plugin>
         </plugins>
     </build>
