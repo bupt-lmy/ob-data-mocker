@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<assembly xmlns="http://maven.apache.org/ASSEMBLY/2.0.0"
-          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          xsi:schemaLocation="http://maven.apache.org/ASSEMBLY/2.0.0 http://maven.apache.org/xsd/assembly-2.0.0.xsd">
+<assembly xmlns="http://maven.apache.org/ASSEMBLY/2.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/ASSEMBLY/2.0.0 http://maven.apache.org/xsd/assembly-2.0.0.xsd">
     <id>jar-without-dependencies</id>
     <includeBaseDirectory>false</includeBaseDirectory>
     <formats>
@@ -9,12 +8,12 @@
     </formats>
     <files>
         <file>
-            <source>../README.md</source>
+            <source>README.md</source>
             <outputDirectory/>
             <filtered>true</filtered>
         </file>
         <file>
-            <source>../LEGAL.md</source>
+            <source>LEGAL.md</source>
             <outputDirectory/>
             <filtered>true</filtered>
         </file>
