@@ -17,7 +17,8 @@ package com.oceanbase.tools.datamocker;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
+import java.net.URL;
+import java.nio.file.Paths;
 import java.util.Properties;
 
 import com.oceanbase.tools.datamocker.model.config.model.DataBaseConfig;
@@ -65,8 +66,6 @@ public class MockerTestBase {
 
     private static class Keys {
 
-        private static final String ENV_FILE = "../.env";
-
         private static final String OB_ORACLE_HOST_KEY = "OB_ORACLE_HOST";
         private static final String OB_ORACLE_PORT_KEY = "OB_ORACLE_PORT";
         private static final String OB_ORACLE_USER_KEY = "OB_ORACLE_USER";
@@ -103,12 +102,16 @@ public class MockerTestBase {
 
         private Properties getEnvProperties() {
             Properties properties = new Properties();
-            File file = new File(ENV_FILE);
-            if (file.exists()) {
-                try (FileInputStream inputStream = new FileInputStream(file)) {
-                    properties.load(inputStream);
-                } catch (IOException ignored) {
+            try {
+                URL location = MockerTestBase.class.getProtectionDomain().getCodeSource().getLocation();
+                File file = Paths.get(location.toURI()).getParent().getParent().resolve(".env").toFile();
+                if (file.exists()) {
+                    try (FileInputStream inputStream = new FileInputStream(file)) {
+                        properties.load(inputStream);
+                    }
                 }
+            } catch (Exception e) {
+                // eat exception
             }
             return properties;
         }

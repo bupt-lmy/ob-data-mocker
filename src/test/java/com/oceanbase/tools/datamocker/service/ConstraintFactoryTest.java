@@ -28,7 +28,7 @@ import javax.sql.DataSource;
 import com.oceanbase.tools.datamocker.MockerTestBase;
 import com.oceanbase.tools.datamocker.constraint.AbstractConstraint;
 import com.oceanbase.tools.datamocker.constraint.ConstraintFactory;
-import com.oceanbase.tools.datamocker.core.write.output.MockerDataSource;
+import com.oceanbase.tools.datamocker.core.task.DataSourceFactory;
 import com.oceanbase.tools.datamocker.datatype.AbstractDataType;
 import com.oceanbase.tools.datamocker.datatype.oracle.OracleNumberType;
 import com.oceanbase.tools.datamocker.model.config.model.DataBaseConfig;
@@ -90,11 +90,11 @@ public class ConstraintFactoryTest extends MockerTestBase {
     public void initEnv() throws IOException, SQLException {
         if (oracleDatasource == null) {
             DataBaseConfig config = getDBConfig(ObModeType.OB_ORACLE);
-            oracleDatasource = new MockerDataSource(config, 3, 5, 2, null);
+            oracleDatasource = new DataSourceFactory(config).generate();
         }
         if (mysqlDatasource == null) {
             DataBaseConfig config = getDBConfig(ObModeType.OB_MYSQL);
-            mysqlDatasource = new MockerDataSource(config, 3, 5, 2, null);
+            mysqlDatasource = new DataSourceFactory(config).generate();
         }
         try (Connection connection = oracleDatasource.getConnection()) {
             try (Statement statement = connection.createStatement()) {
@@ -209,7 +209,7 @@ public class ConstraintFactoryTest extends MockerTestBase {
     }
 
     @After
-    public void clearEnv() throws SQLException {
+    public void clearEnv() throws Exception {
         try (Connection connection = oracleDatasource.getConnection()) {
             try (Statement statement = connection.createStatement()) {
                 statement.execute("drop table emp1");
@@ -221,6 +221,12 @@ public class ConstraintFactoryTest extends MockerTestBase {
                 statement.execute("drop table emp1");
                 statement.execute("drop table emp");
             }
+        }
+        if (oracleDatasource instanceof AutoCloseable) {
+            ((AutoCloseable) oracleDatasource).close();
+        }
+        if (mysqlDatasource instanceof AutoCloseable) {
+            ((AutoCloseable) mysqlDatasource).close();
         }
     }
 }

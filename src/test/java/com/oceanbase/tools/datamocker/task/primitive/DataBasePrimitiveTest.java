@@ -31,9 +31,9 @@ import javax.sql.DataSource;
 
 import com.oceanbase.tools.datamocker.MockerTestBase;
 import com.oceanbase.tools.datamocker.core.task.AbstractDataPipe;
+import com.oceanbase.tools.datamocker.core.task.DataSourceFactory;
 import com.oceanbase.tools.datamocker.core.write.AbstractMockWriter;
 import com.oceanbase.tools.datamocker.core.write.JdbcWriter;
-import com.oceanbase.tools.datamocker.core.write.output.MockerDataSource;
 import com.oceanbase.tools.datamocker.datatype.oracle.OracleNumberType;
 import com.oceanbase.tools.datamocker.model.config.model.DataBaseConfig;
 import com.oceanbase.tools.datamocker.model.enums.ObModeType;
@@ -126,9 +126,9 @@ public class DataBasePrimitiveTest extends MockerTestBase {
     @BeforeClass
     public static void initEnv() throws SQLException {
         DataBaseConfig mysqlConfig = getDBConfig(ObModeType.OB_MYSQL);
-        mysqlDataSource = new MockerDataSource(mysqlConfig, 3, 5, 2, null);
+        mysqlDataSource = new DataSourceFactory(mysqlConfig).generate();
         DataBaseConfig oracleConfig = getDBConfig(ObModeType.OB_ORACLE);
-        oracleDataSource = new MockerDataSource(oracleConfig, 3, 5, 2, null);
+        oracleDataSource = new DataSourceFactory(oracleConfig).generate();
         initEnv(oracleDataSource.getConnection());
         initEnv(mysqlDataSource.getConnection());
     }

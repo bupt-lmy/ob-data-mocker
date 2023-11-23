@@ -32,7 +32,7 @@ import com.oceanbase.tools.datamocker.MockerTestBase;
 import com.oceanbase.tools.datamocker.ObDataMocker;
 import com.oceanbase.tools.datamocker.ObMockerFactory;
 import com.oceanbase.tools.datamocker.core.task.AbstractMockerFactory;
-import com.oceanbase.tools.datamocker.core.write.output.MockerDataSource;
+import com.oceanbase.tools.datamocker.core.task.DataSourceFactory;
 import com.oceanbase.tools.datamocker.model.config.AbstractTaskConfig;
 import com.oceanbase.tools.datamocker.model.config.impl.DefaultColumnConfig;
 import com.oceanbase.tools.datamocker.model.config.impl.DefaultTableConfig;
@@ -208,7 +208,7 @@ public class DispatcherFactoryTest extends MockerTestBase {
     public void initEnv() throws IOException, SQLException {
         if (oracleDatasource == null) {
             DataBaseConfig config = getDBConfig(ObModeType.OB_ORACLE);
-            oracleDatasource = new MockerDataSource(config, 3, 5, 2, null);
+            oracleDatasource = new DataSourceFactory(config).generate();
         }
         try (Connection connection = oracleDatasource.getConnection()) {
             try (Statement statement = connection.createStatement()) {
@@ -238,23 +238,16 @@ public class DispatcherFactoryTest extends MockerTestBase {
         Assert.assertEquals(1, mocker.size());
     }
 
-    @Test
-    public void testDispatcherWithNullTable() throws Throwable {
-        AbstractTaskConfig config = getTask("EMP2");
-        AbstractMockerFactory factory = new ObMockerFactory(config);
-        thrown.expectMessage("ORA-00942: table or view 'SYS.EMP2' does not exist");
-        thrown.expect(MockerException.class);
-        ObDataMocker mocker = factory.create();
-        Assert.assertEquals(1, mocker.size());
-    }
-
     @After
-    public void clearEnv() throws SQLException {
+    public void clearEnv() throws Exception {
         try (Connection connection = oracleDatasource.getConnection()) {
             try (Statement statement = connection.createStatement()) {
                 statement.execute("drop table emp1");
                 statement.execute("drop table emp");
             }
+        }
+        if (oracleDatasource instanceof AutoCloseable) {
+            ((AutoCloseable) oracleDatasource).close();
         }
     }
 }

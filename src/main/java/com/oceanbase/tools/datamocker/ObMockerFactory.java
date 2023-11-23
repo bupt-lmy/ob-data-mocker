@@ -55,7 +55,8 @@ public class ObMockerFactory extends AbstractMockerFactory {
     }
 
     @Override
-    protected Dispatcher<TableTaskInfo> generate(AbstractTaskConfig taskConfig, String taskId) throws Throwable {
+    protected Dispatcher<TableTaskInfo> generate(AbstractTaskConfig taskConfig, DataSource ds, String taskId)
+            throws Throwable {
         String taskName = taskConfig.taskName() == null ? getTaskName() : taskConfig.taskName();
         List<? extends AbstractTableConfig> tableConfigs = taskConfig.tasks();
         Validate.notEmpty(tableConfigs, "TaskConfig can not be empty for ObMockerFactory");
@@ -63,7 +64,7 @@ public class ObMockerFactory extends AbstractMockerFactory {
         Dispatcher<TableTaskInfo> dispatcher = new Dispatcher<>(tableConfigs.size(), taskName, taskId);
         for (int i = 0; i < tableConfigs.size(); i++) {
             AbstractTableConfig tableConfig = tableConfigs.get(i);
-            List<AbstractConstraint> constraints = getConstraints(tableConfig, taskConfig.obDialectType());
+            List<AbstractConstraint> constraints = getConstraints(tableConfig, ds, taskConfig.obDialectType());
             List<ColumnReader<?>> columnReaders = getColumnReader(tableConfig, constraints);
             Map<String, AbstractDataType<?, ? extends Comparable<?>>> tableSchema = getTableSchema(tableConfig);
             MockerBuffer buffer = new MockerBuffer(tableSchema, tableConfig.maxBatchSize());

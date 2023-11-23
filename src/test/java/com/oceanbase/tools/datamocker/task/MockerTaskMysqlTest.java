@@ -37,8 +37,8 @@ import com.oceanbase.tools.datamocker.MockerTestBase;
 import com.oceanbase.tools.datamocker.ObDataMocker;
 import com.oceanbase.tools.datamocker.ObMockerFactory;
 import com.oceanbase.tools.datamocker.core.task.AbstractMockerFactory;
+import com.oceanbase.tools.datamocker.core.task.DataSourceFactory;
 import com.oceanbase.tools.datamocker.core.task.TableTaskContext;
-import com.oceanbase.tools.datamocker.core.write.output.MockerDataSource;
 import com.oceanbase.tools.datamocker.model.config.AbstractTableConfig;
 import com.oceanbase.tools.datamocker.model.config.AbstractTaskConfig;
 import com.oceanbase.tools.datamocker.model.config.impl.DefaultTaskConfig;
@@ -124,7 +124,7 @@ public class MockerTaskMysqlTest extends MockerTestBase {
     public void initEnv() throws SQLException {
         if (mysqlDatasource == null) {
             DataBaseConfig config = getMySqlConfig();
-            mysqlDatasource = new MockerDataSource(config, 3, 5, 2, null);
+            mysqlDatasource = new DataSourceFactory(config).generate();
         }
         try (Connection connection = mysqlDatasource.getConnection()) {
             try (Statement statement = connection.createStatement()) {
@@ -191,7 +191,13 @@ public class MockerTaskMysqlTest extends MockerTestBase {
                 statement.execute("drop table emp");
             }
         }
-        ((MockerDataSource) mysqlDatasource).clear();
+        try {
+            if (mysqlDatasource instanceof AutoCloseable) {
+                ((AutoCloseable) mysqlDatasource).close();
+            }
+        } catch (Exception e) {
+            // eat exception
+        }
         clearFile();
     }
 }

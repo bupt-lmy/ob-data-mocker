@@ -6,7 +6,7 @@
     <artifactId>ob-data-mocker</artifactId>
     <name>ob-data-mocker</name>
     <url>http://maven.apache.org</url>
-    <version>0.1.4</version>
+    <version>0.1.5-SNAPSHOT</version>
     <licenses>
         <license>
             <name>The Apache Software License, Version 2.0</name>
@@ -44,6 +44,11 @@
                 <artifactId>junit</artifactId>
                 <version>4.12</version>
                 <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.zaxxer</groupId>
+                <artifactId>HikariCP</artifactId>
+                <version>4.0.3</version>
             </dependency>
             <dependency>
                 <groupId>com.oceanbase</groupId>
@@ -116,6 +121,10 @@
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.zaxxer</groupId>
+            <artifactId>HikariCP</artifactId>
         </dependency>
     </dependencies>
     <build>

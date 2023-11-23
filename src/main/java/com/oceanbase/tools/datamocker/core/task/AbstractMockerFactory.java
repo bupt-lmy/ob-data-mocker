@@ -16,11 +16,9 @@
 package com.oceanbase.tools.datamocker.core.task;
 
 import java.io.IOException;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -42,26 +40,21 @@ import com.oceanbase.tools.datamocker.core.read.ColumnReader;
 import com.oceanbase.tools.datamocker.core.write.AbstractMockWriter;
 import com.oceanbase.tools.datamocker.core.write.JdbcWriter;
 import com.oceanbase.tools.datamocker.core.write.SqlScriptWriter;
-import com.oceanbase.tools.datamocker.core.write.output.MockerDataSource;
 import com.oceanbase.tools.datamocker.core.write.output.MockerFile;
 import com.oceanbase.tools.datamocker.datatype.AbstractDataType;
 import com.oceanbase.tools.datamocker.model.config.AbstractColumnConfig;
 import com.oceanbase.tools.datamocker.model.config.AbstractTableConfig;
 import com.oceanbase.tools.datamocker.model.config.AbstractTaskConfig;
-import com.oceanbase.tools.datamocker.model.config.model.DataBaseConfig;
 import com.oceanbase.tools.datamocker.model.enums.ObModeType;
 import com.oceanbase.tools.datamocker.model.enums.ScriptType;
-import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
 import com.oceanbase.tools.datamocker.model.mock.MockRowData;
 import com.oceanbase.tools.datamocker.schedule.AbstractScheduler;
 import com.oceanbase.tools.datamocker.schedule.impl.DefaultScheduler;
-import com.oceanbase.tools.datamocker.util.DbObjectNameUtil;
 import com.oceanbase.tools.datamocker.util.MockDataPipe;
 import com.oceanbase.tools.datamocker.util.MockerBuffer;
-import com.oceanbase.tools.datamocker.util.SqlUtil;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 import org.slf4j.MDC;
 
@@ -79,11 +72,6 @@ public abstract class AbstractMockerFactory {
      */
     private final AbstractTaskConfig taskConfig;
     /**
-     * The internal data source of the factory type, which is used to verify the existence of tables,
-     * check constraints and other information
-     */
-    private MockerDataSource innerDatasource = null;
-    /**
      * The data source is a business data source
      */
     private final Map<String, DataSource> taskId2DataSource;
@@ -92,24 +80,10 @@ public abstract class AbstractMockerFactory {
      */
     private final Map<String, List<MockerFile>> taskId2MockerFiles;
 
-    public AbstractMockerFactory(AbstractTaskConfig taskConfig) {
-        Validate.notNull(taskConfig, "TaskConfig can not be null for AbstractMockerFactory");
+    public AbstractMockerFactory(@NonNull AbstractTaskConfig taskConfig) {
         this.taskConfig = taskConfig;
         this.taskId2DataSource = new HashMap<>();
         this.taskId2MockerFiles = new HashMap<>();
-    }
-
-    /**
-     * Verify the validity of the database configuration object package
-     *
-     * @param dbConfig configuration for database
-     * @return verify result
-     */
-    private boolean validateDbConfig(DataBaseConfig dbConfig) {
-        if (dbConfig == null) {
-            return false;
-        }
-        return !StringUtils.isBlank(dbConfig.getUser()) && !StringUtils.isBlank(dbConfig.getHost());
     }
 
     /**
@@ -124,25 +98,24 @@ public abstract class AbstractMockerFactory {
      *
      * @param scheduler Scheduler object, used for thread resource scheduling
      */
-    public ObDataMocker create(AbstractScheduler scheduler) {
-        Validate.notNull(scheduler, "Scheduler can not be null for AbstractMockerFactory#create");
+    public ObDataMocker create(@NonNull AbstractScheduler scheduler) {
+        DataSource dataSource = null;
         try {
             String taskId = UUID.randomUUID().toString().toUpperCase();
             MDC.put("mocktask.workspace", taskId);
-            if (validateDbConfig(taskConfig.dbConfig())) {
-                if (this.innerDatasource == null) {
-                    this.innerDatasource = new MockerDataSource(taskConfig.dbConfig(), 3, 5, 3,
-                            taskConfig.dbConfig().getConnectParam());
-                }
-            }
-            for (AbstractTableConfig tableConfig : this.taskConfig.tasks()) {
-                validateTableByJdbc(tableConfig.schemaName(), tableConfig.tableName());
-            }
-            Dispatcher<TableTaskInfo> dispatcher = generate(this.taskConfig, taskId);
-            this.innerDatasource.clear();
+            dataSource = new DataSourceFactory(taskConfig.dbConfig()).generate();
+            Dispatcher<TableTaskInfo> dispatcher = generate(this.taskConfig, dataSource, taskId);
             return new ObDataMocker(dispatcher, scheduler);
         } catch (Throwable e) {
             throw new MockerException(e);
+        } finally {
+            if (dataSource instanceof AutoCloseable) {
+                try {
+                    ((AutoCloseable) dataSource).close();
+                } catch (Exception e) {
+                    // eat exception
+                }
+            }
         }
     }
 
@@ -153,42 +126,8 @@ public abstract class AbstractMockerFactory {
      * @param taskId Task Id
      * @return Returns the dispatcher object
      */
-    abstract protected Dispatcher<TableTaskInfo> generate(AbstractTaskConfig task, String taskId) throws Throwable;
-
-    /**
-     * Verify the existence of the table
-     *
-     * @param table table name
-     * @param schema The database or schema
-     * @throws MockerException Throw an exception when the table existence check fails
-     */
-    protected void validateTableByJdbc(String schema, String table) throws Throwable {
-        if (this.innerDatasource == null) {
-            return;
-        }
-        String sql;
-        if (ObModeType.OB_ORACLE.equals(this.taskConfig.obDialectType())) {
-            sql = String.format("select count(*) from \"%s\".\"%s\"", DbObjectNameUtil.doubleCharToEscape(schema, '"'),
-                    DbObjectNameUtil.doubleCharToEscape(table, '"'));
-        } else if (ObModeType.OB_MYSQL.equals(this.taskConfig.obDialectType())) {
-            sql = String.format("select count(*) from `%s`.`%s`", DbObjectNameUtil.doubleCharToEscape(schema, '`'),
-                    DbObjectNameUtil.doubleCharToEscape(table, '`'));
-        } else {
-            throw new MockerException(MockerError.INVALID_OB_MODE);
-        }
-        SqlUtil.executeQuery(this.innerDatasource, sql, null, new AbstractCallBack<ResultSet>() {
-            @Override
-            public void doOnSuccess(ResultSet result) {
-                log.info("Verify the existence of the database table successfully, schema={}, table={}", schema, table);
-            }
-
-            @Override
-            public void doOnFailure(ResultSet result, Throwable e) {
-                log.error("Fail to verify the existence of database table, schema={}, table={}", schema, table, e);
-                throw new MockerException(MockerError.OPERATION_FAILURE, e.getMessage());
-            }
-        });
-    }
+    abstract protected Dispatcher<TableTaskInfo> generate(AbstractTaskConfig task, DataSource ds, String taskId)
+            throws Throwable;
 
     /**
      * Get the table structure
@@ -211,22 +150,19 @@ public abstract class AbstractMockerFactory {
      * @param tableConfig table configuration
      * @return list of constraint
      */
-    protected List<AbstractConstraint> getConstraints(AbstractTableConfig tableConfig, ObModeType dialectType)
-            throws Throwable {
+    protected List<AbstractConstraint> getConstraints(AbstractTableConfig tableConfig,
+            DataSource dataSource, ObModeType dialectType) throws Throwable {
         if (tableConfig.constraints() != null) {
             return tableConfig.constraints();
-        } else if (this.innerDatasource == null) {
-            return Collections.emptyList();
         }
         Map<String, AbstractDataType<?, ? extends Comparable<?>>> columnName2DataType = getTableSchema(tableConfig);
         List<ConstraintFactory> factories = ConstraintFactory.listInstances();
         List<AbstractConstraint> returnVal = new ArrayList<>();
         for (ConstraintFactory factory : factories) {
-            List<AbstractConstraint> customConstraint =
-                    factory.make(this.innerDatasource, dialectType, tableConfig.schemaName(), tableConfig.tableName(),
-                            columnName2DataType, tableConfig.maxCount().intValue());
-            if (customConstraint != null) {
-                returnVal.addAll(customConstraint);
+            List<AbstractConstraint> c = factory.make(dataSource, dialectType, tableConfig.schemaName(),
+                    tableConfig.tableName(), columnName2DataType, tableConfig.maxCount().intValue());
+            if (c != null) {
+                returnVal.addAll(c);
             }
         }
         return returnVal;
@@ -247,9 +183,6 @@ public abstract class AbstractMockerFactory {
         if (dataSource != null) {
             return dataSource;
         }
-        if (!validateDbConfig(this.taskConfig.dbConfig())) {
-            return null;
-        }
         Map<String, String> realParam = new HashMap<>();
         realParam.put("autoReconnect", "true");
         realParam.put("rewriteBatchedStatements", "true");
@@ -262,8 +195,10 @@ public abstract class AbstractMockerFactory {
                 realParam.putIfAbsent(entry.getKey(), entry.getValue());
             }
         }
-        dataSource = new MockerDataSource(this.taskConfig.dbConfig(), taskConfig.minConnection(),
-                taskConfig.maxConnection(), taskConfig.connectionIncreasementStep(), realParam);
+        DataSourceFactory factory = new DataSourceFactory(this.taskConfig.dbConfig());
+        factory.setParams(realParam);
+        factory.setMaxPoolSize(taskConfig.maxConnection());
+        dataSource = factory.generate();
         this.taskId2DataSource.putIfAbsent(tableTaskId, dataSource);
         return dataSource;
     }

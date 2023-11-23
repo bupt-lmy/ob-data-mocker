@@ -33,9 +33,9 @@ import javax.sql.DataSource;
 import com.oceanbase.tools.datamocker.MockerTestBase;
 import com.oceanbase.tools.datamocker.core.read.ColumnReader;
 import com.oceanbase.tools.datamocker.core.task.AbstractDataPipe;
+import com.oceanbase.tools.datamocker.core.task.DataSourceFactory;
 import com.oceanbase.tools.datamocker.core.write.JdbcWriter;
 import com.oceanbase.tools.datamocker.core.write.SqlScriptWriter;
-import com.oceanbase.tools.datamocker.core.write.output.MockerDataSource;
 import com.oceanbase.tools.datamocker.core.write.output.MockerFile;
 import com.oceanbase.tools.datamocker.datatype.AbstractDataType;
 import com.oceanbase.tools.datamocker.datatype.oracle.OracleNumberType;
@@ -85,7 +85,9 @@ public class MockBufferTest extends MockerTestBase {
     @Before
     public void initFileManager() throws IOException, SQLException {
         DataBaseConfig oracleConfig = getDBConfig(ObModeType.OB_ORACLE);
-        dataSource = new MockerDataSource(oracleConfig, 15, 25, 2, null);
+        DataSourceFactory factory = new DataSourceFactory(oracleConfig);
+        factory.setMaxPoolSize(25);
+        dataSource = factory.generate();
         initEnv(dataSource);
         manager = new MockerFile("test/mock/mock.sql", ScriptType.SQL);
     }

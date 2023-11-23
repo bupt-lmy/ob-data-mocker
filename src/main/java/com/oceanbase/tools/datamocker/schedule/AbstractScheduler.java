@@ -30,7 +30,6 @@ import com.oceanbase.tools.datamocker.core.task.AbstractCallBack;
 import com.oceanbase.tools.datamocker.core.task.TableTask;
 import com.oceanbase.tools.datamocker.core.task.TableTaskContext;
 import com.oceanbase.tools.datamocker.core.task.TableTaskInfo;
-import com.oceanbase.tools.datamocker.core.write.output.MockerDataSource;
 import com.oceanbase.tools.datamocker.core.write.output.MockerFile;
 import com.oceanbase.tools.datamocker.model.enums.MockTaskStatus;
 import com.oceanbase.tools.datamocker.model.exception.MockerError;
@@ -183,7 +182,13 @@ public abstract class AbstractScheduler {
                             mockTaskBean.init(service, new AbstractCallBack<TableTaskContext>() {
                                 @Override
                                 public void doOnSuccess(TableTaskContext param) {
-                                    ((MockerDataSource) param.getDataSource()).clear();
+                                    try {
+                                        if (param.getDataSource() instanceof AutoCloseable) {
+                                            ((AutoCloseable) param.getDataSource()).close();
+                                        }
+                                    } catch (Exception e) {
+                                        // eat exception
+                                    }
                                     for (MockerFile fileManager : param.getFileManagers()) {
                                         fileManager.close();
                                     }
@@ -197,7 +202,13 @@ public abstract class AbstractScheduler {
 
                                 @Override
                                 public void doOnFailure(TableTaskContext param, Throwable e) {
-                                    ((MockerDataSource) param.getDataSource()).clear();
+                                    try {
+                                        if (param.getDataSource() instanceof AutoCloseable) {
+                                            ((AutoCloseable) param.getDataSource()).close();
+                                        }
+                                    } catch (Exception ex) {
+                                        // eat exception
+                                    }
                                     for (MockerFile fileManager : param.getFileManagers()) {
                                         fileManager.close();
                                     }
@@ -210,7 +221,13 @@ public abstract class AbstractScheduler {
                                 }
                             });
                             if (service.isShutdown()) {
-                                ((MockerDataSource) task.getDataSource()).clear();
+                                try {
+                                    if (task.getDataSource() instanceof AutoCloseable) {
+                                        ((AutoCloseable) task.getDataSource()).close();
+                                    }
+                                } catch (Exception e) {
+                                    // eat exception
+                                }
                                 for (MockerFile manager : task.getFileManagers()) {
                                     manager.close();
                                 }
@@ -253,7 +270,13 @@ public abstract class AbstractScheduler {
         for (int i = 0; i < dispatcher.getConcurrent(); i++) {
             for (int j = 0; j < dispatcher.getTaskSize(i); j++) {
                 TableTaskInfo bean = dispatcher.getObj(i, j);
-                ((MockerDataSource) bean.getDataSource()).clear();
+                try {
+                    if (bean.getDataSource() instanceof AutoCloseable) {
+                        ((AutoCloseable) bean.getDataSource()).close();
+                    }
+                } catch (Exception e) {
+                    // eat exception
+                }
                 for (MockerFile manager : bean.getFileManagers()) {
                     manager.close();
                 }
