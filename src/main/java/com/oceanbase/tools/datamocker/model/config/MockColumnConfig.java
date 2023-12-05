@@ -13,13 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.oceanbase.tools.datamocker.model.config.impl;
+package com.oceanbase.tools.datamocker.model.config;
 
 import com.oceanbase.tools.datamocker.datatype.AbstractDataType;
 import com.oceanbase.tools.datamocker.datatype.DataTypeFactory;
 import com.oceanbase.tools.datamocker.generator.BaseGenerator;
-import com.oceanbase.tools.datamocker.model.config.AbstractColumnConfig;
-import com.oceanbase.tools.datamocker.model.config.model.DataTypeConfig;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -33,50 +31,24 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public class DefaultColumnConfig extends AbstractColumnConfig {
+public class MockColumnConfig {
+
     private String columnName;
-    /**
-     * Detailed configuration of column generation tasks
-     */
     private DataTypeConfig typeConfig;
-    /**
-     * Whether to allow null values, the default is true
-     */
     private Boolean allowNull = true;
-    /**
-     * The default value of the column
-     */
     private Object defaultValue;
-    /**
-     * Type information
-     */
     private AbstractDataType<?, ? extends Comparable<?>> dataType = null;
 
-    @Override
-    public String columnName() {
-        return columnName;
-    }
-
-    @Override
-    public synchronized AbstractDataType<?, ? extends Comparable<?>> columnType() {
+    public synchronized AbstractDataType<?, ? extends Comparable<?>> getDataType() {
         if (dataType != null) {
             return dataType;
         }
         DataTypeFactory<? extends AbstractDataType<?, ? extends Comparable<?>>, DataTypeConfig, ? extends BaseGenerator<? extends Comparable<?>, ?>> dataTypeFactory =
                 DataTypeFactory.getInstance(typeConfig.getColumnType());
-        typeConfig.setAllowNull(allowNull());
-        typeConfig.setDefaultValue(defaultValue());
+        typeConfig.setAllowNull(getAllowNull());
+        typeConfig.setDefaultValue(getDefaultValue());
         this.dataType = dataTypeFactory.make(typeConfig);
         return this.dataType;
     }
 
-    @Override
-    public Boolean allowNull() {
-        return allowNull;
-    }
-
-    @Override
-    public Object defaultValue() {
-        return defaultValue;
-    }
 }

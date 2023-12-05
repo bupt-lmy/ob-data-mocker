@@ -1,0 +1,114 @@
+list-pk-constraints: |-
+  SELECT
+    o.OWNER,
+    o.CONSTRAINT_NAME,
+    o.TABLE_NAME,
+    o.COLUMN_NAME,
+    o.POSITION
+  FROM
+    (
+      SELECT
+        *
+      FROM
+        ALL_CONSTRAINTS
+      WHERE
+        CONSTRAINT_TYPE='P'
+    ) s
+    INNER JOIN ALL_CONS_COLUMNS o ON
+    s.OWNER=o.OWNER
+    AND s.TABLE_NAME=o.TABLE_NAME
+    AND s.CONSTRAINT_NAME=o.CONSTRAINT_NAME
+  WHERE
+    s.OWNER=?
+    AND s.TABLE_NAME=?
+list-unique-constraints: |-
+  SELECT
+    o.OWNER,
+    o.CONSTRAINT_NAME,
+    o.TABLE_NAME,
+    o.COLUMN_NAME,
+    o.POSITION
+  FROM
+    (
+      SELECT
+        *
+      FROM
+        ALL_CONSTRAINTS
+      WHERE
+        CONSTRAINT_TYPE='U'
+    ) s
+    INNER JOIN ALL_CONS_COLUMNS o ON
+    s.OWNER=o.OWNER
+    AND s.TABLE_NAME=o.TABLE_NAME
+    AND s.CONSTRAINT_NAME=o.CONSTRAINT_NAME
+  WHERE
+    s.OWNER=?
+    AND s.TABLE_NAME=?
+list-constraint-columns: |-
+  SELECT
+    OWNER,
+    TABLE_NAME,
+    COLUMN_NAME,
+    DATA_TYPE,
+    DATA_TYPE_OWNER,
+    DATA_LENGTH,
+    DATA_PRECISION,
+    DATA_SCALE,
+    NULLABLE,
+    COLUMN_ID,
+    DEFAULT_LENGTH,
+    HIDDEN_COLUMN,
+    VIRTUAL_COLUMN
+  FROM
+    ALL_TAB_COLS
+  WHERE
+    OWNER=?
+    AND TABLE_NAME=?
+    AND COLUMN_NAME=?
+list-check-constraints: |-
+  SELECT
+    s.search_condition AS search_condition,
+    o.OWNER,
+    o.CONSTRAINT_NAME,
+    o.TABLE_NAME,
+    o.COLUMN_NAME,
+    o.POSITION
+  FROM
+    (
+      SELECT
+        *
+      FROM
+        ALL_CONSTRAINTS
+      WHERE
+        CONSTRAINT_TYPE='C'
+    ) s
+    INNER JOIN ALL_CONS_COLUMNS o ON
+    s.OWNER=o.OWNER
+    AND s.TABLE_NAME=o.TABLE_NAME
+    AND s.CONSTRAINT_NAME=o.CONSTRAINT_NAME
+  WHERE
+    s.OWNER=?
+    AND s.TABLE_NAME=?
+list-foreign-constraints: |-
+  SELECT
+    o.OWNER,
+    o.CONSTRAINT_NAME,
+    o.TABLE_NAME,
+    o.COLUMN_NAME,
+    o.POSITION
+  FROM
+    (
+      SELECT
+        *
+      FROM
+        ALL_CONSTRAINTS
+      WHERE
+        CONSTRAINT_TYPE='R'
+    ) s
+    INNER JOIN ALL_CONS_COLUMNS o ON
+    s.OWNER=o.OWNER
+    AND s.CONSTRAINT_NAME=o.CONSTRAINT_NAME
+    AND s.TABLE_NAME=o.TABLE_NAME
+  WHERE
+    s.OWNER=?
+    AND s.TABLE_NAME=?

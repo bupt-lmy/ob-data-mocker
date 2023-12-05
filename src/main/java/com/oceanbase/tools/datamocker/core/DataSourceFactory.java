@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.oceanbase.tools.datamocker.core.task;
+package com.oceanbase.tools.datamocker.core;
 
 import java.sql.SQLException;
 import java.util.Map;
@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 
 import javax.sql.DataSource;
 
-import com.oceanbase.tools.datamocker.model.config.model.DataBaseConfig;
+import com.oceanbase.tools.datamocker.model.config.DataBaseConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import lombok.NonNull;
 import lombok.Setter;

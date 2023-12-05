@@ -15,13 +15,12 @@
  */
 package com.oceanbase.tools.datamocker.service;
 
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,15 +30,13 @@ import javax.sql.DataSource;
 import com.oceanbase.tools.datamocker.MockerTestBase;
 import com.oceanbase.tools.datamocker.ObDataMocker;
 import com.oceanbase.tools.datamocker.ObMockerFactory;
-import com.oceanbase.tools.datamocker.core.task.AbstractMockerFactory;
-import com.oceanbase.tools.datamocker.core.task.DataSourceFactory;
-import com.oceanbase.tools.datamocker.model.config.AbstractTaskConfig;
-import com.oceanbase.tools.datamocker.model.config.impl.DefaultColumnConfig;
-import com.oceanbase.tools.datamocker.model.config.impl.DefaultTableConfig;
-import com.oceanbase.tools.datamocker.model.config.impl.DefaultTaskConfig;
-import com.oceanbase.tools.datamocker.model.config.model.DataBaseConfig;
-import com.oceanbase.tools.datamocker.model.config.model.DataTypeConfig;
-import com.oceanbase.tools.datamocker.model.config.model.DigitDataTypeConfig;
+import com.oceanbase.tools.datamocker.core.DataSourceFactory;
+import com.oceanbase.tools.datamocker.model.config.MockTaskConfig;
+import com.oceanbase.tools.datamocker.model.config.MockColumnConfig;
+import com.oceanbase.tools.datamocker.model.config.MockTableConfig;
+import com.oceanbase.tools.datamocker.model.config.DataBaseConfig;
+import com.oceanbase.tools.datamocker.model.config.DataTypeConfig;
+import com.oceanbase.tools.datamocker.model.config.DigitDataTypeConfig;
 import com.oceanbase.tools.datamocker.model.enums.DuplicateStrategy;
 import com.oceanbase.tools.datamocker.model.enums.ObModeType;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
@@ -57,7 +54,7 @@ import org.junit.Test;
  */
 public class DispatcherFactoryTest extends MockerTestBase {
 
-    private final String ddlOracle = "CREATE TABLE \"EMP\" (\n"
+    private static final String ddlOracle = "CREATE TABLE \"EMP\" (\n"
             + "  \"COL\" NUMBER(5,2) NOT NULL,\n"
             + "  \"COL2\" NUMBER(5,2) NOT NULL,\n"
             + "  \"COL3\" NUMBER(4,2) NOT NULL,\n"
@@ -65,7 +62,7 @@ public class DispatcherFactoryTest extends MockerTestBase {
             + "  CONSTRAINT \"EMP_OBUNIQUE_1610357443363981\" UNIQUE (\"COL2\", "
             + "\"COL3\")\n"
             + ") ";
-    private final String ddlWithVirtualColumnOracle = "CREATE TABLE \"EMP1\" (\n"
+    private static final String ddlWithVirtualColumnOracle = "CREATE TABLE \"EMP1\" (\n"
             + "  \"COL\" NUMBER(5,2) NOT NULL,\n"
             + "  \"COL2\" NUMBER(5,2) NOT NULL,\n"
             + "  \"COL3\" NUMBER(4,2) NOT NULL,\n"
@@ -79,135 +76,11 @@ public class DispatcherFactoryTest extends MockerTestBase {
             + "\"SYS\".\"EMP\"(\"COL\")\n"
             + ");";
     private DataSource oracleDatasource = null;
-    private final Long maxBatchsize = 1024L;
-    private final Long maxGenerateCount = 9800L;
-
-    private DataTypeConfig initDigitGen(Map<String, Object> builderParams, String typeName, BigDecimal lowValue,
-            BigDecimal highValue,
-            String genName, Integer precision, Integer scale) {
-        DigitDataTypeConfig digit = new DigitDataTypeConfig();
-        digit.setColumnType(typeName);
-        digit.setLowValue(lowValue);
-        digit.setHighValue(highValue);
-        digit.setGenParams(builderParams);
-        digit.setGenerator(genName);
-        digit.setPrecision(precision);
-        digit.setScale(scale);
-        return digit;
-    }
-
-    private List<DefaultColumnConfig> initColumnConfig(String tableName) {
-        List<DefaultColumnConfig> configList = new ArrayList<>();
-        if ("EMP".equals(tableName)) {
-            Map<String, Object> builderParams = new HashMap<>();
-            builderParams.put("average", 50.21);
-            builderParams.put("variance", 16.43);
-
-            DefaultColumnConfig col1 = new DefaultColumnConfig();
-            col1.setColumnName("COL");
-            col1.setAllowNull(false);
-            col1.setDefaultValue(null);
-            col1.setTypeConfig(initDigitGen(builderParams, "OB_ORACLE_NUMBER", BigDecimal.ZERO,
-                    BigDecimal.TEN.multiply(BigDecimal.TEN).subtract(BigDecimal.ONE),
-                    "NORMAL_GENERATOR", 5, 2));
-            configList.add(col1);
-
-            DefaultColumnConfig col2 = new DefaultColumnConfig();
-            col2.setColumnName("COL2");
-            col2.setAllowNull(false);
-            col2.setDefaultValue(null);
-            col2.setTypeConfig(initDigitGen(builderParams, "OB_ORACLE_NUMBER", BigDecimal.ZERO,
-                    BigDecimal.TEN.multiply(BigDecimal.TEN).subtract(BigDecimal.ONE),
-                    "NORMAL_GENERATOR", 5, 2));
-            configList.add(col2);
-
-            DefaultColumnConfig col3 = new DefaultColumnConfig();
-            col3.setColumnName("COL3");
-            col3.setAllowNull(false);
-            col3.setDefaultValue(null);
-            col3.setTypeConfig(initDigitGen(builderParams, "OB_ORACLE_NUMBER", BigDecimal.ZERO,
-                    BigDecimal.TEN.multiply(BigDecimal.TEN).subtract(BigDecimal.ONE),
-                    "NORMAL_GENERATOR", 4, 2));
-            configList.add(col3);
-        } else if ("EMP1".equals(tableName)) {
-            Map<String, Object> builderParams = new HashMap<>();
-            builderParams.put("average", 50.21);
-            builderParams.put("variance", 16.43);
-
-            DefaultColumnConfig col1 = new DefaultColumnConfig();
-            col1.setColumnName("COL");
-            col1.setAllowNull(false);
-            col1.setDefaultValue(null);
-            col1.setTypeConfig(initDigitGen(builderParams, "OB_ORACLE_NUMBER", BigDecimal.ZERO,
-                    BigDecimal.TEN.multiply(BigDecimal.TEN).subtract(BigDecimal.ONE),
-                    "NORMAL_GENERATOR", 5, 2));
-            configList.add(col1);
-
-            DefaultColumnConfig col2 = new DefaultColumnConfig();
-            col2.setColumnName("COL2");
-            col2.setAllowNull(false);
-            col2.setDefaultValue(null);
-            col2.setTypeConfig(initDigitGen(builderParams, "OB_ORACLE_NUMBER", BigDecimal.ZERO,
-                    BigDecimal.TEN.multiply(BigDecimal.TEN).subtract(BigDecimal.ONE),
-                    "NORMAL_GENERATOR", 5, 2));
-            configList.add(col2);
-
-            DefaultColumnConfig col3 = new DefaultColumnConfig();
-            col3.setColumnName("COL3");
-            col3.setAllowNull(false);
-            col3.setDefaultValue(null);
-            col3.setTypeConfig(initDigitGen(builderParams, "OB_ORACLE_NUMBER", BigDecimal.ZERO,
-                    BigDecimal.TEN.multiply(BigDecimal.TEN).subtract(BigDecimal.ONE),
-                    "NORMAL_GENERATOR", 4, 2));
-            configList.add(col3);
-
-            DefaultColumnConfig col4 = new DefaultColumnConfig();
-            col4.setColumnName("COL4");
-            col4.setAllowNull(false);
-            col4.setDefaultValue(null);
-            col4.setTypeConfig(initDigitGen(builderParams, "OB_ORACLE_NUMBER", BigDecimal.ZERO,
-                    BigDecimal.TEN.multiply(BigDecimal.TEN).subtract(BigDecimal.ONE),
-                    "NORMAL_GENERATOR", 5, 3));
-            configList.add(col4);
-        }
-        return configList;
-    }
-
-    private DefaultTableConfig initTableConfig(String tableName, String schemaName) {
-        DefaultTableConfig tableConfig = new DefaultTableConfig();
-        tableConfig.setColumns(initColumnConfig(tableName));
-        tableConfig.setTotalCount(maxGenerateCount);
-        tableConfig.setStrategy(DuplicateStrategy.IGNORE);
-        tableConfig.setBatchSize(maxBatchsize);
-        tableConfig.setWhetherTruncate(true);
-        tableConfig.setTableName(tableName);
-        tableConfig.setSchemaName(schemaName);
-        tableConfig.setLocation("test/mock/test.txt");
-        tableConfig.setTimeout(180000L);
-        return tableConfig;
-    }
-
-    private DataBaseConfig getDBConfig(ObModeType dialectType) {
-        return dialectType == ObModeType.OB_MYSQL ? getMySqlConfig() : getOracleConfig();
-    }
-
-    private AbstractTaskConfig getTask(String tableName) {
-        DataBaseConfig config = getDBConfig(ObModeType.OB_ORACLE);
-        DefaultTaskConfig taskConfig = new DefaultTaskConfig();
-        DefaultTableConfig tableConfig = initTableConfig(tableName, config.getDefaultSchame());
-        taskConfig.setTables(Arrays.asList(tableConfig));
-        taskConfig.setDbConfig(config);
-        taskConfig.setDialectType(ObModeType.OB_ORACLE);
-        taskConfig.setConnectionIncreasementStep(2);
-        taskConfig.setMaxConnectionSize(15);
-        taskConfig.setMinConnectionSize(5);
-        return taskConfig;
-    }
 
     @Before
-    public void initEnv() throws IOException, SQLException {
+    public void initEnv() throws SQLException {
         if (oracleDatasource == null) {
-            DataBaseConfig config = getDBConfig(ObModeType.OB_ORACLE);
+            DataBaseConfig config = getOracleConfig();
             oracleDatasource = new DataSourceFactory(config).generate();
         }
         try (Connection connection = oracleDatasource.getConnection()) {
@@ -221,21 +94,16 @@ public class DispatcherFactoryTest extends MockerTestBase {
     }
 
     @Test
-    public void testDispatcher() throws Throwable {
-        AbstractTaskConfig config = getTask("EMP");
-        AbstractMockerFactory factory = new ObMockerFactory(config);
-        ObDataMocker mocker = factory.create();
+    public void create_normalInput_createSucceed() {
+        ObDataMocker mocker = new ObMockerFactory(getTask("EMP")).create();
         Assert.assertEquals(1, mocker.size());
     }
 
     @Test
-    public void testDispatcherWithVirtualColumn() throws Throwable {
-        AbstractTaskConfig config = getTask("EMP1");
-        AbstractMockerFactory factory = new ObMockerFactory(config);
-        thrown.expectMessage("Virtual column \"EMP1.COL4\" for constraint is not support yet");
+    public void create_tableWithFk_expThrown() {
+        thrown.expectMessage("Foreign constraint is not support yet");
         thrown.expect(MockerException.class);
-        ObDataMocker mocker = factory.create();
-        Assert.assertEquals(1, mocker.size());
+        new ObMockerFactory(getTask("EMP1")).create();
     }
 
     @After
@@ -250,4 +118,122 @@ public class DispatcherFactoryTest extends MockerTestBase {
             ((AutoCloseable) oracleDatasource).close();
         }
     }
+
+    private DataTypeConfig initDigitGen(Map<String, Object> builderParams,
+            BigDecimal highValue, Integer precision, Integer scale) {
+        DigitDataTypeConfig digit = new DigitDataTypeConfig();
+        digit.setColumnType("OB_ORACLE_NUMBER");
+        digit.setLowValue(BigDecimal.ZERO);
+        digit.setHighValue(highValue);
+        digit.setGenParams(builderParams);
+        digit.setGenerator("NORMAL_GENERATOR");
+        digit.setPrecision(precision);
+        digit.setScale(scale);
+        return digit;
+    }
+
+    private List<MockColumnConfig> initColumnConfig(String tableName) {
+        List<MockColumnConfig> configList = new ArrayList<>();
+        if ("EMP".equals(tableName)) {
+            Map<String, Object> builderParams = new HashMap<>();
+            builderParams.put("average", 50.21);
+            builderParams.put("variance", 16.43);
+
+            MockColumnConfig col1 = new MockColumnConfig();
+            col1.setColumnName("COL");
+            col1.setAllowNull(false);
+            col1.setDefaultValue(null);
+            col1.setTypeConfig(initDigitGen(builderParams,
+                    BigDecimal.TEN.multiply(BigDecimal.TEN).subtract(BigDecimal.ONE),
+                    5, 2));
+            configList.add(col1);
+
+            MockColumnConfig col2 = new MockColumnConfig();
+            col2.setColumnName("COL2");
+            col2.setAllowNull(false);
+            col2.setDefaultValue(null);
+            col2.setTypeConfig(initDigitGen(builderParams,
+                    BigDecimal.TEN.multiply(BigDecimal.TEN).subtract(BigDecimal.ONE),
+                    5, 2));
+            configList.add(col2);
+
+            MockColumnConfig col3 = new MockColumnConfig();
+            col3.setColumnName("COL3");
+            col3.setAllowNull(false);
+            col3.setDefaultValue(null);
+            col3.setTypeConfig(initDigitGen(builderParams,
+                    BigDecimal.TEN.multiply(BigDecimal.TEN).subtract(BigDecimal.ONE),
+                    4, 2));
+            configList.add(col3);
+        } else if ("EMP1".equals(tableName)) {
+            Map<String, Object> builderParams = new HashMap<>();
+            builderParams.put("average", 50.21);
+            builderParams.put("variance", 16.43);
+
+            MockColumnConfig col1 = new MockColumnConfig();
+            col1.setColumnName("COL");
+            col1.setAllowNull(false);
+            col1.setDefaultValue(null);
+            col1.setTypeConfig(initDigitGen(builderParams,
+                    BigDecimal.TEN.multiply(BigDecimal.TEN).subtract(BigDecimal.ONE),
+                    5, 2));
+            configList.add(col1);
+
+            MockColumnConfig col2 = new MockColumnConfig();
+            col2.setColumnName("COL2");
+            col2.setAllowNull(false);
+            col2.setDefaultValue(null);
+            col2.setTypeConfig(initDigitGen(builderParams,
+                    BigDecimal.TEN.multiply(BigDecimal.TEN).subtract(BigDecimal.ONE),
+                    5, 2));
+            configList.add(col2);
+
+            MockColumnConfig col3 = new MockColumnConfig();
+            col3.setColumnName("COL3");
+            col3.setAllowNull(false);
+            col3.setDefaultValue(null);
+            col3.setTypeConfig(initDigitGen(builderParams,
+                    BigDecimal.TEN.multiply(BigDecimal.TEN).subtract(BigDecimal.ONE),
+                    4, 2));
+            configList.add(col3);
+
+            MockColumnConfig col4 = new MockColumnConfig();
+            col4.setColumnName("COL4");
+            col4.setAllowNull(false);
+            col4.setDefaultValue(null);
+            col4.setTypeConfig(initDigitGen(builderParams,
+                    BigDecimal.TEN.multiply(BigDecimal.TEN).subtract(BigDecimal.ONE),
+                    5, 3));
+            configList.add(col4);
+        }
+        return configList;
+    }
+
+    private MockTableConfig initTableConfig(String tableName, String schemaName) {
+        MockTableConfig tableConfig = new MockTableConfig();
+        tableConfig.setColumns(initColumnConfig(tableName));
+        Long maxGenerateCount = 9800L;
+        tableConfig.setTotalCount(maxGenerateCount);
+        tableConfig.setStrategy(DuplicateStrategy.IGNORE);
+        Long maxBatchsize = 1024L;
+        tableConfig.setBatchSize(maxBatchsize);
+        tableConfig.setWhetherTruncate(true);
+        tableConfig.setTableName(tableName);
+        tableConfig.setSchemaName(schemaName);
+        tableConfig.setLocation("test/mock/test.txt");
+        tableConfig.setTimeoutMillis(180000L);
+        return tableConfig;
+    }
+
+    private MockTaskConfig getTask(String tableName) {
+        DataBaseConfig config = getOracleConfig();
+        MockTaskConfig taskConfig = new MockTaskConfig();
+        MockTableConfig tableConfig = initTableConfig(tableName, config.getDefaultSchame());
+        taskConfig.setTables(Collections.singletonList(tableConfig));
+        taskConfig.setDbConfig(config);
+        taskConfig.setDialectType(ObModeType.OB_ORACLE);
+        taskConfig.setMaxConnectionSize(15);
+        return taskConfig;
+    }
+
 }

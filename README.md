@@ -196,14 +196,13 @@ CREATE TABLE "EMP" (
 ```java
 import com.oceanbase.tools.datamocker.ObDataMocker;
 import com.oceanbase.tools.datamocker.ObMockerFactory;
-import com.oceanbase.tools.datamocker.core.task.AbstractMockerFactory;
 import com.oceanbase.tools.datamocker.schedule.MockContext;
 public class App {
     public static void main(String[] args) {
         // 从json文件中反序列化出一个配置对象
         DefaultTaskConfig taskConfig = readFromJson();
         // 启动mock数据任务
-        AbstractMockerFactory factory = new ObMockerFactory(taskConfig);
+        ObMockerFactory factory = new ObMockerFactory(taskConfig);
         ObDataMocker mocker = factory.create();
         // context中封装了模拟数据任务的上下文信息，也封装了模拟数据任务的句柄信息，可以对任务的中断等操作
         MockContext context = mocker.start();

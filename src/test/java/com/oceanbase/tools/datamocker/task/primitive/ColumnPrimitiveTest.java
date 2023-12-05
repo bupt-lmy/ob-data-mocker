@@ -19,12 +19,9 @@ import java.math.BigDecimal;
 
 import com.oceanbase.tools.datamocker.MockerTestBase;
 import com.oceanbase.tools.datamocker.core.read.ColumnReader;
-import com.oceanbase.tools.datamocker.datatype.AbstractDataType;
 import com.oceanbase.tools.datamocker.datatype.oracle.OracleNumberType;
 import com.oceanbase.tools.datamocker.generator.digit.NormalGenerator;
-import com.oceanbase.tools.datamocker.model.exception.MockerException;
 import com.oceanbase.tools.datamocker.model.mock.MockColumnData;
-import com.oceanbase.tools.datamocker.util.Pair;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -59,13 +56,6 @@ public class ColumnPrimitiveTest extends MockerTestBase {
         Assert.assertEquals(Long.valueOf(0), count);
         BigDecimal avg = result.divide(BigDecimal.valueOf(Double.parseDouble(tmp.toString())), BigDecimal.ROUND_DOWN);
         Assert.assertTrue(avg.subtract(expectAvg).abs().doubleValue() < 0.5);
-    }
-
-    @Test
-    public void testColumnPrimitiveWithoutType() {
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("DataType can not be null for ColumnReader");
-        ColumnReader primitive = new ColumnReader(null, null, null);
     }
 
 }

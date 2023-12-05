@@ -15,14 +15,13 @@
  */
 package com.oceanbase.tools.datamocker.model.mock;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
+import lombok.NonNull;
 import org.apache.commons.lang.Validate;
 
 /**
@@ -46,8 +45,7 @@ public class MockRowData {
      * @param columnList list of column list
      * @exception IllegalArgumentException columnList can not be null
      */
-    public MockRowData(List<MockColumnData<?>> columnList) {
-        Validate.notNull(columnList, "ColumnList can not be null for MockRowData");
+    public MockRowData(@NonNull List<MockColumnData<?>> columnList) {
         this.rowWithMultiColumn = new HashMap<>(columnList.size());
         for (MockColumnData<?> columnItem : columnList) {
             rowWithMultiColumn.put(columnItem.getColumnName(), columnItem);
@@ -78,8 +76,7 @@ public class MockRowData {
      * @return Return column data
      * @exception IllegalArgumentException columnName can not be blank
      */
-    public MockColumnData<?> getMockColumn(String columnName) {
-        Validate.notEmpty(columnName, "ColumnName can not be blank for MockRowData#getMockColumn");
+    public MockColumnData<?> getMockColumn(@NonNull String columnName) {
         return this.rowWithMultiColumn.get(columnName);
     }
 
@@ -88,8 +85,7 @@ public class MockRowData {
      *
      * @return removed mock column
      */
-    public MockColumnData<?> remove(MockColumnData<?> mockColumn) {
-        Validate.notNull(mockColumn, "MockColumn can not be null for MockRowData#remove");
+    public MockColumnData<?> remove(@NonNull MockColumnData<?> mockColumn) {
         return this.rowWithMultiColumn.remove(mockColumn.getColumnName());
     }
 
@@ -98,8 +94,7 @@ public class MockRowData {
      *
      * @return removed mock column
      */
-    public MockColumnData<?> remove(String columnName) {
-        Validate.notNull(columnName, "ColumnName can not be null for MockRowData#remove");
+    public MockColumnData<?> remove(@NonNull String columnName) {
         return this.rowWithMultiColumn.remove(columnName);
     }
 
@@ -108,10 +103,8 @@ public class MockRowData {
      *
      * @param mockColumn Corresponding data
      */
-    public MockColumnData<?> addMockColumn(MockColumnData<?> mockColumn) {
-        Validate.notNull(mockColumn, "MockColumn can not be null for MockRowData#putIfAbsent");
-        String columnName = mockColumn.getColumnName();
-        return this.rowWithMultiColumn.putIfAbsent(columnName, mockColumn);
+    public MockColumnData<?> addMockColumn(@NonNull MockColumnData<?> mockColumn) {
+        return this.rowWithMultiColumn.putIfAbsent(mockColumn.getColumnName(), mockColumn);
     }
 
     /**
@@ -140,8 +133,7 @@ public class MockRowData {
      * @return list of mock columns
      */
     public List<MockColumnData<?>> getMockColumns() {
-        return this.rowWithMultiColumn.entrySet().stream()
-                .map((Function<Entry<String, MockColumnData<?>>, MockColumnData<?>>) Entry::getValue).collect(
-                        Collectors.toList());
+        return new ArrayList<>(this.rowWithMultiColumn.values());
     }
+
 }

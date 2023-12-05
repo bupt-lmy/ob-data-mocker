@@ -25,7 +25,6 @@ import java.util.concurrent.Future;
 
 import javax.sql.DataSource;
 
-import com.oceanbase.tools.datamocker.constraint.AbstractConstraint;
 import com.oceanbase.tools.datamocker.core.write.output.MockerFile;
 import com.oceanbase.tools.datamocker.datatype.AbstractDataType;
 import com.oceanbase.tools.datamocker.model.enums.MockTaskStatus;
@@ -137,11 +136,6 @@ public class TableTaskContext {
     private final int topIndex;
     @Getter
     private volatile boolean shutdown;
-    /**
-     * Constraint collection, used to carry a collection of constraint objects
-     */
-    @Getter
-    private final List<AbstractConstraint> constraints = new LinkedList<>();
 
     public TableTaskContext(TableTaskInfo taskInfo, String taskName, int index) {
         Validate.notNull(taskInfo, "TaskInfo can not be null for TableTaskContext");

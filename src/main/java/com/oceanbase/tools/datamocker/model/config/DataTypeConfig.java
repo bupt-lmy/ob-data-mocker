@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.oceanbase.tools.datamocker.model.config.model;
+package com.oceanbase.tools.datamocker.model.config;
 
 import java.util.Map;
 

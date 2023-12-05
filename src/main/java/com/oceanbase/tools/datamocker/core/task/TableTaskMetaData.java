@@ -18,10 +18,10 @@ package com.oceanbase.tools.datamocker.core.task;
 import java.util.Map;
 
 import com.oceanbase.tools.datamocker.datatype.AbstractDataType;
-import com.oceanbase.tools.datamocker.model.config.AbstractTableConfig;
+import com.oceanbase.tools.datamocker.model.config.MockTableConfig;
 import com.oceanbase.tools.datamocker.model.enums.ObModeType;
 import lombok.Getter;
-import org.apache.commons.lang.Validate;
+import lombok.NonNull;
 
 /**
  * Table generation task metadata information
@@ -32,6 +32,7 @@ import org.apache.commons.lang.Validate;
  */
 @Getter
 public class TableTaskMetaData {
+
     private final String tableTaskId;
     /**
      * The maximum number of table generation tasks, when a table is generated, totalCount represents
@@ -52,21 +53,20 @@ public class TableTaskMetaData {
     private final ObModeType dialectType;
     private final String taskId;
 
-    public TableTaskMetaData(Map<String, AbstractDataType<?, ? extends Comparable<?>>> tableSchema,
-            AbstractTableConfig tableConfig, ObModeType obModeType, String taskId, int columnIndex, int rowIndex) {
-        Validate.notNull(tableSchema, "TableSchema can not be null for TableTaskMetaData");
-        Validate.notNull(tableConfig, "TableConfig can not be null for TableTaskMetaData");
-        Validate.notNull(obModeType, "ObModeType can not be null for TableTaskMetaData");
-        Validate.notNull(taskId, "TaskId can not be null for TableTaskMetaData");
+    public TableTaskMetaData(@NonNull Map<String, AbstractDataType<?, ? extends Comparable<?>>> tableSchema,
+            @NonNull MockTableConfig tableConfig,
+            @NonNull ObModeType obModeType,
+            @NonNull String taskId, int columnIndex, int rowIndex) {
         this.tableSchema = tableSchema;
-        this.tableName = tableConfig.tableName();
-        this.schema = tableConfig.schemaName();
-        this.shouldTruncate = tableConfig.truncated();
-        this.timeoutMilliseconds = tableConfig.timeoutMilliseconds();
-        this.batchSize = tableConfig.maxBatchSize();
-        this.totalCount = tableConfig.maxCount();
+        this.tableName = tableConfig.getTableName();
+        this.schema = tableConfig.getSchemaName();
+        this.shouldTruncate = tableConfig.getWhetherTruncate();
+        this.timeoutMilliseconds = tableConfig.getTimeoutMillis();
+        this.batchSize = tableConfig.getMaxBatchSize();
+        this.totalCount = tableConfig.getTotalCount();
         this.tableTaskId = taskId + "-[" + columnIndex + "," + rowIndex + "]";
         this.dialectType = obModeType;
         this.taskId = taskId;
     }
+
 }

@@ -21,7 +21,7 @@ import java.net.URL;
 import java.nio.file.Paths;
 import java.util.Properties;
 
-import com.oceanbase.tools.datamocker.model.config.model.DataBaseConfig;
+import com.oceanbase.tools.datamocker.model.config.DataBaseConfig;
 import org.apache.commons.lang.StringUtils;
 import org.junit.Rule;
 import org.junit.rules.ExpectedException;

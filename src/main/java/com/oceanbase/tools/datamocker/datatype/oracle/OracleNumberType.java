@@ -20,7 +20,7 @@ import java.math.BigDecimal;
 import com.oceanbase.tools.datamocker.datatype.AbstractDigitDataType;
 import com.oceanbase.tools.datamocker.datatype.DataTypeFactory;
 import com.oceanbase.tools.datamocker.generator.BaseDigitalGenerator;
-import com.oceanbase.tools.datamocker.model.config.model.DigitDataTypeConfig;
+import com.oceanbase.tools.datamocker.model.config.DigitDataTypeConfig;
 import com.oceanbase.tools.datamocker.model.enums.ObModeType;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
 

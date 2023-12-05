@@ -21,13 +21,13 @@ import java.util.Set;
 
 import javax.sql.DataSource;
 
-import com.oceanbase.tools.datamocker.constraint.AbstractConstraint;
+import com.oceanbase.tools.datamocker.constraint.Constraint;
 import com.oceanbase.tools.datamocker.core.read.ColumnReader;
 import com.oceanbase.tools.datamocker.core.write.AbstractMockWriter;
 import com.oceanbase.tools.datamocker.core.write.output.MockerFile;
 import com.oceanbase.tools.datamocker.util.MockerBuffer;
 import lombok.Getter;
-import org.apache.commons.lang.Validate;
+import lombok.NonNull;
 
 /**
  * Table generation task object, used to encapsulate all objects related to a table generation task
@@ -48,7 +48,7 @@ public class TableTaskInfo {
     private final MockerBuffer buffer;
     private final List<ColumnReader<?>> columnReaders;
     private final List<AbstractMockWriter> dataWriters;
-    private final List<AbstractConstraint> constraints;
+    private final List<Constraint> constraints;
     private final DataSource dataSource;
     private final List<MockerFile> fileManagers;
 
@@ -63,16 +63,13 @@ public class TableTaskInfo {
      * @param fileManagers list file manager
      * @param metaData meta data for table task
      */
-    public TableTaskInfo(List<ColumnReader<?>> columnReaders, List<AbstractMockWriter> dataWriters,
-            List<AbstractConstraint> constraints, MockerBuffer buffer, DataSource dataSource,
-            List<MockerFile> fileManagers, TableTaskMetaData metaData) {
-        Validate.notNull(columnReaders, "ColumnReaders can not be null for TableTaskInfo");
-        Validate.notNull(dataWriters, "DataWriters can not be null for TableTaskInfo");
-        Validate.notNull(constraints, "Constraints can not be null for TableTaskInfo");
-        Validate.notNull(metaData, "TaskMetaData can not be null for TableTaskInfo");
-        Validate.notNull(buffer, "MockBuffer can not be null for TableTaskInfo");
-        Validate.notNull(dataSource, "DataSource can not be null for TableTaskInfo");
-        Validate.notNull(fileManagers, "FileManagers can not be null for TableTaskInfo");
+    public TableTaskInfo(@NonNull List<ColumnReader<?>> columnReaders,
+            @NonNull List<AbstractMockWriter> dataWriters,
+            @NonNull List<Constraint> constraints,
+            @NonNull MockerBuffer buffer,
+            @NonNull DataSource dataSource,
+            @NonNull List<MockerFile> fileManagers,
+            @NonNull TableTaskMetaData metaData) {
         this.columnReaders = columnReaders;
         this.dataWriters = dataWriters;
         this.constraints = constraints;

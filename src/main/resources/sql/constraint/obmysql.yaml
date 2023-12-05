@@ -1,0 +1,41 @@
+list-pk-constraints: |-
+  select
+    CONSTRAINT_SCHEMA as OWNER,
+    CONSTRAINT_NAME,
+    TABLE_NAME,
+    COLUMN_NAME,
+    ORDINAL_POSITION as POSITION
+  from
+    information_schema.key_column_usage
+  where
+    CONSTRAINT_SCHEMA=?
+    and TABLE_NAME=?
+    and CONSTRAINT_NAME='PRIMARY'
+list-unique-constraints: |-
+  select
+    CONSTRAINT_SCHEMA as OWNER,
+    CONSTRAINT_NAME,
+    TABLE_NAME,
+    COLUMN_NAME,
+    ORDINAL_POSITION as POSITION
+  from
+    information_schema.key_column_usage
+  where
+    CONSTRAINT_SCHEMA=?
+    and TABLE_NAME=?
+    and CONSTRAINT_NAME<>'PRIMARY'
+list-constraint-columns: |-
+  select
+    TABLE_SCHEMA as OWNER,
+    TABLE_NAME,
+    COLUMN_NAME,
+    DATA_TYPE,
+    NUMERIC_PRECISION as DATA_PRECISION,
+    NUMERIC_SCALE as DATA_SCALE,
+    GENERATION_EXPRESSION
+  from
+    information_schema.columns
+  where
+    TABLE_SCHEMA=?
+    and COLUMN_NAME=?
+    and TABLE_NAME=?

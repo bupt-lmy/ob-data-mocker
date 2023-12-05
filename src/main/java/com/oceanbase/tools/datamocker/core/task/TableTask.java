@@ -144,9 +144,6 @@ public class TableTask {
                         "The Mock data preparation task has been completed, and the business task has begun to run, taskStatus={}",
                         MockTaskStatus.RUNNING);
                 for (AbstractMockTask task : thisTaskBean.businessTasks) {
-                    if (task instanceof GenerateDataTask) {
-                        ((GenerateDataTask) task).reloadConstraints(param.getConstraints());
-                    }
                     if (!service.isShutdown() && !context.isShutdown()) {
                         service.submitCallable(task, param);
                     } else {

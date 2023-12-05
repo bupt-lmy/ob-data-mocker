@@ -28,9 +28,9 @@ import com.oceanbase.tools.datamocker.datatype.oracle.OracleNumberType;
 import com.oceanbase.tools.datamocker.generator.GeneratorFactory;
 import com.oceanbase.tools.datamocker.generator.chartype.RandomGenerator;
 import com.oceanbase.tools.datamocker.generator.digit.UniformGenerator;
-import com.oceanbase.tools.datamocker.model.config.impl.DefaultColumnConfig;
-import com.oceanbase.tools.datamocker.model.config.model.CharDataTypeConfig;
-import com.oceanbase.tools.datamocker.model.config.model.DigitDataTypeConfig;
+import com.oceanbase.tools.datamocker.model.config.MockColumnConfig;
+import com.oceanbase.tools.datamocker.model.config.CharDataTypeConfig;
+import com.oceanbase.tools.datamocker.model.config.DigitDataTypeConfig;
 import com.oceanbase.tools.datamocker.model.enums.CharsetType;
 import org.junit.After;
 import org.junit.Assert;
@@ -44,7 +44,7 @@ import org.junit.Test;
  * @date 2020-12-25 17:36
  * @since OBMOCKER-snapshot-0.1.0
  */
-public class ColumnConfigTest extends MockerTestBase {
+public class MockColumnConfigTest extends MockerTestBase {
     private final Integer precision = 5;
     private final Integer scale = 2;
     private final String columnName = "SALARY";
@@ -52,7 +52,7 @@ public class ColumnConfigTest extends MockerTestBase {
     private final BigDecimal lowValue = BigDecimal.ZERO;
     private final BigDecimal highValue = BigDecimal.TEN.multiply(BigDecimal.TEN);
     private final Map<String, Object> builderParams = new HashMap<>();
-    private DefaultColumnConfig config = null;
+    private MockColumnConfig config = null;
     private final int length = 128;
 
     private DigitDataTypeConfig initDigitConfig() {
@@ -84,7 +84,7 @@ public class ColumnConfigTest extends MockerTestBase {
     public void initColumnConfig() {
         builderParams.put("average", 50.21);
         builderParams.put("variance", 16.43);
-        config = new DefaultColumnConfig();
+        config = new MockColumnConfig();
         config.setDefaultValue(defaultValue);
         Boolean allowNull = false;
         config.setAllowNull(allowNull);
@@ -95,12 +95,12 @@ public class ColumnConfigTest extends MockerTestBase {
     public void testDigitColumnConfig() {
         DigitDataTypeConfig typeConfig = initDigitConfig();
         config.setTypeConfig(typeConfig);
-        Assert.assertEquals(columnName, config.columnName());
-        Assert.assertFalse(config.allowNull());
-        Assert.assertEquals(defaultValue, config.defaultValue());
+        Assert.assertEquals(columnName, config.getColumnName());
+        Assert.assertFalse(config.getAllowNull());
+        Assert.assertEquals(defaultValue, config.getDefaultValue());
         OracleNumberType expect = new OracleNumberType(precision, scale, null, false);
         expect.bind((UniformGenerator) GeneratorFactory.getInstance("UNIFORM_GENERATOR").make(null));
-        AbstractDataType<?, ? extends Comparable<?>> real = config.columnType();
+        AbstractDataType<?, ? extends Comparable<?>> real = config.getDataType();
         Assert.assertEquals(expect, real);
         BigDecimal result = new BigDecimal("0");
         int totalCount = 1000;
@@ -116,12 +116,12 @@ public class ColumnConfigTest extends MockerTestBase {
     public void testCharColumnConfig() {
         CharDataTypeConfig typeConfig = initCharConfig();
         config.setTypeConfig(typeConfig);
-        Assert.assertEquals(columnName, config.columnName());
-        Assert.assertFalse(config.allowNull());
-        Assert.assertEquals(defaultValue, config.defaultValue());
+        Assert.assertEquals(columnName, config.getColumnName());
+        Assert.assertFalse(config.getAllowNull());
+        Assert.assertEquals(defaultValue, config.getDefaultValue());
         OracleCharType expect = new OracleCharType(length, null, false, CharsetType.UTF_8, false);
         expect.bind((RandomGenerator) GeneratorFactory.getInstance("RANDOM_GENERATOR").make(builderParams));
-        AbstractDataType<?, ? extends Comparable<?>> real = config.columnType();
+        AbstractDataType<?, ? extends Comparable<?>> real = config.getDataType();
         Assert.assertEquals(expect, real);
         Map<Integer, Integer> result = new HashMap<>();
         int totalCount = 10000;

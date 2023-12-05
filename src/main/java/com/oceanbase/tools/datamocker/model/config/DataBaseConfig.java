@@ -13,28 +13,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.oceanbase.tools.datamocker.model.config.model;
+package com.oceanbase.tools.datamocker.model.config;
+
+import java.util.Map;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 /**
- * Character data type configuration object
+ * Database connection information configuration package object
  *
  * @author yh263208
- * @date 2020-12-24 20:59
+ * @date 2020-12-24 15:30
  * @since OBMOCKER-snapshot-0.1.0
  */
 @Getter
 @Setter
-public class CharDataTypeConfig extends DataTypeConfig {
-    private String charset;
+@ToString(exclude = {"password"})
+public class DataBaseConfig {
+    private String host;
+    private Integer port;
+    private String user;
+    private String tenant;
+    private String cluster;
+    private String password;
+    private String defaultSchame;
     /**
-     * Data length, column length calculated according to Byte
+     * Database connection parameters
      */
-    private Integer width;
-    /**
-     * Whether to use characters to count column width
-     */
-    private boolean isUnicode = false;
+    private Map<String, String> connectParam;
 }

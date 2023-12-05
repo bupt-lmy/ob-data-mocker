@@ -22,12 +22,11 @@ import java.util.List;
 import java.util.Map;
 
 import com.oceanbase.tools.datamocker.MockerTestBase;
-import com.oceanbase.tools.datamocker.model.config.impl.DefaultColumnConfig;
-import com.oceanbase.tools.datamocker.model.config.impl.DefaultTableConfig;
-import com.oceanbase.tools.datamocker.model.config.model.DataTypeConfig;
-import com.oceanbase.tools.datamocker.model.config.model.DigitDataTypeConfig;
+import com.oceanbase.tools.datamocker.model.config.DataTypeConfig;
+import com.oceanbase.tools.datamocker.model.config.DigitDataTypeConfig;
+import com.oceanbase.tools.datamocker.model.config.MockColumnConfig;
+import com.oceanbase.tools.datamocker.model.config.MockTableConfig;
 import com.oceanbase.tools.datamocker.model.enums.DuplicateStrategy;
-import com.oceanbase.tools.datamocker.model.exception.MockerException;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -40,7 +39,7 @@ import org.junit.Test;
  * @date 2020-12-27 20:28
  * @since OBMOCKER-snapshot-0.1.0
  */
-public class TableConfigTest extends MockerTestBase {
+public class MockTableConfigTest extends MockerTestBase {
     private final Object defaultValue = "DEFAULT_VALUE";
     private final BigDecimal lowValue = BigDecimal.ZERO;
     private final BigDecimal highValue = BigDecimal.TEN.multiply(BigDecimal.TEN);
@@ -53,7 +52,7 @@ public class TableConfigTest extends MockerTestBase {
     private final Long totalCount = 1000000L;
     private final String tableName = "test_table";
     private final String schemaName = "schema_name";
-    private DefaultTableConfig tableConfig = null;
+    private MockTableConfig tableConfig = null;
 
     private DataTypeConfig initDigitGen() {
         DigitDataTypeConfig digit = new DigitDataTypeConfig();
@@ -80,13 +79,13 @@ public class TableConfigTest extends MockerTestBase {
      * @param size Column task size
      * @return Return to the list of tasks
      */
-    private List<DefaultColumnConfig> initColumnConfig(int size) {
+    private List<MockColumnConfig> initColumnConfig(int size) {
         builderParams.put("average", 50.21);
         builderParams.put("variance", 16.43);
-        List<DefaultColumnConfig> configList = new ArrayList<>();
+        List<MockColumnConfig> configList = new ArrayList<>();
         DataTypeConfig typeConfig = initDigitGen();
         for (int i = 0; i < size; i++) {
-            DefaultColumnConfig config = new DefaultColumnConfig();
+            MockColumnConfig config = new MockColumnConfig();
             String columnName = "SALARY";
             config.setColumnName(columnName);
             Boolean allowNull = false;
@@ -101,7 +100,7 @@ public class TableConfigTest extends MockerTestBase {
 
     @Before
     public void initTableConfig() {
-        tableConfig = new DefaultTableConfig();
+        tableConfig = new MockTableConfig();
         tableConfig.setColumns(initColumnConfig(configListSize));
         tableConfig.setTotalCount(totalCount);
         tableConfig.setStrategy(DuplicateStrategy.IGNORE);
@@ -113,51 +112,51 @@ public class TableConfigTest extends MockerTestBase {
 
     @Test
     public void testTableConfig() {
-        Assert.assertEquals(batchSize, tableConfig.maxBatchSize());
+        Assert.assertEquals(batchSize, tableConfig.getMaxBatchSize());
         Assert.assertEquals(totalCount, tableConfig.getTotalCount());
-        Assert.assertEquals(tableName, tableConfig.tableName());
-        Assert.assertEquals(schemaName, tableConfig.schemaName());
-        Assert.assertNotNull(tableConfig.columns());
-        Assert.assertEquals(configListSize, tableConfig.columns().size());
-        Assert.assertEquals(DuplicateStrategy.IGNORE, tableConfig.duplicateStrategy());
-        Assert.assertTrue(tableConfig.truncated());
+        Assert.assertEquals(tableName, tableConfig.getTableName());
+        Assert.assertEquals(schemaName, tableConfig.getSchemaName());
+        Assert.assertNotNull(tableConfig.getColumns());
+        Assert.assertEquals(configListSize, tableConfig.getColumns().size());
+        Assert.assertEquals(DuplicateStrategy.IGNORE, tableConfig.getStrategy());
+        Assert.assertTrue(tableConfig.getWhetherTruncate());
 
     }
 
-    @Test(expected = MockerException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void testTableConfigWithIllegalBatchSize() {
         tableConfig.setBatchSize(-100L);
-        Assert.assertEquals(batchSize, tableConfig.maxBatchSize());
+        Assert.assertEquals(batchSize, tableConfig.getMaxBatchSize());
     }
 
-    @Test(expected = MockerException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void testTableConfigWithIllegalBatchSize1() {
         tableConfig.setBatchSize(100001L);
-        Assert.assertEquals(batchSize, tableConfig.maxBatchSize());
+        Assert.assertEquals(batchSize, tableConfig.getMaxBatchSize());
     }
 
-    @Test(expected = MockerException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void testTableConfigWithIllegalMaxSize() {
         tableConfig.setTotalCount(-100L);
-        Assert.assertEquals(totalCount, tableConfig.maxCount());
+        Assert.assertEquals(totalCount, tableConfig.getTotalCount());
     }
 
-    @Test(expected = MockerException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void testTableConfigWithIllegalMaxSize1() {
         tableConfig.setTotalCount(1000001L);
-        Assert.assertEquals(totalCount, tableConfig.maxCount());
+        Assert.assertEquals(totalCount, tableConfig.getTotalCount());
     }
 
-    @Test(expected = MockerException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void testTableConfigWithNullBatchSize() {
         tableConfig.setBatchSize(null);
-        Assert.assertEquals(batchSize, tableConfig.maxBatchSize());
+        Assert.assertEquals(batchSize, tableConfig.getMaxBatchSize());
     }
 
-    @Test(expected = MockerException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void testTableConfigWithNullMaxCount() {
         tableConfig.setTotalCount(null);
-        Assert.assertEquals(totalCount, tableConfig.maxCount());
+        Assert.assertEquals(totalCount, tableConfig.getTotalCount());
     }
 
     @After

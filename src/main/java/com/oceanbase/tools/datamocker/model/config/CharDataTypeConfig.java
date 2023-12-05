@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.oceanbase.tools.datamocker.model.config.model;
+package com.oceanbase.tools.datamocker.model.config;
 
 import lombok.Getter;
 import lombok.Setter;
 
 /**
- * Date type configuration object
+ * Character data type configuration object
  *
  * @author yh263208
  * @date 2020-12-24 20:59
@@ -27,10 +27,14 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public class DateDataTypeConfig extends DataTypeConfig {
-    private String timezone;
+public class CharDataTypeConfig extends DataTypeConfig {
+    private String charset;
     /**
-     * Time precision, mainly for the timestamp type, indicating the length of the time in nanoseconds
+     * Data length, column length calculated according to Byte
      */
-    private Integer scale;
+    private Integer width;
+    /**
+     * Whether to use characters to count column width
+     */
+    private boolean isUnicode = false;
 }

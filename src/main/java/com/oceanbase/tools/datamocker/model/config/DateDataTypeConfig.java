@@ -13,34 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.oceanbase.tools.datamocker.model.config.model;
-
-import java.util.Map;
+package com.oceanbase.tools.datamocker.model.config;
 
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 
 /**
- * Database connection information configuration package object
+ * Date type configuration object
  *
  * @author yh263208
- * @date 2020-12-24 15:30
+ * @date 2020-12-24 20:59
  * @since OBMOCKER-snapshot-0.1.0
  */
 @Getter
 @Setter
-@ToString(exclude = {"password"})
-public class DataBaseConfig {
-    private String host;
-    private Integer port;
-    private String user;
-    private String tenant;
-    private String cluster;
-    private String password;
-    private String defaultSchame;
+public class DateDataTypeConfig extends DataTypeConfig {
+    private String timezone;
     /**
-     * Database connection parameters
+     * Time precision, mainly for the timestamp type, indicating the length of the time in nanoseconds
      */
-    private Map<String, String> connectParam;
+    private Integer scale;
 }

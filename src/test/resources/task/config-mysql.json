@@ -462,13 +462,11 @@
       "whetherTruncate": false,
       "tableName": "emp",
       "schemaName": "test",
-      "timeout": 180000,
+      "timeoutMillis": 180000,
       "location": "test/mock/emp.sql"
     }
   ],
   "dialectType": "OB_MYSQL",
   "taskName": null,
-  "minConnectionSize": 8,
-  "maxConnectionSize": 10,
-  "connectionIncreasementStep": 2
+  "maxConnectionSize": 10
 }

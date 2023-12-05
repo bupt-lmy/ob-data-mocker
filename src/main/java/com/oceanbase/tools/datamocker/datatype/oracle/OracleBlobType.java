@@ -18,7 +18,7 @@ package com.oceanbase.tools.datamocker.datatype.oracle;
 import com.oceanbase.tools.datamocker.datatype.AbstractByteDataType;
 import com.oceanbase.tools.datamocker.datatype.DataTypeFactory;
 import com.oceanbase.tools.datamocker.generator.BaseByteGenerator;
-import com.oceanbase.tools.datamocker.model.config.model.CharDataTypeConfig;
+import com.oceanbase.tools.datamocker.model.config.CharDataTypeConfig;
 import com.oceanbase.tools.datamocker.model.enums.ObModeType;
 
 /**

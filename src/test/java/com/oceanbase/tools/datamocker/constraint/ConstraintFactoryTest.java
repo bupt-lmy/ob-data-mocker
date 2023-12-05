@@ -13,25 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.oceanbase.tools.datamocker.service;
 
-import java.io.IOException;
+package com.oceanbase.tools.datamocker.constraint;
+
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.sql.DataSource;
 
 import com.oceanbase.tools.datamocker.MockerTestBase;
-import com.oceanbase.tools.datamocker.constraint.AbstractConstraint;
-import com.oceanbase.tools.datamocker.constraint.ConstraintFactory;
-import com.oceanbase.tools.datamocker.core.task.DataSourceFactory;
-import com.oceanbase.tools.datamocker.datatype.AbstractDataType;
-import com.oceanbase.tools.datamocker.datatype.oracle.OracleNumberType;
-import com.oceanbase.tools.datamocker.model.config.model.DataBaseConfig;
+import com.oceanbase.tools.datamocker.core.DataSourceFactory;
+import com.oceanbase.tools.datamocker.model.config.DataBaseConfig;
 import com.oceanbase.tools.datamocker.model.enums.ObModeType;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
 import org.junit.After;
@@ -40,22 +34,22 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * The test class of the constraint factory class is used to test the logic of the factory class
+ * {@link ConstraintFactoryTest}
  *
  * @author yh263208
- * @date 2021-01-11 17:11
- * @since OBMOCKER-snapshot-0.1.0
+ * @date 2023-11-27 20:32
+ * @since ODC_release_4.2.3
  */
 public class ConstraintFactoryTest extends MockerTestBase {
 
-    private final String ddlMysql = "CREATE TABLE `emp` (\n"
+    private static final String ddlMysql = "CREATE TABLE `emp` (\n"
             + "  `col` decimal(10,0) NOT NULL,\n"
             + "  `col1` decimal(10,0) DEFAULT NULL,\n"
             + "  `col2` decimal(10,0) DEFAULT NULL,\n"
             + "  PRIMARY KEY (`col`),\n"
             + "  UNIQUE KEY `Hello` (`col1`, `col2`) BLOCK_SIZE 16384 GLOBAL\n"
             + ")";
-    private final String ddlWithVirtualColumnMysql = "CREATE TABLE `emp1` (\n"
+    private static final String ddlWithVirtualColumnMysql = "CREATE TABLE `emp1` (\n"
             + "  `col` decimal(10,0) NOT NULL,\n"
             + "  `col1` decimal(10,0) DEFAULT NULL,\n"
             + "  `col2` decimal(10,0) DEFAULT NULL,\n"
@@ -64,7 +58,7 @@ public class ConstraintFactoryTest extends MockerTestBase {
             + "  UNIQUE KEY `Hello` (`col1`, `col2`) BLOCK_SIZE 16384 GLOBAL,\n"
             + "  UNIQUE KEY `hello2` (`col4`) BLOCK_SIZE 16384 GLOBAL\n"
             + ") ";
-    private final String ddlOracle = "CREATE TABLE \"EMP\" (\n"
+    private static final String ddlOracle = "CREATE TABLE \"EMP\" (\n"
             + "  \"COL\" NUMBER(5,2) NOT NULL,\n"
             + "  \"COL2\" NUMBER(5,2) NOT NULL,\n"
             + "  \"COL3\" NUMBER(4,2) NOT NULL,\n"
@@ -72,7 +66,7 @@ public class ConstraintFactoryTest extends MockerTestBase {
             + "  CONSTRAINT \"EMP_OBUNIQUE_1610357443363981\" UNIQUE (\"COL2\", \"COL3\"),\n"
             + "CONSTRAINT \"EMP_OBCHECK_1610453879284344\" CHECK ((\"COL3\" < 12))\n"
             + ") ";
-    private final String ddlWithVirtualColumnOracle = "CREATE TABLE \"EMP1\" (\n"
+    private static final String ddlWithVirtualColumnOracle = "CREATE TABLE \"EMP1\" (\n"
             + "  \"COL\" NUMBER(5,2) NOT NULL,\n"
             + "  \"COL2\" NUMBER(5,2) NOT NULL,\n"
             + "  \"COL3\" NUMBER(4,2) NOT NULL,\n"
@@ -87,7 +81,7 @@ public class ConstraintFactoryTest extends MockerTestBase {
     private DataSource mysqlDatasource = null;
 
     @Before
-    public void initEnv() throws IOException, SQLException {
+    public void initEnv() throws SQLException {
         if (oracleDatasource == null) {
             DataBaseConfig config = getDBConfig(ObModeType.OB_ORACLE);
             oracleDatasource = new DataSourceFactory(config).generate();
@@ -117,95 +111,56 @@ public class ConstraintFactoryTest extends MockerTestBase {
         return dialectType == ObModeType.OB_MYSQL ? getMySqlConfig() : getOracleConfig();
     }
 
-    private Map<String, AbstractDataType<?, ? extends Comparable<?>>> getSchema() {
-        Map<String, AbstractDataType<?, ? extends Comparable<?>>> schema = new HashMap<>();
-        schema.put("COL", new OracleNumberType(5, 2, null, false));
-        schema.put("COL2", new OracleNumberType(5, 2, null, false));
-        schema.put("COL3", new OracleNumberType(4, 2, null, false));
-        schema.put("COL4", new OracleNumberType(5, 3, null, false));
-        schema.put("col", new OracleNumberType(5, 2, null, false));
-        schema.put("col1", new OracleNumberType(5, 2, null, false));
-        schema.put("col2", new OracleNumberType(5, 2, null, false));
-        schema.put("col4", new OracleNumberType(5, 2, null, false));
-        return schema;
+    @Test
+    public void generate_oracleModeUk_generateSucceed() {
+        List<Constraint> constraints = new OBOracleUKConstraintFactory(oracleDatasource, "SYS", "EMP", 1500).generate();
+        Assert.assertEquals(1, constraints.size());
     }
 
     @Test
-    public void testConstraintFactoryForOracle() throws Throwable {
-        Map<String, AbstractDataType<?, ? extends Comparable<?>>> schema = getSchema();
-        List<AbstractConstraint> list = ConstraintFactory.getInstance("UNIQUE_CONSTRAINT").make(oracleDatasource,
-                ObModeType.OB_ORACLE, "SYS", "EMP", schema, 15000);
-        Assert.assertEquals(1, list.size());
+    public void generate_oracleModePk_generateSucceed() {
+        List<Constraint> constraints = new OBOraclePKConstraintFactory(oracleDatasource, "SYS", "EMP", 1500).generate();
+        Assert.assertEquals(1, constraints.size());
     }
 
     @Test
-    public void testPConstraintFactoryForOracle() throws Throwable {
-        Map<String, AbstractDataType<?, ? extends Comparable<?>>> schema = getSchema();
-        List<AbstractConstraint> list = ConstraintFactory.getInstance("PRIMARY_CONSTRAINT").make(oracleDatasource,
-                ObModeType.OB_ORACLE, "SYS", "EMP", schema, 15000);
-        Assert.assertEquals(1, list.size());
-    }
-
-    @Test
-    public void testCConstraintFactoryForOracle() throws Throwable {
-        Map<String, AbstractDataType<?, ? extends Comparable<?>>> schema = getSchema();
+    public void generate_oracleModeCk_generateSucceed() {
         thrown.expectMessage("Check constraint is not support yet");
         thrown.expect(MockerException.class);
-        List<AbstractConstraint> list = ConstraintFactory.getInstance("CHECK_CONSTRAINT").make(oracleDatasource,
-                ObModeType.OB_ORACLE, "SYS", "EMP", schema, 15000);
-        Assert.assertNull(list);
+        new OBOracleCheckConstraintFactory(oracleDatasource, "SYS", "EMP").generate();
     }
 
     @Test
-    public void testFConstraintFactoryForOracle() throws Throwable {
-        Map<String, AbstractDataType<?, ? extends Comparable<?>>> schema = getSchema();
+    public void generate_oracleModeFk_generateSucceed() {
         thrown.expect(MockerException.class);
         thrown.expectMessage("Foreign constraint is not support yet");
-        List<AbstractConstraint> list = ConstraintFactory.getInstance("FOREIGN_CONSTRAINT").make(oracleDatasource,
-                ObModeType.OB_ORACLE, "SYS", "EMP1", schema, 15000);
-        Assert.assertNull(list);
+        new OBOracleForeignConstraintFactory(oracleDatasource, "SYS", "EMP1").generate();
     }
 
     @Test
-    public void testConstraintFactoryWithVirtualColForOracle() throws Throwable {
-        Map<String, AbstractDataType<?, ? extends Comparable<?>>> schema = getSchema();
+    public void generate_oracleModeVirtualUk_generateSucceed() {
         thrown.expect(MockerException.class);
         thrown.expectMessage("Virtual column \"EMP1.COL4\" for constraint is not support yet");
-        List<AbstractConstraint> list = ConstraintFactory.getInstance("UNIQUE_CONSTRAINT").make(oracleDatasource,
-                ObModeType.OB_ORACLE, "SYS", "EMP1", schema, 15000);
-        Assert.assertEquals(1, list.size());
+        new OBOracleUKConstraintFactory(oracleDatasource, "SYS", "EMP1", 1500).generate();
     }
 
     @Test
-    public void testConstraintFactoryForMysql() throws Throwable {
-        Map<String, AbstractDataType<?, ? extends Comparable<?>>> schema = getSchema();
-        List<AbstractConstraint> list = ConstraintFactory.getInstance("UNIQUE_CONSTRAINT").make(mysqlDatasource,
-                ObModeType.OB_MYSQL, "test", "emp", schema, 15000);
-        Assert.assertEquals(1, list.size());
+    public void generate_mysqlModeUk_generateSucceed() {
+        List<Constraint> constraints = new OBMysqlUKConstraintFactory(mysqlDatasource, "test", "emp", 1500).generate();
+        Assert.assertEquals(1, constraints.size());
     }
 
     @Test
-    public void testPConstraintFactoryForMysql() throws Throwable {
-        Map<String, AbstractDataType<?, ? extends Comparable<?>>> schema = getSchema();
-        List<AbstractConstraint> list = ConstraintFactory.getInstance("PRIMARY_CONSTRAINT").make(mysqlDatasource,
-                ObModeType.OB_MYSQL, "test", "emp1", schema, 15000);
-        Assert.assertEquals(1, list.size());
+    public void generate_mysqlModePk_generateSucceed() {
+        List<Constraint> constraints = new OBMysqlPKConstraintFactory(mysqlDatasource, "test", "emp1", 1500).generate();
+        Assert.assertEquals(1, constraints.size());
     }
 
     @Test
-    public void testConstraintFactoryWithVirtualColForMysql() throws Throwable {
-        Map<String, AbstractDataType<?, ? extends Comparable<?>>> schema = getSchema();
+    public void generate_mysqlModeVirtualUk_generateSucceed() throws Throwable {
         thrown.expect(MockerException.class);
         thrown.expectMessage("Virtual column \"emp1.col4\" for constraint is not support yet");
-        List<AbstractConstraint> list = ConstraintFactory.getInstance("UNIQUE_CONSTRAINT").make(mysqlDatasource,
-                ObModeType.OB_MYSQL, "test", "emp1", schema, 15000);
-        Assert.assertEquals(1, list.size());
-    }
-
-    @Test
-    public void testConstraintFactoryInstances() {
-        List<ConstraintFactory> list = ConstraintFactory.listInstances();
-        Assert.assertEquals(4, list.size());
+        new OBMysqlUKConstraintFactory(mysqlDatasource, "test", "emp1", 1500).generate();
     }
 
     @After
@@ -229,4 +184,5 @@ public class ConstraintFactoryTest extends MockerTestBase {
             ((AutoCloseable) mysqlDatasource).close();
         }
     }
+
 }
