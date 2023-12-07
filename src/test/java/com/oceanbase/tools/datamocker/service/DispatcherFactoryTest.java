@@ -15,6 +15,7 @@
  */
 package com.oceanbase.tools.datamocker.service;
 
+import java.io.File;
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -116,6 +117,13 @@ public class DispatcherFactoryTest extends MockerTestBase {
         }
         if (oracleDatasource instanceof AutoCloseable) {
             ((AutoCloseable) oracleDatasource).close();
+        }
+        MockTaskConfig config = getTask("EMP");
+        for (MockTableConfig tableConfig : config.getTables()) {
+            File file = new File(tableConfig.getOutputDir());
+            if (file.exists()) {
+                file.delete();
+            }
         }
     }
 
@@ -220,7 +228,7 @@ public class DispatcherFactoryTest extends MockerTestBase {
         tableConfig.setWhetherTruncate(true);
         tableConfig.setTableName(tableName);
         tableConfig.setSchemaName(schemaName);
-        tableConfig.setLocation("test/mock/test.txt");
+        tableConfig.setOutputDir("test/mock/test.txt");
         tableConfig.setTimeoutMillis(180000L);
         return tableConfig;
     }
@@ -228,6 +236,7 @@ public class DispatcherFactoryTest extends MockerTestBase {
     private MockTaskConfig getTask(String tableName) {
         DataBaseConfig config = getOracleConfig();
         MockTaskConfig taskConfig = new MockTaskConfig();
+        taskConfig.setLogDir("./");
         MockTableConfig tableConfig = initTableConfig(tableName, config.getDefaultSchame());
         taskConfig.setTables(Collections.singletonList(tableConfig));
         taskConfig.setDbConfig(config);

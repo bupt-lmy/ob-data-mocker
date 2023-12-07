@@ -455,7 +455,6 @@
           "dataType": null
         }
       ],
-      "maxRetainedCount": 1,
       "totalCount": 100,
       "strategy": "IGNORE",
       "batchSize": 240,
@@ -463,10 +462,9 @@
       "tableName": "emp",
       "schemaName": "test",
       "timeoutMillis": 180000,
-      "location": "test/mock/emp.sql"
+      "outputDir": "test/mock"
     }
   ],
   "dialectType": "OB_MYSQL",
-  "taskName": null,
   "maxConnectionSize": 10
 }

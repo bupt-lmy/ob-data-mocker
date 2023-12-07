@@ -40,6 +40,7 @@ import lombok.Setter;
         @JsonSubTypes.Type(value = CharDataTypeConfig.class, name = "CHAR")
 })
 public class DataTypeConfig {
+
     private Object defaultValue;
     private Boolean allowNull;
     private String columnType;

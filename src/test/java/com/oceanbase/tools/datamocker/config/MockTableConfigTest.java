@@ -40,13 +40,11 @@ import org.junit.Test;
  * @since OBMOCKER-snapshot-0.1.0
  */
 public class MockTableConfigTest extends MockerTestBase {
+
     private final Object defaultValue = "DEFAULT_VALUE";
     private final BigDecimal lowValue = BigDecimal.ZERO;
     private final BigDecimal highValue = BigDecimal.TEN.multiply(BigDecimal.TEN);
     private final Map<String, Object> builderParams = new HashMap<>();
-    /**
-     * Table task-related initialization parameters
-     */
     private final int configListSize = 3;
     private final Long batchSize = 1024L;
     private final Long totalCount = 1000000L;
@@ -138,12 +136,6 @@ public class MockTableConfigTest extends MockerTestBase {
     @Test(expected = IllegalArgumentException.class)
     public void testTableConfigWithIllegalMaxSize() {
         tableConfig.setTotalCount(-100L);
-        Assert.assertEquals(totalCount, tableConfig.getTotalCount());
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void testTableConfigWithIllegalMaxSize1() {
-        tableConfig.setTotalCount(1000001L);
         Assert.assertEquals(totalCount, tableConfig.getTotalCount());
     }
 

@@ -29,11 +29,11 @@ import lombok.Setter;
 @Setter
 public class DigitDataTypeConfig extends DataTypeConfig {
     /**
-     * The precision of the data, representing the effective number of digits
-     */
-    private Integer precision;
-    /**
      * The precision of the number type, representing the number of digits after the decimal point
      */
     private Integer scale;
+    /**
+     * The precision of the data, representing the effective number of digits
+     */
+    private Integer precision;
 }

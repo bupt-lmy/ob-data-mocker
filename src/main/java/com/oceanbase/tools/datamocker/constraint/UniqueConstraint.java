@@ -160,7 +160,7 @@ public class UniqueConstraint implements Constraint {
                         "Data for unique constraint have to have same column list \"%s\""
                                 + String.join(",", sortedList));
             }
-            return mockColumn.toDisgestString();
+            return mockColumn.toDigestString();
         }).collect(Collectors.joining(","));
     }
 

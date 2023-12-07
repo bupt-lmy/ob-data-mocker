@@ -13,18 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.oceanbase.tools.datamocker.schedule.impl;
+package com.oceanbase.tools.datamocker.schedule;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ThreadPoolExecutor;
 
 import com.oceanbase.tools.datamocker.core.task.TableTaskContext;
-import com.oceanbase.tools.datamocker.schedule.AbstractScheduler;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -39,23 +35,11 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class DefaultScheduler extends AbstractScheduler {
 
-    private final int maxConnectionSize;
-
-    public DefaultScheduler(int maxConnectionSize) {
-        this.maxConnectionSize = maxConnectionSize;
-    }
-
-    /**
-     * Thread resources are allocated equally, and the same number of thread resources are allocated to
-     * each column grouping
-     */
     @Override
     protected Set<Set<String>> scheduleColumnTask(Set<String> groups, int active, int core, int max) {
         int allocate = (int) ((max - active) * 0.7) - 1;
         if (allocate <= 0) {
-            log.error(
-                    "The scheduling task failed because the idle thread resources are less than or equal to zero, freeThreadCount={}",
-                    allocate);
+            log.warn("The idle thread resources are less than or equal to zero, freeThreadCount={}", allocate);
             return null;
         }
         int size = groups.size();
@@ -85,26 +69,6 @@ public class DefaultScheduler extends AbstractScheduler {
         return returnVal;
     }
 
-    /**
-     * Equally allocate thread resources to each data to write primitives
-     */
-    @Override
-    protected Map<Set<String>, Integer> scheduleDataTask(Set<String> groups, int active, int core, int max) {
-        int allocate = (int) ((max - active) * 0.7) - 1;
-        if (allocate <= 0) {
-            log.error(
-                    "The scheduling task failed because the idle thread resources are less than or equal to zero, freeThreadCount={}",
-                    allocate);
-            return null;
-        }
-        if (allocate > this.maxConnectionSize - 2) {
-            allocate = this.maxConnectionSize - 2;
-        }
-        Map<Set<String>, Integer> returnVal = new HashMap<>();
-        returnVal.put(groups, allocate);
-        return returnVal;
-    }
-
     @Override
     protected void onSuccess(TableTaskContext context) {
 
@@ -115,8 +79,4 @@ public class DefaultScheduler extends AbstractScheduler {
 
     }
 
-    @Override
-    public ThreadPoolExecutor pool() {
-        return null;
-    }
 }

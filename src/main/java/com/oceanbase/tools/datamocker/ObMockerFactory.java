@@ -15,11 +15,10 @@
  */
 package com.oceanbase.tools.datamocker;
 
+import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -27,36 +26,35 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.TimeZone;
 import java.util.UUID;
+import java.util.function.Supplier;
 
 import javax.sql.DataSource;
 
 import com.oceanbase.tools.datamocker.constraint.Constraint;
 import com.oceanbase.tools.datamocker.constraint.ConstraintBuilder;
+import com.oceanbase.tools.datamocker.core.DataSourceFactory;
 import com.oceanbase.tools.datamocker.core.Dispatcher;
 import com.oceanbase.tools.datamocker.core.read.ColumnReader;
-import com.oceanbase.tools.datamocker.core.task.AbstractDataPipe;
-import com.oceanbase.tools.datamocker.core.DataSourceFactory;
 import com.oceanbase.tools.datamocker.core.task.TableTaskInfo;
 import com.oceanbase.tools.datamocker.core.task.TableTaskMetaData;
-import com.oceanbase.tools.datamocker.core.write.AbstractMockWriter;
+import com.oceanbase.tools.datamocker.core.write.DataWriter;
 import com.oceanbase.tools.datamocker.core.write.JdbcWriter;
+import com.oceanbase.tools.datamocker.core.write.SqlScriptOutput;
 import com.oceanbase.tools.datamocker.core.write.SqlScriptWriter;
-import com.oceanbase.tools.datamocker.core.write.output.MockerFile;
 import com.oceanbase.tools.datamocker.datatype.AbstractDataType;
 import com.oceanbase.tools.datamocker.model.config.MockColumnConfig;
 import com.oceanbase.tools.datamocker.model.config.MockTableConfig;
 import com.oceanbase.tools.datamocker.model.config.MockTaskConfig;
 import com.oceanbase.tools.datamocker.model.enums.ObModeType;
-import com.oceanbase.tools.datamocker.model.enums.ScriptType;
-import com.oceanbase.tools.datamocker.model.mock.MockRowData;
 import com.oceanbase.tools.datamocker.schedule.AbstractScheduler;
-import com.oceanbase.tools.datamocker.schedule.impl.DefaultScheduler;
-import com.oceanbase.tools.datamocker.util.MockDataPipe;
-import com.oceanbase.tools.datamocker.util.MockerBuffer;
+import com.oceanbase.tools.datamocker.schedule.DefaultScheduler;
+import com.oceanbase.tools.dbbrowser.util.MySQLSqlBuilder;
+import com.oceanbase.tools.dbbrowser.util.OracleSqlBuilder;
+import com.oceanbase.tools.dbbrowser.util.SqlBuilder;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.Validate;
 import org.slf4j.MDC;
 
@@ -75,28 +73,24 @@ import org.slf4j.MDC;
 public class ObMockerFactory {
 
     private final MockTaskConfig taskConfig;
-    private final Map<String, DataSource> taskId2DataSource;
-    private final Map<String, List<MockerFile>> taskId2MockerFiles;
 
     public ObMockerFactory(@NonNull MockTaskConfig taskConfig) {
         this.taskConfig = taskConfig;
-        this.taskId2DataSource = new HashMap<>();
-        this.taskId2MockerFiles = new HashMap<>();
     }
 
     public ObDataMocker create() {
-        return create(new DefaultScheduler(this.taskConfig.getMaxConnectionSize()));
+        return create(new DefaultScheduler());
     }
 
     public ObDataMocker create(@NonNull AbstractScheduler scheduler) {
         DataSource dataSource = null;
         try {
-            String taskId = UUID.randomUUID().toString().toUpperCase();
-            MDC.put("mocktask.workspace", taskId);
+            String logDir = this.taskConfig.getLogDir();
+            MDC.put("mocktask.workspace", logDir);
             DataSourceFactory factory = new DataSourceFactory(taskConfig.getDbConfig());
             factory.setDriverClassName(taskConfig.getDriverClassName());
             dataSource = factory.generate();
-            Dispatcher<TableTaskInfo> dispatcher = generate(this.taskConfig, dataSource, taskId);
+            Dispatcher<TableTaskInfo> dispatcher = generate(this.taskConfig, dataSource, logDir);
             return new ObDataMocker(dispatcher, scheduler);
         } catch (IOException | SQLException throwables) {
             throw new IllegalArgumentException(throwables);
@@ -111,26 +105,21 @@ public class ObMockerFactory {
         }
     }
 
-    private Dispatcher<TableTaskInfo> generate(MockTaskConfig taskConfig, DataSource ds, String taskId)
+    private Dispatcher<TableTaskInfo> generate(MockTaskConfig taskConfig, DataSource ds, String logDir)
             throws SQLException, IOException {
-        String taskName = taskConfig.getTaskName() == null ? getTaskName() : taskConfig.getTaskName();
         List<MockTableConfig> tableConfigs = taskConfig.getTables();
-        Validate.notEmpty(tableConfigs, "TaskConfig can not be empty for ObMockerFactory");
+        Validate.notEmpty(tableConfigs, "TaskConfig can not be empty");
         ObModeType obModeType = taskConfig.getDialectType();
-        Dispatcher<TableTaskInfo> dispatcher = new Dispatcher<>(tableConfigs.size(), taskName, taskId);
+        Dispatcher<TableTaskInfo> dispatcher = new Dispatcher<>(tableConfigs.size(), logDir);
         for (int i = 0; i < tableConfigs.size(); i++) {
             MockTableConfig tableConfig = tableConfigs.get(i);
-            List<Constraint> constraints = getConstraints(tableConfig, ds, taskConfig.getDialectType());
-            List<ColumnReader<?>> columnReaders = getColumnReader(tableConfig, constraints);
-            Map<String, AbstractDataType<?, ? extends Comparable<?>>> tableSchema = getTableSchema(tableConfig);
-            MockerBuffer buffer = new MockerBuffer(tableSchema, tableConfig.getMaxBatchSize());
-            TableTaskMetaData metaData = new TableTaskMetaData(tableSchema, tableConfig, obModeType, taskId, 0, i);
-            DataSource dataSource = getDataSource(metaData.getTableTaskId());
-            List<MockerFile> managers = getFileManager(metaData.getTableTaskId(), tableConfig);
-            List<AbstractMockWriter> dataWriter = getDataWriter(tableConfig, buffer, managers, dataSource);
-            TableTaskInfo bean =
-                    new TableTaskInfo(columnReaders, dataWriter, constraints, buffer, dataSource, managers, metaData);
-            dispatcher.setObj(i, bean);
+            List<Constraint> constraints = getConstraints(tableConfig, ds, obModeType);
+            SqlScriptOutput output = getOutput(tableConfig);
+            dispatcher.setObj(i, new TableTaskInfo(getDataWriters(output, tableConfig),
+                    getColumnReader(tableConfig, constraints),
+                    getDataSourceFactory(tableConfig), constraints,
+                    new TableTaskMetaData(getTableSchema(tableConfig), tableConfig, logDir),
+                    output, getSqlBuilder(obModeType)));
         }
         return dispatcher;
     }
@@ -161,14 +150,7 @@ public class ObMockerFactory {
                 .build().getConstraints();
     }
 
-    private DataSource getDataSource(String tableTaskId) throws SQLException {
-        if (tableTaskId == null) {
-            return null;
-        }
-        DataSource dataSource = this.taskId2DataSource.get(tableTaskId);
-        if (dataSource != null) {
-            return dataSource;
-        }
+    private DataSourceFactory getDataSourceFactory(MockTableConfig tableConfig) {
         Map<String, String> realParam = new HashMap<>();
         realParam.put("autoReconnect", "true");
         realParam.put("rewriteBatchedStatements", "true");
@@ -184,65 +166,37 @@ public class ObMockerFactory {
         DataSourceFactory factory = new DataSourceFactory(this.taskConfig.getDbConfig());
         factory.setDriverClassName(taskConfig.getDriverClassName());
         factory.setParams(realParam);
+        factory.setTimeoutMillis(tableConfig.getTimeoutMillis());
         factory.setMaxPoolSize(taskConfig.getMaxConnectionSize());
-        dataSource = factory.generate();
-        this.taskId2DataSource.putIfAbsent(tableTaskId, dataSource);
-        return dataSource;
+        return factory;
     }
 
-    /**
-     * Get file manager collection
-     *
-     * @param tableTaskId table task id
-     * @param tableConfig config for table task
-     * @return list of file manager
-     * @exception IOException Throw an exception when the file operation fails
-     */
-    private List<MockerFile> getFileManager(String tableTaskId, MockTableConfig tableConfig) throws IOException {
-        List<MockerFile> returnVal = taskId2MockerFiles.get(tableTaskId);
-        if (returnVal == null) {
-            returnVal = new LinkedList<>();
-            taskId2MockerFiles.put(tableTaskId, returnVal);
-            for (ScriptType scriptType : tableConfig.getScriptType()) {
-                String location = tableConfig.dataWriteLocation(scriptType);
-                MockerFile fileManager = new MockerFile(location, scriptType, true);
-                returnVal.add(fileManager);
+    private SqlScriptOutput getOutput(MockTableConfig tableConfig) throws IOException {
+        File file = new File(tableConfig.getOutputDir());
+        if (file.exists()) {
+            if (!file.delete()) {
+                throw new IOException("Failed to delete a dir " + file.getAbsolutePath());
             }
+            FileUtils.forceMkdir(file);
+        } else {
+            FileUtils.forceMkdir(file);
         }
-        return returnVal;
+        if (!file.isDirectory()) {
+            throw new IllegalArgumentException("Location is not a dir, " + file.getAbsolutePath());
+        }
+        return new SqlScriptOutput(file, tableConfig.getTableName(), tableConfig.getMaxSingleFileSizeInBytes());
     }
 
-    /**
-     * Get data writer
-     *
-     * @param tableConfig table task config
-     * @param buffer buffer which is bound to writer
-     * @param managers list of file managers
-     * @param dataSource datasource
-     * @return list of mock writer
-     */
-    private List<AbstractMockWriter> getDataWriter(MockTableConfig tableConfig, MockerBuffer buffer,
-            List<MockerFile> managers, DataSource dataSource) {
-        Validate.notNull(managers, "Mocker file manager list can not be null");
-        List<AbstractMockWriter> dataWriters = new LinkedList<>();
-        for (MockerFile manager : managers) {
-            SqlScriptWriter writer = new SqlScriptWriter(manager, this.taskConfig.getDialectType(),
-                    tableConfig.getSchemaName(), tableConfig.getTableName());
-            dataWriters.add(writer);
-        }
-        if (dataSource == null) {
-            return dataWriters;
-        }
-        JdbcWriter writer = new JdbcWriter(dataSource, this.taskConfig.getDialectType(),
-                tableConfig.getSchemaName(), tableConfig.getTableName());
-        dataWriters.add(writer);
-        Map<String, AbstractDataPipe<List<MockRowData>>> groupId2DataPipe = new HashMap<>();
-        for (AbstractMockWriter item : dataWriters) {
-            AbstractDataPipe<List<MockRowData>> dataPipe = groupId2DataPipe.computeIfAbsent(item.groupId(),
-                    s -> new MockDataPipe(tableConfig.getMaxRetainedCount()));
-            item.register(dataPipe);
-            buffer.register(dataPipe);
-        }
+    private List<DataWriter> getDataWriters(SqlScriptOutput output,
+            MockTableConfig tableConfig) throws SQLException {
+        List<DataWriter> dataWriters = new LinkedList<>();
+        dataWriters.add(new SqlScriptWriter(output,
+                getSqlBuilder(this.taskConfig.getDialectType()),
+                tableConfig.getSchemaName(), tableConfig.getTableName()));
+        dataWriters.add(new JdbcWriter(getDataSourceFactory(tableConfig),
+                getSqlBuilder(this.taskConfig.getDialectType()),
+                tableConfig.getConcurrent(),
+                tableConfig.getSchemaName(), tableConfig.getTableName()));
         return dataWriters;
     }
 
@@ -300,12 +254,15 @@ public class ObMockerFactory {
         return returnValue;
     }
 
-    private String getTaskName() {
-        TimeZone timeZone = TimeZone.getDefault();
-        Date date = new Date();
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmssSS");
-        dateFormat.setTimeZone(timeZone);
-        return "datamock_" + dateFormat.format(date);
+    private Supplier<SqlBuilder> getSqlBuilder(ObModeType obModeType) {
+        switch (obModeType) {
+            case OB_ORACLE:
+                return OracleSqlBuilder::new;
+            case OB_MYSQL:
+                return MySQLSqlBuilder::new;
+            default:
+                throw new UnsupportedOperationException("Unknown dialect type, " + obModeType);
+        }
     }
 
 }

@@ -42,9 +42,9 @@ import com.oceanbase.tools.datamocker.model.config.DataBaseConfig;
 import com.oceanbase.tools.datamocker.model.config.MockTableConfig;
 import com.oceanbase.tools.datamocker.model.config.MockTaskConfig;
 import com.oceanbase.tools.datamocker.model.enums.MockTaskStatus;
-import com.oceanbase.tools.datamocker.model.enums.ScriptType;
 import com.oceanbase.tools.datamocker.schedule.MockContext;
-import com.oceanbase.tools.datamocker.util.PrintUtil;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -94,6 +94,7 @@ public class MockerTaskOracleTest extends MockerTestBase {
         ObjectMapper mapper = new ObjectMapper();
         MockTaskConfig config = mapper.readValue(writer.toString(), MockTaskConfig.class);
         config.setDbConfig(getOracleConfig());
+        config.setLogDir("./");
         return config;
     }
 
@@ -130,9 +131,8 @@ public class MockerTaskOracleTest extends MockerTestBase {
                 }
                 for (TableTaskContext item : contexts) {
                     long interval = System.currentTimeMillis() - start;
-                    System.out.printf("[\"%s\" - \"%s\"] : %s - %s - %.2f %%%n", item.getTaskName(),
-                            item.getTableTaskId(), item.getStatus(), PrintUtil.convertToReadableTimeString(interval,
-                                    TimeUnit.MILLISECONDS, TimeUnit.MINUTES, TimeUnit.SECONDS),
+                    System.out.printf("%s - %s - %.2f %%%n",
+                            item.getStatus(), DurationFormatUtils.formatDurationHMS(interval),
                             context.getProgress());
                     if (MockTaskStatus.CANCELED.equals(item.getStatus())
                             || MockTaskStatus.FAILED.equals(item.getStatus())) {
@@ -153,13 +153,7 @@ public class MockerTaskOracleTest extends MockerTestBase {
     private void clearFile() throws IOException {
         MockTaskConfig config = getTask();
         for (MockTableConfig tableConfig : config.getTables()) {
-            for (ScriptType type : ScriptType.values()) {
-                String location = tableConfig.dataWriteLocation(type);
-                File file = new File(location);
-                if (file.exists()) {
-                    file.delete();
-                }
-            }
+            FileUtils.deleteDirectory(new File(tableConfig.getOutputDir()));
         }
     }
 

@@ -21,8 +21,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import com.oceanbase.tools.datamocker.model.exception.MockerError;
-import com.oceanbase.tools.datamocker.model.exception.MockerException;
 import dk.brics.automaton.Automaton;
 import dk.brics.automaton.RegExp;
 import dk.brics.automaton.State;
@@ -37,65 +35,30 @@ import org.apache.commons.lang.StringUtils;
  * @since OBMOCKER_snapshot_0.1.0
  */
 public class RegExpTextBuilder {
-    /**
-     * Match a special regular expression, this regular expression needs to be rewritten
-     */
-    private static final Pattern PATTERN_REQUOTED = Pattern.compile("\\\\Q(.*?)\\\\E");
-    /**
-     * Need to replace the regular expression matched in PATTERN_REQUOTED
-     */
-    private static final Pattern PATTERN_SPECIAL = Pattern.compile("[.^$*+?(){|\\[\\\\@]");
-    /**
-     * Examples of automata represented by regular expressions
-     */
-    private final Automaton automaton;
-    /**
-     * Traversing automata may encounter multiple paths, and use a random object to increase the
-     * diversity of generated data
-     */
-    private final Random random;
 
-    /**
-     * Constructor, used to construct a regular expression tool class
-     *
-     * @param regex Regular expression
-     * @param random Random object
-     */
+    private static final Pattern PATTERN_REQUOTED = Pattern.compile("\\\\Q(.*?)\\\\E");
+    private static final Pattern PATTERN_SPECIAL = Pattern.compile("[.^$*+?(){|\\[\\\\@]");
+    private final Random random;
+    private final Automaton automaton;
+
     public RegExpTextBuilder(String regex, Random random) {
         if (StringUtils.isBlank(regex) || random == null) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "RegExp or random obj can not be null");
+            throw new IllegalArgumentException("RegExp or random obj can not be null");
         }
-        this.automaton = new RegExp(requote(regex)).toAutomaton();
         this.random = random;
+        this.automaton = new RegExp(requote(regex)).toAutomaton();
     }
 
-    /**
-     * Standard constructor
-     *
-     * @param regex Regular expression
-     */
     public RegExpTextBuilder(String regex) {
         this(regex, new Random());
     }
 
-    /**
-     * Get a string that conforms to a regular expression
-     *
-     * @return Return string
-     */
     public String generate() {
         StringBuilder builder = new StringBuilder();
         generate(builder, automaton.getInitialState());
         return builder.toString();
     }
 
-    /**
-     * Generate a regular expression string that meets the length specification
-     *
-     * @param minLength Minimum length of string
-     * @param maxLength The maximum length of the string
-     * @return Return string
-     */
     public String generate(int minLength, int maxLength) {
         final StringBuilder builder = new StringBuilder();
         int walkLength = 0;
@@ -109,9 +72,9 @@ public class RegExpTextBuilder {
                     assert state.isAccept();
                     return builder.toString();
                 } else {
-                    throw new MockerException(
-                            String.format("Reached accept state before min length (current = %d < min = %d)",
-                                    walkLength, minLength));
+                    throw new IllegalStateException(String.format(
+                            "Reached accept state before min length (current = %d < min = %d)",
+                            walkLength, minLength));
                 }
             }
             List<Transition> nonFinalTransitions = transitions.stream()
@@ -140,10 +103,9 @@ public class RegExpTextBuilder {
         if (state.isAccept()) {
             return builder.toString();
         } else {
-            throw new MockerException(String.format(
+            throw new IllegalStateException(String.format(
                     "Exceeded max walk length (%d) before reaching an accept state: target length was %d (min length = %d)",
-                    maxLength,
-                    targetLength, minLength));
+                    maxLength, targetLength, minLength));
         }
     }
 
@@ -173,12 +135,6 @@ public class RegExpTextBuilder {
         return random.nextInt(maxForRandom) + min;
     }
 
-    /**
-     * Need to rewrite the regular expression, remove the special part
-     *
-     * @param regex Regular expression string
-     * @return Return regular expression
-     */
     private static String requote(String regex) {
         StringBuilder sb = new StringBuilder(regex);
         Matcher matcher = PATTERN_REQUOTED.matcher(sb);
@@ -187,4 +143,5 @@ public class RegExpTextBuilder {
         }
         return sb.toString();
     }
+
 }

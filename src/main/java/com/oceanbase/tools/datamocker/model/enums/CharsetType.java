@@ -67,6 +67,15 @@ public enum CharsetType {
         public String getCharSet() {
             return "GBK";
         }
+    },
+    /**
+     * gbk character encoding format
+     */
+    ZHSGB2312 {
+        @Override
+        public String getCharSet() {
+            return "GBK";
+        }
     };
 
     /**

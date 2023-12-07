@@ -34,9 +34,9 @@ public class MockTaskConfig {
 
     private ObModeType dialectType;
     private DataBaseConfig dbConfig;
-    private String taskName = null;
     private int maxConnectionSize;
     private String driverClassName;
+    private String logDir = "./";
     private List<MockTableConfig> tables;
 
     public int getMaxConnectionSize() {

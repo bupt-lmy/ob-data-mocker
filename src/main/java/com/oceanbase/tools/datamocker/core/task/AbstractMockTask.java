@@ -13,15 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.oceanbase.tools.datamocker.schedule;
+package com.oceanbase.tools.datamocker.core.task;
 
-import java.util.UUID;
 import java.util.concurrent.Callable;
 
-import com.oceanbase.tools.datamocker.core.task.AbstractCallBack;
-import com.oceanbase.tools.datamocker.core.task.TableTaskContext;
-import com.oceanbase.tools.datamocker.core.task.TableTaskMetaData;
 import com.oceanbase.tools.datamocker.model.enums.MockTaskStatus;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 
@@ -35,45 +32,28 @@ import org.slf4j.MDC;
  */
 @Slf4j
 public abstract class AbstractMockTask implements Callable<Void> {
-    /**
-     * Timestamp when the task was started
-     */
-    private final long startTimeStamp;
-    /**
-     * Callback method
-     */
-    private AbstractCallBack<TableTaskContext> callBack;
-    /**
-     * Unique ID of the task
-     */
-    private final String taskId = UUID.randomUUID().toString();
-    /**
-     * Table generation task configuration object
-     */
-    private final TableTaskMetaData metaData;
-    /**
-     * Table generation task context
-     */
-    private final TableTaskContext context;
 
-    public AbstractMockTask(TableTaskMetaData metaData, TableTaskContext context) {
+    private final long startTimeStamp;
+    private final TableTaskMetaData metaData;
+    private final TableTaskContext context;
+    private AbstractCallBack<TableTaskContext> callBack;
+    private volatile boolean cancelled = false;
+
+    public AbstractMockTask(@NonNull TableTaskMetaData metaData, @NonNull TableTaskContext context) {
         this.metaData = metaData;
-        this.startTimeStamp = System.currentTimeMillis();
         this.context = context;
+        this.startTimeStamp = System.currentTimeMillis();
     }
 
-    /**
-     * Task execution method, in which the user’s business logic is written
-     *
-     * @param metaData Table task configuration object
-     * @throws Exception Mainly to be compatible with exceptions thrown by the Call method
-     */
-    public abstract void execute(TableTaskMetaData metaData, TableTaskContext context) throws Throwable;
+    public abstract void execute(TableTaskMetaData metaData, TableTaskContext context) throws Exception;
 
     @Override
     public Void call() {
         try {
-            MDC.put("mocktask.workspace", metaData.getTaskId());
+            if (isCancelled()) {
+                return null;
+            }
+            MDC.put("mocktask.workspace", metaData.getLogDir());
             execute(metaData, context);
             if (this.callBack != null) {
                 try {
@@ -81,15 +61,12 @@ public abstract class AbstractMockTask implements Callable<Void> {
                 } catch (Throwable e) {
                     boolean shutdownResult = context.terminate();
                     context.setStatus(MockTaskStatus.FAILED);
-                    log.error(
-                            "Some errors happened when onSuccess call back method executed, context has been shutdown. shutdownResult={},"
-                                    + "status={}",
-                            shutdownResult, "FAILED", e);
+                    log.warn("Failed to call onSuccess, result={}", shutdownResult, e);
                 }
             }
             return null;
         } catch (Throwable e) {
-            log.error("Fail to execute mock data task", e);
+            log.warn("Failed to execute mock data task, message={}", e.getMessage());
             Throwable exception = e;
             while (true) {
                 if (exception instanceof InterruptedException) {
@@ -120,7 +97,7 @@ public abstract class AbstractMockTask implements Callable<Void> {
                 try {
                     this.callBack.onFailure(context, e);
                 } catch (Throwable e1) {
-                    log.error("Some errors happend when execute onFailure call back method. status={}", finalStatus, e);
+                    log.warn("Failed to call onFailure call back method, status={}", finalStatus, e);
                 }
                 context.setStatus(finalStatus);
             }
@@ -128,47 +105,24 @@ public abstract class AbstractMockTask implements Callable<Void> {
         return null;
     }
 
-    /**
-     * Bind back function
-     *
-     * @param callBack Return function to be bound
-     */
-    public void bind(AbstractCallBack<TableTaskContext> callBack) {
-        this.callBack = callBack;
+    public void cancel() {
+        this.cancelled = true;
     }
 
-    /**
-     * Get the time that the current task has been executed
-     *
-     * @return Returns the number of milliseconds
-     */
+    public boolean isCancelled() {
+        return Thread.currentThread().isInterrupted() || this.cancelled;
+    }
+
     protected long interval() {
         return System.currentTimeMillis() - this.startTimeStamp;
     }
 
-    /**
-     * Returns the start timestamp of the task
-     *
-     * @return Return to start time
-     */
     protected long startTime() {
         return this.startTimeStamp;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        AbstractMockTask that = (AbstractMockTask) o;
-        return this.taskId == that.taskId;
+    public void bind(AbstractCallBack<TableTaskContext> callBack) {
+        this.callBack = callBack;
     }
 
-    @Override
-    public int hashCode() {
-        return this.taskId.hashCode();
-    }
 }

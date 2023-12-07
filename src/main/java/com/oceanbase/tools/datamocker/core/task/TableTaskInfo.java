@@ -15,17 +15,17 @@
  */
 package com.oceanbase.tools.datamocker.core.task;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import javax.sql.DataSource;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import com.oceanbase.tools.datamocker.constraint.Constraint;
+import com.oceanbase.tools.datamocker.core.DataSourceFactory;
 import com.oceanbase.tools.datamocker.core.read.ColumnReader;
-import com.oceanbase.tools.datamocker.core.write.AbstractMockWriter;
-import com.oceanbase.tools.datamocker.core.write.output.MockerFile;
-import com.oceanbase.tools.datamocker.util.MockerBuffer;
+import com.oceanbase.tools.datamocker.core.write.DataWriter;
+import com.oceanbase.tools.datamocker.core.write.SqlScriptOutput;
+import com.oceanbase.tools.dbbrowser.util.SqlBuilder;
 import lombok.Getter;
 import lombok.NonNull;
 
@@ -38,70 +38,33 @@ import lombok.NonNull;
  */
 @Getter
 public class TableTaskInfo {
-    /**
-     * Metadata information of the table generation task
-     */
-    private final TableTaskMetaData metaData;
-    /**
-     * Mock data buffer object
-     */
-    private final MockerBuffer buffer;
-    private final List<ColumnReader<?>> columnReaders;
-    private final List<AbstractMockWriter> dataWriters;
-    private final List<Constraint> constraints;
-    private final DataSource dataSource;
-    private final List<MockerFile> fileManagers;
 
-    /**
-     * Construction method, used to construct a table task bean object
-     *
-     * @param columnReaders list of column reader
-     * @param dataWriters list of writers
-     * @param constraints list of constraint
-     * @param buffer buffer object
-     * @param dataSource datasource
-     * @param fileManagers list file manager
-     * @param metaData meta data for table task
-     */
-    public TableTaskInfo(@NonNull List<ColumnReader<?>> columnReaders,
-            @NonNull List<AbstractMockWriter> dataWriters,
+    private final TableTaskMetaData metaData;
+    private final List<DataWriter> dataWriters;
+    private final List<ColumnReader<?>> columnReaders;
+    private final List<Constraint> constraints;
+    private final DataSourceFactory dataSourceFactory;
+    private final SqlScriptOutput output;
+    private final Supplier<SqlBuilder> sqlBuilderSupplier;
+
+    public TableTaskInfo(@NonNull List<DataWriter> dataWriters,
+            @NonNull List<ColumnReader<?>> columnReaders,
+            @NonNull DataSourceFactory dataSourceFactory,
             @NonNull List<Constraint> constraints,
-            @NonNull MockerBuffer buffer,
-            @NonNull DataSource dataSource,
-            @NonNull List<MockerFile> fileManagers,
-            @NonNull TableTaskMetaData metaData) {
+            @NonNull TableTaskMetaData metaData,
+            @NonNull SqlScriptOutput output,
+            @NonNull Supplier<SqlBuilder> sqlBuilderSupplier) {
         this.columnReaders = columnReaders;
-        this.dataWriters = dataWriters;
         this.constraints = constraints;
         this.metaData = metaData;
-        this.buffer = buffer;
-        this.dataSource = dataSource;
-        this.fileManagers = fileManagers;
+        this.dataWriters = dataWriters;
+        this.dataSourceFactory = dataSourceFactory;
+        this.output = output;
+        this.sqlBuilderSupplier = sqlBuilderSupplier;
     }
 
-    /**
-     * Get column grouping collection
-     *
-     * @return Returns the column grouping collection
-     */
     public Set<String> columnGroups() {
-        Set<String> returnVal = new HashSet<>();
-        for (ColumnReader<?> reader : this.columnReaders) {
-            returnVal.add(reader.groupId());
-        }
-        return returnVal;
+        return this.columnReaders.stream().map(ColumnReader::groupId).collect(Collectors.toSet());
     }
 
-    /**
-     * Get data and write out a grouping set of primitives
-     *
-     * @return Return to grouped collection
-     */
-    public Set<String> dataWriteGroups() {
-        Set<String> returnVal = new HashSet<>();
-        for (AbstractMockWriter writer : this.dataWriters) {
-            returnVal.add(writer.groupId());
-        }
-        return returnVal;
-    }
 }

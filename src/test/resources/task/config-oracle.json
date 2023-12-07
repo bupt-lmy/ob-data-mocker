@@ -120,10 +120,9 @@
       "tableName": "EMP",
       "schemaName": "SYS",
       "timeoutMillis": 180000,
-      "location": "test/mock/emp.sql"
+      "outputDir": "test/mock"
     }
   ],
   "dialectType": "OB_ORACLE",
-  "taskName": null,
   "maxConnectionSize": 6
 }

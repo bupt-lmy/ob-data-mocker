@@ -153,7 +153,6 @@ public class MockTaskConfigTest extends MockerTestBase {
         Assert.assertEquals(ObModeType.OB_ORACLE, taskConfig.getDialectType());
         Assert.assertNotNull(taskConfig.getTables());
         Assert.assertEquals(configListSize, taskConfig.getTables().size());
-        Assert.assertNull(taskConfig.getTaskName());
     }
 
     @After

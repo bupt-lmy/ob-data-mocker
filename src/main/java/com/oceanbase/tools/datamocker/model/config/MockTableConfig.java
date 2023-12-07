@@ -18,7 +18,6 @@ package com.oceanbase.tools.datamocker.model.config;
 import java.util.List;
 
 import com.oceanbase.tools.datamocker.model.enums.DuplicateStrategy;
-import com.oceanbase.tools.datamocker.model.enums.ScriptType;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -40,20 +39,12 @@ public class MockTableConfig {
     private Boolean whetherTruncate;
     private String tableName;
     private String schemaName;
+    private Long maxSingleFileSizeInBytes = 200 * 1024 * 1024L;
     private Long timeoutMillis = 3600000L;
-    private String location;
+    private String outputDir;
+    private int maxErrors = 0;
+    private Integer concurrent;
     private List<MockColumnConfig> columns;
-    private int maxRetainedCount = -1;
-
-    public ScriptType[] getScriptType() {
-        return new ScriptType[] {
-                ScriptType.SQL
-        };
-    }
-
-    public String dataWriteLocation(ScriptType scriptType) {
-        return location;
-    }
 
     public Long getTotalCount() {
         if (this.totalCount == null) {
@@ -61,8 +52,6 @@ public class MockTableConfig {
         }
         if (this.totalCount < 0) {
             throw new IllegalArgumentException("Max count can not be smaller than 0");
-        } else if (this.totalCount > 1000000) {
-            throw new IllegalArgumentException("Max count can not be bigger than 1000000");
         }
         return this.totalCount;
     }
@@ -77,6 +66,17 @@ public class MockTableConfig {
             throw new IllegalArgumentException("Batch size can not be bigger than 100000");
         }
         return this.batchSize;
+    }
+
+    public Integer getConcurrent() {
+        if (this.concurrent == null || this.concurrent <= 0) {
+            return 1;
+        }
+        long epoch = this.concurrent * this.batchSize;
+        if (epoch < 0 || epoch >= this.totalCount) {
+            return Long.valueOf(this.totalCount / this.batchSize).intValue();
+        }
+        return this.concurrent;
     }
 
 }

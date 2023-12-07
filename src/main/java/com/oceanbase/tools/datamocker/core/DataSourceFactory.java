@@ -45,7 +45,7 @@ public class DataSourceFactory {
     private final DataBaseConfig config;
     private String driverClassName;
     private int maxPoolSize;
-    private int loginTimeoutSeconds;
+    private Long timeoutMillis;
     private Map<String, String> params;
 
     public DataSourceFactory(@NonNull DataBaseConfig config) {
@@ -56,7 +56,18 @@ public class DataSourceFactory {
 
     public DataSource generate() throws SQLException {
         HikariDataSource dataSource = new HikariDataSource();
+        String initSql = "set session ob_query_timeout=180000000;"
+                + "set session ob_trx_timeout=180000000;";
+        if (this.timeoutMillis != null && this.timeoutMillis > 0) {
+            long timeoutUs = this.timeoutMillis * 1000;
+            if (timeoutUs > 0) {
+                initSql = "set session ob_query_timeout=" + timeoutUs + ";"
+                        + "set session ob_trx_timeout=" + timeoutUs + ";";
+            }
+        }
+        dataSource.setConnectionInitSql(initSql);
         dataSource.setJdbcUrl(getJdbcUrl());
+        dataSource.setAutoCommit(true);
         dataSource.setUsername(getUsername());
         if (StringUtils.isEmpty(this.driverClassName)) {
             dataSource.setDriverClassName(JDBC_DRIVER_CLASS);
@@ -84,9 +95,6 @@ public class DataSourceFactory {
         dataSource.setMaximumPoolSize(5);
         if (this.maxPoolSize > 0) {
             dataSource.setMaximumPoolSize(this.maxPoolSize);
-        }
-        if (this.loginTimeoutSeconds > 0) {
-            dataSource.setLoginTimeout(this.loginTimeoutSeconds);
         }
     }
 

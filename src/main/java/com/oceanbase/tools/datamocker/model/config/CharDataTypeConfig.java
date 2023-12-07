@@ -28,6 +28,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class CharDataTypeConfig extends DataTypeConfig {
+
     private String charset;
     /**
      * Data length, column length calculated according to Byte
@@ -37,4 +38,5 @@ public class CharDataTypeConfig extends DataTypeConfig {
      * Whether to use characters to count column width
      */
     private boolean isUnicode = false;
+
 }

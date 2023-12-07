@@ -13,18 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.oceanbase.tools.datamocker.model.enums;
+
+package com.oceanbase.tools.datamocker.core.write;
+
+import java.io.IOException;
+import java.util.List;
+
+import com.oceanbase.tools.datamocker.model.mock.MockRowData;
 
 /**
- * Script type enumeration, currently only supports sql script mode
+ * {@link DataWriter}
  *
  * @author yh263208
- * @date 2021-01-12 22:25
- * @since OBMOCKER_snasphot_0.1.0
+ * @date 2023-11-28 19:48
+ * @since ODC_release_4.2.3
  */
-public enum ScriptType {
-    /**
-     * sql script type enumeration
-     */
-    SQL;
+public interface DataWriter extends AutoCloseable {
+
+    long write(List<MockRowData> rows) throws IOException;
+
+    boolean isClosed();
+
 }
