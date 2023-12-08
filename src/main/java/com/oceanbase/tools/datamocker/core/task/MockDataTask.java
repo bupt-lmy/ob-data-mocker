@@ -16,7 +16,6 @@
 package com.oceanbase.tools.datamocker.core.task;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -43,7 +42,7 @@ public class MockDataTask extends AbstractMockTask {
 
     private final DataWriter dataWriter;
     private final List<ColumnReader<?>> readers;
-    private final List<Constraint> constraints = new LinkedList<>();
+    private final List<Constraint> constraints;
     private Integer failedWriteBatchCount = 0;
 
     public MockDataTask(TableTaskMetaData metaData,
@@ -54,15 +53,10 @@ public class MockDataTask extends AbstractMockTask {
         super(metaData, context);
         this.readers = readers;
         this.dataWriter = dataWriter;
-        for (Constraint constraint : constraints) {
-            Set<String> colSet = constraint.columns().get(metaData.getTableName()).keySet();
-            for (ColumnReader<?> reader : readers) {
-                if (colSet.contains(reader.getColumnName())) {
-                    this.constraints.add(constraint);
-                    break;
-                }
-            }
-        }
+        this.constraints = constraints.stream().filter(c -> {
+            Set<String> colSet = c.columns().get(metaData.getTableName()).keySet();
+            return readers.stream().anyMatch(r -> colSet.contains(r.getColumnName()));
+        }).collect(Collectors.toList());
     }
 
     @Override

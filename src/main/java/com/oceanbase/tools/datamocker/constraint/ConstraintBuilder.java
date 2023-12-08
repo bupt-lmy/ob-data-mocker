@@ -27,9 +27,8 @@ import javax.sql.DataSource;
 
 import com.oceanbase.tools.datamocker.datatype.AbstractDataType;
 import com.oceanbase.tools.datamocker.model.enums.ObModeType;
-import com.oceanbase.tools.datamocker.model.exception.MockerError;
-import com.oceanbase.tools.datamocker.model.exception.MockerException;
 import lombok.Builder;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * {@link ConstraintBuilder}
@@ -38,6 +37,7 @@ import lombok.Builder;
  * @date 2023-11-27 21:34
  * @since ODC_release_4.2.3
  */
+@Slf4j
 @Builder
 public class ConstraintBuilder {
 
@@ -96,6 +96,12 @@ public class ConstraintBuilder {
             Long limitCount = 1L;
             for (String col : colSet) {
                 AbstractDataType<?, ? extends Comparable<?>> dataType = columnName2DataType.get(col);
+                if (dataType == null) {
+                    log.warn("Constraint's related column is not found, constraintName={}, colName={}",
+                            constraint.name(), col);
+                    limitCount = (long) totalCount;
+                    break;
+                }
                 Long typeLimit = dataType.distinctLimit();
                 if (typeLimit > totalCount) {
                     limitCount = (long) totalCount;
@@ -107,7 +113,7 @@ public class ConstraintBuilder {
                 }
             }
             if (limitCount < totalCount) {
-                throw new MockerException(MockerError.PARAMETER_ERROR, String.format(
+                throw new IllegalArgumentException(String.format(
                         "The given data generator can only generate %d unique data for cols {%s}, but the goal is %d",
                         limitCount.intValue(), String.join(", ", colSet), totalCount));
             }
