@@ -78,7 +78,7 @@ public class RangeGeneratorTest {
             BigDecimal value = generator.generate(min, max);
             boolean flag = false;
             for (Range<BigDecimal> item : list) {
-                flag = item.contain(value);
+                flag = item.contains(value);
                 if (flag) {
                     Integer count = countMap.getOrDefault(item, 0);
                     countMap.put(item, count + 1);

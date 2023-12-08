@@ -26,6 +26,7 @@ import java.util.UUID;
  * @since OBMOCKER_snapshot_0.1.0
  */
 public class Pair<T, V> {
+
     private final String uniqueId = UUID.randomUUID().toString();
     private final T key;
     private final V value;
@@ -64,4 +65,5 @@ public class Pair<T, V> {
     public int hashCode() {
         return this.uniqueId.hashCode();
     }
+
 }

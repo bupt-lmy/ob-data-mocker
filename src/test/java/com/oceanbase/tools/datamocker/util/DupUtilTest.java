@@ -18,7 +18,6 @@ package com.oceanbase.tools.datamocker.util;
 import java.util.UUID;
 
 import com.oceanbase.tools.datamocker.MockerTestBase;
-import com.oceanbase.tools.datamocker.model.exception.MockerException;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -60,9 +59,9 @@ public class DupUtilTest extends MockerTestBase {
 
     @Test
     public void testDupUtilWithNegativeCount() {
-        thrown.expect(MockerException.class);
-        thrown.expectMessage("Count for DuplicatedJudger can not be equal to or smaleer than zero");
-        DuplicatedJudger util = new DuplicatedJudger(-1);
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("Count <= 0");
+        new DuplicatedJudger(-1);
     }
 
     @Test
@@ -71,9 +70,8 @@ public class DupUtilTest extends MockerTestBase {
         DuplicatedJudger dupUtil = new DuplicatedJudger(count);
         for (int i = 0; i < count + 1; i++) {
             if (i == count) {
-                thrown.expectMessage(
-                        String.format("The max count for DuplicatedJudger is %d, can not add more", count));
-                thrown.expect(MockerException.class);
+                thrown.expectMessage(String.format("The max count is %d, can not add more", count));
+                thrown.expect(IllegalStateException.class);
             }
             dupUtil.add(UUID.randomUUID().toString());
         }

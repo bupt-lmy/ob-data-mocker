@@ -15,8 +15,6 @@
  */
 package com.oceanbase.tools.datamocker.util;
 
-import com.oceanbase.tools.datamocker.model.exception.MockerException;
-
 /**
  * Represents a numeric interval, which is a left-closed right-closed interval
  *
@@ -25,47 +23,26 @@ import com.oceanbase.tools.datamocker.model.exception.MockerException;
  * @since OBMOCKER_snapshot_0.1.0
  */
 public class Range<T extends Comparable<? super T>> {
-    /**
-     * Left range of interval
-     */
+
     private final T min;
-    /**
-     * Right range of interval
-     */
     private final T max;
 
     public Range(T min, T max) {
         if (min.compareTo(max) > 0) {
-            throw new MockerException("Min value can not be bigger than max value");
+            throw new IllegalArgumentException("Min value can not be bigger than max value");
         }
         this.min = min;
         this.max = max;
     }
 
-    /**
-     * Used to judge whether a value is in the interval, this is a left-closed right-closed interval
-     *
-     * @param value Value used for judgment
-     * @return Return boolean result
-     */
-    public boolean contain(T value) {
+    public boolean contains(T value) {
         return min.compareTo(value) <= 0 && max.compareTo(value) >= 0;
     }
 
-    /**
-     * Get the left margin
-     *
-     * @return Returns the left boundary value
-     */
     public T getMin() {
         return this.min;
     }
 
-    /**
-     * Get the right boundary value
-     *
-     * @return Returns the right boundary value
-     */
     public T getMax() {
         return this.max;
     }
@@ -87,4 +64,5 @@ public class Range<T extends Comparable<? super T>> {
         String buffer = this.min.hashCode() + this.max.hashCode() + "";
         return buffer.hashCode();
     }
+
 }

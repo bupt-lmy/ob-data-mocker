@@ -32,34 +32,28 @@ import com.oceanbase.tools.datamocker.model.exception.MockerException;
  * @since OBMOCKER_snapshot_0.1.0
  */
 public class OracleNumberType extends AbstractDigitDataType<BigDecimal> {
-    /**
-     * The number of significant digits, the value is 0 to 38 in oracle
-     */
-    private final int precision;
-    /**
-     * Accuracy, the accuracy range in oracle is -84～127
-     */
+
     private final int scale;
+    private final int precision;
 
-    public OracleNumberType(int precision, int scale, BaseDigitalGenerator<BigDecimal> generator,
-            BigDecimal defaultValue,
-            Boolean allowNull) {
+    public OracleNumberType(int precision, BaseDigitalGenerator<BigDecimal> generator,
+            BigDecimal defaultValue, Boolean allowNull) {
         super(generator, ObModeType.OB_ORACLE, defaultValue, allowNull);
-        this.precision = precision;
-        this.scale = scale;
-    }
-
-    public OracleNumberType(int precision, BaseDigitalGenerator<BigDecimal> generator, BigDecimal defaultValue,
-            Boolean allowNull) {
-        super(generator, ObModeType.OB_ORACLE, defaultValue, allowNull);
-        this.precision = precision;
         this.scale = 0;
+        this.precision = precision;
     }
 
     public OracleNumberType(int precision, int scale, BigDecimal defaultValue, Boolean allowNull) {
         super(ObModeType.OB_ORACLE, defaultValue, allowNull);
-        this.precision = precision;
         this.scale = scale;
+        this.precision = precision;
+    }
+
+    public OracleNumberType(int precision, int scale, BaseDigitalGenerator<BigDecimal> generator,
+            BigDecimal defaultValue, Boolean allowNull) {
+        super(generator, ObModeType.OB_ORACLE, defaultValue, allowNull);
+        this.scale = scale;
+        this.precision = precision;
     }
 
     @Override
@@ -69,8 +63,7 @@ public class OracleNumberType extends AbstractDigitDataType<BigDecimal> {
 
     @Override
     protected BigDecimal minValueForType() {
-        return maxOrMinForNumber()
-                .multiply(new BigDecimal(-1));
+        return maxOrMinForNumber().multiply(new BigDecimal(-1));
     }
 
     @Override
@@ -150,4 +143,5 @@ public class OracleNumberType extends AbstractDigitDataType<BigDecimal> {
     public DataTypeFactory<OracleNumberType, DigitDataTypeConfig, BaseDigitalGenerator<BigDecimal>> getFactory() {
         return DataTypeFactory.getInstance("OB_ORACLE_NUMBER");
     }
+
 }

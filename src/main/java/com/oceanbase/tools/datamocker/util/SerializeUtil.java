@@ -25,9 +25,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.oceanbase.tools.datamocker.model.exception.MockerError;
-import com.oceanbase.tools.datamocker.model.exception.MockerException;
-
 /**
  * ODC object deserialization tool class, used to read objects from the DB in the form of objects
  *
@@ -69,10 +66,9 @@ public class SerializeUtil {
             return Collections.emptyList();
         }
         if (resultList.get(0).size() != columnList.size()) {
-            throw new MockerException(MockerError.OPERATION_FAILURE,
-                    String.format("Result set's length \"%d\" is not equal to the length of the column names \"%d\"",
-                            resultList.get(0).size(),
-                            columnList.size()));
+            throw new IllegalStateException(String.format(
+                    "Result set's length \"%d\" is not equal to the length of the column names \"%d\"",
+                    resultList.get(0).size(), columnList.size()));
         }
         int columnLength = columnList.size();
         for (int i = 0; i < columnLength; i++) {
@@ -115,10 +111,9 @@ public class SerializeUtil {
             return null;
         }
         if (resultList.size() != columnList.size()) {
-            throw new MockerException(MockerError.OPERATION_FAILURE,
-                    String.format("Result set's length \"%d\" is not equal to the length of the column names \"%d\"",
-                            resultList.size(),
-                            columnList.size()));
+            throw new IllegalStateException(String.format(
+                    "Result set's length \"%d\" is not equal to the length of the column names \"%d\"",
+                    resultList.size(), columnList.size()));
         }
         int columnLength = columnList.size();
         for (int i = 0; i < columnLength; i++) {
@@ -165,4 +160,5 @@ public class SerializeUtil {
         }
         return instance;
     }
+
 }

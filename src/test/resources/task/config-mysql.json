@@ -445,10 +445,10 @@
         {
           "columnName": "col33",
           "typeConfig": {
-            "name": "CHAR",
+            "name": "DIGIT",
             "columnType": "OB_MYSQL_BIT",
-            "generator": "RANDOM_BYTE_GENERATOR",
-            "width": 16
+            "generator": "UNIFORM_GENERATOR",
+            "precision": 16
           },
           "allowNull": false,
           "defaultValue": null,
