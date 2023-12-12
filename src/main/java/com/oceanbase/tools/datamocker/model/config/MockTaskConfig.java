@@ -36,6 +36,8 @@ public class MockTaskConfig {
     private DataBaseConfig dbConfig;
     private int maxConnectionSize;
     private String driverClassName;
+    private String protocolName;
+    private String connectionInitSql;
     private String logDir = "./";
     private List<MockTableConfig> tables;
 

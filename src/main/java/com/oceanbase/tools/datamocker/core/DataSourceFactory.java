@@ -44,6 +44,8 @@ public class DataSourceFactory {
     private final static String JDBC_DRIVER_CLASS = "com.oceanbase.jdbc.Driver";
     private final DataBaseConfig config;
     private String driverClassName;
+    private String protocolName;
+    private String connectionInitSql;
     private int maxPoolSize;
     private Long timeoutMillis;
     private Map<String, String> params;
@@ -56,16 +58,23 @@ public class DataSourceFactory {
 
     public DataSource generate() throws SQLException {
         HikariDataSource dataSource = new HikariDataSource();
-        String initSql = "set session ob_query_timeout=180000000;"
-                + "set session ob_trx_timeout=180000000;";
-        if (this.timeoutMillis != null && this.timeoutMillis > 0) {
-            long timeoutUs = this.timeoutMillis * 1000;
-            if (timeoutUs > 0) {
-                initSql = "set session ob_query_timeout=" + timeoutUs + ";"
-                        + "set session ob_trx_timeout=" + timeoutUs + ";";
+        if ("jdbc:oceanbase".equals(getProtocolName())) {
+            String initSql = "set session ob_query_timeout=180000000;"
+                    + "set session ob_trx_timeout=180000000;";
+            if (this.timeoutMillis != null && this.timeoutMillis > 0) {
+                long timeoutUs = this.timeoutMillis * 1000;
+                if (timeoutUs > 0) {
+                    initSql = "set session ob_query_timeout=" + timeoutUs + ";"
+                            + "set session ob_trx_timeout=" + timeoutUs + ";";
+                }
+            }
+            if (StringUtils.isEmpty(this.connectionInitSql)) {
+                this.connectionInitSql = initSql;
+            } else {
+                this.connectionInitSql = initSql + this.connectionInitSql;
             }
         }
-        dataSource.setConnectionInitSql(initSql);
+        dataSource.setConnectionInitSql(this.connectionInitSql);
         dataSource.setJdbcUrl(getJdbcUrl());
         dataSource.setAutoCommit(true);
         dataSource.setUsername(getUsername());
@@ -81,6 +90,10 @@ public class DataSourceFactory {
         }
         init(dataSource);
         return dataSource;
+    }
+
+    public String getProtocolName() {
+        return StringUtils.isEmpty(this.protocolName) ? "jdbc:oceanbase" : this.protocolName;
     }
 
     private void validate(DataBaseConfig config) {
@@ -99,8 +112,9 @@ public class DataSourceFactory {
     }
 
     private String getJdbcUrl() {
-        StringBuilder buffer = new StringBuilder("jdbc:oceanbase://");
-        buffer.append(this.config.getHost())
+        StringBuilder buffer = new StringBuilder(getProtocolName());
+        buffer.append("://")
+                .append(this.config.getHost())
                 .append(":")
                 .append(this.config.getPort())
                 .append("/")

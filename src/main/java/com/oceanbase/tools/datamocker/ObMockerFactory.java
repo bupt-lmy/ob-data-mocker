@@ -89,6 +89,7 @@ public class ObMockerFactory {
             MDC.put("mocktask.workspace", logDir);
             DataSourceFactory factory = new DataSourceFactory(taskConfig.getDbConfig());
             factory.setDriverClassName(taskConfig.getDriverClassName());
+            factory.setProtocolName(taskConfig.getProtocolName());
             dataSource = factory.generate();
             Dispatcher<TableTaskInfo> dispatcher = generate(this.taskConfig, dataSource, logDir);
             return new ObDataMocker(dispatcher, scheduler);
@@ -165,6 +166,8 @@ public class ObMockerFactory {
         }
         DataSourceFactory factory = new DataSourceFactory(this.taskConfig.getDbConfig());
         factory.setDriverClassName(taskConfig.getDriverClassName());
+        factory.setProtocolName(taskConfig.getProtocolName());
+        factory.setConnectionInitSql(taskConfig.getConnectionInitSql());
         factory.setParams(realParam);
         factory.setTimeoutMillis(tableConfig.getTimeoutMillis());
         factory.setMaxPoolSize(taskConfig.getMaxConnectionSize());
