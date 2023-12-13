@@ -39,7 +39,8 @@ public class MockTableConfig {
     private Boolean whetherTruncate;
     private String tableName;
     private String schemaName;
-    private Long maxSingleFileSizeInBytes = 200 * 1024 * 1024L;
+    private Long maxFileOutputSizeInBytes = 400 * 1024 * 1024L;
+    private Long maxSingleFileSizeInBytes = 50 * 1024 * 1024L;
     private Long timeoutMillis = 3600000L;
     private String outputDir;
     private int maxErrors = 0;

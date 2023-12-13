@@ -88,7 +88,7 @@ public class ConcurrentDataWriterTest extends MockerTestBase {
     @Test
     public void write_2ThreadWrite_writeSucceed() throws ExecutionException, InterruptedException, IOException {
         List<DataWriter> dataWriters = new ArrayList<>();
-        dataWriters.add(new SqlScriptWriter(getOutput(), OracleSqlBuilder::new, "test", "emp"));
+        dataWriters.add(new SqlScriptWriter(getOutput(), 0L, OracleSqlBuilder::new, "test", "emp"));
         ConcurrentDataWriter dataWriter = new ConcurrentDataWriter(2, dataWriters);
         Future<Long> f1 = executor.submit(() -> dataWriter.write(getRows(Arrays.asList("COL1", "COL2"))));
         Future<Long> f2 = executor.submit(() -> dataWriter.write(getRows(Collections.singletonList("COL3"))));
@@ -100,7 +100,7 @@ public class ConcurrentDataWriterTest extends MockerTestBase {
     @Test(expected = ExecutionException.class)
     public void write_dupCol_writeSucceed() throws ExecutionException, InterruptedException, IOException {
         List<DataWriter> dataWriters = new ArrayList<>();
-        dataWriters.add(new SqlScriptWriter(getOutput(), OracleSqlBuilder::new, "test", "emp"));
+        dataWriters.add(new SqlScriptWriter(getOutput(), 0L, OracleSqlBuilder::new, "test", "emp"));
         ConcurrentDataWriter dataWriter = new ConcurrentDataWriter(2, dataWriters);
         Future<Long> f1 = executor.submit(() -> dataWriter.write(getRows(Arrays.asList("COL1", "COL2"))));
         Future<Long> f2 = executor.submit(() -> dataWriter.write(getRows(Collections.singletonList("COL2"))));

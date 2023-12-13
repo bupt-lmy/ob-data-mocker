@@ -193,7 +193,7 @@ public class ObMockerFactory {
     private List<DataWriter> getDataWriters(SqlScriptOutput output,
             MockTableConfig tableConfig) throws SQLException {
         List<DataWriter> dataWriters = new LinkedList<>();
-        dataWriters.add(new SqlScriptWriter(output,
+        dataWriters.add(new SqlScriptWriter(output, tableConfig.getMaxFileOutputSizeInBytes(),
                 getSqlBuilder(this.taskConfig.getDialectType()),
                 tableConfig.getSchemaName(), tableConfig.getTableName()));
         dataWriters.add(new JdbcWriter(getDataSourceFactory(tableConfig),

@@ -18,6 +18,7 @@ package com.oceanbase.tools.datamocker.core.write;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -173,7 +174,16 @@ public class JdbcWriter implements DataWriter {
                 }
             }
         });
-        return Arrays.stream(affectRows).sum();
+        return Arrays.stream(affectRows).map(value -> {
+            switch (value) {
+                case Statement.EXECUTE_FAILED:
+                    throw new IllegalStateException("Failed to execute a batch");
+                case Statement.SUCCESS_NO_INFO:
+                    return 1;
+                default:
+                    return value;
+            }
+        }).sum();
     }
 
 }

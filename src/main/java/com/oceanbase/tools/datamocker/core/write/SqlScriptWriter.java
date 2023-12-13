@@ -41,15 +41,20 @@ public class SqlScriptWriter implements DataWriter {
     private final String tableName;
     private final String schema;
     private final SqlScriptOutput output;
+    private final Long maxOutputSizeInBytes;
     private final Supplier<SqlBuilder> sqlBuilderSupplier;
     private volatile boolean closed = false;
 
     public SqlScriptWriter(@NonNull SqlScriptOutput output,
+            @NonNull Long maxOutputSizeInBytes,
             @NonNull Supplier<SqlBuilder> sqlBuilderSupplier,
             @NonNull String schema, @NonNull String tableName) {
         this.tableName = tableName;
         this.schema = schema;
         this.output = output;
+        this.maxOutputSizeInBytes = maxOutputSizeInBytes <= 0
+                ? Long.MAX_VALUE
+                : maxOutputSizeInBytes;
         this.sqlBuilderSupplier = sqlBuilderSupplier;
     }
 
@@ -57,6 +62,8 @@ public class SqlScriptWriter implements DataWriter {
     public long write(List<MockRowData> rows) throws IOException {
         if (this.closed) {
             throw new IllegalStateException("SqlScriptWriter has been closed");
+        } else if (this.output.getTotalWriteBytes() >= this.maxOutputSizeInBytes) {
+            return 0L;
         }
         SqlBuilder prefixBuilder = this.sqlBuilderSupplier.get();
         prefixBuilder.append("INSERT INTO ")

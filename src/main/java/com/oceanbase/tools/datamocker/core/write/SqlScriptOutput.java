@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Arrays;
+import java.util.concurrent.atomic.AtomicLong;
 
 import lombok.Getter;
 import lombok.NonNull;
@@ -50,6 +51,7 @@ public class SqlScriptOutput implements AutoCloseable {
     private final Long maxSingleFileInByte;
     private final String tableName;
     private Integer counter = 0;
+    private AtomicLong totalWriteBytes = new AtomicLong(0L);
     private FileOutputStreamWrapper currentOutput;
 
     public SqlScriptOutput(@NonNull File outputDir,
@@ -74,6 +76,10 @@ public class SqlScriptOutput implements AutoCloseable {
             }
         }
         return this.currentOutput;
+    }
+
+    public Long getTotalWriteBytes() {
+        return this.totalWriteBytes.get();
     }
 
     public static void toZip(@NonNull File target, @NonNull File workingDir) throws IOException {
@@ -133,34 +139,40 @@ public class SqlScriptOutput implements AutoCloseable {
         if (!target.createNewFile()) {
             throw new IllegalStateException("Fail to create file, " + target.getName());
         }
-        return new FileOutputStreamWrapper(target, true);
+        return new FileOutputStreamWrapper(target, true, this.totalWriteBytes);
     }
 
     @Getter
     private static class FileOutputStreamWrapper extends FileOutputStream {
 
+        private final AtomicLong totalOutputSize;
         private Long totalWriteBytes = 0L;
 
-        public FileOutputStreamWrapper(File file, boolean append) throws FileNotFoundException {
+        public FileOutputStreamWrapper(File file, boolean append, AtomicLong totalOutputSize)
+                throws FileNotFoundException {
             super(file, append);
+            this.totalOutputSize = totalOutputSize;
         }
 
         @Override
         public void write(int b) throws IOException {
             super.write(b);
             this.totalWriteBytes++;
+            this.totalOutputSize.incrementAndGet();
         }
 
         @Override
         public void write(byte b[]) throws IOException {
             super.write(b);
             this.totalWriteBytes += b.length;
+            this.totalOutputSize.addAndGet(b.length);
         }
 
         @Override
         public void write(byte b[], int off, int len) throws IOException {
             super.write(b, off, len);
             this.totalWriteBytes += len;
+            this.totalOutputSize.addAndGet(len);
         }
     }
 

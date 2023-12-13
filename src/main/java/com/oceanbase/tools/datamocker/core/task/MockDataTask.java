@@ -133,7 +133,7 @@ public class MockDataTask extends AbstractMockTask {
             throw new InterruptedException("Mock data task has been interrupted");
         }
         if (this.interval() >= metaData.getTimeoutMillis()) {
-            log.warn("Mock data task is timedout, totalGenerate={}, totalWrite={}, duration={}", counter,
+            log.warn("Mock data task is timeout, totalGenerate={}, totalWrite={}, duration={}", counter,
                     writeCount, DurationFormatUtils.formatDurationHMS(interval()));
         }
         if (counter >= metaData.getTotalCount()) {

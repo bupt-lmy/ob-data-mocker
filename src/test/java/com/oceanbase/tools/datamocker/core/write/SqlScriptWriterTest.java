@@ -60,7 +60,7 @@ public class SqlScriptWriterTest {
 
     @Test
     public void write_oracleMode_writeSucceed() throws Throwable {
-        DataWriter dataWriter = new SqlScriptWriter(getOutput(), OracleSqlBuilder::new, "test", "emp");
+        DataWriter dataWriter = new SqlScriptWriter(getOutput(), 0L, OracleSqlBuilder::new, "test", "emp");
         long actual = dataWriter.write(getRows());
         FileInputStream inputStream = new FileInputStream(new File(DEST_DIR).listFiles()[0]);
         Assert.assertEquals(inputStream.available(), actual);
@@ -68,7 +68,7 @@ public class SqlScriptWriterTest {
 
     @Test
     public void write_mysqlMode_writeSucceed() throws Throwable {
-        DataWriter dataWriter = new SqlScriptWriter(getOutput(), MySQLSqlBuilder::new, "test", "emp");
+        DataWriter dataWriter = new SqlScriptWriter(getOutput(), 0L, MySQLSqlBuilder::new, "test", "emp");
         long actual = dataWriter.write(getRows());
         FileInputStream inputStream = new FileInputStream(new File(DEST_DIR).listFiles()[0]);
         Assert.assertEquals(inputStream.available(), actual);
