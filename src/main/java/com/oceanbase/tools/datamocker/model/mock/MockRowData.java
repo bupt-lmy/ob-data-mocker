@@ -15,14 +15,13 @@
  */
 package com.oceanbase.tools.datamocker.model.mock;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
+import lombok.NonNull;
 import org.apache.commons.lang.Validate;
 
 /**
@@ -34,114 +33,53 @@ import org.apache.commons.lang.Validate;
  * @since OBMOCKER_snapshot_0.1.0
  */
 public class MockRowData {
-    /**
-     * A row of data, including multiple columns, is a key-value data structure, the key is the column
-     * name of the column, and the value is the actual data of the column
-     */
+
     private final Map<String, MockColumnData<?>> rowWithMultiColumn;
 
-    /**
-     * Default Constructor, init MockRowData by list of MockColumn
-     *
-     * @param columnList list of column list
-     * @exception IllegalArgumentException columnList can not be null
-     */
-    public MockRowData(List<MockColumnData<?>> columnList) {
-        Validate.notNull(columnList, "ColumnList can not be null for MockRowData");
+    public MockRowData(@NonNull List<MockColumnData<?>> columnList) {
         this.rowWithMultiColumn = new HashMap<>(columnList.size());
         for (MockColumnData<?> columnItem : columnList) {
             rowWithMultiColumn.put(columnItem.getColumnName(), columnItem);
         }
     }
 
-    /**
-     * Non-Arguments Constructor
-     */
     public MockRowData() {
         this.rowWithMultiColumn = new HashMap<>();
     }
 
-    /**
-     * Constructor
-     *
-     * @param rowWidth width for mock row
-     */
     public MockRowData(int rowWidth) {
         Validate.isTrue(rowWidth > 0, "Row width can not be negative for MockRowData");
         this.rowWithMultiColumn = new HashMap<>(rowWidth);
     }
 
-    /**
-     * Get a column of data
-     *
-     * @param columnName Column name
-     * @return Return column data
-     * @exception IllegalArgumentException columnName can not be blank
-     */
-    public MockColumnData<?> getMockColumn(String columnName) {
-        Validate.notEmpty(columnName, "ColumnName can not be blank for MockRowData#getMockColumn");
+    public MockColumnData<?> getMockColumn(@NonNull String columnName) {
         return this.rowWithMultiColumn.get(columnName);
     }
 
-    /**
-     * Remove the mock column from mock row
-     *
-     * @return removed mock column
-     */
-    public MockColumnData<?> remove(MockColumnData<?> mockColumn) {
-        Validate.notNull(mockColumn, "MockColumn can not be null for MockRowData#remove");
+    public MockColumnData<?> remove(@NonNull MockColumnData<?> mockColumn) {
         return this.rowWithMultiColumn.remove(mockColumn.getColumnName());
     }
 
-    /**
-     * Remove the mock column from mock row
-     *
-     * @return removed mock column
-     */
-    public MockColumnData<?> remove(String columnName) {
-        Validate.notNull(columnName, "ColumnName can not be null for MockRowData#remove");
+    public MockColumnData<?> remove(@NonNull String columnName) {
         return this.rowWithMultiColumn.remove(columnName);
     }
 
-    /**
-     * Set up a column of data
-     *
-     * @param mockColumn Corresponding data
-     */
-    public MockColumnData<?> addMockColumn(MockColumnData<?> mockColumn) {
-        Validate.notNull(mockColumn, "MockColumn can not be null for MockRowData#putIfAbsent");
-        String columnName = mockColumn.getColumnName();
-        return this.rowWithMultiColumn.putIfAbsent(columnName, mockColumn);
+    public MockColumnData<?> addMockColumn(@NonNull MockColumnData<?> mockColumn) {
+        return this.rowWithMultiColumn.putIfAbsent(mockColumn.getColumnName(), mockColumn);
     }
 
-    /**
-     * Get how many columns of data are contained in the current row
-     *
-     * @return Return size
-     */
     public int columnNum() {
         synchronized (this.rowWithMultiColumn) {
             return this.rowWithMultiColumn.size();
         }
     }
 
-    /**
-     * Get the column collection of row data
-     *
-     * @return Return column collection
-     */
     public Set<String> columnNames() {
         return this.rowWithMultiColumn.keySet();
     }
 
-    /**
-     * Get all mock columns
-     *
-     * @return list of mock columns
-     */
     public List<MockColumnData<?>> getMockColumns() {
-        return this.rowWithMultiColumn.entrySet().stream()
-                .map((Function<Entry<String, MockColumnData<?>>, MockColumnData<?>>) Entry::getValue).collect(
-                        Collectors.toList());
+        return new ArrayList<>(this.rowWithMultiColumn.values());
     }
+
 }

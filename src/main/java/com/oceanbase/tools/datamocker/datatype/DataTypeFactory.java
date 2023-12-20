@@ -30,6 +30,7 @@ import java.util.TimeZone;
 import com.oceanbase.jdbc.extend.datatype.INTERVALYM;
 import com.oceanbase.tools.datamocker.datatype.mysql.MysqlBigIntType;
 import com.oceanbase.tools.datamocker.datatype.mysql.MysqlBinaryType;
+import com.oceanbase.tools.datamocker.datatype.mysql.MysqlBitType;
 import com.oceanbase.tools.datamocker.datatype.mysql.MysqlBlobType;
 import com.oceanbase.tools.datamocker.datatype.mysql.MysqlCharType;
 import com.oceanbase.tools.datamocker.datatype.mysql.MysqlDateTimeType;
@@ -60,10 +61,10 @@ import com.oceanbase.tools.datamocker.generator.BaseDateGenerator;
 import com.oceanbase.tools.datamocker.generator.BaseDigitalGenerator;
 import com.oceanbase.tools.datamocker.generator.BaseGenerator;
 import com.oceanbase.tools.datamocker.generator.GeneratorFactory;
-import com.oceanbase.tools.datamocker.model.config.model.CharDataTypeConfig;
-import com.oceanbase.tools.datamocker.model.config.model.DataTypeConfig;
-import com.oceanbase.tools.datamocker.model.config.model.DateDataTypeConfig;
-import com.oceanbase.tools.datamocker.model.config.model.DigitDataTypeConfig;
+import com.oceanbase.tools.datamocker.model.config.CharDataTypeConfig;
+import com.oceanbase.tools.datamocker.model.config.DataTypeConfig;
+import com.oceanbase.tools.datamocker.model.config.DateDataTypeConfig;
+import com.oceanbase.tools.datamocker.model.config.DigitDataTypeConfig;
 import com.oceanbase.tools.datamocker.model.enums.CharsetType;
 import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
@@ -271,29 +272,30 @@ public abstract class DataTypeFactory<T extends AbstractDataType<?, ? extends Co
     /**
      * The bit type in mysql mode
      */
-    private static final DataTypeFactory<MysqlBinaryType, CharDataTypeConfig, BaseByteGenerator> OB_MYSQL_BIT =
-            new DataTypeFactory<MysqlBinaryType, CharDataTypeConfig, BaseByteGenerator>() {
+    private static final DataTypeFactory<MysqlBitType, DigitDataTypeConfig, BaseDigitalGenerator<BigDecimal>> OB_MYSQL_BIT =
+            new DataTypeFactory<MysqlBitType, DigitDataTypeConfig, BaseDigitalGenerator<BigDecimal>>() {
+
                 @Override
                 public String name() {
                     return "OB_MYSQL_BIT";
                 }
 
                 @Override
-                protected MysqlBinaryType newInstance(CharDataTypeConfig config, BaseByteGenerator generator) {
-                    Validate.notNull(config.getWidth(), "Width for bit can not be null");
-                    Validate.isTrue(config.getWidth() <= 64,
-                            String.format("Width for bit is too big (max = %d)", config.getWidth()));
-                    int byteWidth = config.getWidth() / 8;
-                    Validate.isTrue(byteWidth > 0, "Byte width can not be equal to or smaller than zero");
-                    MysqlBinaryType returnValue =
-                            new MysqlBinaryType(null, config.getAllowNull(), byteWidth, generator);
+                protected MysqlBitType newInstance(DigitDataTypeConfig config,
+                        BaseDigitalGenerator<BigDecimal> generator) {
+                    BigDecimal defaultValue = null;
+                    if (config.getDefaultValue() != null) {
+                        defaultValue = new BigDecimal(config.getDefaultValue().toString());
+                    }
+                    MysqlBitType type = new MysqlBitType(config.getPrecision(), generator,
+                            defaultValue, config.getAllowNull());
                     if (config.getLowValue() != null) {
-                        returnValue.setLowValue((Integer) config.getLowValue() / 8);
+                        type.setLowValue(new BigDecimal(config.getLowValue().toString()));
                     }
                     if (config.getHighValue() != null) {
-                        returnValue.setHighValue((Integer) config.getHighValue() / 8);
+                        type.setHighValue(new BigDecimal(config.getHighValue().toString()));
                     }
-                    return returnValue;
+                    return type;
                 }
             };
     /**

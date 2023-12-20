@@ -18,6 +18,7 @@ package com.oceanbase.tools.datamocker.core;
 import java.util.concurrent.locks.ReentrantLock;
 
 import lombok.Getter;
+import lombok.NonNull;
 import org.apache.commons.lang.Validate;
 
 /**
@@ -33,73 +34,33 @@ import org.apache.commons.lang.Validate;
  */
 public class Dispatcher<T> {
     @Getter
-    private final String taskId;
-    /**
-     * The name can refer to the name of the distributor or the name of the entire task
-     */
-    @Getter
-    private final String name;
-    /**
-     * The lock object, the data encapsulation object uses an array to maintain the top pointers of
-     * multiple stacks. Since the array cannot be dynamically changed in size, the lock is acquired
-     * whenever the program wants to maintain the array of top pointers to prevent multiple threads from
-     * concurrency Modifying the array of pointers at the top of the stack causes a race condition
-     */
+    private final String logDir;
     private final ReentrantLock lock = new ReentrantLock();
     /**
      * The length of the pointer data on the top of the stack can also be used to describe the current
      * number of concurrent tasks
      */
     @Getter
-    private int concurrent;
-    /**
-     * Stack top pointer array
-     */
+    private int width;
     private TopNode<T>[] queuePointers;
 
-    /**
-     * The default constructor, at this time, initialize the length of the pointer array at the top of
-     * the stack to 0. It is not recommended to use this constructor. It is best to set the size of the
-     * pointer array on the top of the stack at the beginning of the construction, because adjusting the
-     * size of the pointer array is a resource-consuming behavior
-     *
-     * @param name dispatcher's name or task name
-     * @param taskId task id
-     */
-    public Dispatcher(String name, String taskId) {
-        Validate.notEmpty(taskId, "TaskId can not be null for Dispatcher");
-        this.name = name;
-        this.taskId = taskId;
-        this.concurrent = 0;
+    public Dispatcher(@NonNull String logDir) {
+        this.width = 0;
+        this.logDir = logDir;
     }
 
-    /**
-     * Constructor, the constructor passes in the default size of the stack top pointer array, and the
-     * program initializes the stack top pointer array according to the incoming size
-     *
-     * @param concurrent initial size of this dispatcher
-     * @param name dispatcher's name or task name
-     * @param taskId task id
-     */
-    public Dispatcher(int concurrent, String name, String taskId) {
-        Validate.notEmpty(taskId, "TaskId can not be null for Dispatcher");
-        Validate.isTrue(concurrent > 0, "Concurrent can not be negative");
-        this.name = name;
-        this.taskId = taskId;
-        this.concurrent = concurrent;
-        queuePointers = new TopNode[concurrent];
-        for (int i = 0; i < concurrent; i++) {
+    public Dispatcher(int width, @NonNull String logDir) {
+        Validate.isTrue(width > 0, "Width can not be negative");
+        this.logDir = logDir;
+        this.width = width;
+        queuePointers = new TopNode[width];
+        for (int i = 0; i < width; i++) {
             queuePointers[i] = new TopNode<>();
         }
     }
 
-    /**
-     * Returns the number of all objects in the distributor
-     *
-     * @return Return specific quantity
-     */
-    public int totalCount() {
-        int queueSize = getConcurrent();
+    public int getTotalCount() {
+        int queueSize = getWidth();
         int returnVal = 0;
         for (int i = 0; i < queueSize; i++) {
             returnVal += getTaskSize(i);
@@ -107,33 +68,17 @@ public class Dispatcher<T> {
         return returnVal;
     }
 
-    /**
-     * Get the length of a specific task queue
-     *
-     * @param index Index of the target task queue
-     * @return Returns the length of the target task queue
-     */
     public int getTaskSize(int index) {
-        if (index >= this.concurrent || index < 0) {
-            throw new IllegalArgumentException(String.format("index %d out of bound [0,%d)", index, this.concurrent));
+        if (index >= this.width || index < 0) {
+            throw new IllegalArgumentException(String.format("Index %d out of bound [0,%d)", index, this.width));
         }
         TopNode<T> topNode = this.queuePointers[index];
         return topNode.length;
     }
 
-    /**
-     * This method passes in two parameters, through these two parameters to uniquely locate a task
-     * object and scope, this method will not change the data package object
-     *
-     * @param index The index number of the stack top pointer array, the method obtains the
-     *        corresponding position of the stack top pointer according to the index
-     * @param columnIndex Stack index, the method finds the corresponding position of the stack index
-     *        according to this index
-     * @return Return the queried object
-     */
     public T getObj(int index, int columnIndex) {
-        if (index >= this.concurrent || index < 0) {
-            throw new IllegalArgumentException(String.format("index %d out of bound [0,%d)", index, this.concurrent));
+        if (index >= this.width || index < 0) {
+            throw new IllegalArgumentException(String.format("Index %d out of bound [0,%d)", index, this.width));
         }
         TopNode<T> topNode = this.queuePointers[index];
         if (columnIndex >= topNode.length) {
@@ -151,15 +96,9 @@ public class Dispatcher<T> {
         return destNode.getObj();
     }
 
-    /**
-     * Perform a pop operation
-     *
-     * @param index Which task queue to "pop"
-     * @return Return the specific task object
-     */
     public T pop(int index) {
-        if (index >= this.concurrent || index < 0) {
-            throw new IllegalArgumentException(String.format("index %d out of bound [0,%d)", index, this.concurrent));
+        if (index >= this.width || index < 0) {
+            throw new IllegalArgumentException(String.format("Index %d out of bound [0,%d)", index, this.width));
         }
         TopNode<T> topNode = this.queuePointers[index];
         if (topNode.length <= 0) {
@@ -195,26 +134,16 @@ public class Dispatcher<T> {
         return returnObj;
     }
 
-    /**
-     * Use this method to publish tasks, index indicates which task stack needs to be inserted into, and
-     * appends to the end of the task stack.
-     *
-     * @param index The index of the pointer array at the top of the stack indicates which stack the
-     *        current task wants to be inserted into. The value range of the index is from 0 to the size
-     *        of the stack top pointer array. If the maximum value is taken, the stack top pointer array
-     *        performs an expansion operation.
-     * @param obj Task object to be inserted
-     */
     public void setObj(int index, T obj) {
         if (obj == null) {
             return;
         }
         // The index of the top pointer of the stack is within the range of the array, and the insertion
         // operation is performed directly
-        if (index < this.concurrent) {
+        if (index < this.width) {
             TopNode<T> topNode = queuePointers[index];
             if (topNode == null) {
-                throw new IllegalArgumentException(String.format("index %d is invaild", index));
+                throw new IllegalArgumentException(String.format("Index %d is invaild", index));
             }
             // Lock the current stack pointer
             topNode.writeLock.lock();
@@ -238,17 +167,17 @@ public class Dispatcher<T> {
             } finally {
                 topNode.writeLock.unlock();
             }
-        } else if (index == this.concurrent) {
+        } else if (index == this.width) {
             // Here to expand the stack top pointer array, the new size is the original size plus one
             lock.lock();
             try {
-                if (index == this.concurrent) {
-                    this.concurrent++;
-                    TopNode<T>[] newTopNodes = new TopNode[this.concurrent];
-                    for (int i = 0; i < this.concurrent - 1; i++) {
+                if (index == this.width) {
+                    this.width++;
+                    TopNode<T>[] newTopNodes = new TopNode[this.width];
+                    for (int i = 0; i < this.width - 1; i++) {
                         newTopNodes[i] = this.queuePointers[i];
                     }
-                    newTopNodes[this.concurrent - 1] = new TopNode<>();
+                    newTopNodes[this.width - 1] = new TopNode<>();
                     this.queuePointers = newTopNodes;
                 }
             } finally {
@@ -257,7 +186,7 @@ public class Dispatcher<T> {
             this.setObj(index, obj);
         } else {
             // Illegal index
-            throw new IllegalArgumentException(String.format("index %d out of bound", index));
+            throw new IllegalArgumentException(String.format("Index %d out of bound", index));
         }
     }
 
@@ -286,6 +215,7 @@ public class Dispatcher<T> {
             return obj;
         }
     }
+
 }
 
 

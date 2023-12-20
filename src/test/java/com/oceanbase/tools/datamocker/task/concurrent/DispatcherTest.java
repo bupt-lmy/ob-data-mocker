@@ -33,6 +33,7 @@ import org.junit.rules.ExpectedException;
  * @since OBMOCKER_0.1.0_snapshot
  */
 public class DispatcherTest extends MockerTestBase {
+
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 
@@ -46,14 +47,14 @@ public class DispatcherTest extends MockerTestBase {
     @Test
     public void testDispatcher() throws Exception {
         List<List<String>> queue = getQueue();
-        Dispatcher<String> dispatcher = new Dispatcher<>(queue.size(), null, "test_task_id");
+        Dispatcher<String> dispatcher = new Dispatcher<>(queue.size(), "test_task_id");
         for (int i = 0; i < queue.size(); i++) {
             List<String> list = queue.get(i);
             for (int j = 0; j < list.size(); j++) {
                 dispatcher.setObj(i, list.get(j));
             }
         }
-        for (int i = 0; i < dispatcher.getConcurrent(); i++) {
+        for (int i = 0; i < dispatcher.getWidth(); i++) {
             for (int j = 0; j < dispatcher.getTaskSize(i); j++) {
                 String obj = dispatcher.getObj(i, 0);
                 String obj1 = dispatcher.pop(i);
@@ -65,16 +66,16 @@ public class DispatcherTest extends MockerTestBase {
     }
 
     @Test
-    public void testDefaultDispatcher() throws Exception {
+    public void testDefaultDispatcher() {
         List<List<String>> queue = getQueue();
-        Dispatcher<String> dispatcher = new Dispatcher<>(null, "test_task_id");
+        Dispatcher<String> dispatcher = new Dispatcher<>("test_task_id");
         for (int i = 0; i < queue.size(); i++) {
             List<String> list = queue.get(i);
             for (int j = 0; j < list.size(); j++) {
                 dispatcher.setObj(i, list.get(j));
             }
         }
-        for (int i = 0; i < dispatcher.getConcurrent(); i++) {
+        for (int i = 0; i < dispatcher.getWidth(); i++) {
             for (int j = 0; j < dispatcher.getTaskSize(i); j++) {
                 String obj = dispatcher.getObj(i, 0);
                 String obj1 = dispatcher.pop(i);
@@ -87,55 +88,55 @@ public class DispatcherTest extends MockerTestBase {
 
     @Test
     public void testDispatcherWithIllegalIndex() throws Exception {
-        Dispatcher<String> dispatcher = new Dispatcher<>(3, null, "test_task_id");
+        Dispatcher<String> dispatcher = new Dispatcher<>(3, "test_task_id");
         int index = 3;
         thrown.expect(Exception.class);
-        thrown.expectMessage(String.format("index %d out of bound [0,%d)", index, 3));
+        thrown.expectMessage(String.format("Index %d out of bound [0,%d)", index, 3));
         dispatcher.getTaskSize(index);
     }
 
     @Test
     public void testDispatcherWithIllegalIndex1() throws Exception {
-        Dispatcher<String> dispatcher = new Dispatcher<>(3, null, "test_task_id");
+        Dispatcher<String> dispatcher = new Dispatcher<>(3, "test_task_id");
         int index = 3;
         thrown.expect(Exception.class);
-        thrown.expectMessage(String.format("index %d out of bound [0,%d)", index, 3));
+        thrown.expectMessage(String.format("Index %d out of bound [0,%d)", index, 3));
         dispatcher.getObj(index, 0);
     }
 
     @Test
     public void testDispatcherWithIllegalIndex2() throws Exception {
-        Dispatcher<String> dispatcher = new Dispatcher<>(3, null, "test_task_id");
+        Dispatcher<String> dispatcher = new Dispatcher<>(3, "test_task_id");
         dispatcher.setObj(0, "Hello");
         Assert.assertNull(dispatcher.getObj(0, 1));
     }
 
     @Test
     public void testDispatcherWithIllegalIndexForPop() throws Exception {
-        Dispatcher<String> dispatcher = new Dispatcher<>(3, null, "test_task_id");
+        Dispatcher<String> dispatcher = new Dispatcher<>(3, "test_task_id");
         int index = 3;
         thrown.expect(Exception.class);
-        thrown.expectMessage(String.format("index %d out of bound [0,%d)", index, 3));
+        thrown.expectMessage(String.format("Index %d out of bound [0,%d)", index, 3));
         dispatcher.pop(index);
     }
 
     @Test
     public void testDispatcherWithIllegalIndexForPop1() throws Exception {
-        Dispatcher<String> dispatcher = new Dispatcher<>(3, null, "test_task_id");
+        Dispatcher<String> dispatcher = new Dispatcher<>(3, "test_task_id");
         Assert.assertNull(dispatcher.pop(0));
     }
 
     @Test
     public void testDispatcherWithnullSet() throws Exception {
-        Dispatcher<String> dispatcher = new Dispatcher<>(3, null, "test_task_id");
+        Dispatcher<String> dispatcher = new Dispatcher<>(3, "test_task_id");
         dispatcher.setObj(0, null);
     }
 
     @Test
     public void testDispatcherWithIllegalSet() throws Exception {
-        Dispatcher<String> dispatcher = new Dispatcher<>(3, null, "test_task_id");
+        Dispatcher<String> dispatcher = new Dispatcher<>(3, "test_task_id");
         thrown.expect(Exception.class);
-        thrown.expectMessage(String.format("index %d out of bound", 4));
+        thrown.expectMessage(String.format("Index %d out of bound", 4));
         dispatcher.setObj(4, "null");
     }
 }

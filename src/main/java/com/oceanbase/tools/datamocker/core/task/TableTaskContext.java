@@ -15,27 +15,21 @@
  */
 package com.oceanbase.tools.datamocker.core.task;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.OptionalDouble;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
 
-import javax.sql.DataSource;
-
-import com.oceanbase.tools.datamocker.constraint.AbstractConstraint;
-import com.oceanbase.tools.datamocker.core.write.output.MockerFile;
+import com.oceanbase.tools.datamocker.core.write.SqlScriptOutput;
 import com.oceanbase.tools.datamocker.datatype.AbstractDataType;
 import com.oceanbase.tools.datamocker.model.enums.MockTaskStatus;
-import com.oceanbase.tools.datamocker.model.enums.ObModeType;
-import com.oceanbase.tools.datamocker.model.exception.MockerError;
-import com.oceanbase.tools.datamocker.model.exception.MockerException;
-import com.oceanbase.tools.datamocker.util.Pair;
+import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.Setter;
-import org.apache.commons.lang.Validate;
+import lombok.NonNull;
 
 /**
  * The context of mock data is also the handle of the task of operating mock data
@@ -44,31 +38,10 @@ import org.apache.commons.lang.Validate;
  * @date 2021-01-18 11:14
  * @since OBMOCKER_snapshot_0.1.0
  */
+@Getter
 public class TableTaskContext {
-    /**
-     * Task name
-     */
-    @Getter
-    private final String taskName;
-    /**
-     * Table task ID
-     */
-    @Getter
-    private final String tableTaskId;
-    /**
-     * Batch size
-     */
-    @Getter
+
     private final Long batchSize;
-    /**
-     * The current task status of mock data
-     */
-    @Getter
-    private volatile MockTaskStatus status;
-    /**
-     * Total amount of data to be generated
-     */
-    @Getter
     private final Long totalCount;
     /**
      * Table structure definition, used to describe the structure of the table, including the mapping
@@ -76,92 +49,39 @@ public class TableTaskContext {
      */
     @Getter
     private final Map<String, AbstractDataType<?, ? extends Comparable<?>>> tableSchema;
-    /**
-     * table name
-     */
-    @Getter
     private final String tableName;
-    /**
-     * The schema where the table is located
-     */
-    @Getter
     private final String schema;
-    /**
-     * Whether to empty the table
-     */
-    @Getter
     private final Boolean truncate;
-    /**
-     * overtime time
-     */
-    @Getter
     private final Long timeoutMilliseconds;
     /**
      * Handle collection, used to control thread tasks
      */
+    @Getter(AccessLevel.NONE)
     private final List<Future<?>> handlers;
-    /**
-     * Data write statistics. The Key here represents the names of different output sources: for
-     * example, the name of the output source for writing DB and the name of the output source for
-     * writing files. Value here represents the amount of data written by the output source.
-     */
-    @Getter
-    private final Map<String, Long> writerName2writeCount;
-    /**
-     * Data generation statistics
-     */
-    @Getter
-    private Long totalDataGenerateCount = null;
-    /**
-     * The number of records in the current database table
-     */
-    @Getter
-    @Setter
-    private Long currentRecordNum;
-    /**
-     * data source
-     */
-    @Getter
-    private final DataSource dataSource;
-    /**
-     * file manager
-     */
-    @Getter
-    private final List<MockerFile> fileManagers;
-    @Getter
-    private final ObModeType dialectType;
-    /**
-     * Top pointer index
-     */
-    @Getter
+    private final Map<String, Long> threadName2WriteCount;
+    private final Map<String, Long> threadName2GenerateCount;
     private final int topIndex;
-    @Getter
+    private final SqlScriptOutput output;
+    private final List<AbstractMockTask> tableTasks;
     private volatile boolean shutdown;
-    /**
-     * Constraint collection, used to carry a collection of constraint objects
-     */
-    @Getter
-    private final List<AbstractConstraint> constraints = new LinkedList<>();
+    private volatile MockTaskStatus status;
 
-    public TableTaskContext(TableTaskInfo taskInfo, String taskName, int index) {
-        Validate.notNull(taskInfo, "TaskInfo can not be null for TableTaskContext");
+    public TableTaskContext(@NonNull TableTaskInfo taskInfo, int index) {
         TableTaskMetaData metaData = taskInfo.getMetaData();
-        this.tableTaskId = metaData.getTableTaskId();
-        this.taskName = taskName;
+        this.output = taskInfo.getOutput();
+        this.topIndex = index;
         this.batchSize = metaData.getBatchSize();
         this.totalCount = metaData.getTotalCount();
         this.tableSchema = metaData.getTableSchema();
         this.tableName = metaData.getTableName();
         this.schema = metaData.getSchema();
         this.truncate = metaData.getShouldTruncate();
-        this.timeoutMilliseconds = metaData.getTimeoutMilliseconds();
+        this.timeoutMilliseconds = metaData.getTimeoutMillis();
         this.status = MockTaskStatus.CREATED;
-        this.handlers = new LinkedList<>();
-        this.writerName2writeCount = new HashMap<>();
-        this.dataSource = taskInfo.getDataSource();
-        this.fileManagers = taskInfo.getFileManagers();
-        this.dialectType = metaData.getDialectType();
-        this.topIndex = index;
+        this.handlers = new ArrayList<>();
+        this.tableTasks = new ArrayList<>();
+        this.threadName2WriteCount = new ConcurrentHashMap<>();
+        this.threadName2GenerateCount = new ConcurrentHashMap<>();
     }
 
     public void appendHandle(Future<?> handle) {
@@ -173,6 +93,31 @@ public class TableTaskContext {
         }
     }
 
+    public Long getTotalGenerateCount() {
+        OptionalDouble optional = this.threadName2GenerateCount.values().stream().mapToLong(v -> v).average();
+        if (!optional.isPresent()) {
+            return 0L;
+        }
+        return Double.valueOf(optional.getAsDouble()).longValue();
+    }
+
+    public Long getTotalWriteCount() {
+        return this.threadName2WriteCount.values().stream().mapToLong(v -> v).sum();
+    }
+
+    public Long getTotalWriteCountByCurrentThread() {
+        Long value = this.threadName2WriteCount.get(Thread.currentThread().getName());
+        return value == null ? 0L : value;
+    }
+
+    public void appendHandle(@NonNull List<AbstractMockTask> tableTasks) {
+        this.tableTasks.addAll(tableTasks);
+    }
+
+    public void appendHandle(@NonNull AbstractMockTask tableTask) {
+        this.tableTasks.add(tableTask);
+    }
+
     public boolean shutdown() {
         this.status = MockTaskStatus.CANCELED;
         return terminate();
@@ -181,6 +126,7 @@ public class TableTaskContext {
     public synchronized boolean terminate() {
         shutdown = true;
         boolean returnVal = Boolean.TRUE;
+        this.tableTasks.forEach(AbstractMockTask::cancel);
         for (Future<?> task : this.handlers) {
             if (!task.isCancelled() && !task.isDone()) {
                 returnVal &= task.cancel(true);
@@ -189,60 +135,46 @@ public class TableTaskContext {
         return returnVal;
     }
 
-    /**
-     * Add a writer's statistical information
-     *
-     * @param result statistical results
-     */
-    public synchronized void appendWriteInfo(Pair<String, Long> result) {
-        if (result == null || result.getKey() == null || result.getValue() == null) {
-            return;
+    public long accumulateGenerateCountAndGet(long count) {
+        String threadName = Thread.currentThread().getName();
+        Long value = this.threadName2GenerateCount.get(threadName);
+        if (value == null) {
+            value = count;
+        } else {
+            value += count;
         }
-        Long value = this.writerName2writeCount.getOrDefault(result.getKey(), 0L);
-        this.writerName2writeCount.put(result.getKey(), value + result.getValue());
+        this.threadName2GenerateCount.put(threadName, value);
+        return this.threadName2GenerateCount.values().stream().mapToLong(v -> v).sum();
     }
 
-    /**
-     * Append a piece of statistical information for data generation primitives
-     *
-     * @param result statistical results
-     * @throws MockerException All data generation primitives must generate the same amount of data. If
-     *         violated, an error will be reported
-     */
-    public synchronized void appendDataGenInfo(Long result) {
-        if (result == null) {
-            return;
-        }
-        if (this.totalDataGenerateCount == null) {
-            this.totalDataGenerateCount = result;
+    public long accumulateWriteCountAndGet(long count) {
+        String threadName = Thread.currentThread().getName();
+        Long value = this.threadName2WriteCount.get(threadName);
+        if (value == null) {
+            value = count;
         } else {
-            if (!this.totalDataGenerateCount.equals(result)) {
-                throw new MockerException(MockerError.OPERATION_FAILURE,
-                        "All column readers have to generate same number of data");
-            }
+            value += count;
         }
+        this.threadName2WriteCount.put(threadName, value);
+        return this.threadName2WriteCount.values().stream().mapToLong(v -> v).sum();
     }
 
     public synchronized void setStatus(MockTaskStatus status) {
         this.status = status;
     }
 
-    /**
-     * get table task progress
-     *
-     * @return progress of task
-     */
     public double getProgress() {
-        if (totalCount != 0 && writerName2writeCount.size() != 0) {
-            Collection<Long> values = writerName2writeCount.values();
+        if (totalCount != 0 && this.threadName2GenerateCount.size() != 0) {
+            Collection<Long> values = this.threadName2GenerateCount.values();
             Iterator<Long> iter = values.iterator();
             double totalProgress = 0.0;
             while (iter.hasNext()) {
                 Long value = iter.next();
                 totalProgress += value.doubleValue() / totalCount;
             }
-            return totalProgress / writerName2writeCount.size();
+            return totalProgress / this.threadName2GenerateCount.size();
         }
         return 0.0;
     }
+
 }

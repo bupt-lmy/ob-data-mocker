@@ -18,10 +18,9 @@ package com.oceanbase.tools.datamocker.core.task;
 import java.util.Map;
 
 import com.oceanbase.tools.datamocker.datatype.AbstractDataType;
-import com.oceanbase.tools.datamocker.model.config.AbstractTableConfig;
-import com.oceanbase.tools.datamocker.model.enums.ObModeType;
+import com.oceanbase.tools.datamocker.model.config.MockTableConfig;
 import lombok.Getter;
-import org.apache.commons.lang.Validate;
+import lombok.NonNull;
 
 /**
  * Table generation task metadata information
@@ -32,11 +31,7 @@ import org.apache.commons.lang.Validate;
  */
 @Getter
 public class TableTaskMetaData {
-    private final String tableTaskId;
-    /**
-     * The maximum number of table generation tasks, when a table is generated, totalCount represents
-     * the maximum number of entries of data to be generated
-     */
+
     private final Long totalCount;
     /**
      * Table structure definition, used to describe the structure of the table, including the mapping
@@ -47,26 +42,24 @@ public class TableTaskMetaData {
     private final String tableName;
     private final String schema;
     private final Boolean shouldTruncate;
-    private final Long timeoutMilliseconds;
+    private final Long timeoutMillis;
     private final Long batchSize;
-    private final ObModeType dialectType;
-    private final String taskId;
+    private final String logDir;
+    private final int maxErrors;
+    private final Integer concurrent;
 
-    public TableTaskMetaData(Map<String, AbstractDataType<?, ? extends Comparable<?>>> tableSchema,
-            AbstractTableConfig tableConfig, ObModeType obModeType, String taskId, int columnIndex, int rowIndex) {
-        Validate.notNull(tableSchema, "TableSchema can not be null for TableTaskMetaData");
-        Validate.notNull(tableConfig, "TableConfig can not be null for TableTaskMetaData");
-        Validate.notNull(obModeType, "ObModeType can not be null for TableTaskMetaData");
-        Validate.notNull(taskId, "TaskId can not be null for TableTaskMetaData");
+    public TableTaskMetaData(@NonNull Map<String, AbstractDataType<?, ? extends Comparable<?>>> tableSchema,
+            @NonNull MockTableConfig tableConfig, @NonNull String logDir) {
         this.tableSchema = tableSchema;
-        this.tableName = tableConfig.tableName();
-        this.schema = tableConfig.schemaName();
-        this.shouldTruncate = tableConfig.truncated();
-        this.timeoutMilliseconds = tableConfig.timeoutMilliseconds();
-        this.batchSize = tableConfig.maxBatchSize();
-        this.totalCount = tableConfig.maxCount();
-        this.tableTaskId = taskId + "-[" + columnIndex + "," + rowIndex + "]";
-        this.dialectType = obModeType;
-        this.taskId = taskId;
+        this.tableName = tableConfig.getTableName();
+        this.schema = tableConfig.getSchemaName();
+        this.shouldTruncate = tableConfig.getWhetherTruncate();
+        this.timeoutMillis = tableConfig.getTimeoutMillis();
+        this.batchSize = tableConfig.getMaxBatchSize();
+        this.totalCount = tableConfig.getTotalCount();
+        this.logDir = logDir;
+        this.maxErrors = tableConfig.getMaxErrors();
+        this.concurrent = tableConfig.getConcurrent();
     }
+
 }

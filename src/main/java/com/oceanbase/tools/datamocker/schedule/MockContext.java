@@ -16,14 +16,13 @@
 package com.oceanbase.tools.datamocker.schedule;
 
 import java.math.BigDecimal;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.oceanbase.tools.datamocker.core.Dispatcher;
 import com.oceanbase.tools.datamocker.core.task.TableTaskContext;
-import com.oceanbase.tools.datamocker.model.exception.MockerError;
-import com.oceanbase.tools.datamocker.model.exception.MockerException;
 import lombok.Getter;
+import lombok.NonNull;
 
 /**
  * Context object for mock task
@@ -33,31 +32,21 @@ import lombok.Getter;
  * @since OB_MOCKER_snapshot_0.1.0
  */
 public class MockContext {
+
     private final Integer totalTableTaskCount;
     @Getter
-    private final String taskName;
-    @Getter
-    private final String taskId;
+    private final String logDir;
     @Getter
     private final List<TableTaskContext> tables;
     private final MockExecutorService service;
 
-    public MockContext(MockExecutorService service, String taskId, String taskName, Integer totalTableTaskCount) {
-        this.taskId = taskId;
-        this.taskName = taskName;
-        this.totalTableTaskCount = totalTableTaskCount;
-        tables = new LinkedList<>();
-        if (service == null) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "Thread pool for schedule context can not be null");
-        }
+    public MockContext(@NonNull MockExecutorService service, @NonNull Dispatcher<?> dispatcher) {
+        this.logDir = dispatcher.getLogDir();
+        this.tables = new LinkedList<>();
         this.service = service;
+        this.totalTableTaskCount = dispatcher.getTotalCount();
     }
 
-    /**
-     * Append a mock data context object
-     *
-     * @param context Context object
-     */
     protected void appendContext(TableTaskContext context) {
         if (context == null) {
             return;
@@ -67,33 +56,6 @@ public class MockContext {
         }
     }
 
-    /**
-     * Delete a context object
-     *
-     * @param taskId Pass in a subtask id
-     */
-    protected List<TableTaskContext> removeContext(String taskId) {
-        if (taskId == null) {
-            return Collections.emptyList();
-        }
-        List<TableTaskContext> returnVal = new LinkedList<>();
-        synchronized (this.tables) {
-            int length = this.tables.size();
-            for (int i = 0; i < length; i++) {
-                if (taskId.equals(this.tables.get(i).getTableTaskId())) {
-                    returnVal.add(this.tables.remove(i));
-                    length--;
-                }
-            }
-        }
-        return returnVal;
-    }
-
-    /**
-     * Close the mock data scheduler object
-     *
-     * @return Return close result
-     */
     public Boolean shutdown() {
         this.service.shutdown();
         boolean returnVal = true;
@@ -103,11 +65,6 @@ public class MockContext {
         return returnVal;
     }
 
-    /**
-     * get task progress(%)
-     *
-     * @return progress
-     */
     public double getProgress() {
         if (this.tables.size() != 0) {
             double returnVal = 0.0;
@@ -119,4 +76,5 @@ public class MockContext {
         }
         return 0.0;
     }
+
 }

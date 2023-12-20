@@ -13,239 +13,177 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.oceanbase.tools.datamocker.core.write;
 
-import java.security.NoSuchAlgorithmException;
-import java.sql.ResultSet;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
+import java.util.concurrent.CompletionService;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorCompletionService;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 
 import javax.sql.DataSource;
 
-import com.oceanbase.tools.datamocker.core.task.AbstractCallBack;
-import com.oceanbase.tools.datamocker.model.enums.ObModeType;
-import com.oceanbase.tools.datamocker.model.exception.MockerError;
-import com.oceanbase.tools.datamocker.model.exception.MockerException;
+import com.oceanbase.tools.datamocker.core.DataSourceFactory;
 import com.oceanbase.tools.datamocker.model.mock.MockRowData;
-import com.oceanbase.tools.datamocker.util.DbObjectNameUtil;
-import com.oceanbase.tools.datamocker.util.DigestUtil;
-import com.oceanbase.tools.datamocker.util.PrintUtil;
-import com.oceanbase.tools.datamocker.util.SqlUtil;
+import com.oceanbase.tools.dbbrowser.util.SqlBuilder;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.Validate;
+import org.apache.commons.collections4.ListUtils;
+import org.apache.commons.lang3.concurrent.BasicThreadFactory;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
+import org.springframework.jdbc.core.JdbcOperations;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
- * The database write writer is used to write data directly to the database
+ * {@link JdbcWriter}
  *
  * @author yh263208
- * @date 2021-01-04 11:04
- * @since OBMOCKER_0.1.0_snapshot
+ * @date 2023-11-28 19:51
+ * @since ODC_release_4.2.3
  */
 @Slf4j
-public class JdbcWriter extends AbstractMockWriter {
-    /**
-     * Get a database connection pool, use the connection pool to get database connections for data
-     * writing
-     */
-    private final DataSource dataSource;
-    /**
-     * The written target library, if the target library is specified when the connection is
-     * established, this value can also be left blank
-     */
-    private final String database;
-    /**
-     * The target table to be written, this parameter must be passed, specify the incoming target table
-     */
+public class JdbcWriter implements DataWriter {
+
     private final String tableName;
-    /**
-     * The dialect mode of OB, the default is oracle mode
-     */
-    private ObModeType dialectType = ObModeType.OB_ORACLE;
-    private final String groupId;
-    /**
-     * The flag bit that marks the existence of the database table
-     */
-    private volatile boolean ifCheck = false;
+    private final String schema;
+    private final DataSource dataSource;
+    private final JdbcOperations jdbc;
+    private final Supplier<SqlBuilder> sqlBuilderSupplier;
+    private final Integer concurrent;
+    private final ExecutorService executorService;
+    private volatile boolean closed = false;
 
-    /**
-     * The constructor writes a data source, which is required
-     *
-     * @param dataSource datasource
-     * @param dialectType dialect type
-     * @param database schema or database name
-     * @param tableName table name
-     */
-    public JdbcWriter(DataSource dataSource, ObModeType dialectType, String database, String tableName) {
-        validate(dataSource, dialectType, database, tableName);
-        this.dataSource = dataSource;
-        this.database = database;
+    public JdbcWriter(@NonNull DataSourceFactory dataSourceFactory,
+            @NonNull Supplier<SqlBuilder> sqlBuilderSupplier,
+            @NonNull Integer concurrent, @NonNull String schema,
+            @NonNull String tableName) throws SQLException {
         this.tableName = tableName;
-        this.dialectType = dialectType;
-        try {
-            this.groupId = DigestUtil.getToken(this.dialectType.name() + this.database + this.tableName);
-        } catch (NoSuchAlgorithmException e) {
-            throw new MockerException(MockerError.UNKNOWN_ERROR, e.getMessage());
-        }
-    }
-
-    /**
-     * The constructor writes a data source, which is required
-     *
-     * @param dataSource datasource
-     * @param dialectType dialect type
-     * @param database schema or database name
-     * @param tableName table name
-     * @param groupId group Id for Database writer
-     */
-    public JdbcWriter(DataSource dataSource, ObModeType dialectType, String database, String tableName,
-            String groupId) {
-        validate(dataSource, dialectType, database, tableName);
-        this.dataSource = dataSource;
-        this.database = database;
-        this.tableName = tableName;
-        this.dialectType = dialectType;
-        Validate.notNull(groupId, "Group id can not be null for JdbcWriter");
-        this.groupId = groupId;
-    }
-
-    /**
-     * Verify that the input to the constructor is legal
-     *
-     * @param dataSource datasource, can not be null
-     * @param database database name or schema name
-     * @param tableName table name
-     * @param dialectType dialect type
-     * @throws MockerException An exception is thrown if verification fails
-     */
-    private void validate(DataSource dataSource, ObModeType dialectType, String database, String tableName) {
-        Validate.notNull(dataSource, "DataSource can not be null for JdbcWriter#validate");
-        Validate.notNull(database, "Database can not be null for JdbcWriter#validate");
-        Validate.notNull(tableName, "TableName can not be null for JdbcWriter#validate");
-        if (!ObModeType.OB_ORACLE.equals(dialectType) && !ObModeType.OB_MYSQL.equals(dialectType)) {
-            throw new MockerException(MockerError.INVALID_OB_MODE);
-        }
-    }
-
-    /**
-     * Pre-check method, mainly used to check whether the target table exists, if it does not exist,
-     * throw an exception
-     *
-     * @throws SQLException Throw a table or database does not exist exception
-     */
-    private void detectExistenceOfTables() throws Throwable {
-        String descSql;
-        if (ObModeType.OB_ORACLE.equals(this.dialectType)) {
-            descSql = String.format("select count(*) from \"%s\".\"%s\"",
-                    DbObjectNameUtil.doubleCharToEscape(database, '"'),
-                    DbObjectNameUtil.doubleCharToEscape(tableName, '"'));
-        } else if (ObModeType.OB_MYSQL.equals(this.dialectType)) {
-            descSql =
-                    String.format("select count(*) from `%s`.`%s`", DbObjectNameUtil.doubleCharToEscape(database, '`'),
-                            DbObjectNameUtil.doubleCharToEscape(tableName, '`'));
-        } else {
-            throw new MockerException(MockerError.INVALID_OB_MODE);
-        }
-        SqlUtil.executeQuery(dataSource, descSql, null, new AbstractCallBack<ResultSet>() {
-            @Override
-            public void doOnSuccess(ResultSet result) {
-                ifCheck = true;
-            }
-
-            @Override
-            public void doOnFailure(ResultSet result, Throwable e) {
-                throw new MockerException(e);
-            }
-        });
+        this.schema = schema;
+        this.dataSource = dataSourceFactory.generate();
+        this.jdbc = new JdbcTemplate(this.dataSource);
+        this.sqlBuilderSupplier = sqlBuilderSupplier;
+        this.concurrent = concurrent;
+        this.executorService = getThreadPoolExecutor();
     }
 
     @Override
-    protected long doWrite(List<MockRowData> rows) throws Throwable {
-        if (!ifCheck) {
-            detectExistenceOfTables();
+    public long write(List<MockRowData> rows) {
+        if (this.closed) {
+            throw new IllegalStateException("JdbcWriter has been closed");
         }
-        MockRowData firstRow = rows.get(0);
-        Set<String> columnSet = firstRow.columnNames();
-        List<String> columnList = new ArrayList<>(columnSet);
-        StringBuffer sqlBuffer;
-        if (ObModeType.OB_ORACLE.equals(this.dialectType)) {
-            sqlBuffer = new StringBuffer(
-                    String.format("insert into \"%s\".\"%s\"(", DbObjectNameUtil.doubleCharToEscape(database, '"'),
-                            DbObjectNameUtil.doubleCharToEscape(tableName, '"')));
-        } else if (ObModeType.OB_MYSQL.equals(this.dialectType)) {
-            sqlBuffer = new StringBuffer(
-                    String.format("insert into `%s`.`%s`(", DbObjectNameUtil.doubleCharToEscape(database, '`'),
-                            DbObjectNameUtil.doubleCharToEscape(tableName, '`')));
-        } else {
-            throw new MockerException(MockerError.INVALID_OB_MODE);
-        }
+        SqlBuilder sqlBuilder = this.sqlBuilderSupplier.get().append("INSERT INTO ")
+                .identifier(this.schema)
+                .append(".").identifier(this.tableName).append(" (");
+        List<String> columnList = new ArrayList<>(rows.get(0).columnNames());
         int columnLength = columnList.size();
         for (int i = 0; i < columnLength; i++) {
-            String columnName = columnList.get(i);
-            if (i == columnLength - 1) {
-                if (ObModeType.OB_ORACLE.equals(this.dialectType)) {
-                    sqlBuffer.append(
-                            String.format("\"%s\") values (", DbObjectNameUtil.doubleCharToEscape(columnName, '"')));
-                } else if (ObModeType.OB_MYSQL.equals(this.dialectType)) {
-                    sqlBuffer.append(
-                            String.format("`%s`) values (", DbObjectNameUtil.doubleCharToEscape(columnName, '`')));
-                }
-                for (int j = 0; j < columnLength; j++) {
-                    if (j == columnLength - 1) {
-                        sqlBuffer.append("?) ");
-                    } else {
-                        sqlBuffer.append("?,");
-                    }
-                }
-            } else {
-                if (ObModeType.OB_ORACLE.equals(this.dialectType)) {
-                    sqlBuffer.append(String.format("\"%s\", ", DbObjectNameUtil.doubleCharToEscape(columnName, '"')));
-                } else if (ObModeType.OB_MYSQL.equals(this.dialectType)) {
-                    sqlBuffer.append(String.format("`%s`, ", DbObjectNameUtil.doubleCharToEscape(columnName, '`')));
-                }
+            sqlBuilder.identifier(columnList.get(i));
+            if (i < columnLength - 1) {
+                sqlBuilder.append(", ");
             }
         }
-        int rowLength = rows.size();
-        Object[][] params = new Object[rows.size()][];
-        for (int j = 0; j < rowLength; j++) {
-            MockRowData row = rows.get(j);
-            Object[] innerParam = new Object[columnLength];
-            for (int i = 0; i < columnLength; i++) {
-                String columnName = columnList.get(i);
-                innerParam[i] = row.getMockColumn(columnName).getJdbcColumnValue();
+        sqlBuilder.append(") VALUES (");
+        for (int i = 0; i < columnLength; i++) {
+            sqlBuilder.append("?");
+            if (i < columnLength - 1) {
+                sqlBuilder.append(", ");
             }
-            params[j] = innerParam;
         }
-        List<Long> returnVal = new ArrayList<>();
-        long startTimestamp = System.currentTimeMillis();
-        SqlUtil.executeBatch(dataSource, sqlBuffer.toString(), params, new AbstractCallBack<int[]>() {
-            @Override
-            public void doOnSuccess(int[] result) {
-                String elapsedTime = PrintUtil.convertToReadableTimeString(System.currentTimeMillis() - startTimestamp,
-                        TimeUnit.MILLISECONDS, TimeUnit.MINUTES, TimeUnit.MILLISECONDS);
-                if (result != null) {
-                    log.info("JDBC writer writes a batch successfully, effectRow={}, elapsedTime={}", result.length,
-                            elapsedTime);
-                    returnVal.add((long) result.length);
-                } else {
-                    log.warn("JDBC writer has finished writing, but no data has been written, elapsedTime={}",
-                            elapsedTime);
-                }
+        String sql = sqlBuilder.append(")").toString();
+        int size = rows.size() / this.concurrent;
+        if (rows.size() % this.concurrent != 0) {
+            size += 1;
+        }
+        List<List<MockRowData>> lists = ListUtils.partition(rows, size);
+        CompletionService<Integer> completionService = new ExecutorCompletionService<>(this.executorService);
+        for (int i = 1; i < lists.size(); i++) {
+            List<MockRowData> mockRowData = lists.get(i);
+            completionService.submit(() -> doWrite(sql, columnList, mockRowData));
+        }
+        Integer totalAffectRows = 0;
+        try {
+            totalAffectRows += doWrite(sql, columnList, lists.get(0));
+        } catch (Exception e) {
+            log.warn("Failed to write jdbc, message={}", e.getMessage());
+            throw new IllegalStateException(e);
+        }
+        for (int i = 1; i < lists.size(); i++) {
+            try {
+                totalAffectRows += completionService.take().get();
+            } catch (InterruptedException | ExecutionException e) {
+                log.warn("Failed to write jdbc, message={}", e.getMessage());
+                throw new IllegalStateException(e);
             }
-
-            @Override
-            public void doOnFailure(int[] result, Throwable e) throws Throwable {
-                log.error("JDBC writer failed to write", e);
-                throw e;
-            }
-        });
-        return returnVal.get(0);
+        }
+        return totalAffectRows.longValue();
     }
 
     @Override
-    public String groupId() {
-        return this.groupId;
+    public boolean isClosed() {
+        return this.closed;
     }
+
+    @Override
+    public void close() throws Exception {
+        if (isClosed()) {
+            return;
+        }
+        this.closed = true;
+        try {
+            this.executorService.shutdown();
+        } catch (Exception e) {
+            // eat exception
+        }
+        if (this.dataSource instanceof AutoCloseable) {
+            ((AutoCloseable) this.dataSource).close();
+        }
+        log.info("JdbcWriter has been closed");
+    }
+
+    private ThreadPoolExecutor getThreadPoolExecutor() {
+        int corePoolSize = Math.max(Runtime.getRuntime().availableProcessors(), 5);
+        return new ThreadPoolExecutor(corePoolSize, corePoolSize, 0,
+                TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>(),
+                new BasicThreadFactory.Builder().namingPattern("ob-data-mocker-writer-thread-%d").build(),
+                new ThreadPoolExecutor.CallerRunsPolicy());
+    }
+
+    private int doWrite(String sql, List<String> columnList, List<MockRowData> mockRowData) {
+        int columnLength = columnList.size();
+        int[] affectRows = jdbc.batchUpdate(sql, new BatchPreparedStatementSetter() {
+            @Override
+            public int getBatchSize() {
+                return mockRowData.size();
+            }
+
+            @Override
+            public void setValues(PreparedStatement ps, int i) throws SQLException {
+                MockRowData row = mockRowData.get(i);
+                for (int j = 0; j < columnLength; j++) {
+                    ps.setObject(j + 1, row.getMockColumn(columnList.get(j)).getJdbcColumnValue());
+                }
+            }
+        });
+        return Arrays.stream(affectRows).map(value -> {
+            switch (value) {
+                case Statement.EXECUTE_FAILED:
+                    throw new IllegalStateException("Failed to execute a batch");
+                case Statement.SUCCESS_NO_INFO:
+                    return 1;
+                default:
+                    return value;
+            }
+        }).sum();
+    }
+
 }

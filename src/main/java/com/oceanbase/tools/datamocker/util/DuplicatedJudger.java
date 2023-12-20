@@ -18,9 +18,6 @@ package com.oceanbase.tools.datamocker.util;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.oceanbase.tools.datamocker.model.exception.MockerError;
-import com.oceanbase.tools.datamocker.model.exception.MockerException;
-
 /**
  * Tool class, used to determine whether a value has repeatedly appeared
  *
@@ -29,35 +26,23 @@ import com.oceanbase.tools.datamocker.model.exception.MockerException;
  * @since OBMOCKER_0.1.0_snapshot
  */
 public class DuplicatedJudger {
-    /**
-     * Set, used for judging whether it is repeated when the amount of data is small
-     */
+
     private Set<Object> set;
-    /**
-     * Bitmap, used to judge whether the data is duplicated when there is a large amount of data
-     */
     private BitMap bitMap;
-    /**
-     * The maximum number that can be carried
-     */
-    private final int maxCount;
-    /**
-     * Current cursor
-     */
     private int cursor;
+    private final int maxCount;
 
     public DuplicatedJudger(int count) {
         if (count <= 0) {
-            throw new MockerException(MockerError.PARAMETER_ERROR,
-                    "Count for DuplicatedJudger can not be equal to or smaleer than zero");
+            throw new IllegalArgumentException("Count <= 0");
         }
         if (count < 10000) {
             this.set = new HashSet<>();
         } else {
             this.bitMap = new BitMap(count);
         }
-        this.maxCount = count;
         this.cursor = 0;
+        this.maxCount = count;
     }
 
     public boolean contains(Object obj) {
@@ -70,8 +55,7 @@ public class DuplicatedJudger {
 
     public boolean add(Object obj) {
         if (++this.cursor > this.maxCount) {
-            throw new MockerException(MockerError.OPERATION_FAILURE,
-                    String.format("The max count for DuplicatedJudger is %d, can not add more", this.maxCount));
+            throw new IllegalStateException(String.format("The max count is %d, can not add more", this.maxCount));
         }
         if (this.set != null) {
             return this.set.add(obj);
@@ -88,4 +72,5 @@ public class DuplicatedJudger {
             this.bitMap.clear();
         }
     }
+
 }

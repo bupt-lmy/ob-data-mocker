@@ -6,7 +6,7 @@
     <artifactId>ob-data-mocker</artifactId>
     <name>ob-data-mocker</name>
     <url>http://maven.apache.org</url>
-    <version>0.1.4</version>
+    <version>0.2.0</version>
     <licenses>
         <license>
             <name>The Apache Software License, Version 2.0</name>
@@ -46,6 +46,11 @@
                 <scope>test</scope>
             </dependency>
             <dependency>
+                <groupId>com.zaxxer</groupId>
+                <artifactId>HikariCP</artifactId>
+                <version>4.0.3</version>
+            </dependency>
+            <dependency>
                 <groupId>com.oceanbase</groupId>
                 <artifactId>oceanbase-client</artifactId>
                 <version>2.4.3</version>
@@ -53,7 +58,12 @@
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-databind</artifactId>
-                <version>2.9.10.8</version>
+                <version>2.14.1</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-jdbc</artifactId>
+                <version>5.3.24</version>
             </dependency>
             <dependency>
                 <groupId>commons-lang</groupId>
@@ -80,6 +90,22 @@
                 <artifactId>lombok</artifactId>
                 <version>1.18.4</version>
                 <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-compress</artifactId>
+                <version>1.21</version>
+            </dependency>
+            <dependency>
+                <groupId>com.oceanbase</groupId>
+                <artifactId>db-browser</artifactId>
+                <version>1.0.3</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>commons-io</groupId>
+                <artifactId>commons-io</artifactId>
+                <version>2.11.0</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -116,6 +142,26 @@
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.zaxxer</groupId>
+            <artifactId>HikariCP</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-jdbc</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.oceanbase</groupId>
+            <artifactId>db-browser</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-compress</artifactId>
         </dependency>
     </dependencies>
     <build>

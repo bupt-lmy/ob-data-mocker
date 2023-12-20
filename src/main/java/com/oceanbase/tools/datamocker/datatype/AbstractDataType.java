@@ -16,7 +16,7 @@
 package com.oceanbase.tools.datamocker.datatype;
 
 import com.oceanbase.tools.datamocker.generator.BaseGenerator;
-import com.oceanbase.tools.datamocker.model.config.model.DataTypeConfig;
+import com.oceanbase.tools.datamocker.model.config.DataTypeConfig;
 import com.oceanbase.tools.datamocker.model.enums.ObModeType;
 import com.oceanbase.tools.datamocker.model.exception.MockerError;
 import com.oceanbase.tools.datamocker.model.exception.MockerException;
@@ -32,14 +32,14 @@ import org.apache.commons.lang.Validate;
  * @since OBMOCKER_snapshot_0.1.0
  */
 public abstract class AbstractDataType<T, V extends Comparable<? super V>> {
-    /**
-     * Pre-check result cache
-     */
-    private Boolean preCheck = null;
+
     @Getter
     private final T defaultValue;
     @Getter
     private final Boolean allowNull;
+    @Getter
+    private final ObModeType dialectType;
+    private Boolean preCheck = null;
     /**
      * The minimum value that the corresponding type of the data type can reach in the database. The
      * value can be specified manually. If not specified, it is the minimum value that the data type can
@@ -52,15 +52,7 @@ public abstract class AbstractDataType<T, V extends Comparable<? super V>> {
      * represent.
      */
     protected V highValue = null;
-    /**
-     * A data generator is bound by default
-     */
     protected BaseGenerator<V, T> generator;
-    /**
-     * OB mode corresponding to this data type
-     */
-    @Getter
-    private final ObModeType dialectType;
 
     /**
      * The constructor of the abstract base class, where you need to pass in the random data generator
@@ -215,32 +207,20 @@ public abstract class AbstractDataType<T, V extends Comparable<? super V>> {
         }
     }
 
-    /**
-     * Set the low value of the data type
-     *
-     * @param value low value
-     */
     public void setLowValue(V value) {
         validateValue(value);
         if (value.compareTo(highValue()) > 0) {
-            throw new MockerException(MockerError.VALUE_OUT_OFRANGE,
-                    String.format("Min value can not be bigger than max value \"%s\" for data type %s",
-                            highValue().toString(), toString()));
+            throw new IllegalArgumentException(String.format(
+                    "Min is bigger than max \"%s\" for data type %s", highValue().toString(), toString()));
         }
         this.lowValue = value;
     }
 
-    /**
-     * Set the high value of the data type
-     *
-     * @param value high value
-     */
     public void setHighValue(V value) {
         validateValue(value);
         if (value.compareTo(lowValue()) < 0) {
-            throw new MockerException(MockerError.VALUE_OUT_OFRANGE,
-                    String.format("Max value can not be smaller than min value \"%s\" for data type %s",
-                            lowValue().toString(), toString()));
+            throw new IllegalArgumentException(String.format(
+                    "Max is smaller than min \"%s\" for data type %s", lowValue().toString(), toString()));
         }
         this.highValue = value;
     }
@@ -252,13 +232,13 @@ public abstract class AbstractDataType<T, V extends Comparable<? super V>> {
      */
     public T acquire() {
         if (generator == null) {
-            throw new MockerException(MockerError.OPERATION_FAILURE, "Generator can not be null");
+            throw new IllegalStateException("Generator can not be null");
         }
         if (this.preCheck == null) {
             this.preCheck = generator.preCheck(lowValue(), highValue());
         }
         if (this.preCheck == null || !this.preCheck) {
-            throw new MockerException(MockerError.PARAMETER_ERROR,
+            throw new IllegalArgumentException(
                     String.format("Data check of column \"%s\" for generator is not passed", this));
         }
         return preProcessingBeforeOutput(generator.next(lowValue(), highValue()));
@@ -278,6 +258,18 @@ public abstract class AbstractDataType<T, V extends Comparable<? super V>> {
         return this.highValue;
     }
 
+    /**
+     * Convert method to generate a mock column
+     *
+     * @param columnName column name
+     * @param jdbcObject column value
+     * @return mock column
+     */
+    public MockColumnData<T> convertFromJdbcObjectToMockColumn(String columnName, Object jdbcObject) {
+        Validate.notEmpty(columnName, "ColumnName can not be null for AbstractDataType#toMockColumn");
+        return new MockColumnData<>(columnName, this, this.convertFromJdbcObjectToJavaObject(jdbcObject));
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -293,18 +285,6 @@ public abstract class AbstractDataType<T, V extends Comparable<? super V>> {
     @Override
     public int hashCode() {
         return (getFactory().toString() + this.dialectType.name()).hashCode();
-    }
-
-    /**
-     * Convert method to generate a mock column
-     *
-     * @param columnName column name
-     * @param jdbcObject column value
-     * @return mock column
-     */
-    public MockColumnData<T> convertFromJdbcObjectToMockColumn(String columnName, Object jdbcObject) {
-        Validate.notEmpty(columnName, "ColumnName can not be null for AbstractDataType#toMockColumn");
-        return new MockColumnData<>(columnName, this, this.convertFromJdbcObjectToJavaObject(jdbcObject));
     }
 
 }

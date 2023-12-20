@@ -445,30 +445,26 @@
         {
           "columnName": "col33",
           "typeConfig": {
-            "name": "CHAR",
+            "name": "DIGIT",
             "columnType": "OB_MYSQL_BIT",
-            "generator": "RANDOM_BYTE_GENERATOR",
-            "width": 16
+            "generator": "UNIFORM_GENERATOR",
+            "precision": 16
           },
           "allowNull": false,
           "defaultValue": null,
           "dataType": null
         }
       ],
-      "maxRetainedCount": 1,
       "totalCount": 100,
       "strategy": "IGNORE",
       "batchSize": 240,
       "whetherTruncate": false,
       "tableName": "emp",
       "schemaName": "test",
-      "timeout": 180000,
-      "location": "test/mock/emp.sql"
+      "timeoutMillis": 180000,
+      "outputDir": "test/mock"
     }
   ],
   "dialectType": "OB_MYSQL",
-  "taskName": null,
-  "minConnectionSize": 8,
-  "maxConnectionSize": 10,
-  "connectionIncreasementStep": 2
+  "maxConnectionSize": 10
 }

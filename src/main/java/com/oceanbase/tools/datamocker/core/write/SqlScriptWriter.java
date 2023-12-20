@@ -13,176 +13,110 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.oceanbase.tools.datamocker.core.write;
 
 import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
+import java.util.function.Supplier;
 
-import com.oceanbase.tools.datamocker.core.write.output.MockerFile;
-import com.oceanbase.tools.datamocker.model.enums.ObModeType;
-import com.oceanbase.tools.datamocker.model.exception.MockerError;
-import com.oceanbase.tools.datamocker.model.exception.MockerException;
 import com.oceanbase.tools.datamocker.model.mock.MockColumnData;
 import com.oceanbase.tools.datamocker.model.mock.MockRowData;
-import com.oceanbase.tools.datamocker.util.DbObjectNameUtil;
-import com.oceanbase.tools.datamocker.util.DigestUtil;
+import com.oceanbase.tools.dbbrowser.util.SqlBuilder;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.Validate;
+import org.apache.commons.io.IOUtils;
 
 /**
- * SQL text generation primitive
+ * {@link SqlScriptWriter}
  *
  * @author yh263208
- * @date 2021-01-05 20:47
- * @since OBMOCKER_snasphot_0.1.0
+ * @date 2023-11-28 20:41
+ * @since ODC_release_4.2.3
  */
 @Slf4j
-public class SqlScriptWriter extends AbstractMockWriter {
-    /**
-     * The written target library, if the target library is specified when the connection is
-     * established, this value can also be left blank
-     */
-    private final String database;
-    /**
-     * The target table to be written, this parameter must be passed, specify the incoming target table
-     */
+public class SqlScriptWriter implements DataWriter {
+
     private final String tableName;
-    /**
-     * The dialect mode of OB, the default is oracle mode
-     */
-    private final ObModeType dialectType;
-    private final MockerFile manager;
-    private final String groupId;
+    private final String schema;
+    private final SqlScriptOutput output;
+    private final Long maxOutputSizeInBytes;
+    private final Supplier<SqlBuilder> sqlBuilderSupplier;
+    private volatile boolean closed = false;
 
-    /**
-     * The constructor writes a mock file, which is required
-     *
-     * @param manager mock file object
-     * @param dialectType dialect type
-     * @param database schema or database name
-     * @param tableName table name
-     */
-    public SqlScriptWriter(MockerFile manager, ObModeType dialectType, String database,
-            String tableName) {
-        validateParam(manager, dialectType, database, tableName);
-        this.database = database;
+    public SqlScriptWriter(@NonNull SqlScriptOutput output,
+            @NonNull Long maxOutputSizeInBytes,
+            @NonNull Supplier<SqlBuilder> sqlBuilderSupplier,
+            @NonNull String schema, @NonNull String tableName) {
         this.tableName = tableName;
-        this.manager = manager;
-        this.dialectType = dialectType;
-        try {
-            this.groupId = DigestUtil.getToken(manager.getFile().getAbsolutePath());
-        } catch (NoSuchAlgorithmException e) {
-            throw new MockerException(MockerError.UNKNOWN_ERROR, e.getMessage());
-        }
-    }
-
-    /**
-     * The constructor writes a mock file, which is required
-     *
-     * @param manager mock file object
-     * @param dialectType dialect type
-     * @param database schema or database name
-     * @param tableName table name
-     * @param groupId group id
-     */
-    public SqlScriptWriter(MockerFile manager, ObModeType dialectType, String database, String tableName,
-            String groupId) {
-        validateParam(manager, dialectType, database, tableName);
-        this.database = database;
-        this.tableName = tableName;
-        this.manager = manager;
-        this.dialectType = dialectType;
-        if (groupId == null) {
-            throw new MockerException(MockerError.PARAMETER_ERROR, "Group id can not be null");
-        }
-        this.groupId = groupId;
-    }
-
-    /**
-     * Validation primitive input parameters
-     *
-     * @param manager mock file
-     * @param dialectType dialect type
-     * @param database database or schema name
-     * @param tableName table name
-     * @throws MockerException An exception is thrown when verification fails
-     */
-    private void validateParam(MockerFile manager, ObModeType dialectType, String database, String tableName) {
-        Validate.notNull(manager, "File manager can not be null for SqlScriptWriter#validateParam");
-        Validate.notNull(database, "DataBase can not be null for SqlScriptWriter#validateParam");
-        Validate.notNull(tableName, "TableName can not be null for SqlScriptWriter#validateParam");
-        if (!ObModeType.OB_ORACLE.equals(dialectType) && !ObModeType.OB_MYSQL.equals(dialectType)) {
-            throw new MockerException(MockerError.INVALID_OB_MODE);
-        }
+        this.schema = schema;
+        this.output = output;
+        this.maxOutputSizeInBytes = maxOutputSizeInBytes <= 0
+                ? Long.MAX_VALUE
+                : maxOutputSizeInBytes;
+        this.sqlBuilderSupplier = sqlBuilderSupplier;
     }
 
     @Override
-    protected long doWrite(List<MockRowData> rows) throws IOException {
-        MockRowData firstRow = rows.get(0);
-        Set<String> columnSet = firstRow.columnNames();
-        List<String> columnList = new ArrayList<>(columnSet);
-        StringBuffer sqlBuffer;
-        if (ObModeType.OB_ORACLE.equals(this.dialectType)) {
-            sqlBuffer = new StringBuffer(
-                    String.format("insert into \"%s\".\"%s\"(", DbObjectNameUtil.doubleCharToEscape(database, '"'),
-                            DbObjectNameUtil.doubleCharToEscape(tableName, '"')));
-        } else if (ObModeType.OB_MYSQL.equals(this.dialectType)) {
-            sqlBuffer = new StringBuffer(
-                    String.format("insert into `%s`.`%s`(", DbObjectNameUtil.doubleCharToEscape(database, '`'),
-                            DbObjectNameUtil.doubleCharToEscape(tableName, '`')));
-        } else {
-            throw new MockerException(MockerError.INVALID_OB_MODE);
+    public long write(List<MockRowData> rows) throws IOException {
+        if (this.closed) {
+            throw new IllegalStateException("SqlScriptWriter has been closed");
+        } else if (this.output.getTotalWriteBytes() >= this.maxOutputSizeInBytes) {
+            return 0L;
         }
+        SqlBuilder prefixBuilder = this.sqlBuilderSupplier.get();
+        prefixBuilder.append("INSERT INTO ")
+                .identifier(this.schema)
+                .append(".").identifier(this.tableName).append(" (");
+        List<String> columnList = new ArrayList<>(rows.get(0).columnNames());
         int columnLength = columnList.size();
         for (int i = 0; i < columnLength; i++) {
-            String columnName = columnList.get(i);
-            if (i == columnLength - 1) {
-                if (ObModeType.OB_ORACLE.equals(this.dialectType)) {
-                    sqlBuffer.append(
-                            String.format("\"%s\") values (", DbObjectNameUtil.doubleCharToEscape(columnName, '"')));
-                } else {
-                    sqlBuffer.append(
-                            String.format("`%s`) values (", DbObjectNameUtil.doubleCharToEscape(columnName, '`')));
-                }
-            } else {
-                if (ObModeType.OB_ORACLE.equals(this.dialectType)) {
-                    sqlBuffer.append(String.format("\"%s\", ", DbObjectNameUtil.doubleCharToEscape(columnName, '"')));
-                } else {
-                    sqlBuffer.append(String.format("`%s`, ", DbObjectNameUtil.doubleCharToEscape(columnName, '`')));
-                }
+            prefixBuilder.identifier(columnList.get(i));
+            if (i < columnLength - 1) {
+                prefixBuilder.append(", ");
             }
         }
-        String prefix = sqlBuffer.toString();
-        List<String> sqlList = new ArrayList<>();
-        for (MockRowData row : rows) {
-            StringBuilder buffer = new StringBuilder(prefix);
+        String prefix = prefixBuilder.append(") VALUES (").toString();
+
+        StringBuilder sqlStringBuilder = new StringBuilder();
+        rows.forEach(rowData -> {
+            SqlBuilder sqlBuilder = sqlBuilderSupplier.get().append(prefix);
             for (int i = 0; i < columnLength; i++) {
                 String columnName = columnList.get(i);
-                MockColumnData<?> mockColumn = row.getMockColumn(columnName);
+                MockColumnData<?> mockColumn = rowData.getMockColumn(columnName);
                 String value = mockColumn.getColumnValueString();
                 if (value == null) {
-                    throw new MockerException(MockerError.ILLEGAL_RETURN_VALUE,
-                            String.format("Value for column \"%s\" is null", columnName));
+                    throw new IllegalStateException(String.format(
+                            "Value for column \"%s\" is null", columnName));
                 }
+                sqlBuilder.append(value);
                 if (i == columnLength - 1) {
-                    buffer.append(String.format("%s); ", value));
+                    sqlBuilder.append(");");
                 } else {
-                    buffer.append(String.format("%s,", value));
+                    sqlBuilder.append(", ");
                 }
             }
-            sqlList.add(buffer.append("\n").toString());
-        }
-        String result = String.join("", sqlList);
-        this.manager.write(result.getBytes(), 0, result.getBytes().length, true);
-        return rows.size();
+            sqlStringBuilder.append(sqlBuilder.toString()).append("\n");
+        });
+        byte[] buffer = sqlStringBuilder.toString().getBytes();
+        IOUtils.write(buffer, this.output.getOutputStream());
+        return buffer.length;
     }
 
     @Override
-    public String groupId() {
-        return this.groupId;
+    public boolean isClosed() {
+        return this.closed;
+    }
+
+    @Override
+    public void close() throws Exception {
+        if (isClosed()) {
+            return;
+        }
+        this.closed = true;
+        this.output.close();
+        log.info("SqlScriptWriter has been closed");
     }
 
 }

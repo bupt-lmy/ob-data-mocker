@@ -36,17 +36,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.oceanbase.tools.datamocker.MockerTestBase;
 import com.oceanbase.tools.datamocker.ObDataMocker;
 import com.oceanbase.tools.datamocker.ObMockerFactory;
-import com.oceanbase.tools.datamocker.core.task.AbstractMockerFactory;
+import com.oceanbase.tools.datamocker.core.DataSourceFactory;
 import com.oceanbase.tools.datamocker.core.task.TableTaskContext;
-import com.oceanbase.tools.datamocker.core.write.output.MockerDataSource;
-import com.oceanbase.tools.datamocker.model.config.AbstractTableConfig;
-import com.oceanbase.tools.datamocker.model.config.AbstractTaskConfig;
-import com.oceanbase.tools.datamocker.model.config.impl.DefaultTaskConfig;
-import com.oceanbase.tools.datamocker.model.config.model.DataBaseConfig;
+import com.oceanbase.tools.datamocker.model.config.DataBaseConfig;
+import com.oceanbase.tools.datamocker.model.config.MockTableConfig;
+import com.oceanbase.tools.datamocker.model.config.MockTaskConfig;
 import com.oceanbase.tools.datamocker.model.enums.MockTaskStatus;
-import com.oceanbase.tools.datamocker.model.enums.ScriptType;
 import com.oceanbase.tools.datamocker.schedule.MockContext;
-import com.oceanbase.tools.datamocker.util.PrintUtil;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -60,6 +58,7 @@ import org.junit.Test;
  * @since OBMOCKER_0.1.0_snapshot
  */
 public class MockerTaskMysqlTest extends MockerTestBase {
+
     private final ThreadPoolExecutor executor = new ThreadPoolExecutor(3, 5, 0, TimeUnit.MILLISECONDS,
             new LinkedBlockingQueue<>(), new ThreadPoolExecutor.CallerRunsPolicy());
     private final String configFile = "task/config-mysql.json";
@@ -102,7 +101,7 @@ public class MockerTaskMysqlTest extends MockerTestBase {
     };
     private DataSource mysqlDatasource = null;
 
-    private AbstractTaskConfig getTask() throws IOException {
+    private MockTaskConfig getTask() throws IOException {
         URL url = this.getClass().getClassLoader().getResource(this.configFile);
         FileReader reader = new FileReader(url.getPath());
         StringWriter writer = new StringWriter();
@@ -115,8 +114,9 @@ public class MockerTaskMysqlTest extends MockerTestBase {
         reader.close();
         writer.close();
         ObjectMapper mapper = new ObjectMapper();
-        DefaultTaskConfig config = mapper.readValue(writer.toString(), DefaultTaskConfig.class);
+        MockTaskConfig config = mapper.readValue(writer.toString(), MockTaskConfig.class);
         config.setDbConfig(getMySqlConfig());
+        config.setLogDir("./");
         return config;
     }
 
@@ -124,7 +124,7 @@ public class MockerTaskMysqlTest extends MockerTestBase {
     public void initEnv() throws SQLException {
         if (mysqlDatasource == null) {
             DataBaseConfig config = getMySqlConfig();
-            mysqlDatasource = new MockerDataSource(config, 3, 5, 2, null);
+            mysqlDatasource = new DataSourceFactory(config).generate();
         }
         try (Connection connection = mysqlDatasource.getConnection()) {
             try (Statement statement = connection.createStatement()) {
@@ -137,8 +137,8 @@ public class MockerTaskMysqlTest extends MockerTestBase {
 
     @Test
     public void testMockTask() throws Throwable {
-        AbstractTaskConfig config = getTask();
-        AbstractMockerFactory factory = new ObMockerFactory(config);
+        MockTaskConfig config = getTask();
+        ObMockerFactory factory = new ObMockerFactory(config);
         ObDataMocker mocker = factory.create();
         MockContext context = mocker.start();
         Callable<Boolean> task = () -> {
@@ -151,9 +151,8 @@ public class MockerTaskMysqlTest extends MockerTestBase {
                 }
                 for (TableTaskContext item : contexts) {
                     long interval = System.currentTimeMillis() - start;
-                    System.out.printf("[\"%s\" - \"%s\"] : %s - %s - %.2f %%%n", item.getTaskName(),
-                            item.getTableTaskId(), item.getStatus(), PrintUtil.convertToReadableTimeString(interval,
-                                    TimeUnit.MILLISECONDS, TimeUnit.MINUTES, TimeUnit.SECONDS),
+                    System.out.printf("%s - %s - %.2f %%%n",
+                            item.getStatus(), DurationFormatUtils.formatDurationHMS(interval),
                             context.getProgress());
                     if (MockTaskStatus.CANCELED.equals(item.getStatus())
                             || MockTaskStatus.FAILED.equals(item.getStatus())) {
@@ -172,15 +171,9 @@ public class MockerTaskMysqlTest extends MockerTestBase {
     }
 
     private void clearFile() throws IOException {
-        AbstractTaskConfig config = getTask();
-        for (AbstractTableConfig tableConfig : config.tasks()) {
-            for (ScriptType type : ScriptType.values()) {
-                String location = tableConfig.dataWriteLocation(type);
-                File file = new File(location);
-                if (file.exists()) {
-                    file.delete();
-                }
-            }
+        MockTaskConfig config = getTask();
+        for (MockTableConfig tableConfig : config.getTables()) {
+            FileUtils.deleteDirectory(new File(tableConfig.getOutputDir()));
         }
     }
 
@@ -191,7 +184,13 @@ public class MockerTaskMysqlTest extends MockerTestBase {
                 statement.execute("drop table emp");
             }
         }
-        ((MockerDataSource) mysqlDatasource).clear();
+        try {
+            if (mysqlDatasource instanceof AutoCloseable) {
+                ((AutoCloseable) mysqlDatasource).close();
+            }
+        } catch (Exception e) {
+            // eat exception
+        }
         clearFile();
     }
 }
