@@ -17,6 +17,7 @@
 package com.oceanbase.tools.datamocker.core;
 
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -73,6 +74,10 @@ public class DataSourceFactory {
             } else {
                 this.connectionInitSql = initSql + this.connectionInitSql;
             }
+            if (this.params == null) {
+                this.params = new HashMap<>();
+            }
+            this.params.putIfAbsent("allowMultiQueries", "true");
         }
         dataSource.setConnectionInitSql(this.connectionInitSql);
         dataSource.setJdbcUrl(getJdbcUrl());

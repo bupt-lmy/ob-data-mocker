@@ -147,7 +147,7 @@ public class JdbcWriter implements DataWriter {
         if (this.dataSource instanceof AutoCloseable) {
             ((AutoCloseable) this.dataSource).close();
         }
-        log.info("JdbcWriter has been closed");
+        log.info("JdbcWriter has been closed, concurrent={}", this.concurrent);
     }
 
     private ThreadPoolExecutor getThreadPoolExecutor() {
