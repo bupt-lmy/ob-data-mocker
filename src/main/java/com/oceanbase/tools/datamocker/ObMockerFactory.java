@@ -161,7 +161,7 @@ public class ObMockerFactory {
         if (param != null) {
             Set<Entry<String, String>> entries = param.entrySet();
             for (Map.Entry<String, String> entry : entries) {
-                realParam.putIfAbsent(entry.getKey(), entry.getValue());
+                realParam.put(entry.getKey(), entry.getValue());
             }
         }
         DataSourceFactory factory = new DataSourceFactory(this.taskConfig.getDbConfig());

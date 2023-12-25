@@ -75,7 +75,8 @@ public class MockTableConfig {
         }
         long epoch = this.concurrent * this.batchSize;
         if (epoch < 0 || epoch >= this.totalCount) {
-            return Long.valueOf(this.totalCount / this.batchSize).intValue();
+            int res = Long.valueOf(this.totalCount / this.batchSize).intValue();
+            return res <= 0 ? 1 : res;
         }
         return this.concurrent;
     }
