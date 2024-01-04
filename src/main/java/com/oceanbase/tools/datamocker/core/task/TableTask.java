@@ -98,11 +98,11 @@ public class TableTask {
         this.afterTask.bind(new AbstractCallBack<TableTaskContext>() {
             @Override
             public void doOnSuccess(TableTaskContext param) throws Throwable {
+                callBack.onSuccess(param);
                 if (!MockTaskStatus.FAILED.equals(that.getStatus())
                         && !MockTaskStatus.CANCELED.equals(that.getStatus())) {
                     param.setStatus(MockTaskStatus.SUCCESS);
                 }
-                callBack.onSuccess(param);
             }
 
             @Override
