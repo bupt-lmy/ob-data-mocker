@@ -6,7 +6,7 @@
     <artifactId>ob-data-mocker</artifactId>
     <name>ob-data-mocker</name>
     <url>http://maven.apache.org</url>
-    <version>0.2.1</version>
+    <version>0.2.2</version>
     <licenses>
         <license>
             <name>The Apache Software License, Version 2.0</name>
