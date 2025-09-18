@@ -184,13 +184,70 @@ CREATE TABLE "EMP" (
     "password": "xxx",
     "defaultSchame": "SYS"
   },
+  "llmConfig": {
+    "enabled": true,
+    "taskConfigPath": "emp_task.json",
+    "apiKey": "你的apikey",
+    "endpoint": "https://api.deepseek.com/chat/completions",
+    "timeoutSeconds": 300
+  }
   "taskName": null,
   "minConnectionSize": 4,
   "maxConnectionSize": 6,
   "connectionIncreasementStep": 2
 }
-```
 
+```
+如果llmConfig下enabled设置为true，则需要在相同目录下新建一个config.json文件用于向AI解释数据库配置，示例如下：
+```json
+{
+  "taskName": "emp_demo",
+  "output": {
+    "dir": "test/obtest",          // 输出目录（必须可写）
+    "filePrefix": "emp_seed",      // 输出文件名前缀
+    "rows": 500,                   // 生成行数
+    "batchSize": 100,              // 每条INSERT包含的 VALUES 数
+    "schema": "obtest",            // 可选，用于反引号包裹时拼接
+    "table": "emp"                 // 表名
+  },
+  "table": {
+    "name": "emp",
+    "uniqueConstraints": [["ID"]], // 可选：用于提醒唯一性（本实现不会查库，仅做去重保护）
+    "columns": [
+      {
+        "name": "ID",
+        "type": "INT",
+        "nullable": false,
+        "comment": "主键，自增（步进）",
+        "generator": { "name": "STEP", "start": 1, "step": 1 }
+      },
+      {
+        "name": "NAME",
+        "type": "VARCHAR(50)",
+        "nullable": false,
+        "comment": "英文姓名（首字母大写）",
+        "generator": { "name": "REGEXP", "pattern": "[A-Z][a-z]{3,8}" }
+      },
+      {
+        "name": "AGE",
+        "type": "INT",
+        "nullable": true,
+        "comment": "年龄 18~65 随机",
+        "generator": { "name": "RANGE_INT", "start": 18, "end": 65 }
+      },
+      {
+        "name": "HIRE_DATE",
+        "type": "DATE",
+        "nullable": true,
+        "comment": "入职日期（2000-01-01 ~ 2025-01-01）随机",
+        "generator": { "name": "RANDOM_DATE", "start": "2000-01-01", "end": "2025-01-01" }
+      }
+    ]
+  }
+}
+
+
+```
 实际的 Java 代码调用层面只需要不超过10行代码即可完成调用，需要说明的是模拟数据工具的 SDK 是异步的：
 
 ```java
@@ -200,12 +257,16 @@ import com.oceanbase.tools.datamocker.schedule.MockContext;
 public class App {
     public static void main(String[] args) {
         // 从json文件中反序列化出一个配置对象
-        DefaultTaskConfig taskConfig = readFromJson();
+        ObjectMapper mapper = new ObjectMapper();
+        MockTaskConfig taskConfig = mapper.readValue(
+                new File(App.class.getClassLoader().getResource("data-config.json").getFile()),
+                MockTaskConfig.class);
         // 启动mock数据任务
         ObMockerFactory factory = new ObMockerFactory(taskConfig);
         ObDataMocker mocker = factory.create();
         // context中封装了模拟数据任务的上下文信息，也封装了模拟数据任务的句柄信息，可以对任务的中断等操作
         MockContext context = mocker.start();
+        
     }
 }
 ```

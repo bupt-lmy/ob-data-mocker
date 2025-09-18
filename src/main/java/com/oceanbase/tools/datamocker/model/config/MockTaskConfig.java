@@ -40,6 +40,7 @@ public class MockTaskConfig {
     private String connectionInitSql;
     private String logDir = "./";
     private List<MockTableConfig> tables;
+    private LlmConfig llmConfig; // 新增，模型相关配置
 
     public int getMaxConnectionSize() {
         if (this.maxConnectionSize < 5) {

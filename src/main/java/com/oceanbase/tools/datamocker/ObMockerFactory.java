@@ -43,6 +43,8 @@ import com.oceanbase.tools.datamocker.core.write.JdbcWriter;
 import com.oceanbase.tools.datamocker.core.write.SqlScriptOutput;
 import com.oceanbase.tools.datamocker.core.write.SqlScriptWriter;
 import com.oceanbase.tools.datamocker.datatype.AbstractDataType;
+import com.oceanbase.tools.datamocker.generator.DeepseekSqlGeneratorAdapter;
+import com.oceanbase.tools.datamocker.model.config.LlmConfig;
 import com.oceanbase.tools.datamocker.model.config.MockColumnConfig;
 import com.oceanbase.tools.datamocker.model.config.MockTableConfig;
 import com.oceanbase.tools.datamocker.model.config.MockTaskConfig;
@@ -83,6 +85,12 @@ public class ObMockerFactory {
     }
 
     public ObDataMocker create(@NonNull AbstractScheduler scheduler) {
+        // ======= 新增：LLM 选路（在工厂内判断）=======
+        LlmConfig llm = (taskConfig == null) ? null : taskConfig.getLlmConfig();
+        if (llm != null && Boolean.TRUE.equals(llm.getEnabled())) {
+            return createLlmCompletedMocker(scheduler, llm);
+        }
+        // ======= 原有分支（老路径）=======
         DataSource dataSource = null;
         try {
             String logDir = this.taskConfig.getLogDir();
@@ -99,11 +107,48 @@ public class ObMockerFactory {
             if (dataSource instanceof AutoCloseable) {
                 try {
                     ((AutoCloseable) dataSource).close();
-                } catch (Exception e) {
-                    // eat exception
-                }
+                } catch (Exception e) { /* ignore */ }
             }
         }
+    }
+    /**
+     * LLM 分支：先生成 SQL 文件，再返回一个“空 Dispatcher”的 ObDataMocker。
+     * 调用 start() 后会立即完成，得到一个“完成型” MockContext。
+     */
+    private ObDataMocker createLlmCompletedMocker(@NonNull AbstractScheduler scheduler, @NonNull LlmConfig llm) {
+        String logDir = this.taskConfig.getLogDir();
+        MDC.put("mocktask.workspace", logDir);
+        try {
+            // 1) 先做 LLM 生成（直接写盘）
+            String taskConfigPath = req(llm.getTaskConfigPath(), "llmMode.taskConfigPath");
+            String apiKey = req(llm.getApiKey(), "llmMode.apiKey");
+            String endpoint = (llm.getEndpoint() == null || llm.getEndpoint().isEmpty())
+                    ? "https://api.deepseek.com/chat/completions"
+                    : llm.getEndpoint();
+            int timeout = llm.getTimeoutSeconds() == null ? 300 : llm.getTimeoutSeconds();
+
+            File generated = DeepseekSqlGeneratorAdapter.generateFromTaskConfig(
+                    taskConfigPath, apiKey, endpoint, timeout
+            );
+            log.info("LLM SQL generated at {}", generated.getAbsolutePath());
+
+            // 2) 构造空 Dispatcher（宽度=0），交给调度器生成一个“完成型”上下文
+            Dispatcher<TableTaskInfo> emptyDispatcher = new Dispatcher<>(logDir);
+
+            // 3) 返回 ObDataMocker（start() 立即完成，得到标准 MockContext）
+            return new ObDataMocker(emptyDispatcher, scheduler);
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Failed to generate SQL via LLM: " + e.getMessage(), e);
+        } finally {
+            MDC.clear();
+        }
+    }
+
+    private static String req(String v, String name) {
+        if (v == null || v.trim().isEmpty()) {
+            throw new IllegalArgumentException("Missing required field: " + name);
+        }
+        return v;
     }
 
     private Dispatcher<TableTaskInfo> generate(MockTaskConfig taskConfig, DataSource ds, String logDir)

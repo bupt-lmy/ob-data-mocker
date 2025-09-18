@@ -1,0 +1,45 @@
+{
+  "taskName": "emp_demo",
+  "output": {
+    "dir": "test/obtest",          // 输出目录（必须可写）
+    "filePrefix": "emp_seed",      // 输出文件名前缀
+    "rows": 500,                   // 生成行数
+    "batchSize": 100,              // 每条INSERT包含的 VALUES 数
+    "schema": "obtest",            // 可选，用于反引号包裹时拼接
+    "table": "emp"                 // 表名
+  },
+  "table": {
+    "name": "emp",
+    "uniqueConstraints": [["ID"]], // 可选：用于提醒唯一性（本实现不会查库，仅做去重保护）
+    "columns": [
+      {
+        "name": "ID",
+        "type": "INT",
+        "nullable": false,
+        "comment": "主键，自增（步进）",
+        "generator": { "name": "STEP", "start": 1, "step": 1 }
+      },
+      {
+        "name": "NAME",
+        "type": "VARCHAR(50)",
+        "nullable": false,
+        "comment": "英文姓名（首字母大写）",
+        "generator": { "name": "REGEXP", "pattern": "[A-Z][a-z]{3,8}" }
+      },
+      {
+        "name": "AGE",
+        "type": "INT",
+        "nullable": true,
+        "comment": "年龄 18~65 随机",
+        "generator": { "name": "RANGE_INT", "start": 18, "end": 65 }
+      },
+      {
+        "name": "HIRE_DATE",
+        "type": "DATE",
+        "nullable": true,
+        "comment": "入职日期（2000-01-01 ~ 2025-01-01）随机",
+        "generator": { "name": "RANDOM_DATE", "start": "2000-01-01", "end": "2025-01-01" }
+      }
+    ]
+  }
+}

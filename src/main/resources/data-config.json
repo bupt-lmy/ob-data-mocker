@@ -1,0 +1,74 @@
+{
+  "tables": [
+    {
+      "columns": [
+        {
+          "columnName": "ID",
+          "allowNull": false,
+          "typeConfig": {
+            "name": "DIGIT",
+            "columnType": "OB_MYSQL_INT",
+            "generator": "STEP_GENERATOR",
+            "genParams": { "step": 1 }
+          }
+        },
+        {
+          "columnName": "NAME",
+          "allowNull": false,
+          "typeConfig": {
+            "name": "CHAR",
+            "columnType": "OB_MYSQL_VARCHAR",
+            "width": 50,
+            "charset": "UTF_8",
+            "generator": "REGEXP_GENERATOR",
+            "genParams": { "regText": "[A-Z][a-z]{3,8}" }
+          }
+        },
+        {
+          "columnName": "AGE",
+          "allowNull": true,
+          "typeConfig": {
+            "name": "DIGIT",
+            "columnType": "OB_MYSQL_INT",
+            "generator": "STEP_GENERATOR",
+            "genParams": { "start": 20, "step": 1 }
+          }
+        },
+        {
+          "columnName": "HIRE_DATE",
+          "allowNull": true,
+          "typeConfig": {
+            "name": "DATE",
+            "columnType": "OB_MYSQL_DATE",
+            "generator": "RANDOM_DATE_GENERATOR",
+            "genParams": { "start": "2000-01-01", "end": "2025-01-01" }
+          }
+        }
+      ],
+      "totalCount": 500,
+      "batchSize": 100,
+      "tableName": "emp",
+      "schemaName": "obtest",
+      "outputDir": "test/obtest",
+      "maxSingleFileSizeInBytes": 10485760,
+      "strategy": "IGNORE"
+    }
+  ],
+  "dialectType": "OB_MYSQL",
+  "maxConnectionSize": 8,
+  "dbConfig": {
+    "host": "youroceanbasehost",
+    "port": 3306,
+    "user": "superuser",
+    "tenant": null,
+    "password": "yourpassword",
+    "defaultSchame": "obtest"
+  },
+  "llmConfig": {
+    "enabled": true,
+    "taskConfigPath": "emp_task.json",//示例数据库配置文件
+    "apiKey": "yourdeepseekapi",
+    "endpoint": "https://api.deepseek.com/chat/completions",
+    "timeoutSeconds": 300
+  }
+}
