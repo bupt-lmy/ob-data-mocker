@@ -3,6 +3,9 @@ package com.oceanbase.tools.datamocker.config;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * SQL 数据生成任务配置类。定义表名、列定义、输出路径等生成任务的全部配置信息。
+ */
 public class TaskConfig {
     public String taskName;
     public Output output;

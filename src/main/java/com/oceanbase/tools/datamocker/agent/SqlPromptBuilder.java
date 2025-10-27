@@ -5,6 +5,9 @@ import com.oceanbase.tools.datamocker.config.GeneratorParamUtil;
 
 import java.util.StringJoiner;
 
+/**
+ * SQL 生成提示词构建工具。根据任务配置生成适合 LLM 理解的 SQL 生成提示词。
+ */
 public class SqlPromptBuilder {
 
     public static String buildFromTaskConfig(TaskConfig cfg) {

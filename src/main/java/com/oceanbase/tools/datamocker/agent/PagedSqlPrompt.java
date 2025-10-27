@@ -21,6 +21,9 @@ import com.oceanbase.tools.datamocker.config.TaskConfig;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * SQL 生成提示词生成器。为分页式 SQL 生成提供三阶段（首段、中段、末段）的优化提示词。
+ */
 public class PagedSqlPrompt {
 
     private static String fqTable(TaskConfig cfg) {

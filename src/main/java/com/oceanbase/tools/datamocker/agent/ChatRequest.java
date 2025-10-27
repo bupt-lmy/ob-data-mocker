@@ -16,8 +16,9 @@
 
 package com.oceanbase.tools.datamocker.agent;
 
-import java.util.List;
-
+/**
+ * LLM API 请求数据模型。封装向 DeepSeek API 发送聊天完成请求的参数信息。
+ */
 public class ChatRequest {
     public String model;
     public java.util.List<Message> messages;

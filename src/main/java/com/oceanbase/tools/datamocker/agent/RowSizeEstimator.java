@@ -18,6 +18,9 @@ package com.oceanbase.tools.datamocker.agent;
 
 import com.oceanbase.tools.datamocker.config.TaskConfig;
 
+/**
+ * 行大小估算工具。估算 SQL 行长度并动态计算每次 LLM 调用应生成的行数。
+ */
 public final class RowSizeEstimator {
     private RowSizeEstimator() {}
 

@@ -18,6 +18,9 @@ package com.oceanbase.tools.datamocker.config;
 
 import java.util.Map;
 
+/**
+ * 生成器参数提取工具。从参数映射表中安全地提取字符串、整数和长整数类型的参数值。
+ */
 public class GeneratorParamUtil {
 
     public static String getString(Map<String, Object> m, String key, String defVal) {

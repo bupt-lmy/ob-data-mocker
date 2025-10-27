@@ -16,8 +16,9 @@
 
 package com.oceanbase.tools.datamocker.agent;
 
-import java.util.List;
-
+/**
+ * LLM API 响应数据模型。封装从 DeepSeek API 返回的聊天完成结果。
+ */
 public class ChatResponse {
     public java.util.List<Choice> choices;
 

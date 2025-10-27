@@ -15,6 +15,10 @@
  */
 // 可选：极简 tuple 计数器
 package com.oceanbase.tools.datamocker.agent;
+
+/**
+ * SQL 元组计数工具。通过统计左括号个数粗略估算 SQL 中生成的数据行数。
+ */
 public final class SqlTupleCounter {
     private SqlTupleCounter(){}
     public static int countTuples(String sql){

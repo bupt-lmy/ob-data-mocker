@@ -88,7 +88,7 @@ public class ObMockerFactory {
         // ======= 新增：LLM 选路（在工厂内判断）=======
         LlmConfig llm = (taskConfig == null) ? null : taskConfig.getLlmConfig();
         if (llm != null && Boolean.TRUE.equals(llm.getEnabled())) {
-            return createLlmCompletedMocker(scheduler, llm);
+            return createLlmBasedMocker(scheduler, llm);
         }
         // ======= 原有分支（老路径）=======
         DataSource dataSource = null;
@@ -115,13 +115,16 @@ public class ObMockerFactory {
      * LLM 分支：先生成 SQL 文件，再返回一个“空 Dispatcher”的 ObDataMocker。
      * 调用 start() 后会立即完成，得到一个“完成型” MockContext。
      */
-    private ObDataMocker createLlmCompletedMocker(@NonNull AbstractScheduler scheduler, @NonNull LlmConfig llm) {
+    private ObDataMocker createLlmBasedMocker(@NonNull AbstractScheduler scheduler, @NonNull LlmConfig llm) {
         String logDir = this.taskConfig.getLogDir();
         MDC.put("mocktask.workspace", logDir);
         try {
             // 1) 先做 LLM 生成（直接写盘）
             String taskConfigPath = req(llm.getTaskConfigPath(), "llmMode.taskConfigPath");
-            String apiKey = req(llm.getApiKey(), "llmMode.apiKey");
+            String apiKey = System.getenv("MODEL_API_KEY");//从环境变量中读取模型APIKEY
+            if (apiKey == null || apiKey.trim().isEmpty()) {
+                throw new IllegalArgumentException("API Key not found. Please set the DEEPSEEK_API_KEY environment variable.");
+            }
             String endpoint = (llm.getEndpoint() == null || llm.getEndpoint().isEmpty())
                     ? "https://api.deepseek.com/chat/completions"
                     : llm.getEndpoint();

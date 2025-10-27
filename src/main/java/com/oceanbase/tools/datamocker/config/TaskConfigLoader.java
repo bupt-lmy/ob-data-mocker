@@ -6,6 +6,9 @@ import com.google.gson.stream.JsonReader;
 
 import java.io.FileReader;
 
+/**
+ * 任务配置加载工具。从 JSON 文件中加载并反序列化 TaskConfig 对象。
+ */
 public class TaskConfigLoader {
     public static TaskConfig load(String path) throws Exception {
         Gson gson = new GsonBuilder()

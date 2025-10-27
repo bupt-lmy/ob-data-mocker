@@ -30,12 +30,6 @@ public class LlmConfig {
 
     private String taskConfigPath;    // 你的 TaskConfig JSON（如：emp_task.json）
 
-    public String getApiKey() {
-        return apiKey;
-    }
-
-
-    private String apiKey;            // DeepSeek API Key
 
     public String getEndpoint() {
         return endpoint;

@@ -19,6 +19,9 @@ package com.oceanbase.tools.datamocker.agent;
 
 import com.oceanbase.tools.datamocker.config.TaskConfig;
 
+/**
+ * 非流式分页 SQL 生成器。通过多次分批调用 LLM API 生成完整的事务包裹 SQL 脚本。
+ */
 public class SqlPagedGenerator {
 
     /**

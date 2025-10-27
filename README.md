@@ -187,8 +187,7 @@ CREATE TABLE "EMP" (
   "llmConfig": {
     "enabled": true,
     "taskConfigPath": "emp_task.json",
-    "apiKey": "你的apikey",
-    "endpoint": "https://api.deepseek.com/chat/completions",
+    "endpoint": "https://api.deepseek.com/chat/completions",//注意：此处需要在系统环境变量中设置MODEL_API_KEY="your-api-key"
     "timeoutSeconds": 300
   }
   "taskName": null,

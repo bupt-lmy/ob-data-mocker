@@ -17,6 +17,9 @@
 // SqlStreamSanitizer.java
 package com.oceanbase.tools.datamocker.agent;
 
+/**
+ * 流式内容清洗工具。清洗 LLM 流式返回的增量内容中的 Markdown 标记和噪声。
+ */
 public final class SqlStreamSanitizer {
     private SqlStreamSanitizer(){}
 

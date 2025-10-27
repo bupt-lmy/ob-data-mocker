@@ -18,9 +18,11 @@ package com.oceanbase.tools.datamocker.agent;
 
 import java.io.File;
 import java.io.FileWriter;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * SQL 输出处理工具。用于清洗 LLM 输出、写入文件和验证 SQL 格式。
+ */
 public class SqlOutputUtil {
 
     // 清洗: 去除```和非SQL噪声, 保留BEGIN/COMMIT/INSERT/SET/--注释等

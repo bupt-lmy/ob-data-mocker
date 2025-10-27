@@ -6,11 +6,12 @@ import com.oceanbase.tools.datamocker.config.TaskConfig;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
-import java.nio.charset.StandardCharsets;
 
+/**
+ * 流式分页 SQL 生成器。通过流式方式分批调用 LLM API，实时生成和写盘 SQL 脚本。
+ */
 public class SqlStreamingPagedGenerator {
 
-    private char lastWrittenChar = '\n';          // 全局/成员：上一次写入的最后字符
     boolean firstDeltaInThisCall = true; // 本次分页的第一块流式内容
 
 

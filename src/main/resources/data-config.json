@@ -67,7 +67,6 @@
   "llmConfig": {
     "enabled": true,
     "taskConfigPath": "emp_task.json",//示例数据库配置文件
-    "apiKey": "yourdeepseekapi",
     "endpoint": "https://api.deepseek.com/chat/completions",
     "timeoutSeconds": 300
   }
